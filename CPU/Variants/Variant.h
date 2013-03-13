@@ -1,0 +1,62 @@
+#pragma once
+
+class Variant {
+	public:
+		virtual unsigned int getP1DIR() = 0;
+		virtual unsigned int getP1IE() = 0;
+		virtual unsigned int getP1IES() = 0;
+		virtual unsigned int getP1IFG() = 0;
+		virtual unsigned int getP1IN() = 0;
+		virtual unsigned int getP1OUT() = 0;
+		virtual unsigned int getP1REN() = 0;
+		virtual unsigned int getP1SEL() = 0;
+		virtual unsigned int getP2DIR() = 0;
+		virtual unsigned int getP2IE() = 0;
+		virtual unsigned int getP2IES() = 0;
+		virtual unsigned int getP2IFG() = 0;
+		virtual unsigned int getP2IN() = 0;
+		virtual unsigned int getP2OUT() = 0;
+		virtual unsigned int getP2REN() = 0;
+		virtual unsigned int getP2SEL() = 0;
+		virtual unsigned int getP3DIR() = 0;
+		virtual unsigned int getP3IN() = 0;
+		virtual unsigned int getP3OUT() = 0;
+		virtual unsigned int getP3REN() = 0;
+		virtual unsigned int getP3SEL() = 0;
+		virtual unsigned int getP4DIR() = 0;
+		virtual unsigned int getP4IN() = 0;
+		virtual unsigned int getP4OUT() = 0;
+		virtual unsigned int getP4REN() = 0;
+		virtual unsigned int getP4SEL() = 0;
+		virtual unsigned int getP5DIR() = 0;
+		virtual unsigned int getP5IN() = 0;
+		virtual unsigned int getP5OUT() = 0;
+		virtual unsigned int getP5REN() = 0;
+		virtual unsigned int getP5SEL() = 0;
+		virtual unsigned int getP6DIR() = 0;
+		virtual unsigned int getP6IN() = 0;
+		virtual unsigned int getP6OUT() = 0;
+		virtual unsigned int getP6REN() = 0;
+		virtual unsigned int getP6SEL() = 0;
+		virtual unsigned int getP7DIR() = 0;
+		virtual unsigned int getP7IN() = 0;
+		virtual unsigned int getP7OUT() = 0;
+		virtual unsigned int getP7REN() = 0;
+		virtual unsigned int getP7SEL() = 0;
+		virtual unsigned int getP8DIR() = 0;
+		virtual unsigned int getP8IN() = 0;
+		virtual unsigned int getP8OUT() = 0;
+		virtual unsigned int getP8REN() = 0;
+		virtual unsigned int getP8SEL() = 0;
+		virtual unsigned int getP9DIR() = 0;
+		virtual unsigned int getP9IN() = 0;
+		virtual unsigned int getP9OUT() = 0;
+		virtual unsigned int getP9REN() = 0;
+		virtual unsigned int getP9SEL() = 0;
+		virtual unsigned int getP10DIR() = 0;
+		virtual unsigned int getP10IN() = 0;
+		virtual unsigned int getP10OUT() = 0;
+		virtual unsigned int getP10REN() = 0;
+		virtual unsigned int getP10SEL() = 0;
+
+};
