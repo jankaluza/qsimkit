@@ -35,6 +35,29 @@ void RegisterSet::addRegister(const std::string &name, uint16_t value, const std
 	m_registers.push_back(reg);
 }
 
+void RegisterSet::addDefaultRegisters() {
+	addRegister("PC", 0);
+	addRegister("SP", 0);
+	addRegister("R2", 0);
+	addRegister("R3", 0);
+	addRegister("R4", 0);
+	addRegister("R5", 0);
+	addRegister("R6", 0);
+	addRegister("R7", 0);
+	addRegister("R8", 0);
+	addRegister("R9", 0);
+	addRegister("R10", 0);
+	addRegister("R11", 0);
+	addRegister("R12", 0);
+	addRegister("R13", 0);
+	addRegister("R14", 0);
+	addRegister("R15", 0);
+}
+
 Register *RegisterSet::operator[](unsigned int reg) {
+	return m_registers[reg];
+}
+
+Register *RegisterSet::get(unsigned int reg) {
 	return m_registers[reg];
 }

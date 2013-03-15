@@ -19,27 +19,27 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string>
-#include <vector>
-
+class _msp430_instruction;
 class RegisterSet;
+class Memory;
 
-class Memory {
+typedef double (*InstructionCallback) (RegisterSet *, Memory *);
+
+typedef enum {
+	Instruction1,
+	InstructionCond,
+	Instruction2,
+} InstructionType;
+
+void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction);
+
+class _msp430_instruction {
 	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
-
-		bool loadA43(const std::string &data, RegisterSet *reg);
-
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
-
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
-
-	private:
-		std::vector<uint8_t> m_memory;
+		_msp430_instruction(const char *name, InstructionType type, unsigned int opcode, InstructionCallback callback);
+		const char *name;
+		InstructionCallback callback;
 };
+
+#define MSP430_INSTRUCTION(NAME, TYPE, OPCODE, CALLBACK) \
+	static const char *instruction_name_##OPCODE = NAME;\
+	_msp430_instruction _msp430_instruction_##OPCODE(instruction_name_##OPCODE, TYPE, OPCODE, CALLBACK);

@@ -17,45 +17,38 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
+#include "CPU/Instructions/IndexedArgument.h"
 #include "CPU/Memory/Register.h"
+#include "CPU/Memory/Memory.h"
 
-Register::Register(const std::string &name, uint16_t value, const std::string &desc) :
-	m_value(value), m_name(name), m_desc(desc) { }
+IndexedArgument::IndexedArgument(Memory *mem, Register *reg, uint16_t offset) :
+	m_reg(reg), m_offset(offset), m_mem(mem) { }
 
-Register::~Register() {
+IndexedArgument::~IndexedArgument() {
 
 }
 
-uint16_t Register::get() {
-	return m_value;
+uint16_t IndexedArgument::get() {
+	return m_mem->get(m_reg->getBigEndian() + m_offset);
 }
 
-uint16_t Register::getBigEndian() {
-	uint16_t w;
-	uint8_t *ptr = (uint8_t *) &w;
-	uint8_t *ptr2 = (uint8_t *) &m_value;
-	*ptr++ = *(ptr2 + 1);
-	*ptr++ = *ptr2;
-	return w;
+uint16_t IndexedArgument::getBigEndian() {
+	return m_mem->getBigEndian(m_reg->getBigEndian() + m_offset);
 }
 
-void Register::set(uint16_t value) {
-	m_value = value;
+void IndexedArgument::set(uint16_t value) {
+	m_mem->set(m_reg->getBigEndian() + m_offset, value);
 }
 
-void Register::setBigEndian(uint16_t value) {
-	uint8_t *ptr = (uint8_t *) &m_value;
-	uint8_t *ptr2 = (uint8_t *) &value;
-	*ptr++ = *(ptr2 + 1);
-	*ptr++ = *ptr2;
+void IndexedArgument::setBigEndian(uint16_t value) {
+	m_mem->setBigEndian(m_reg->getBigEndian() + m_offset, value);
 }
 
-uint8_t Register::getByte() {
-	return (uint8_t) m_value;
+uint8_t IndexedArgument::getByte() {
+	return m_mem->getByte(m_reg->getBigEndian() + m_offset);
 }
 
-void Register::setByte(uint8_t value) {
-	uint8_t *ptr = (uint8_t *) &m_value;
-	*ptr = value;
+void IndexedArgument::setByte(uint8_t value) {
+	m_mem->setByte(m_reg->getBigEndian() + m_offset, value);
 }
 

@@ -2,6 +2,8 @@
 #include <cppunit/extensions/HelperMacros.h>
 
 #include "CPU/Memory/Memory.h"
+#include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
 
 class MemoryTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(MemoryTest);
@@ -19,6 +21,8 @@ class MemoryTest : public CPPUNIT_NS :: TestFixture{
 
 		void loadA43() {
 			Memory m(120000);
+			RegisterSet r;
+			r.addRegister("PC", 0);
 
 			std::string data =
 				":10F0000031400003B240805A20013F4000000F937E\r\n"
@@ -38,9 +42,15 @@ class MemoryTest : public CPPUNIT_NS :: TestFixture{
 				":00000001FF\r\n";
 
 
-			bool ret = m.loadA43(data);
+			bool ret = m.loadA43(data, &r);
 			CPPUNIT_ASSERT_EQUAL(true, ret);
-			CPPUNIT_ASSERT_EQUAL((uint8_t) 4, m[61552]); // 0xF070
+			CPPUNIT_ASSERT_EQUAL((uint8_t) 4, m.getByte(61552)); // 0xF070
+			// little endian...
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 1024, m.get(61552)); // 0xF070
+			// ... big endian
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 4, m.getBigEndian(61552)); // 0xF070
+			// check if PC is set properly
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 61440, r[0]->get()); // 0xF000
 		}
 };
 

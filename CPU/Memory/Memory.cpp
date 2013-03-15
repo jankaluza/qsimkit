@@ -18,6 +18,8 @@
  **/
 
 #include "CPU/Memory/Memory.h"
+#include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
 
 #include <iostream>
 #include <sstream>
@@ -56,7 +58,7 @@ Memory::~Memory() {
 		LOAD_DIGIT; \
 		X = hexToInt(byte);
 
-bool Memory::loadA43(const std::string &data) {
+bool Memory::loadA43(const std::string &data, RegisterSet *reg) {
 	unsigned int byte_count;
 	unsigned int address;
 	unsigned int record_type;
@@ -87,6 +89,7 @@ bool Memory::loadA43(const std::string &data) {
 				}
 				LOAD_2BYTES(default_ip);
 				LOAD_2BYTES(default_ip);
+				reg->get(0)->set(default_ip);
 				break;
 			case 1:
 				// We have reached End of File
@@ -100,7 +103,39 @@ bool Memory::loadA43(const std::string &data) {
 	return false;
 }
 
-uint8_t Memory::operator[](unsigned int offset) {
-	return m_memory[offset];
+uint16_t Memory::get(uint16_t address) {
+	uint16_t w;
+	uint8_t *ptr = (uint8_t *) &w;
+	*ptr++ = m_memory[address + 1];
+	*ptr++ = m_memory[address];
+	return w;
+}
+
+uint16_t Memory::getBigEndian(uint16_t address) {
+	uint16_t w;
+	uint8_t *ptr = (uint8_t *) &w;
+	*ptr++ = m_memory[address];
+	*ptr++ = m_memory[address + 1];
+	return w;
+}
+
+void Memory::set(uint16_t address, uint16_t value) {
+	uint8_t *ptr2 = (uint8_t *) &value;
+	m_memory[address] = *(ptr2 + 1);
+	m_memory[address + 1] = *ptr2;
+}
+
+void Memory::setBigEndian(uint16_t address, uint16_t value) {
+	uint8_t *ptr2 = (uint8_t *) &value;
+	m_memory[address] = *(ptr2);
+	m_memory[address + 1] = *(ptr2 + 1);
+}
+
+uint8_t Memory::getByte(uint16_t address) {
+	return m_memory[address];
+}
+
+void Memory::setByte(uint16_t address, uint8_t value) {
+	m_memory[address] = value;
 }
 

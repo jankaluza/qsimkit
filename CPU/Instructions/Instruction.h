@@ -23,23 +23,29 @@
 #include <string>
 #include <vector>
 
-class RegisterSet;
+#include "CPU/Instructions/InstructionDecoder.h"
 
-class Memory {
+class InstructionArgument;
+
+class Instruction {
 	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+		Instruction ();
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+		virtual ~Instruction();
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
+		void setSrc(InstructionArgument *src);
 
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+		InstructionArgument *getSrc();
+
+		void setDst(InstructionArgument *dst);
+
+		InstructionArgument *getDst();
+
+		InstructionType type;
+		uint8_t opcode;
+		bool bw;
 
 	private:
-		std::vector<uint8_t> m_memory;
+		InstructionArgument *m_src;
+		InstructionArgument *m_dst;
 };

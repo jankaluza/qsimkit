@@ -6,40 +6,37 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "CPU/Instructions/InstructionManager.h"
 
-#include <stdint.h>
-#include <string>
-#include <vector>
+#include <iostream>
+#include <sstream>
+#include <map>
 
-class RegisterSet;
+#define TYPE_OFFSET 100
 
-class Memory {
-	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+static std::map<unsigned int, _msp430_instruction *> *instructions;
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction) {
+	if (instructions == 0) {
+		instructions = new std::map<unsigned int, _msp430_instruction *>;
+	}
+	(*instructions)[((int) type) * TYPE_OFFSET + opcode] = instruction;
+	std::cout << "Loaded instruction: " << (*instructions)[((int) type) * TYPE_OFFSET + opcode]->name << "\n";
+}
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
-
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
-
-	private:
-		std::vector<uint8_t> m_memory;
-};
+_msp430_instruction::_msp430_instruction(const char *name, InstructionType type, unsigned int opcode, InstructionCallback callback) {
+	this->name = name;
+	this->callback = callback;
+	addInstruction(type, opcode, this);
+}

@@ -6,40 +6,54 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "CPU/Instructions/Instruction.h"
+#include "CPU/Instructions/InstructionArgument.h"
+#include "CPU/Memory/Register.h"
 
-#include <stdint.h>
-#include <string>
-#include <vector>
 
-class RegisterSet;
+Instruction::Instruction () : m_src(0), m_dst(0) {
 
-class Memory {
-	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+}
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+Instruction::~Instruction() {
+	if (m_src && dynamic_cast<Register *>(m_src) == 0) {
+		delete m_src;
+	}
+	if (m_dst && dynamic_cast<Register *>(m_dst) == 0) {
+		delete m_dst;
+	}
+}
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
+void Instruction::setSrc(InstructionArgument *src) {
+	if (m_src && dynamic_cast<Register *>(m_src) == 0) {
+		delete m_src;
+	}
+	m_src = src;
+}
 
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+InstructionArgument *Instruction::getSrc() {
+	return m_src;
+}
 
-	private:
-		std::vector<uint8_t> m_memory;
-};
+void Instruction::setDst(InstructionArgument *dst) {
+	if (m_dst && dynamic_cast<Register *>(m_dst) == 0) {
+		delete m_dst;
+	}
+	m_dst = dst;
+}
+
+InstructionArgument *Instruction::getDst() {
+	return m_dst;
+}
+

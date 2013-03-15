@@ -31,7 +31,7 @@ void addVariant(_msp430_variant *variant) {
 		variants = new std::map<const char *, _msp430_variant *>;
 	}
 	(*variants)[variant->name] = variant;
-	std::cout << (*variants)[variant->name]->name << "\n";
+// 	std::cout << "Loaded variant: " << (*variants)[variant->name]->name << "\n";
 }
 
 _msp430_variant::_msp430_variant(const char *name, Variant *(*fnc)()) {

@@ -22,16 +22,20 @@
 #include <stdint.h>
 #include <string>
 
-class Register {
+#include "CPU/Instructions/InstructionArgument.h"
+
+class Register : public InstructionArgument {
 	public:
 		Register(const std::string &name, uint16_t value, const std::string &desc = "");
 		virtual ~Register();
 
-		void set(uint16_t value);
-
-		Register *operator=(uint16_t value);
-
 		uint16_t get();
+		uint16_t getBigEndian();
+		void set(uint16_t value);
+		void setBigEndian(uint16_t value);
+
+		uint8_t getByte();
+		void setByte(uint8_t value);
 
 	private:
 		uint16_t m_value;

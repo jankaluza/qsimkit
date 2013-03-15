@@ -21,25 +21,27 @@
 
 #include <stdint.h>
 #include <string>
-#include <vector>
 
-class RegisterSet;
+#include "CPU/Instructions/InstructionArgument.h"
 
-class Memory {
+class Register;
+class Memory;
+
+class IndirectAutoincrementArgument : public InstructionArgument {
 	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+		IndirectAutoincrementArgument(Memory *mem, Register *reg, bool bw);
+		virtual ~IndirectAutoincrementArgument();
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+		uint16_t get();
+		uint16_t getBigEndian();
+		void set(uint16_t value);
+		void setBigEndian(uint16_t value);
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
-
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+		uint8_t getByte();
+		void setByte(uint8_t value);
 
 	private:
-		std::vector<uint8_t> m_memory;
+		Register *m_reg;
+		bool m_bw;
+		Memory *m_mem;
 };

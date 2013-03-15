@@ -1,0 +1,7 @@
+Makefile
+*.cmake
+simkit_test
+*.so
+*.a
+CMakeFiles
+CMakeCache.txt
