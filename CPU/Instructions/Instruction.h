@@ -44,6 +44,7 @@ class Instruction {
 		InstructionType type;
 		uint8_t opcode;
 		bool bw;
+		int16_t offset;
 
 	private:
 		InstructionArgument *m_src;

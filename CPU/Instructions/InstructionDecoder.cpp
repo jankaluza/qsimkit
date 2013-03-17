@@ -175,8 +175,18 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 	if (IS_INSTRUCTION1(data)) {
 		instruction->type = Instruction1;
 	}
-	else if (IS_INSTRUCTION_COND(data)) {
+	else if ((data & 0xe000) == 0x2000) {
 		instruction->type = InstructionCond;
+		instruction->opcode = (data >>10) & 7;
+
+		int16_t offset = (data & 0x3ff) << 1; // PC offset * 2
+		// negative offset
+		if (offset & 0x400) {
+			offset = -((~offset + 1) & 0x7ff);
+		}
+
+		instruction->offset = offset;
+		cycles += 1;
 	}
 	else {
 		instruction->type = Instruction2;

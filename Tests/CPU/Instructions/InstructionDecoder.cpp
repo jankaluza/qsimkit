@@ -17,6 +17,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(decodeMOVAbsoluteToImmediate);
 	CPPUNIT_TEST(decodeMOVAutoincrementToIndexed);
 	CPPUNIT_TEST(decodeMOVIndirectToAbsolute);
+	CPPUNIT_TEST(decodeJZ);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -229,6 +230,27 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) 0x0120, (int) r->get(15)->getBigEndian());
 			CPPUNIT_ASSERT(i->getDst());
 			CPPUNIT_ASSERT_EQUAL((int) 50, (int) i->getDst()->getBigEndian());
+		}
+
+		void decodeJZ() {
+			std::string data =
+				// 05 24       	jz	$+12     	;abs 0xf01c
+				":10F00000052421002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			m->setBigEndian(0x0120, 55);
+			r->get(15)->setBigEndian(0x0120);
+
+			m->setBigEndian(0x0021, 50);
+
+			m->loadA43(data, r);
+			int inc = d->decodeCurrentInstruction(i);
+
+			CPPUNIT_ASSERT_EQUAL(2, inc);
+			CPPUNIT_ASSERT_EQUAL((int) InstructionCond, (int) i->type);
+			CPPUNIT_ASSERT_EQUAL((int) 1, (int) i->opcode);
+			CPPUNIT_ASSERT_EQUAL((int) 10, (int) i->offset);
 		}
 
 
