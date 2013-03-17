@@ -66,11 +66,11 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 				break;
 			// Const 4
 			case 2:
-				arg = new ConstantArgument(4);
+				arg = new ConstantArgument(0x0400);
 				break;
 			// Const 8
 			case 3:
-				arg = new ConstantArgument(8);
+				arg = new ConstantArgument(0x0800);
 				break;
 			default:
 				break;
@@ -84,15 +84,15 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 				break;
 			// Const 1
 			case 1:
-				arg = new ConstantArgument(1);
+				arg = new ConstantArgument(0x0100);
 				break;
 			// Const 2
 			case 2:
-				arg = new ConstantArgument(2);
+				arg = new ConstantArgument(0x0200);
 				break;
 			// Const -1
 			case 3:
-				arg = new ConstantArgument(-1);
+				arg = new ConstantArgument(0xffff);
 				break;
 			default:
 				break;
@@ -172,10 +172,21 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 	int cycles = 1; // instruction fetch
 	pc += 2;
 
-	if (IS_INSTRUCTION1(data)) {
+	if ((data & 0xf000) == 0x1000) {
+		// Single operand instructions
 		instruction->type = Instruction1;
+		instruction->opcode = (data >>7) & 7;
+		uint8_t dest_reg = data & 15;
+		uint8_t ad = (data >> 4) & 3;
+		bool bw = (data >> 6) & 1;
+
+		InstructionArgument *dst = getSourceArg(cycles, pc, bw, ad, dest_reg);
+		instruction->setDst(dst);
+
+		instruction->bw = bw;
 	}
 	else if ((data & 0xe000) == 0x2000) {
+		// Jump instructions
 		instruction->type = InstructionCond;
 		instruction->opcode = (data >>10) & 7;
 
@@ -189,6 +200,7 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 		cycles += 1;
 	}
 	else {
+		// Two operand instructions
 		instruction->type = Instruction2;
 		instruction->opcode = data >>12;
 		uint8_t dest_reg = data & 15;

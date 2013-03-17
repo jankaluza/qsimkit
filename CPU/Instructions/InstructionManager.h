@@ -22,8 +22,9 @@
 class _msp430_instruction;
 class RegisterSet;
 class Memory;
+class Instruction;
 
-typedef double (*InstructionCallback) (RegisterSet *, Memory *);
+typedef int (*InstructionCallback) (Instruction *instruction);
 
 typedef enum {
 	Instruction1,
@@ -32,6 +33,8 @@ typedef enum {
 } InstructionType;
 
 void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction);
+
+int executeInstruction(Instruction *instruction);
 
 class _msp430_instruction {
 	public:

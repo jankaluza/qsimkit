@@ -18,35 +18,32 @@
  **/
 
 #include "CPU/Instructions/InstructionManager.h"
+#include "CPU/Instructions/InstructionArgument.h"
 #include "CPU/Instructions/Instruction.h"
 
 #include <iostream>
 #include <sstream>
 #include <map>
 
-#define TYPE_OFFSET 100
-
-static std::map<unsigned int, _msp430_instruction *> *instructions;
-
-void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction) {
-	if (instructions == 0) {
-		instructions = new std::map<unsigned int, _msp430_instruction *>;
+static int execMOV(Instruction *i) {
+	if (i->bw) {
+		i->getDst()->setByte(i->getSrc()->getByte());
 	}
-	(*instructions)[((int) type) * TYPE_OFFSET + opcode] = instruction;
-	std::cout << "Loaded instruction: " << (*instructions)[((int) type) * TYPE_OFFSET + opcode]->name << "\n";
-}
-
-int executeInstruction(Instruction *i) {
-	std::map<unsigned int, _msp430_instruction *>::iterator it = instructions->find(((int) i->type) * TYPE_OFFSET + i->opcode);
-	if (it == instructions->end()) {
-		return -1;
+	else {
+		i->getDst()->set(i->getSrc()->get());
 	}
-
-	return it->second->callback(i);
+	return 0;
 }
 
-_msp430_instruction::_msp430_instruction(const char *name, InstructionType type, unsigned int opcode, InstructionCallback callback) {
-	this->name = name;
-	this->callback = callback;
-	addInstruction(type, opcode, this);
+static int execADD(Instruction *i) {
+	if (i->bw) {
+		i->getDst()->setByte(i->getDst()->getByte() + i->getSrc()->getByte());
+	}
+	else {
+		i->getDst()->setBigEndian(i->getDst()->getBigEndian() + i->getSrc()->getBigEndian());
+	}
+	return 0;
 }
+
+MSP430_INSTRUCTION("mov", Instruction2, 4, &execMOV);
+MSP430_INSTRUCTION("add", Instruction2, 5, &execADD);

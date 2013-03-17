@@ -20,6 +20,9 @@
 #include "CPU/Instructions/MemoryArgument.h"
 #include "CPU/Memory/Memory.h"
 
+#include <iostream>
+#include <sstream>
+
 MemoryArgument::MemoryArgument(Memory *mem, uint16_t address) :
 	m_mem(mem), m_address(address) { }
 

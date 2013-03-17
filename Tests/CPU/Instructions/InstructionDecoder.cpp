@@ -18,6 +18,9 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(decodeMOVAutoincrementToIndexed);
 	CPPUNIT_TEST(decodeMOVIndirectToAbsolute);
 	CPPUNIT_TEST(decodeJZ);
+	CPPUNIT_TEST(decodeJNC);
+	CPPUNIT_TEST(decodeCALL);
+	CPPUNIT_TEST(decodeRETI);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -57,7 +60,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) Instruction2, (int) i->type);
 			CPPUNIT_ASSERT_EQUAL((int) 5, (int) i->opcode);
 			CPPUNIT_ASSERT(i->getSrc());
-			CPPUNIT_ASSERT_EQUAL((int) 1, (int) i->getSrc()->get());
+			CPPUNIT_ASSERT_EQUAL((int) 1, (int) i->getSrc()->getBigEndian());
 			CPPUNIT_ASSERT(i->getDst());
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getDst()->get());
 		}
@@ -239,11 +242,6 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			m->setBigEndian(0x0120, 55);
-			r->get(15)->setBigEndian(0x0120);
-
-			m->setBigEndian(0x0021, 50);
-
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
 
@@ -251,6 +249,55 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) InstructionCond, (int) i->type);
 			CPPUNIT_ASSERT_EQUAL((int) 1, (int) i->opcode);
 			CPPUNIT_ASSERT_EQUAL((int) 10, (int) i->offset);
+		}
+
+		void decodeJNC() {
+			std::string data =
+				// fc 2b       	jnc	$-6      	;abs 0xf03c
+				":10F00000FC2B21002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			m->loadA43(data, r);
+			int inc = d->decodeCurrentInstruction(i);
+
+			CPPUNIT_ASSERT_EQUAL(2, inc);
+			CPPUNIT_ASSERT_EQUAL((int) InstructionCond, (int) i->type);
+			CPPUNIT_ASSERT_EQUAL((int) 2, (int) i->opcode);
+			CPPUNIT_ASSERT_EQUAL((int) -8, (int) i->offset);
+		}
+
+		void decodeCALL() {
+			std::string data =
+				// b0 12 36 f0 	call	#0xf036	
+				":10F00000B01236F02001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			m->loadA43(data, r);
+			int inc = d->decodeCurrentInstruction(i);
+
+			CPPUNIT_ASSERT_EQUAL(2, inc);
+			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
+			CPPUNIT_ASSERT_EQUAL((int) 5, (int) i->opcode);
+			CPPUNIT_ASSERT(i->getDst());
+			CPPUNIT_ASSERT_EQUAL((int) 0xf036, (int) i->getDst()->getBigEndian());
+		}
+
+		void decodeRETI() {
+			std::string data =
+				// 00 13       	reti
+				":10F00000001336F02001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			m->loadA43(data, r);
+			int inc = d->decodeCurrentInstruction(i);
+
+			CPPUNIT_ASSERT_EQUAL(1, inc);
+			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
+			CPPUNIT_ASSERT_EQUAL((int) 6, (int) i->opcode);
+// 			CPPUNIT_ASSERT(!i->getDst());
 		}
 
 
