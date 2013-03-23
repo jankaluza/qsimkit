@@ -166,7 +166,7 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 
 int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 	Register *pc_reg = m_reg->get(0);
-	uint16_t pc = pc_reg->get();
+	uint16_t pc = pc_reg->getBigEndian();
 
 	uint16_t data = m_mem->getBigEndian(pc);
 	int cycles = 1; // instruction fetch
@@ -190,13 +190,13 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 		instruction->type = InstructionCond;
 		instruction->opcode = (data >>10) & 7;
 
-		int16_t offset = (data & 0x3ff) << 1; // PC offset * 2
+		int16_t offset = ((data & 0x3ff) << 1); // PC offset * 2
 		// negative offset
 		if (offset & 0x400) {
 			offset = -((~offset + 1) & 0x7ff);
 		}
 
-		instruction->offset = offset;
+		instruction->offset = offset; // + 2; // PC_new = PC_old + offset * 2 + 2
 		cycles += 1;
 	}
 	else {
@@ -219,7 +219,7 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 		instruction->bw = bw;
 	}
 
-	pc_reg->set(pc);
+	pc_reg->setBigEndian(pc);
 
 	return cycles;
 }

@@ -24,6 +24,17 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+/// Status register bits
+#define SR_V 256
+#define SR_SCG1 128
+#define SR_SCG0 64
+#define SR_OSC_OFF 32
+#define SR_CPU_OFF 16
+#define SR_GIE 8
+#define SR_N 4
+#define SR_Z 2
+#define SR_C 1
+
 class Register : public InstructionArgument {
 	public:
 		Register(const std::string &name, uint16_t value, const std::string &desc = "");
@@ -36,6 +47,9 @@ class Register : public InstructionArgument {
 
 		uint8_t getByte();
 		void setByte(uint8_t value);
+
+		bool isBitSet(uint16_t bit);
+		bool setBit(uint16_t bit, bool value = true);
 
 	private:
 		uint16_t m_value;

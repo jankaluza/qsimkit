@@ -51,7 +51,7 @@ void ConstantArgument::setBigEndian(uint16_t value) {
 }
 
 uint8_t ConstantArgument::getByte() {
-	return (uint8_t) m_value;
+	return (uint8_t) getBigEndian();
 }
 
 void ConstantArgument::setByte(uint8_t value) {

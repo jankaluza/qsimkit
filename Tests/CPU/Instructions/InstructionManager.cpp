@@ -12,6 +12,8 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 	CPPUNIT_TEST_SUITE(InstructionManagerTest);
 	CPPUNIT_TEST(executeADD1ToRegister);
 	CPPUNIT_TEST(executeADDRegisterToRegister);
+	CPPUNIT_TEST(executeADDRegisterToRegisterOverflow);
+	CPPUNIT_TEST(executeADDRegisterToRegisterZero);
 	CPPUNIT_TEST(executeMOVConstantToRegister);
 	CPPUNIT_TEST(executeMOVImmediateToRegister);
 	CPPUNIT_TEST(executeMOV760r1MOVCLR);
@@ -22,6 +24,10 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 	CPPUNIT_TEST(executeJNC);
 	CPPUNIT_TEST(executeCALL);
 	CPPUNIT_TEST(executeRETI);
+	CPPUNIT_TEST(executeCMPPositive);
+	CPPUNIT_TEST(executeCMPZero);
+	CPPUNIT_TEST(executeCMPNegative);
+	CPPUNIT_TEST(executeCMPCarry);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -55,9 +61,10 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			r->get(11)->setBigEndian(55);
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
 
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
 			CPPUNIT_ASSERT_EQUAL((int) 56, (int) r->get(11)->getBigEndian());
 		}
 
@@ -68,19 +75,63 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(1)->set(51);
-			r->get(15)->set(55);
+			r->get(1)->setBigEndian(51);
+			r->get(15)->setBigEndian(55);
 
 			m->loadA43(data, r);
-			int inc = d->decodeCurrentInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
 
-			CPPUNIT_ASSERT_EQUAL(1, inc);
-			CPPUNIT_ASSERT_EQUAL((int) Instruction2, (int) i->type);
-			CPPUNIT_ASSERT_EQUAL((int) 5, (int) i->opcode);
-			CPPUNIT_ASSERT(i->getSrc());
-			CPPUNIT_ASSERT_EQUAL((int) 51, (int) i->getSrc()->get());
-			CPPUNIT_ASSERT(i->getDst());
-			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getDst()->get());
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
+			CPPUNIT_ASSERT_EQUAL((int) 51, (int) r->get(1)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int) 106, (int) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+		}
+
+		void executeADDRegisterToRegisterOverflow() {
+			std::string data =
+				// 0f 51       	add	r1,	r15
+				":10F000000F510003B240805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(1)->setBigEndian(32767);
+			r->get(15)->setBigEndian(2);
+
+			m->loadA43(data, r);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
+			CPPUNIT_ASSERT_EQUAL((int) 32767, (int) r->get(1)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) -32767, (int16_t) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+		}
+
+		void executeADDRegisterToRegisterZero() {
+			std::string data =
+				// 0f 51       	add	r1,	r15
+				":10F000000F510003B240805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(1)->setBigEndian(-2);
+			r->get(15)->setBigEndian(2);
+
+			m->loadA43(data, r);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
+			CPPUNIT_ASSERT_EQUAL((int16_t) -2, (int16_t) r->get(1)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
 		}
 
 		void executeMOVConstantToRegister() {
@@ -94,8 +145,9 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) r->get(11)->getBigEndian());
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
 
 			CPPUNIT_ASSERT_EQUAL((int) 0, (int) r->get(11)->getBigEndian());
 		}
@@ -111,8 +163,10 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) r->get(1)->getBigEndian());
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(2, cycles);
 			CPPUNIT_ASSERT_EQUAL((int) 760, (int) r->get(1)->getBigEndian());
 		}
 
@@ -132,11 +186,11 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			m->loadA43(data, r);
 
 			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			executeInstruction(r, m, i);
 			CPPUNIT_ASSERT_EQUAL((int) 760, (int) r->get(1)->getBigEndian());
 
 			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			executeInstruction(r, m, i);
 
 			CPPUNIT_ASSERT_EQUAL((int) 0, (int) r->get(11)->getBigEndian());
 		}
@@ -153,9 +207,10 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) m->getBigEndian(0x0120));
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
 
+			CPPUNIT_ASSERT_EQUAL(5, cycles);
 			CPPUNIT_ASSERT_EQUAL((int) 23168, (int) m->getBigEndian(0x0120));
 		}
 
@@ -175,9 +230,10 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			r->get(1)->setBigEndian(0x0130);
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
-			executeInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
 
+			CPPUNIT_ASSERT_EQUAL(5, cycles);
 			// r15 should be incremented by 2
 			CPPUNIT_ASSERT_EQUAL((int) 0x0122, (int) r->get(15)->getBigEndian());
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) m->getBigEndian(0x0130));
@@ -200,10 +256,11 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL((int) 0xff, (int) m->getByte(0x0021));
 
 			m->loadA43(data, r);
-			d->decodeCurrentInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
 			// write 50 to 0x0021
-			executeInstruction(i);
+			cycles += executeInstruction(r, m, i);
 
+			CPPUNIT_ASSERT_EQUAL(5, cycles);
 			// register not incremented
 			CPPUNIT_ASSERT_EQUAL((int) 0x0120, (int) r->get(15)->getBigEndian());
 			CPPUNIT_ASSERT_EQUAL((int) 0x50ff, (int) m->getBigEndian(0x0020));
@@ -212,34 +269,53 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 
 		void executeJZ() {
 			std::string data =
-				// 05 24       	jz	$+12     	;abs 0xf01c
-				":10F00000052421002001805A20013F4000000F937E\r\n"
-				":040000030000F00009\r\n"
+				// f010: 05 24       	jz	$+12     	;abs 0xf01c
+				":10F01000052421002001805A20013F4000000F937E\r\n"
+				":040000030000F01009\r\n"
 				":00000001FF\r\n";
 
 			m->loadA43(data, r);
-			int inc = d->decodeCurrentInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			r->get(2)->setBit(SR_Z, 0);
+			uint16_t pc = r->get(0)->getBigEndian();
+			executeInstruction(r, m, i);
 
-			CPPUNIT_ASSERT_EQUAL(2, inc);
-			CPPUNIT_ASSERT_EQUAL((int) InstructionCond, (int) i->type);
-			CPPUNIT_ASSERT_EQUAL((int) 1, (int) i->opcode);
-			CPPUNIT_ASSERT_EQUAL((int) 10, (int) i->offset);
+			CPPUNIT_ASSERT_EQUAL(pc, r->get(0)->getBigEndian());
+
+			r->get(2)->setBit(SR_Z, 1);
+			cycles += executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL(2, cycles);
+
+			// PC has been incremented by two during decodeCurrentInstruction,
+			// so we have to decrement here.
+			pc += 12 - 2;
+			CPPUNIT_ASSERT_EQUAL((uint16_t)0xf01c, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL(pc, r->get(0)->getBigEndian());
 		}
 
 		void executeJNC() {
 			std::string data =
-				// fc 2b       	jnc	$-6      	;abs 0xf03c
-				":10F00000FC2B21002001805A20013F4000000F937E\r\n"
-				":040000030000F00009\r\n"
+				//f042: fc 2b       	jnc	$-6      	;abs 0xf03c
+				":10F04200FC2B21002001805A20013F4000000F937E\r\n"
+				":040000030000F04209\r\n"
 				":00000001FF\r\n";
 
 			m->loadA43(data, r);
-			int inc = d->decodeCurrentInstruction(i);
+			r->get(2)->setBit(SR_C, 1);
+			d->decodeCurrentInstruction(i);
+			uint16_t pc = r->get(0)->getBigEndian();
+			executeInstruction(r, m, i);
 
-			CPPUNIT_ASSERT_EQUAL(2, inc);
-			CPPUNIT_ASSERT_EQUAL((int) InstructionCond, (int) i->type);
-			CPPUNIT_ASSERT_EQUAL((int) 2, (int) i->opcode);
-			CPPUNIT_ASSERT_EQUAL((int) -8, (int) i->offset);
+			CPPUNIT_ASSERT_EQUAL(pc, r->get(0)->getBigEndian());
+
+			r->get(2)->setBit(SR_C, 0);
+			executeInstruction(r, m, i);
+
+			// PC has been incremented by two during decodeCurrentInstruction,
+			// so we have to decrement here.
+			pc -= 6 + 2;
+			CPPUNIT_ASSERT_EQUAL((uint16_t)0xf03c, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t)pc, r->get(0)->getBigEndian());
 		}
 
 		void executeCALL() {
@@ -250,30 +326,136 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 				":00000001FF\r\n";
 
 			m->loadA43(data, r);
-			int inc = d->decodeCurrentInstruction(i);
+			int cycles = d->decodeCurrentInstruction(i);
+			uint16_t pc = r->get(0)->getBigEndian();
 
-			CPPUNIT_ASSERT_EQUAL(2, inc);
-			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
-			CPPUNIT_ASSERT_EQUAL((int) 5, (int) i->opcode);
-			CPPUNIT_ASSERT(i->getDst());
-			CPPUNIT_ASSERT_EQUAL((int) 0xf036, (int) i->getDst()->getBigEndian());
+			r->get(1)->setBigEndian(0x0300); // SP
+			cycles += executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(5, cycles);
+			CPPUNIT_ASSERT_EQUAL((uint16_t)0xf036, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t)(0x0300 - 2), r->get(1)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL(pc, m->getBigEndian(0x0300 - 2));
+
 		}
 
 		void executeRETI() {
+			// TODO:
+// 			std::string data =
+// 				// 00 13       	reti
+// 				":10F00000001336F02001805A20013F4000000F937E\r\n"
+// 				":040000030000F00009\r\n"
+// 				":00000001FF\r\n";
+// 
+// 			m->loadA43(data, r);
+// 			int inc = d->decodeCurrentInstruction(i);
+// 
+// 			CPPUNIT_ASSERT_EQUAL(1, inc);
+// 			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
+// 			CPPUNIT_ASSERT_EQUAL((int) 6, (int) i->opcode);
+		}
+
+		void executeCMPPositive() {
 			std::string data =
-				// 00 13       	reti
-				":10F00000001336F02001805A20013F4000000F937E\r\n"
+				//f00e:	0f 93       	tst	r15 = cmp #0, r15
+				":10F000000F9321002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(15)->setBigEndian(1);
+
+			m->loadA43(data, r);
+			int cycles = d->decodeCurrentInstruction(i);
+			cycles += executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(1, cycles);
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+		}
+
+		void executeCMPZero() {
+			std::string data =
+				//f00e:	0f 93       	tst	r15 = cmp #0, r15
+				":10F000000F9321002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(15)->setBigEndian(0);
+
+			m->loadA43(data, r);
+			d->decodeCurrentInstruction(i);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
+		}
+
+		void executeCMPNegative() {
+			std::string data =
+				//f00e:	0f 93       	tst	r15 = cmp #0, r15
+				":10F000000F9321002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(15)->setBigEndian(-1);
+
+			m->loadA43(data, r);
+			d->decodeCurrentInstruction(i);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+		}
+
+		void executeCMPCarry() {
+			std::string data =
+				// f038:	0e 9f       	cmp	r15,	r14	// r14 - r15
+				":10F000000E9F21002001805A20013F4000000F937E\r\n"
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
 			m->loadA43(data, r);
-			int inc = d->decodeCurrentInstruction(i);
+			d->decodeCurrentInstruction(i);
 
-			CPPUNIT_ASSERT_EQUAL(1, inc);
-			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
-			CPPUNIT_ASSERT_EQUAL((int) 6, (int) i->opcode);
+			r->get(15)->setBigEndian(2);
+			r->get(14)->setBigEndian(0);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_C));
+
+			r->get(15)->setBigEndian(2);
+			r->get(14)->setBigEndian(1);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_C));
+
+			r->get(15)->setBigEndian(2);
+			r->get(14)->setBigEndian(2);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_C));
+
+			r->get(15)->setBigEndian(2);
+			r->get(14)->setBigEndian(3);
+			executeInstruction(r, m, i);
+
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_V));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_N));
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_C));
 		}
-
 
 };
 

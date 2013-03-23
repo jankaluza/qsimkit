@@ -89,7 +89,9 @@ bool Memory::loadA43(const std::string &data, RegisterSet *reg) {
 				}
 				LOAD_2BYTES(default_ip);
 				LOAD_2BYTES(default_ip);
-				reg->get(0)->set(default_ip);
+
+				// Default PC is stored as big endian
+				reg->get(0)->setBigEndian(default_ip);
 				break;
 			case 1:
 				// We have reached End of File

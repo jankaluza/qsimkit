@@ -59,3 +59,16 @@ void Register::setByte(uint8_t value) {
 	*ptr = value;
 }
 
+bool Register::isBitSet(uint16_t bit) {
+	return m_value & bit;
+}
+
+bool Register::setBit(uint16_t bit, bool value) {
+	if (value) {
+		m_value = m_value | bit;
+	}
+	else {
+		m_value = m_value & (~bit);
+	}
+}
+

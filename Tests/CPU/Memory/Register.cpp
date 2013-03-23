@@ -7,6 +7,7 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(RegisterTest);
 	CPPUNIT_TEST(setget);
 	CPPUNIT_TEST(setByte);
+	CPPUNIT_TEST(setBit);
 	CPPUNIT_TEST_SUITE_END();
 
 	public:
@@ -21,8 +22,12 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 		void setget() {
 			Register r("R0", 55, "desc");
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 55, r.get());
-			r.set(66);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 66, r.get());
+			r.set(0xff00);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xff00, r.get());
+
+			r.setBigEndian(0xfffc); // -4
+			CPPUNIT_ASSERT_EQUAL((int16_t) -4, (int16_t) r.getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) ((uint32_t) r.getBigEndian() + 4));
 		}
 
 		void setByte() {
@@ -31,6 +36,16 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 			r.setByte(0x04);
 			CPPUNIT_ASSERT_EQUAL((int) 4, (int) r.getByte());
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0204, r.get());
+		}
+
+		void setBit() {
+			Register r("R0", 0x0203, "desc");
+			r.setBit(SR_V, false);
+			CPPUNIT_ASSERT_EQUAL(false, r.isBitSet(SR_V));
+			r.setBit(SR_V, true);
+			CPPUNIT_ASSERT_EQUAL(true, r.isBitSet(SR_V));
+			r.setBit(SR_V, false);
+			CPPUNIT_ASSERT_EQUAL(false, r.isBitSet(SR_V));
 		}
 };
 

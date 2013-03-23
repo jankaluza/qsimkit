@@ -8,6 +8,7 @@
 class MemoryTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(MemoryTest);
 	CPPUNIT_TEST(loadA43);
+	CPPUNIT_TEST(setget);
 	CPPUNIT_TEST_SUITE_END();
 
 	public:
@@ -17,6 +18,23 @@ class MemoryTest : public CPPUNIT_NS :: TestFixture{
 
 		void tearDown (void) {
 
+		}
+
+		void setget() {
+			Memory m(120000);
+			m.setByte(1, 0xff);
+			m.setByte(2, 0x00);
+			CPPUNIT_ASSERT_EQUAL((uint8_t) 0xff, m.getByte(1));
+			CPPUNIT_ASSERT_EQUAL((uint8_t) 0x00, m.getByte(2));
+
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x00ff, m.getBigEndian(1));
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xff00, m.get(1));
+
+			m.set(1, 0xf000);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf000, m.get(1));
+
+			m.setBigEndian(1, 0xf000);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf000, m.getBigEndian(1));
 		}
 
 		void loadA43() {
@@ -50,7 +68,7 @@ class MemoryTest : public CPPUNIT_NS :: TestFixture{
 			// ... big endian
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 4, m.getBigEndian(61552)); // 0xF070
 			// check if PC is set properly
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 61440, r[0]->get()); // 0xF000
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 61440, r[0]->getBigEndian()); // 0xF000
 		}
 };
 

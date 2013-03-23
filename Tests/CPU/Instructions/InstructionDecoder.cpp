@@ -21,6 +21,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(decodeJNC);
 	CPPUNIT_TEST(decodeCALL);
 	CPPUNIT_TEST(decodeRETI);
+	CPPUNIT_TEST(decodeCMP);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -300,6 +301,26 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 // 			CPPUNIT_ASSERT(!i->getDst());
 		}
 
+		void decodeCMP() {
+			std::string data =
+				//f00e:	0f 93       	tst	r15 = cmp #0, r15
+				":10F000000F9321002001805A20013F4000000F937E\r\n"
+				":040000030000F00009\r\n"
+				":00000001FF\r\n";
+
+			r->get(15)->set(55);
+
+			m->loadA43(data, r);
+			int inc = d->decodeCurrentInstruction(i);
+
+			CPPUNIT_ASSERT_EQUAL(1, inc);
+			CPPUNIT_ASSERT_EQUAL((int) Instruction2, (int) i->type);
+			CPPUNIT_ASSERT_EQUAL((int) 9, (int) i->opcode);
+			CPPUNIT_ASSERT(i->getSrc());
+			CPPUNIT_ASSERT_EQUAL((int) 0, (int) i->getSrc()->get());
+			CPPUNIT_ASSERT(i->getDst());
+			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getDst()->get());
+		}
 
 };
 

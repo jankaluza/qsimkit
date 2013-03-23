@@ -24,7 +24,7 @@ class RegisterSet;
 class Memory;
 class Instruction;
 
-typedef int (*InstructionCallback) (Instruction *instruction);
+typedef int (*InstructionCallback) (RegisterSet *reg, Memory *mem, Instruction *instruction);
 
 typedef enum {
 	Instruction1,
@@ -34,7 +34,7 @@ typedef enum {
 
 void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction);
 
-int executeInstruction(Instruction *instruction);
+int executeInstruction(RegisterSet *reg, Memory *mem, Instruction *instruction);
 
 class _msp430_instruction {
 	public:
@@ -45,4 +45,4 @@ class _msp430_instruction {
 
 #define MSP430_INSTRUCTION(NAME, TYPE, OPCODE, CALLBACK) \
 	static const char *instruction_name_##OPCODE = NAME;\
-	_msp430_instruction _msp430_instruction_##OPCODE(instruction_name_##OPCODE, TYPE, OPCODE, CALLBACK);
+	_msp430_instruction _msp430_instruction##TYPE##_##OPCODE(instruction_name_##OPCODE, TYPE, OPCODE, CALLBACK);

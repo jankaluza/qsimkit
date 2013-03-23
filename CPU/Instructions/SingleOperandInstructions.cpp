@@ -18,36 +18,37 @@
  **/
 
 #include "CPU/Instructions/InstructionManager.h"
+#include "CPU/Instructions/InstructionArgument.h"
 #include "CPU/Instructions/Instruction.h"
 #include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
+#include "CPU/Memory/Memory.h"
 
 #include <iostream>
 #include <sstream>
 #include <map>
 
-#define TYPE_OFFSET 100
-
-static std::map<unsigned int, _msp430_instruction *> *instructions;
-
-void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction) {
-	if (instructions == 0) {
-		instructions = new std::map<unsigned int, _msp430_instruction *>;
-	}
-	(*instructions)[((int) type) * TYPE_OFFSET + opcode] = instruction;
-	std::cout << "Loaded instruction: " << (*instructions)[((int) type) * TYPE_OFFSET + opcode]->name << "\n";
+static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
+	// Decrease SP, Store current PC, change PC
+	uint16_t sp = reg->get(1)->getBigEndian();
+	sp -= 2;
+	mem->setBigEndian(sp, reg->get(0)->getBigEndian());
+	reg->get(1)->setBigEndian(sp);
+	reg->get(0)->setBigEndian(i->getDst()->getBigEndian());
+	return 3;
 }
 
-int executeInstruction(RegisterSet *reg, Memory *mem, Instruction *i) {
-	std::map<unsigned int, _msp430_instruction *>::iterator it = instructions->find(((int) i->type) * TYPE_OFFSET + i->opcode);
-	if (it == instructions->end()) {
-		return -1;
-	}
+static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
+	uint16_t sp = reg->get(1)->getBigEndian();
+	reg->get(1)->setBigEndian(mem->getBigEndian(sp));
+	sp += 2;
 
-	return it->second->callback(reg, mem, i);
+	reg->get(0)->setBigEndian(mem->getBigEndian(sp));
+	sp += 2;
+
+	reg->get(1)->setBigEndian(sp);
+	return 4;
 }
 
-_msp430_instruction::_msp430_instruction(const char *name, InstructionType type, unsigned int opcode, InstructionCallback callback) {
-	this->name = name;
-	this->callback = callback;
-	addInstruction(type, opcode, this);
-}
+MSP430_INSTRUCTION("call", Instruction1, 5, &execCALL);
+MSP430_INSTRUCTION("reti", Instruction1, 6, &execRETI);
