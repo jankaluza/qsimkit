@@ -24,11 +24,27 @@
 #include <sstream>
 #include <map>
 
-static std::map<const char *, _msp430_variant *> *variants;
+static std::map<std::string, _msp430_variant *> *variants;
+
+std::vector<_msp430_variant*> getVariants() {
+	std::vector<_msp430_variant *> ret;
+	for(std::map<std::string, _msp430_variant *>::iterator it = variants->begin(); it != variants->end(); it++) {
+		ret.push_back(it->second);
+	}
+
+	return ret;
+}
+
+Variant *getVariant(const char *name) {
+	if (variants->find(std::string(name)) == variants->end())
+		return 0;
+	_msp430_variant *variant = (*variants)[std::string(name)];
+	return variant->create_variant();
+}
 
 void addVariant(_msp430_variant *variant) {
 	if (variants == 0) {
-		variants = new std::map<const char *, _msp430_variant *>;
+		variants = new std::map<std::string, _msp430_variant *>;
 	}
 	(*variants)[variant->name] = variant;
 // 	std::cout << "Loaded variant: " << (*variants)[variant->name]->name << "\n";

@@ -125,12 +125,36 @@ void Memory::set(uint16_t address, uint16_t value) {
 	uint8_t *ptr2 = (uint8_t *) &value;
 	m_memory[address] = *(ptr2 + 1);
 	m_memory[address + 1] = *ptr2;
+
+	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
+
+	it = m_watchers.find(address);
+	if (it != m_watchers.end()) {
+		it->second->handleMemoryChanged(this, address);
+	}
+
+	it = m_watchers.find(address + 1);
+	if (it != m_watchers.end()) {
+		it->second->handleMemoryChanged(this, address + 1);
+	}
 }
 
 void Memory::setBigEndian(uint16_t address, uint16_t value) {
 	uint8_t *ptr2 = (uint8_t *) &value;
 	m_memory[address] = *(ptr2);
 	m_memory[address + 1] = *(ptr2 + 1);
+
+	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
+
+	it = m_watchers.find(address);
+	if (it != m_watchers.end()) {
+		it->second->handleMemoryChanged(this, address);
+	}
+
+	it = m_watchers.find(address + 1);
+	if (it != m_watchers.end()) {
+		it->second->handleMemoryChanged(this, address + 1);
+	}
 }
 
 uint8_t Memory::getByte(uint16_t address) {
@@ -139,5 +163,16 @@ uint8_t Memory::getByte(uint16_t address) {
 
 void Memory::setByte(uint16_t address, uint8_t value) {
 	m_memory[address] = value;
+
+	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
+
+	it = m_watchers.find(address);
+	if (it != m_watchers.end()) {
+		it->second->handleMemoryChanged(this, address);
+	}
+}
+
+void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher) {
+	m_watchers[address] = watcher;
 }
 

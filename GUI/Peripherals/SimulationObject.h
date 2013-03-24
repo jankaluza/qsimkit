@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,37 +19,47 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <string>
-#include <vector>
+#include <QWidget>
+#include <QString>
+#include <QChar>
+#include <QRect>
 #include <map>
 
-class RegisterSet;
-class Memory;
+#include "adevs.h"
 
-class MemoryWatcher {
+class SimulationEvent {
 	public:
-		virtual void handleMemoryChanged(Memory *memory, uint16_t address) = 0;
+		SimulationEvent() {}
+		virtual ~SimulationEvent() {}
 };
 
-class Memory {
+
+class SimulationObject : public adevs::Atomic<SimulationEvent *> {
 	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+		SimulationObject();
+		virtual ~SimulationObject();
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+		virtual void internalTransition() = 0;
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
+		virtual double timeAdvance() = 0;
 
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+		/// Internal transition function.
+		void delta_int();
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher);
+		/// Handles external changes (change on PINs or interrupts)
+		void delta_ext(double e, const adevs::Bag<SimulationEvent *>& xb);
 
-	private:
-		std::vector<uint8_t> m_memory;
-		std::map<uint16_t, MemoryWatcher *> m_watchers;
+		/// Confluent transition function.
+		void delta_conf(const adevs::Bag<SimulationEvent *>& xb);
+
+		/// Output function.
+		void output_func(adevs::Bag<SimulationEvent *>& yb);
+
+		/// Time advance function.
+		double ta();
+
+		/// Output value garbage collection.
+		void gc_output(adevs::Bag<SimulationEvent *>& g);
+
 };
+

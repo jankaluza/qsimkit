@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,28 +19,40 @@
 
 #pragma once
 
-// #include <stdint.h>
-// #include <string>
-// #include <map>
-#include <vector>
+#include <QMainWindow>
+#include <QString>
+#include <QTimer>
+
+#include "ui_QSimKit.h"
+
+#include "adevs.h"
 
 class Variant;
-class _msp430_variant;
+class CPU;
+class SimulationEvent;
 
-void addVariant(_msp430_variant *variant);
+class QSimKit : public QMainWindow, public Ui::QSimKit
+{
+	Q_OBJECT
 
-std::vector<_msp430_variant*> getVariants();
-Variant *getVariant(const char *name);
-
-class _msp430_variant {
 	public:
-		_msp430_variant(const char *name, Variant *(*fnc)());
-		const char *name;
-		Variant *(*create_variant)();
+		QSimKit(QWidget *parent = 0);
+
+		void setVariant(const QString &variant);
+		bool loadA43File(const QString &file);
+
+	public slots:
+		void loadA43();
+		void chooseVariant();
+		void simulationStep();
+
+	private:
+		void resetSimulation();
+
+	private:
+		Variant *m_variant;
+		adevs::SimpleDigraph<SimulationEvent *> *m_dig;
+		adevs::Simulator<SimulationEvent *> *m_sim;
+		QTimer *m_timer;
 };
 
-#define MSP430_VARIANT(NAME, CLASS) static Variant *create_##CLASS() { \
-		return (Variant *) new Variant_##CLASS(); \
-	} \
-	static const char *variant_name_##CLASS = NAME;\
-	_msp430_variant _msp430_variant_##CLASS(variant_name_##CLASS, &create_##CLASS);

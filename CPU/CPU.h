@@ -22,34 +22,51 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include <map>
 
-class RegisterSet;
-class Memory;
+#include "adevs.h"
 
-class MemoryWatcher {
+class Event {
 	public:
-		virtual void handleMemoryChanged(Memory *memory, uint16_t address) = 0;
+		Event() {}
+		virtual ~Event() {}
 };
 
-class Memory {
+class Memory;
+class RegisterSet;
+class InstructionDecoder;
+class Instruction;
+
+class CPU : public adevs::Atomic<Event *> {
 	public:
-		Memory(unsigned int size);
-		virtual ~Memory();
+		CPU();
+		virtual ~CPU();
 
-		bool loadA43(const std::string &data, RegisterSet *reg);
+		bool loadA43(const std::string &data);
 
-		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
-		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
+		/// Internal transition function.
+		void delta_int();
 
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+		/// Handles external changes (change on PINs or interrupts)
+		void delta_ext(double e, const adevs::Bag<Event *>& xb);
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher);
+		/// Confluent transition function.
+		void delta_conf(const adevs::Bag<Event *>& xb);
+
+		/// Output function.
+		void output_func(adevs::Bag<Event *>& yb);
+
+		/// Time advance function.
+		double ta();
+
+		/// Output value garbage collection.
+		void gc_output(adevs::Bag<Event *>& g);
 
 	private:
-		std::vector<uint8_t> m_memory;
-		std::map<uint16_t, MemoryWatcher *> m_watchers;
+		double m_cycles;
+		double m_instructionCycles;
+
+		Memory *m_mem;
+		RegisterSet *m_reg;
+		InstructionDecoder *m_decoder;
+		Instruction *m_instruction;
 };
