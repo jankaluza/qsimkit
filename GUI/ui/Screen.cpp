@@ -25,6 +25,7 @@
 
 #include <QWidget>
 #include <QMainWindow>
+#include <QToolTip>
 #include <QString>
 #include <QFileDialog>
 #include <QInputDialog>
@@ -90,9 +91,10 @@ ScreenObject *Screen::getObject(int x, int y) {
 }
 
 int Screen::getPin(ScreenObject *object, int x, int y) {
-	std::map<int, QRect> &pins = object->getPins();
-	for (std::map<int, QRect>::const_iterator it = pins.begin(); it != pins.end(); ++it) {
-		if (it->second.adjusted(object->x(),object->y(),object->x(),object->y()).contains(x,y)) {
+	std::map<int, Pin> &pins = object->getPins();
+	for (std::map<int, Pin>::const_iterator it = pins.begin(); it != pins.end(); ++it) {
+// 		qDebug() << it->second.rect.adjusted(object->x(),object->y(),object->x(),object->y()) << x << y;
+		if (it->second.rect.adjusted(object->x(),object->y(),object->x(),object->y()).contains(x,y)) {
 			return it->first;
 		}
 	}
@@ -124,5 +126,18 @@ void Screen::mouseMoveEvent(QMouseEvent *event) {
 	}
 	else {
 		m_moving = 0;
+
+		ScreenObject *object = getObject(event->x(), event->y());
+		if (!object) {
+			return;
+		}
+
+		int pin = getPin(object, event->x(), event->y());
+		if (pin == -1) {
+			return;
+		}
+
+		Pin &p = object->getPins()[pin];
+		QToolTip::showText(event->pos(), p.name);
 	}
 }

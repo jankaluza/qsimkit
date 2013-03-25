@@ -36,11 +36,13 @@
 #include <QDebug>
 #include <QDomDocument>
 
-MSP430::MSP430(Variant *variant) : m_cycles(0), m_instructionCycles(0),
+MSP430::MSP430(Variant *variant, unsigned long frequency) :
+m_time(0), m_instructionCycles(0),
 m_mem(new Memory(512000)), m_reg(new RegisterSet()),
 m_decoder(new InstructionDecoder(m_reg, m_mem)),
 m_instruction(new Instruction), m_variant(variant) {
 
+	m_step = 1.0/frequency;
 	m_reg->addDefaultRegisters();
 
 	addMemoryWatchers();
@@ -82,11 +84,11 @@ void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
 }
 
 void MSP430::internalTransition() {
-	qDebug() << m_cycles << "next simulation step";
 	m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
 	m_instructionCycles += executeInstruction(m_reg, m_mem, m_instruction);
+	m_instructionCycles *= m_step;
 
-	m_cycles += m_instructionCycles;
+	m_time += m_instructionCycles;
 }
 
 double MSP430::timeAdvance() {
@@ -94,10 +96,10 @@ double MSP430::timeAdvance() {
 }
 
 bool MSP430::loadXML(const QString &file) {
-	int font_w = QApplication::fontMetrics().width("99") + 2;
-	int font_h = QApplication::fontMetrics().height() + 2;
-	int width = font_w * 2;
-	int height = font_w * 2;
+	int font_w = QApplication::fontMetrics().width("99") -3;
+	int font_h = QApplication::fontMetrics().height() - 3;
+	int width = 4*font_w;
+	int height = 4*font_w;
     int errorLine, errorColumn;
     QString errorMsg;
 
@@ -141,18 +143,18 @@ bool MSP430::loadXML(const QString &file) {
 		int y = 0;
 		if (side == 'l') {
 			x = 0;
-			y = font_w;
+			y = 2*font_w;
 		}
 		else if (side == 'r') {
 			x = width - font_w;
-			y = height - 2 * font_w;
+			y = height - 3 * font_w;
 		}
 		else if (side == 'd') {
-			x = font_w;
+			x = 2*font_w;
 			y = height - font_w;
 		}
 		else if (side == 'u') {
-			x = width - 2 * font_w;
+			x = width - 3 * font_w;
 			y = 0;
 		}
 
@@ -166,7 +168,10 @@ bool MSP430::loadXML(const QString &file) {
 			}
 			qDebug() << n;
 			m_names[id] = n;
-			m_pins[id] = QRect(x, y, font_w, font_h);
+			m_pins[id].rect = QRect(x, y, font_w, font_h);
+			m_pins[id].high = false;
+			m_pins[id].name = n;
+			
 
 			PinState p;
 			p.high = false;
@@ -194,25 +199,65 @@ bool MSP430::loadXML(const QString &file) {
 }
 
 void MSP430::paint(QPainter &qp) {
-	int font_w = QApplication::fontMetrics().width("99");
-	int font_h = QApplication::fontMetrics().height();
+	int font_w = QApplication::fontMetrics().width("99") - 3;
+	int font_h = QApplication::fontMetrics().height() - 3;
 
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
-	qp.drawRect(m_x,m_y, width() - 2, height() - 2);
+	qp.drawRect(m_x + font_w, m_y + font_w, width() - 2*font_w, height() - 2*font_w);
 
 	QPen pen2(Qt::black, 1, Qt::SolidLine);
 	qp.setPen(pen2);
 
-	for (std::map<int, QRect>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+	int even = -1;
+	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
 		if (m_states[it->first].high) {
-			qp.fillRect(it->second.adjusted(m_x, m_y, m_x, m_y), QBrush(QColor(0,255,0)));
+			qp.fillRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y), QBrush(QColor(0,255,0)));
 		}
-		qp.drawRect(it->second.adjusted(m_x, m_y, m_x, m_y));
-		qp.drawText(it->second.adjusted(m_x, m_y, m_x, m_y), Qt::AlignCenter, QString::number(it->first));
+		qp.drawRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y));
 		if (m_sides[it->first] == 'l') {
-			qp.drawText(QRect(m_x + it->second.x() + it->second.width() + 4, m_y + it->second.y(), 100, font_h), Qt::AlignCenter, m_names[it->first]);
+			qp.drawText(it->second.rect.adjusted(m_x + font_w - 3, m_y , m_x + 2*font_w, m_y + 2), Qt::AlignCenter, QString::number(it->first));
 		}
+		else if (m_sides[it->first] == 'r') {
+			qp.drawText(it->second.rect.adjusted(m_x - font_w - 5, m_y, m_x - font_w, m_y + 2), Qt::AlignCenter, QString::number(it->first));
+			even = -1;
+		}
+		else if (m_sides[it->first] == 'd') {
+			if (even == -1) {
+				even = 0;
+			}
+			if (even) {
+				std::map<int, Pin>::iterator next = it;
+				next++;
+				if (m_sides[next->first] != 'r') {
+					qp.drawText(it->second.rect.adjusted(m_x, m_y - font_h - 13 - font_h, m_x + 5, m_y - font_h), Qt::AlignCenter, QString::number(it->first));
+				}
+			}
+			else {
+				qp.drawText(it->second.rect.adjusted(m_x, m_y - font_h - 13, m_x + 5, m_y), Qt::AlignCenter, QString::number(it->first));
+			}
+			even = not even;
+		}
+		else if (m_sides[it->first] == 'u') {
+			if (even == -1) {
+				even = 0;
+			}
+			if (even) {
+				std::map<int, Pin>::iterator next = it;
+				next++;
+				if (next != m_pins.end()) {
+					qp.drawText(it->second.rect.adjusted(m_x, m_y + font_h + 18 + font_h, m_x + 5, m_y + font_h), Qt::AlignCenter, QString::number(it->first));
+				}
+			}
+			else {
+				qp.drawText(it->second.rect.adjusted(m_x, m_y + font_h + 18, m_x + 5, m_y), Qt::AlignCenter, QString::number(it->first));
+			}
+			even = not even;
+		}
+// 		}
+// 		if (m_sides[it->first] == 'l') {
+// 			qp.drawText(QRect(m_x + it->second.x() + it->second.width() + 4, m_y + it->second.y(), 100, font_h), Qt::AlignCenter, m_names[it->first]);
+// 		}
 		
 	}
 }

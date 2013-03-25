@@ -22,6 +22,12 @@
 #include <QPainter>
 #include <map>
 
+typedef struct {
+	QRect rect;
+	QString name;
+	bool high;
+} Pin;
+
 class ScreenObject : public QObject
 {
 	Q_OBJECT
@@ -44,7 +50,7 @@ class ScreenObject : public QObject
 
 		virtual void paint(QPainter &p) = 0;
 
-		virtual std::map<int, QRect> &getPins() = 0;
+		virtual std::map<int, Pin> &getPins() = 0;
 
 	signals:
 		void onUpdated();

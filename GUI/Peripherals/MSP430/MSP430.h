@@ -41,7 +41,7 @@ struct PinState {
 class MSP430 : public Peripheral, public MemoryWatcher
 {
 	public:
-		MSP430(Variant *variant);
+		MSP430(Variant *variant, unsigned long freq = 1000000);
 
 		bool loadXML(const QString &file);
 
@@ -53,7 +53,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void paint(QPainter &p);
 
-		std::map<int, QRect> &getPins() {
+		std::map<int, Pin> &getPins() {
 			return m_pins;
 		}
 
@@ -68,12 +68,12 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 	private:
 		std::map<int, QChar> m_sides;
-		std::map<int, QRect> m_pins;
+		std::map<int, Pin> m_pins;
 		std::map<int, PinState> m_states;
 		std::map<int, QString> m_names;
 		std::map<QString, int> m_map;
 
-		double m_cycles;
+		double m_time;
 		double m_instructionCycles;
 
 		Memory *m_mem;
@@ -81,6 +81,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		InstructionDecoder *m_decoder;
 		Instruction *m_instruction;
 		Variant *m_variant;
+		double m_step;
 		
 };
 

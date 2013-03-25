@@ -24,6 +24,7 @@
 #include "Peripherals/MSP430/MSP430.h"
 
 #include <QWidget>
+#include <QTime>
 #include <QMainWindow>
 #include <QString>
 #include <QFileDialog>
@@ -47,7 +48,13 @@ void QSimKit::setVariant(const QString &variant) {
 }
 
 void QSimKit::simulationStep() {
-	m_sim->execNextEvent();
+	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
+// 	QTime perf;
+// 	perf.start();
+	for (int i = 0; i < 20000; ++i) {
+		m_sim->execNextEvent();
+	}
+// 	qDebug() << perf.elapsed();
 }
 
 void QSimKit::resetSimulation() {
@@ -63,7 +70,7 @@ void QSimKit::resetSimulation() {
 
 	m_dig->add(screen->getCPU());
 	m_sim = new adevs::Simulator<SimulationEvent *>(m_dig);
-	m_timer->start(5);
+	m_timer->start(100);
 }
 
 bool QSimKit::loadA43File(const QString &f) {
