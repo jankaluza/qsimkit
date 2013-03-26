@@ -23,7 +23,7 @@
 #include <QDebug>
 
 ConnectionManager::ConnectionManager() {
-	
+	m_moving = NULL;
 }
 
 void ConnectionManager::addConnection(ScreenObject *from, int fport, ScreenObject *to, int tport, const std::vector<QPoint> &points) {
@@ -56,9 +56,70 @@ void ConnectionManager::paint(QPainter &p) {
 				to = *it2;
 				p.drawLine(from, to);
 				from = to;
+				p.drawRect(to.x() - 5, to.y() - 5, 10, 10);
 			}
 			to = it->to->getPins()[it->tport].rect.adjusted(it->to->x(), it->to->y(), it->to->x(), it->to->y()).center();
 			p.drawLine(from, to);
 		}
 	}
+}
+
+bool ConnectionManager::mouseMoveEvent(QMouseEvent *event) {
+	if (event->buttons() & Qt::LeftButton) {
+		if (m_moving) {
+			m_moving->setX(m_moving->x() - (m_movingX - event->x()));
+			m_moving->setY(m_moving->y() - (m_movingY - event->y()));
+			m_movingX = event->x();
+			m_movingY = event->y();
+			return true;
+		}
+		else {
+			QPointF from;
+			QPointF to;
+			QPointF intersectPnt;
+			for (std::list<Connection>::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+				from = it->from->getPins()[it->fport].rect.adjusted(it->from->x(), it->from->y(), it->from->x(), it->from->y()).center();
+				std::vector<QPoint>::iterator it2 = it->points.begin();
+				if (it2 != it->points.end()) {
+					for (it2++; it2 != it->points.end() - 1; ++it2) {
+						to = *it2;
+						QRectF r(to.x() - 5, to.y() - 5, 10, 10);
+						if (r.contains(event->x(), event->y())) {
+							m_moving = &(*it2);
+							break;
+						}
+						else {
+							QLineF line(from, to);
+							QLineF line2(event->x()-10, event->y()-10, event->x()+10, event->y()+10);
+							if (line.intersect(line2, &intersectPnt)==QLineF::BoundedIntersection) {
+								QPoint p = intersectPnt.toPoint();
+								it2 = it->points.insert(it2, p);
+								m_moving = &(*it2);
+								break;
+							}
+						}
+						from = to;
+					}
+					to = it->to->getPins()[it->tport].rect.adjusted(it->to->x(), it->to->y(), it->to->x(), it->to->y()).center();
+					QLineF line(from, to);
+					QLineF line2(event->x()-10, event->y()-10, event->x()+10, event->y()+10);
+					if (line.intersect(line2, &intersectPnt)==QLineF::BoundedIntersection) {
+						QPoint p = intersectPnt.toPoint();
+						it2 = it->points.insert(it2, p);
+						m_moving = &(*it2);
+						break;
+					}
+					if (m_moving)
+						break;
+				}
+			}
+		}
+
+		m_movingX = event->x();
+		m_movingY = event->y();
+	}
+	else {
+		m_moving = 0;
+	}
+	return false;
 }

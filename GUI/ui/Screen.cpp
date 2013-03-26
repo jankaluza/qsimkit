@@ -210,6 +210,11 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 }
 
 void Screen::mouseMoveEvent(QMouseEvent *event) {
+	if (m_conns->mouseMoveEvent(event)) {
+		repaint();
+		return;
+	}
+
 	if (event->buttons() & Qt::LeftButton) {
 		if (m_fromPin != -1) {
 			repaint();

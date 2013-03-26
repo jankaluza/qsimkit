@@ -21,6 +21,7 @@
 
 #include <QPoint>
 #include <QPainter>
+#include <QMouseEvent>
 #include <vector>
 #include <map>
 
@@ -50,9 +51,14 @@ class ConnectionManager
 
 		void paint(QPainter &p);
 
+		bool mouseMoveEvent(QMouseEvent *event);
+
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 	private:
 		std::list<Connection> m_conns;
+		QPoint *m_moving;
+		int m_movingX;
+		int m_movingY;
 };
 
