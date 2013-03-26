@@ -21,45 +21,34 @@
 
 #include <QWidget>
 #include <QString>
-#include <QList>
+#include <QChar>
+#include <QRect>
+#include <map>
+#include "Peripherals/Peripheral.h"
 
-#include "adevs.h"
-
-class Package;
-class ScreenObject;
-class MSP430;
-class SimulationEvent;
-class ConnectionManager;
-
-class Screen : public QWidget
+class LED : public Peripheral
 {
-	Q_OBJECT
-
 	public:
-		Screen(QWidget *parent = 0);
+		LED();
 
-		void setCPU(MSP430 *cpu);
-		MSP430 *getCPU();
+		void internalTransition();
 
-		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
+		void externalEvent(const std::vector<SimulationEvent *> &);
 
-	protected:
-		void paintEvent(QPaintEvent *e);
-		void mouseMoveEvent(QMouseEvent *event);
-		void mousePressEvent(QMouseEvent *event);
+		void output(std::vector<SimulationEvent *> &output);
 
+		double timeAdvance();
+
+		void reset();
+
+		void paint(QPainter &p);
+
+		std::map<int, Pin> &getPins() {
+			return m_pins;
+		}
 	private:
-		void resizeAccordingToObjects();
-		ScreenObject *getObject(int x, int y);
-		int getPin(ScreenObject *object, int x, int y);
+		std::map<int, Pin> m_pins;
+		bool m_state;
 
-	private:
-		QList<ScreenObject *> m_objects;
-		ScreenObject *m_moving;
-		int m_movingX;
-		int m_movingY;
-		int m_fromPin;
-		std::vector<QPoint> m_points;
-		ConnectionManager *m_conns;
 };
 

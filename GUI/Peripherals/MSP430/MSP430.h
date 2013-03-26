@@ -49,7 +49,13 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void internalTransition();
 
+		void externalEvent(const std::vector<SimulationEvent *> &);
+
+		void output(std::vector<SimulationEvent *> &output);
+
 		double timeAdvance();
+
+		void reset();
 
 		void paint(QPainter &p);
 
@@ -82,6 +88,8 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		Instruction *m_instruction;
 		Variant *m_variant;
 		double m_step;
+		std::string m_code;
+		std::vector<SimulationEvent *> m_output;
 		
 };
 

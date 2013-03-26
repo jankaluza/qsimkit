@@ -21,6 +21,8 @@
 
 #include <QPainter>
 #include <map>
+#include "Peripherals/SimulationObject.h"
+
 
 typedef struct {
 	QRect rect;
@@ -28,7 +30,7 @@ typedef struct {
 	bool high;
 } Pin;
 
-class ScreenObject : public QObject
+class ScreenObject : public QObject, public SimulationObject
 {
 	Q_OBJECT
 

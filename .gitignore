@@ -5,3 +5,5 @@ simkit_test
 *.a
 CMakeFiles
 CMakeCache.txt
+*.cxx
+ui_*

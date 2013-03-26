@@ -22,7 +22,7 @@ static const uint qt_meta_data_QSimKit[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       3,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -33,13 +33,19 @@ static const uint qt_meta_data_QSimKit[] = {
        9,    8,    8,    8, 0x0a,
       19,    8,    8,    8, 0x0a,
       35,    8,    8,    8, 0x0a,
+      52,    8,    8,    8, 0x0a,
+      70,    8,    8,    8, 0x0a,
+      93,   87,    8,    8, 0x0a,
+     115,    8,    8,    8, 0x0a,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_QSimKit[] = {
     "QSimKit\0\0loadA43()\0chooseVariant()\0"
-    "simulationStep()\0"
+    "simulationStep()\0startSimulation()\0"
+    "stopSimulation()\0pause\0pauseSimulation(bool)\0"
+    "resetSimulation()\0"
 };
 
 void QSimKit::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -51,10 +57,13 @@ void QSimKit::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, voi
         case 0: _t->loadA43(); break;
         case 1: _t->chooseVariant(); break;
         case 2: _t->simulationStep(); break;
+        case 3: _t->startSimulation(); break;
+        case 4: _t->stopSimulation(); break;
+        case 5: _t->pauseSimulation((*reinterpret_cast< bool(*)>(_a[1]))); break;
+        case 6: _t->resetSimulation(); break;
         default: ;
         }
     }
-    Q_UNUSED(_a);
 }
 
 const QMetaObjectExtraData QSimKit::staticMetaObjectExtraData = {
@@ -91,9 +100,9 @@ int QSimKit::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 3)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 3;
+        _id -= 7;
     }
     return _id;
 }

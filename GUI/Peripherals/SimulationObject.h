@@ -29,37 +29,52 @@
 
 class SimulationEvent {
 	public:
-		SimulationEvent() {}
+		SimulationEvent(int port, bool high) : port(port), high(high) {}
 		virtual ~SimulationEvent() {}
+
+		int port;
+		bool high;
 };
 
-
-class SimulationObject : public adevs::Atomic<SimulationEvent *> {
+class SimulationObject {
 	public:
-		SimulationObject();
-		virtual ~SimulationObject();
+		SimulationObject() {}
+		virtual ~SimulationObject() {}
 
 		virtual void internalTransition() = 0;
 
+		virtual void externalEvent(const std::vector<SimulationEvent *> &) = 0;
+
+		virtual void output(std::vector<SimulationEvent *> &output) = 0;
+
 		virtual double timeAdvance() = 0;
+
+};
+
+class SimulationObjectWrapper : public adevs::Atomic<adevs::PortValue<SimulationEvent *> > {
+	public:
+		SimulationObjectWrapper(SimulationObject *obj) : m_obj(obj) {}
+		~SimulationObjectWrapper() {}
 
 		/// Internal transition function.
 		void delta_int();
 
 		/// Handles external changes (change on PINs or interrupts)
-		void delta_ext(double e, const adevs::Bag<SimulationEvent *>& xb);
+		void delta_ext(double e, const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb);
 
 		/// Confluent transition function.
-		void delta_conf(const adevs::Bag<SimulationEvent *>& xb);
+		void delta_conf(const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb);
 
 		/// Output function.
-		void output_func(adevs::Bag<SimulationEvent *>& yb);
+		void output_func(adevs::Bag<adevs::PortValue<SimulationEvent *> >& yb);
 
 		/// Time advance function.
 		double ta();
 
 		/// Output value garbage collection.
-		void gc_output(adevs::Bag<SimulationEvent *>& g);
+		void gc_output(adevs::Bag<adevs::PortValue<SimulationEvent *> >& g);
 
+	private:
+		SimulationObject *m_obj;
 };
 

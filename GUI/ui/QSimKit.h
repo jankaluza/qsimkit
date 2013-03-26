@@ -46,13 +46,15 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void chooseVariant();
 		void simulationStep();
 
-	private:
+		void startSimulation();
+		void stopSimulation();
+		void pauseSimulation(bool pause);
 		void resetSimulation();
 
 	private:
 		Variant *m_variant;
-		adevs::SimpleDigraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<SimulationEvent *> *m_sim;
+		adevs::Digraph<SimulationEvent *> *m_dig;
+		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
 		QTimer *m_timer;
 };
 

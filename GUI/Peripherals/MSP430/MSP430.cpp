@@ -38,14 +38,31 @@
 
 MSP430::MSP430(Variant *variant, unsigned long frequency) :
 m_time(0), m_instructionCycles(0),
-m_mem(new Memory(512000)), m_reg(new RegisterSet()),
-m_decoder(new InstructionDecoder(m_reg, m_mem)),
+m_mem(0), m_reg(0), m_decoder(0),
 m_instruction(new Instruction), m_variant(variant) {
 
 	m_step = 1.0/frequency;
+	reset();
+}
+
+void MSP430::reset() {
+	delete m_mem;
+	delete m_reg;
+	delete m_decoder;
+
+	m_mem = new Memory(512000);
+	m_reg = new RegisterSet();
+	m_decoder = new InstructionDecoder(m_reg, m_mem);
+
+
 	m_reg->addDefaultRegisters();
 
 	addMemoryWatchers();
+
+	if (!m_code.empty()) {
+		loadA43(m_code);
+	}
+	
 }
 
 void MSP430::addMemoryWatchers() {
@@ -59,6 +76,7 @@ void MSP430::addMemoryWatchers() {
 }
 
 bool MSP430::loadA43(const std::string &data) {
+	m_code = data;
 	return m_mem->loadA43(data, m_reg);
 }
 
@@ -68,9 +86,11 @@ bool MSP430::loadA43(const std::string &data) {
 		QString p2 = QString(PREFIX) + "." + QString::number(i); \
 		if (b & (1 << i)) { \
 			m_states[m_map[p2]].high = true; \
+			m_output.push_back(new SimulationEvent(m_map[p2], true)); \
 		} \
 		else { \
 			m_states[m_map[p2]].high = false; \
+			m_output.push_back(new SimulationEvent(m_map[p2], false)); \
 		} \
 	} \
 }
@@ -81,6 +101,14 @@ void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
 	}
 
 	onUpdated();
+}
+
+void MSP430::externalEvent(const std::vector<SimulationEvent *> &) {
+
+}
+
+void MSP430::output(std::vector<SimulationEvent *> &output) {
+	output.swap(m_output);
 }
 
 void MSP430::internalTransition() {
@@ -166,7 +194,7 @@ bool MSP430::loadXML(const QString &file) {
 				n += name.toElement().text() + "/";
 				m_map[name.toElement().text()] = id;
 			}
-			qDebug() << n;
+// 			qDebug() << n;
 			m_names[id] = n;
 			m_pins[id].rect = QRect(x, y, font_w, font_h);
 			m_pins[id].high = false;

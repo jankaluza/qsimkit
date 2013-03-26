@@ -19,47 +19,40 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QString>
-#include <QList>
+#include <QPoint>
+#include <QPainter>
+#include <vector>
+#include <map>
 
 #include "adevs.h"
 
-class Package;
 class ScreenObject;
-class MSP430;
+class SimulationObjectWrapper;
 class SimulationEvent;
-class ConnectionManager;
 
-class Screen : public QWidget
+
+typedef struct {
+	ScreenObject *from;
+	int fport;
+	ScreenObject *to;
+	int tport;
+	std::vector<QPoint> points;
+} Connection;
+
+class ConnectionManager
 {
-	Q_OBJECT
 
 	public:
-		Screen(QWidget *parent = 0);
+		ConnectionManager();
+		virtual ~ConnectionManager() {}
 
-		void setCPU(MSP430 *cpu);
-		MSP430 *getCPU();
+		void addConnection(ScreenObject *from, int fport, ScreenObject *to, int tport, const std::vector<QPoint> &points);
 
-		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
+		void paint(QPainter &p);
 
-	protected:
-		void paintEvent(QPaintEvent *e);
-		void mouseMoveEvent(QMouseEvent *event);
-		void mousePressEvent(QMouseEvent *event);
+		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 	private:
-		void resizeAccordingToObjects();
-		ScreenObject *getObject(int x, int y);
-		int getPin(ScreenObject *object, int x, int y);
-
-	private:
-		QList<ScreenObject *> m_objects;
-		ScreenObject *m_moving;
-		int m_movingX;
-		int m_movingY;
-		int m_fromPin;
-		std::vector<QPoint> m_points;
-		ConnectionManager *m_conns;
+		std::list<Connection> m_conns;
 };
 

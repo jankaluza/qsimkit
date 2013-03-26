@@ -26,12 +26,13 @@
 #include <map>
 
 #include "ui/ScreenObject.h"
-#include "SimulationObject.h"
 
 
-class Peripheral : public ScreenObject, public SimulationObject {
+class Peripheral : public ScreenObject {
 	public:
 		Peripheral() {}
+
+	virtual void reset() = 0;
 
 };
 
