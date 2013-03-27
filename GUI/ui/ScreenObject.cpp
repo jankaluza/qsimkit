@@ -21,3 +21,23 @@
 
 ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0) {
 }
+
+void ScreenObject::setX(int x) {
+	movePins(x, m_y);
+	m_x = x;
+}
+
+void ScreenObject::setY(int y) {
+	movePins(m_x, y);
+	m_y = y;
+}
+
+void ScreenObject::movePins(int x, int y) {
+	std::map<int, Pin> &pins = getPins();
+	int mx = x - m_x;
+	int my = y - m_y;
+
+	for (std::map<int, Pin>::iterator it = pins.begin(); it != pins.end(); ++it) {
+		it->second.rect.adjust(mx, my, mx, my);
+	}
+}

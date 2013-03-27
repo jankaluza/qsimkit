@@ -43,8 +43,8 @@ class ScreenObject : public QObject, public SimulationObject
 		int width() { return m_width; }
 		int height() { return m_height; }
 
-		void setX(int x) { m_x = x; }
-		void setY(int y) { m_y = y; }
+		void setX(int x);
+		void setY(int y);
 		void setWidth(int width) { m_width = width; }
 		void setHeight(int height) { m_height = height; }
 
@@ -56,6 +56,9 @@ class ScreenObject : public QObject, public SimulationObject
 
 	signals:
 		void onUpdated();
+
+	private:
+		void movePins(int x, int y);
 
 	protected:
 		int m_x;

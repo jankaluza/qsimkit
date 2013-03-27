@@ -34,20 +34,21 @@ class SimulationEvent;
 
 typedef struct {
 	ScreenObject *from;
-	int fport;
+	int fpin;
 	ScreenObject *to;
-	int tport;
+	int tpin;
 	std::vector<QPoint> points;
 } Connection;
 
 class ConnectionManager
 {
+	typedef std::list<Connection> ConnectionList;
 
 	public:
 		ConnectionManager();
 		virtual ~ConnectionManager() {}
 
-		void addConnection(ScreenObject *from, int fport, ScreenObject *to, int tport, const std::vector<QPoint> &points);
+		void addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points);
 
 		void paint(QPainter &p);
 
@@ -56,7 +57,10 @@ class ConnectionManager
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 	private:
-		std::list<Connection> m_conns;
+		void paint(QPainter &p, Connection &c);
+
+	private:
+		ConnectionList m_conns;
 		QPoint *m_moving;
 		int m_movingX;
 		int m_movingY;

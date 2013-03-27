@@ -240,14 +240,14 @@ void MSP430::paint(QPainter &qp) {
 	int even = -1;
 	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
 		if (m_states[it->first].high) {
-			qp.fillRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y), QBrush(QColor(0,255,0)));
+			qp.fillRect(it->second.rect, QBrush(QColor(0,255,0)));
 		}
-		qp.drawRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y));
+		qp.drawRect(it->second.rect);
 		if (m_sides[it->first] == 'l') {
-			qp.drawText(it->second.rect.adjusted(m_x + font_w - 3, m_y , m_x + 2*font_w, m_y + 2), Qt::AlignCenter, QString::number(it->first));
+			qp.drawText(it->second.rect.adjusted(0 + font_w - 3, 0 , 0 + 2*font_w, 0 + 2), Qt::AlignCenter, QString::number(it->first));
 		}
 		else if (m_sides[it->first] == 'r') {
-			qp.drawText(it->second.rect.adjusted(m_x - font_w - 5, m_y, m_x - font_w, m_y + 2), Qt::AlignCenter, QString::number(it->first));
+			qp.drawText(it->second.rect.adjusted(0 - font_w - 5, 0, 0 - font_w, 0 + 2), Qt::AlignCenter, QString::number(it->first));
 			even = -1;
 		}
 		else if (m_sides[it->first] == 'd') {
@@ -258,11 +258,11 @@ void MSP430::paint(QPainter &qp) {
 				std::map<int, Pin>::iterator next = it;
 				next++;
 				if (m_sides[next->first] != 'r') {
-					qp.drawText(it->second.rect.adjusted(m_x, m_y - font_h - 13 - font_h, m_x + 5, m_y - font_h), Qt::AlignCenter, QString::number(it->first));
+					qp.drawText(it->second.rect.adjusted(0, 0 - font_h - 13 - font_h, 0 + 5, 0 - font_h), Qt::AlignCenter, QString::number(it->first));
 				}
 			}
 			else {
-				qp.drawText(it->second.rect.adjusted(m_x, m_y - font_h - 13, m_x + 5, m_y), Qt::AlignCenter, QString::number(it->first));
+				qp.drawText(it->second.rect.adjusted(0, 0 - font_h - 13, 0 + 5, 0), Qt::AlignCenter, QString::number(it->first));
 			}
 			even = not even;
 		}
@@ -274,17 +274,17 @@ void MSP430::paint(QPainter &qp) {
 				std::map<int, Pin>::iterator next = it;
 				next++;
 				if (next != m_pins.end()) {
-					qp.drawText(it->second.rect.adjusted(m_x, m_y + font_h + 18 + font_h, m_x + 5, m_y + font_h), Qt::AlignCenter, QString::number(it->first));
+					qp.drawText(it->second.rect.adjusted(0, 0 + font_h + 18 + font_h, 0 + 5, 0 + font_h), Qt::AlignCenter, QString::number(it->first));
 				}
 			}
 			else {
-				qp.drawText(it->second.rect.adjusted(m_x, m_y + font_h + 18, m_x + 5, m_y), Qt::AlignCenter, QString::number(it->first));
+				qp.drawText(it->second.rect.adjusted(0, 0 + font_h + 18, 0 + 5, 0), Qt::AlignCenter, QString::number(it->first));
 			}
 			even = not even;
 		}
 // 		}
 // 		if (m_sides[it->first] == 'l') {
-// 			qp.drawText(QRect(m_x + it->second.x() + it->second.width() + 4, m_y + it->second.y(), 100, font_h), Qt::AlignCenter, m_names[it->first]);
+// 			qp.drawText(QRect(0 + it->second.x() + it->second.width() + 4, 0 + it->second.y(), 100, font_h), Qt::AlignCenter, m_names[it->first]);
 // 		}
 		
 	}

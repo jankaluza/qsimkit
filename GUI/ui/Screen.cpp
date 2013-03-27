@@ -141,7 +141,7 @@ int Screen::getPin(ScreenObject *object, int x, int y) {
 	std::map<int, Pin> &pins = object->getPins();
 	for (std::map<int, Pin>::const_iterator it = pins.begin(); it != pins.end(); ++it) {
 // 		qDebug() << it->second.rect.adjusted(object->x(),object->y(),object->x(),object->y()) << x << y;
-		if (it->second.rect.adjusted(object->x(),object->y(),object->x(),object->y()).contains(x,y)) {
+		if (it->second.rect.contains(x,y)) {
 			return it->first;
 		}
 	}
@@ -165,7 +165,7 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 			if (object) {
 				int pin = getPin(object, event->x(), event->y());
 				if (pin != -1) {
-					to = object->getPins()[pin].rect.adjusted(object->x(), object->y(), object->x(), object->y()).center();
+					to = object->getPins()[pin].rect.center();
 				}
 			}
 			m_points.push_back(from);
@@ -203,8 +203,8 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 		m_fromPin = getPin(object, event->x(), event->y());
 		if (m_fromPin != -1) {
 			m_moving = object;
-			m_movingX = object->getPins()[m_fromPin].rect.adjusted(object->x(), object->y(), object->x(), object->y()).center().x();
-			m_movingY = object->getPins()[m_fromPin].rect.adjusted(object->x(), object->y(), object->x(), object->y()).center().y();
+			m_movingX = object->getPins()[m_fromPin].rect.center().x();
+			m_movingY = object->getPins()[m_fromPin].rect.center().y();
 		}
 	}
 }

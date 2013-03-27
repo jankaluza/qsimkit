@@ -26,41 +26,46 @@ ConnectionManager::ConnectionManager() {
 	m_moving = NULL;
 }
 
-void ConnectionManager::addConnection(ScreenObject *from, int fport, ScreenObject *to, int tport, const std::vector<QPoint> &points) {
+void ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points) {
+	if (points.size() < 3) {
+		return;
+	}
+
 	Connection c;
 	c.from = from;
-	c.fport = fport;
+	c.fpin = fpin;
 	c.to = to;
-	c.tport = tport;
+	c.tpin = tpin;
 	c.points = points;
 
 	m_conns.push_back(c);
 }
 
 void ConnectionManager::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers) {
-	for (std::list<Connection>::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
-		qDebug() << wrappers[it->from] << it->fport << wrappers[it->to] << it->tport;
-		dig->couple(wrappers[it->from], it->fport, wrappers[it->to], it->tport);
-		dig->couple(wrappers[it->to], it->tport, wrappers[it->from], it->fport);
+	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+		dig->couple(wrappers[it->from], it->fpin, wrappers[it->to], it->tpin);
+		dig->couple(wrappers[it->to], it->tpin, wrappers[it->from], it->fpin);
 	}
 }
 
-void ConnectionManager::paint(QPainter &p) {
+void ConnectionManager::paint(QPainter &p, Connection &c) {
 	QPoint from;
 	QPoint to;
-	for (std::list<Connection>::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
-		from = it->from->getPins()[it->fport].rect.adjusted(it->from->x(), it->from->y(), it->from->x(), it->from->y()).center();
-		std::vector<QPoint>::iterator it2 = it->points.begin();
-		if (it2 != it->points.end()) {
-			for (it2++; it2 != it->points.end() - 1; ++it2) {
-				to = *it2;
-				p.drawLine(from, to);
-				from = to;
-				p.drawRect(to.x() - 5, to.y() - 5, 10, 10);
-			}
-			to = it->to->getPins()[it->tport].rect.adjusted(it->to->x(), it->to->y(), it->to->x(), it->to->y()).center();
-			p.drawLine(from, to);
-		}
+
+	from = c.from->getPins()[c.fpin].rect.center();
+	for (int i = 1; i < c.points.size() - 1; ++i) {
+		to = c.points[i];
+		p.drawLine(from, to);
+		from = to;
+		p.drawRect(to.x() - 5, to.y() - 5, 10, 10);
+	}
+	to = c.to->getPins()[c.tpin].rect.center();
+	p.drawLine(from, to);
+}
+
+void ConnectionManager::paint(QPainter &p) {
+	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+		paint(p, *it);
 	}
 }
 
@@ -78,7 +83,7 @@ bool ConnectionManager::mouseMoveEvent(QMouseEvent *event) {
 			QPointF to;
 			QPointF intersectPnt;
 			for (std::list<Connection>::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
-				from = it->from->getPins()[it->fport].rect.adjusted(it->from->x(), it->from->y(), it->from->x(), it->from->y()).center();
+				from = it->from->getPins()[it->fpin].rect.center();
 				std::vector<QPoint>::iterator it2 = it->points.begin();
 				if (it2 != it->points.end()) {
 					for (it2++; it2 != it->points.end() - 1; ++it2) {
@@ -100,7 +105,7 @@ bool ConnectionManager::mouseMoveEvent(QMouseEvent *event) {
 						}
 						from = to;
 					}
-					to = it->to->getPins()[it->tport].rect.adjusted(it->to->x(), it->to->y(), it->to->x(), it->to->y()).center();
+					to = it->to->getPins()[it->tpin].rect.center();
 					QLineF line(from, to);
 					QLineF line2(event->x()-10, event->y()-10, event->x()+10, event->y()+10);
 					if (line.intersect(line2, &intersectPnt)==QLineF::BoundedIntersection) {

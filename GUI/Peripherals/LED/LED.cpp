@@ -69,8 +69,8 @@ void LED::paint(QPainter &qp) {
 	int even = -1;
 	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
 		if (m_state) {
-			qp.fillRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y), QBrush(QColor(0,255,0)));
+			qp.fillRect(it->second.rect, QBrush(QColor(0,255,0)));
 		}
-		qp.drawRect(it->second.rect.adjusted(m_x, m_y, m_x, m_y));
+		qp.drawRect(it->second.rect);
 	}
 }
