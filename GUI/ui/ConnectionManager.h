@@ -20,8 +20,10 @@
 #pragma once
 
 #include <QPoint>
+#include <QPointF>
 #include <QPainter>
 #include <QMouseEvent>
+#include <QApplication>
 #include <vector>
 #include <map>
 
@@ -30,6 +32,7 @@
 class ScreenObject;
 class SimulationObjectWrapper;
 class SimulationEvent;
+class Screen;
 
 
 typedef struct {
@@ -42,10 +45,10 @@ typedef struct {
 
 class ConnectionManager
 {
-	typedef std::list<Connection> ConnectionList;
+	typedef std::list<Connection *> ConnectionList;
 
 	public:
-		ConnectionManager();
+		ConnectionManager(Screen *screen);
 		virtual ~ConnectionManager() {}
 
 		void addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points);
@@ -53,16 +56,30 @@ class ConnectionManager
 		void paint(QPainter &p);
 
 		bool mouseMoveEvent(QMouseEvent *event);
+		bool mousePressEvent(QMouseEvent *event);
+		bool mouseReleaseEvent(QMouseEvent *event);
 
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
+		void movePins(ScreenObject *object);
+
 	private:
-		void paint(QPainter &p, Connection &c);
+		void paint(QPainter &p, Connection *c);
+		Connection *getPoint(int x, int y, int &point);
+		Connection *getConnection(int x, int y, int &point, QPointF *intersectPnt = 0);
+		void removeConnection(Connection *c);
+		void removePoint(Connection *c, int point);
+		void removeDuplicatePoints(Connection *c);
 
 	private:
 		ConnectionList m_conns;
 		QPoint *m_moving;
 		int m_movingX;
 		int m_movingY;
+		std::vector<QPoint> m_points;
+		Screen *m_screen;
+		int m_fromPin;
+		ScreenObject *m_fromObject;
+		Connection *m_movingConn;
 };
 

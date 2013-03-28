@@ -29,6 +29,7 @@
 #include <QMainWindow>
 #include <QToolTip>
 #include <QString>
+#include <QApplication>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QFile>
@@ -39,8 +40,7 @@
 
 Screen::Screen(QWidget *parent) : QWidget(parent) {
 	m_moving = 0;
-	m_fromPin = -1;
-	m_conns = new ConnectionManager();
+	m_conns = new ConnectionManager(this);
 	setMouseTracking(true);
 }
 
@@ -76,37 +76,12 @@ MSP430 *Screen::getCPU() {
 
 void Screen::paintEvent(QPaintEvent *e) {
 	QPainter p(this);
+	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
 	for (int i = 0; i < m_objects.size(); ++i) {
 		m_objects[i]->paint(p);
 	}
 
 	m_conns->paint(p);
-
-	if (m_fromPin != -1) {
-		QPoint from = QPoint(m_movingX, m_movingY);
-		QPoint to;
-		std::vector<QPoint>::iterator it = m_points.begin();
-		if (it != m_points.end()) {
-			from = *it;
-			for (it++; it != m_points.end(); ++it) {
-				to = *it;
-				p.drawLine(from, to);
-				from = to;
-			}
-		}
-
-
-		to = mapFromGlobal(QCursor::pos());
-
-		if (getObject(from.x(), to.y()) == m_moving && getPin(m_moving, from.x(), to.y()) != -1) {
-			p.drawLine(from, QPoint(to.x(), from.y()));
-			p.drawLine(QPoint(to.x(), from.y()), to);
-		}
-		else {
-			p.drawLine(from, QPoint(from.x(), to.y()));
-			p.drawLine(QPoint(from.x(), to.y()), to);
-		}
-	}
 }
 
 void Screen::resizeAccordingToObjects() {
@@ -140,7 +115,6 @@ ScreenObject *Screen::getObject(int x, int y) {
 int Screen::getPin(ScreenObject *object, int x, int y) {
 	std::map<int, Pin> &pins = object->getPins();
 	for (std::map<int, Pin>::const_iterator it = pins.begin(); it != pins.end(); ++it) {
-// 		qDebug() << it->second.rect.adjusted(object->x(),object->y(),object->x(),object->y()) << x << y;
 		if (it->second.rect.contains(x,y)) {
 			return it->first;
 		}
@@ -149,80 +123,49 @@ int Screen::getPin(ScreenObject *object, int x, int y) {
 	return -1;
 }
 
+void Screen::mouseReleaseEvent(QMouseEvent *event) {
+	if (m_conns->mouseReleaseEvent(event)) {
+		repaint();
+		return;
+	}
+}
+
 void Screen::mousePressEvent(QMouseEvent *event) {
+	if (m_conns->mousePressEvent(event)) {
+		repaint();
+		return;
+	}
+
 	if (event->button() == Qt::RightButton) {
-		if (m_fromPin != -1) {
-			m_fromPin = -1;
-			m_points.clear();
-			repaint();
-		}
+
 	}
 	else if (event->button() == Qt::LeftButton) {
-		if (m_fromPin != -1) {
-			QPoint from = QPoint(m_movingX, m_movingY);
-			QPoint to = mapFromGlobal(QCursor::pos());
-			ScreenObject *object = getObject(event->x(), event->y());
-			if (object) {
-				int pin = getPin(object, event->x(), event->y());
-				if (pin != -1) {
-					to = object->getPins()[pin].rect.center();
-				}
-			}
-			m_points.push_back(from);
 
-			if (getObject(from.x(), to.y()) == m_moving && getPin(m_moving, from.x(), to.y()) != -1) {
-				m_points.push_back(QPoint(to.x(), from.y()));
-			}
-			else {
-				m_points.push_back(QPoint(from.x(), to.y()));
-			}
+	}
+}
 
-			m_points.push_back(to);
-
-			if (object) {
-				int pin = getPin(object, event->x(), event->y());
-				if (pin != -1) {
-					m_conns->addConnection(m_moving, m_fromPin, object, pin, m_points);
-					m_fromPin = -1;
-					m_points.clear();
-					repaint();
-					return;
-				}
-			}
-
-			m_movingX = event->x();
-			m_movingY = event->y();
-			return;
-		}
-
+void Screen::mouseMoveEvent(QMouseEvent *event) {
+	if (!m_moving && m_conns->mouseMoveEvent(event)) {
 		ScreenObject *object = getObject(event->x(), event->y());
 		if (!object) {
 			return;
 		}
 
-		m_fromPin = getPin(object, event->x(), event->y());
-		if (m_fromPin != -1) {
-			m_moving = object;
-			m_movingX = object->getPins()[m_fromPin].rect.center().x();
-			m_movingY = object->getPins()[m_fromPin].rect.center().y();
+		int pin = getPin(object, event->x(), event->y());
+		if (pin == -1) {
+			return;
 		}
-	}
-}
 
-void Screen::mouseMoveEvent(QMouseEvent *event) {
-	if (m_conns->mouseMoveEvent(event)) {
-		repaint();
+		Pin &p = object->getPins()[pin];
+		QToolTip::showText(mapToGlobal(event->pos()), p.name);
 		return;
 	}
 
 	if (event->buttons() & Qt::LeftButton) {
-		if (m_fromPin != -1) {
-			repaint();
-			return;
-		}
-		else if (m_moving) {
+		if (m_moving) {
 			m_moving->setX(m_moving->x() - (m_movingX - event->x()));
 			m_moving->setY(m_moving->y() - (m_movingY - event->y()));
+			m_conns->movePins(m_moving);
 			resizeAccordingToObjects();
 			repaint();
 		}
@@ -242,12 +185,7 @@ void Screen::mouseMoveEvent(QMouseEvent *event) {
 		m_movingY = event->y();
 	}
 	else {
-		if (m_fromPin != -1) {
-			repaint();
-		}
-		else {
-			m_moving = 0;
-		}
+		m_moving = 0;
 
 		ScreenObject *object = getObject(event->x(), event->y());
 		if (!object) {
@@ -260,6 +198,6 @@ void Screen::mouseMoveEvent(QMouseEvent *event) {
 		}
 
 		Pin &p = object->getPins()[pin];
-		QToolTip::showText(event->pos(), p.name);
+		QToolTip::showText(mapToGlobal(event->pos()), p.name);
 	}
 }

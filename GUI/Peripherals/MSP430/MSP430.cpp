@@ -233,6 +233,7 @@ void MSP430::paint(QPainter &qp) {
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
 	qp.drawRect(m_x + font_w, m_y + font_w, width() - 2*font_w, height() - 2*font_w);
+	qp.fillRect(QRect(m_x + font_w, m_y + font_w, width() - 2*font_w, height() - 2*font_w), QBrush(QColor(226, 206, 255)));
 
 	QPen pen2(Qt::black, 1, Qt::SolidLine);
 	qp.setPen(pen2);

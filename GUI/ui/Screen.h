@@ -43,23 +43,23 @@ class Screen : public QWidget
 
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 
+		ScreenObject *getObject(int x, int y);
+		int getPin(ScreenObject *object, int x, int y);
+
 	protected:
 		void paintEvent(QPaintEvent *e);
 		void mouseMoveEvent(QMouseEvent *event);
 		void mousePressEvent(QMouseEvent *event);
+		void mouseReleaseEvent(QMouseEvent *event);
 
 	private:
 		void resizeAccordingToObjects();
-		ScreenObject *getObject(int x, int y);
-		int getPin(ScreenObject *object, int x, int y);
 
 	private:
 		QList<ScreenObject *> m_objects;
 		ScreenObject *m_moving;
 		int m_movingX;
-		int m_movingY;
-		int m_fromPin;
-		std::vector<QPoint> m_points;
+		int m_movingY;		
 		ConnectionManager *m_conns;
 };
 
