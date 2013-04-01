@@ -29,6 +29,7 @@
 class PeripheralInterface;
 class PeripheralManager;
 class Peripheral;
+class ScriptEngine;
 
 class PeripheralInfo {
 	public:
@@ -54,10 +55,10 @@ class PeripheralManager : public QObject {
 		PeripheralInterface *loadBinaryPeripheral(QString dir);
 
 	private:
-		
-
 		bool loadXML(QString xml);
+
 		QMap<QString, PeripheralInfo> m_peripherals;
+		ScriptEngine *m_scriptEngine;
 
 };
 

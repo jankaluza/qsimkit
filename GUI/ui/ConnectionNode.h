@@ -33,7 +33,7 @@ class ConnectionNode : public ScreenObject
 		ConnectionNode();
 		virtual ~ConnectionNode();
 
-		void paint(QPainter &p);
+		void paint(QWidget *screen);
 
 		void setConnection(int pin, Connection *c) {
 			qDebug() << "adding" << pin;

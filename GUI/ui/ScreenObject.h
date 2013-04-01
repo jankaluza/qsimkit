@@ -50,7 +50,7 @@ class ScreenObject : public QObject
 
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
-		virtual void paint(QPainter &p) = 0;
+		virtual void paint(QWidget *screen) = 0;
 
 		virtual std::map<int, Pin> &getPins() = 0;
 

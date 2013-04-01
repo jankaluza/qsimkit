@@ -20,6 +20,7 @@
 #include "PeripheralManager.h"
 #include "PeripheralInterface.h"
 #include "Peripheral.h"
+#include "Script/ScriptEngine.h"
 #include <QPluginLoader>
 #include <QApplication>
 #include <QDebug>
@@ -30,11 +31,11 @@ Peripheral *PeripheralInfo::create() {
 }
 
 PeripheralManager::PeripheralManager() {
-
+	m_scriptEngine = new ScriptEngine();
 }
 
 PeripheralManager::~PeripheralManager() {
-	
+	delete m_scriptEngine;
 }
 
 bool PeripheralManager::loadXML(QString file) {

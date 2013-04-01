@@ -62,7 +62,8 @@ double LED::timeAdvance() {
 	return DBL_MAX;
 }
 
-void LED::paint(QPainter &qp) {
+void LED::paint(QWidget *screen) {
+	QPainter qp(screen);
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
 	qp.drawEllipse(m_x + 6, m_y, m_width - 6, m_height - 12);

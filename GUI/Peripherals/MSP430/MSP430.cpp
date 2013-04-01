@@ -226,7 +226,8 @@ bool MSP430::loadXML(const QString &file) {
 	return true;
 }
 
-void MSP430::paint(QPainter &qp) {
+void MSP430::paint(QWidget *screen) {
+	QPainter qp(screen);
 	int font_w = 10;
 	int font_h = 10;
 

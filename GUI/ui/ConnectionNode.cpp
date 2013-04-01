@@ -18,6 +18,9 @@
  **/
 
 #include "ConnectionNode.h"
+#include <QPainter>
+#include <QPaintDevice>
+#include <QWidget>
 
 ConnectionNode::ConnectionNode() {
 	m_width = 36;
@@ -44,7 +47,8 @@ ConnectionNode::~ConnectionNode() {
 
 }
 
-void ConnectionNode::paint(QPainter &p) {
+void ConnectionNode::paint(QWidget *screen) {
+	QPainter p(screen);
 	QBrush b = p.brush();
 	QPen pen = p.pen();
 // 	p.drawRect(m_x, m_y, m_width, m_height);

@@ -42,7 +42,7 @@ class LED : public Peripheral
 
 		void reset();
 
-		void paint(QPainter &p);
+		void paint(QWidget *screen);
 
 		std::map<int, Pin> &getPins() {
 			return m_pins;

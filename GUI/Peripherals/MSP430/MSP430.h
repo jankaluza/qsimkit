@@ -57,7 +57,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void reset();
 
-		void paint(QPainter &p);
+		void paint(QWidget *screen);
 
 		std::map<int, Pin> &getPins() {
 			return m_pins;
