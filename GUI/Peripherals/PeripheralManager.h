@@ -19,44 +19,45 @@
 
 #pragma once
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
+#include <QChar>
+#include <QRect>
+#include <QMap>
+#include <QDir>
 
-#include "ui_QSimKit.h"
-
-#include "adevs.h"
-
-class Variant;
-class CPU;
-class SimulationEvent;
+class PeripheralInterface;
 class PeripheralManager;
+class Peripheral;
 
-class QSimKit : public QMainWindow, public Ui::QSimKit
-{
+class PeripheralInfo {
+	public:
+		PeripheralInfo() {}
+		virtual ~PeripheralInfo() {}
+
+		Peripheral *create();
+
+	private:
+		PeripheralInterface *m_peripheral;
+
+	friend class PeripheralManager;
+};
+
+class PeripheralManager : public QObject {
 	Q_OBJECT
 
 	public:
-		QSimKit(QWidget *parent = 0);
+		PeripheralManager();
+		~PeripheralManager();
 
-		void setVariant(const QString &variant);
-		bool loadA43File(const QString &file);
-
-	public slots:
-		void loadA43();
-		void chooseVariant();
-		void simulationStep();
-
-		void startSimulation();
-		void stopSimulation();
-		void pauseSimulation(bool pause);
-		void resetSimulation();
+		void loadPeripherals();
+		PeripheralInterface *loadBinaryPeripheral(QString dir);
 
 	private:
-		Variant *m_variant;
-		adevs::Digraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
-		QTimer *m_timer;
-		PeripheralManager *m_peripherals;
+		
+
+		bool loadXML(QString xml);
+		QMap<QString, PeripheralInfo> m_peripherals;
+
 };
 

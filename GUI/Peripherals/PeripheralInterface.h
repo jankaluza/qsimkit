@@ -19,44 +19,21 @@
 
 #pragma once
 
-#include <QMainWindow>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
+#include <QChar>
+#include <QRect>
+#include <map>
 
-#include "ui_QSimKit.h"
+class Peripheral;
 
-#include "adevs.h"
-
-class Variant;
-class CPU;
-class SimulationEvent;
-class PeripheralManager;
-
-class QSimKit : public QMainWindow, public Ui::QSimKit
-{
-	Q_OBJECT
-
+class PeripheralInterface {
 	public:
-		QSimKit(QWidget *parent = 0);
+		virtual ~PeripheralInterface() {}
 
-		void setVariant(const QString &variant);
-		bool loadA43File(const QString &file);
-
-	public slots:
-		void loadA43();
-		void chooseVariant();
-		void simulationStep();
-
-		void startSimulation();
-		void stopSimulation();
-		void pauseSimulation(bool pause);
-		void resetSimulation();
-
-	private:
-		Variant *m_variant;
-		adevs::Digraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
-		QTimer *m_timer;
-		PeripheralManager *m_peripherals;
+		virtual Peripheral *create() = 0;
 };
 
+
+Q_DECLARE_INTERFACE(PeripheralInterface,
+                     "com.trolltech.QSimKit.PeripheralInterface/1.0");

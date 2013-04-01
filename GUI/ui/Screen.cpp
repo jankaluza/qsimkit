@@ -19,14 +19,18 @@
 
 #include "Screen.h"
 
+#include "Peripherals/Peripheral.h"
 #include "Peripherals/MSP430/MSP430.h"
-#include "Peripherals/LED/LED.h"
+// #include "Peripherals/LED/LED.h"
+#include "ConnectionNode.h"
 #include "ScreenObject.h"
 #include "ConnectionManager.h"
 
 
 #include <QWidget>
 #include <QMainWindow>
+#include <QAction>
+#include <QMenu>
 #include <QToolTip>
 #include <QString>
 #include <QApplication>
@@ -38,6 +42,8 @@
 #include <QMouseEvent>
 #include <QDebug>
 
+#define NORM(X) ((X) - (X) % 12)
+
 Screen::Screen(QWidget *parent) : QWidget(parent) {
 	m_moving = 0;
 	m_conns = new ConnectionManager(this);
@@ -47,10 +53,13 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 void Screen::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig) {
 	std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
 	for (int i = 0; i < m_objects.size(); ++i) {
-		SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(m_objects[i]);
-		dig->add(wrapper);
+		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
+		if (p) {
+			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p);
+			dig->add(wrapper);
 
-		wrappers[m_objects[i]] = wrapper;
+			wrappers[m_objects[i]] = wrapper;
+		}
 	}
 
 	m_conns->prepareSimulation(dig, wrappers);
@@ -59,7 +68,8 @@ void Screen::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig) {
 void Screen::setCPU(MSP430 *cpu) {
 	if (m_objects.empty()) {
 		m_objects.append(cpu);
-		m_objects.append(new LED());
+// 		m_objects.append(new LED());
+// 		m_objects.append(new ConnectionNode());
 	}
 	else {
 		disconnect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
@@ -77,6 +87,16 @@ MSP430 *Screen::getCPU() {
 void Screen::paintEvent(QPaintEvent *e) {
 	QPainter p(this);
 	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
+	p.setPen(QPen(QColor(245, 245, 245), 1, Qt::SolidLine));
+	for (int i = 0; i < 1500; i += 12) {
+		p.drawLine(i, 0, i, 1500);
+	}
+
+	for (int i = 0; i < 1500; i += 12) {
+		p.drawLine(0, i, 1500, i);
+	}
+
+
 	for (int i = 0; i < m_objects.size(); ++i) {
 		m_objects[i]->paint(p);
 	}
@@ -130,6 +150,14 @@ void Screen::mouseReleaseEvent(QMouseEvent *event) {
 	}
 }
 
+void Screen::removeObject(ScreenObject *object) {
+	m_conns->objectRemoved(object);
+	m_objects.removeAll(object);
+	qDebug() << "removing";
+	qDebug() << "removing" << object;
+	delete object;
+}
+
 void Screen::mousePressEvent(QMouseEvent *event) {
 	if (m_conns->mousePressEvent(event)) {
 		repaint();
@@ -137,7 +165,17 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 	}
 
 	if (event->button() == Qt::RightButton) {
+		ScreenObject *object = getObject(event->x(), event->y());
+		if (!object) {
+			return;
+		}
 
+		QList<QAction *> actions;
+		actions.append(new QAction("Remove object", 0));
+		QAction *action = QMenu::exec(actions, event->globalPos(), 0, 0);
+		if (action) {
+			removeObject(object);
+		}
 	}
 	else if (event->button() == Qt::LeftButton) {
 
@@ -163,8 +201,8 @@ void Screen::mouseMoveEvent(QMouseEvent *event) {
 
 	if (event->buttons() & Qt::LeftButton) {
 		if (m_moving) {
-			m_moving->setX(m_moving->x() - (m_movingX - event->x()));
-			m_moving->setY(m_moving->y() - (m_movingY - event->y()));
+			m_moving->setX(NORM(m_moving->x() - (m_movingX - event->x())));
+			m_moving->setY(NORM(m_moving->y() - (m_movingY - event->y())));
 			m_conns->movePins(m_moving);
 			resizeAccordingToObjects();
 			repaint();
@@ -181,10 +219,13 @@ void Screen::mouseMoveEvent(QMouseEvent *event) {
 			}
 			m_moving = object;
 		}
-		m_movingX = event->x();
-		m_movingY = event->y();
+		m_movingX = NORM(event->x());
+		m_movingY = NORM(event->y());
 	}
 	else {
+		if (m_moving) {
+			m_conns->objectMoved(m_moving);
+		}
 		m_moving = 0;
 
 		ScreenObject *object = getObject(event->x(), event->y());

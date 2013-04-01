@@ -6,6 +6,15 @@ find_package(cppunit)
 
 FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtXml REQUIRED)
 
+find_package(PythonLibs REQUIRED)
+include_directories(${PYTHON_INCLUDE_PATH})
+
+# Find PythonQt
+find_package(PythonQt REQUIRED)
+include_directories(${LIBPYTHONQT_INCLUDE_PATH})
+
+message(STATUS "Using PythonQt: ${PYTHONQT_LIBRARIES} ${PYTHONQT_INCLUDE_PATH}")
+
 if(NOT CPPUNIT_FOUND AND CPPUNIT_INCLUDE_DIR AND CPPUNIT_LIBRARY)
 	set(CCPUNIT_LIBRARIES ${CPPUNIT_LIBRARY})
 	set(CPPUNIT_FOUND 1)

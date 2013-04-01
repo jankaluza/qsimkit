@@ -33,6 +33,7 @@ class ScreenObject;
 class SimulationObjectWrapper;
 class SimulationEvent;
 class Screen;
+class ConnectionNode;
 
 
 typedef struct {
@@ -51,7 +52,7 @@ class ConnectionManager
 		ConnectionManager(Screen *screen);
 		virtual ~ConnectionManager() {}
 
-		void addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points);
+		Connection *addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points);
 
 		void paint(QPainter &p);
 
@@ -62,6 +63,8 @@ class ConnectionManager
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 		void movePins(ScreenObject *object);
+		void objectMoved(ScreenObject *object);
+		void objectRemoved(ScreenObject *object);
 
 	private:
 		void paint(QPainter &p, Connection *c);
@@ -70,6 +73,8 @@ class ConnectionManager
 		void removeConnection(Connection *c);
 		void removePoint(Connection *c, int point);
 		void removeDuplicatePoints(Connection *c);
+		void addConnectionNode(Connection *c, int point, int x, int y, std::vector<QPoint> &points);
+		void removeUselessNode(ConnectionNode *node);
 
 	private:
 		ConnectionList m_conns;
@@ -81,5 +86,6 @@ class ConnectionManager
 		int m_fromPin;
 		ScreenObject *m_fromObject;
 		Connection *m_movingConn;
+		bool m_removingUselessNode;
 };
 

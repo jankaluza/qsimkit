@@ -41,6 +41,12 @@ class Screen : public QWidget
 		void setCPU(MSP430 *cpu);
 		MSP430 *getCPU();
 
+		void addObject(ScreenObject *obj) {
+			m_objects.append(obj);
+		}
+
+		void removeObject(ScreenObject *obj);
+
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 
 		ScreenObject *getObject(int x, int y);

@@ -25,6 +25,7 @@
 #include <QRect>
 #include <map>
 #include "Peripherals/Peripheral.h"
+#include "Peripherals/PeripheralInterface.h"
 
 class LED : public Peripheral
 {
@@ -50,5 +51,13 @@ class LED : public Peripheral
 		std::map<int, Pin> m_pins;
 		bool m_state;
 
+};
+
+class LEDInterface : public QObject, PeripheralInterface {
+	Q_OBJECT
+	Q_INTERFACES(PeripheralInterface)
+
+	public:
+		Peripheral *create();
 };
 

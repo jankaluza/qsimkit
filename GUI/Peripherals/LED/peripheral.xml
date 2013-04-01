@@ -1,0 +1,9 @@
+<peripheral type='binary'>
+   <name>LED</name>
+   <comment>LED</comment>
+   <author>Jan Kaluza</author>
+   <email>hanzz.k@gmail.com</email>
+   <version>0.1</version>
+   <license>GNU/GPL</license>
+   <library>libled</library>
+</peripheral>

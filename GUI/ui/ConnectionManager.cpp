@@ -20,10 +20,15 @@
 #include "ConnectionManager.h"
 #include "ScreenObject.h"
 #include "Screen.h"
+#include "Peripherals/SimulationObject.h"
+#include "ConnectionNode.h"
+#include "math.h"
 
 #include <QAction>
 #include <QMenu>
 #include <QDebug>
+
+#define NORM(X) (X - X % 12 + 6)
 
 ConnectionManager::ConnectionManager(Screen *screen) {
 	m_moving = NULL;
@@ -31,11 +36,12 @@ ConnectionManager::ConnectionManager(Screen *screen) {
 	m_fromPin = -1;
 	m_fromObject = 0;
 	m_movingConn = 0;
+	m_removingUselessNode = false;
 }
 
-void ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points) {
-	if (points.size() < 3) {
-		return;
+Connection *ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points) {
+	if (points.size() < 2) {
+		return 0;
 	}
 
 	Connection *c = new Connection;
@@ -50,7 +56,16 @@ void ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject
 
 	removeDuplicatePoints(c);
 
+	if (dynamic_cast<ConnectionNode *>(c->to)) {
+		dynamic_cast<ConnectionNode *>(c->to)->setConnection(c->tpin, c);
+	}
+
+	if (dynamic_cast<ConnectionNode *>(c->from)) {
+		dynamic_cast<ConnectionNode *>(c->from)->setConnection(c->fpin, c);
+	}
+
 	m_conns.push_back(c);
+	return c;
 }
 
 void ConnectionManager::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers) {
@@ -72,17 +87,66 @@ void ConnectionManager::movePins(ScreenObject *object) {
 	}
 }
 
+void ConnectionManager::objectMoved(ScreenObject *object) {
+	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+		Connection *c = *it;
+		if (c->from == object || c->to == object) {
+			removeDuplicatePoints(c);
+		}
+	}
+}
+
+void ConnectionManager::objectRemoved(ScreenObject *object) {
+	if (m_removingUselessNode)
+		return;
+
+	ConnectionNode *node = dynamic_cast<ConnectionNode *>(object);
+	if (node) {
+		bool stop = false;
+		for (int i = 0; i < 4; ++i) {
+			Connection *c = node->getConnection(i);
+			if (!c) {
+				continue;
+			}
+
+			stop = node->isUseless();
+			m_removingUselessNode = true;
+			removeConnection(c);
+			m_removingUselessNode = false;
+			if (stop) {
+				return;
+			}
+		}
+		return;
+	}
+
+	std::vector<Connection *> toRemove;
+	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+		Connection *c = *it;
+		if (c->from == object || c->to == object) {
+			toRemove.push_back(c);
+		}
+	}
+
+	for (int i = 0; i < toRemove.size(); ++i) {
+		removeConnection(toRemove[i]);
+	}
+}
+
 void ConnectionManager::paint(QPainter &p, Connection *c) {
 	QPoint from;
 	QPoint to;
 
+// 	p.setPen(QPen(QColor(194, 194, 194), 1, Qt::SolidLine));
 	from = c->points[0];
-	p.drawRect(from.x() - 5, from.y() - 5, 12, 12);
+// 	p.drawRect(from.x() - 5, from.y() - 5, 12, 12);
 	for (int i = 1; i < c->points.size(); ++i) {
 		to = c->points[i];
+		p.setPen(QPen(Qt::black, 2, Qt::SolidLine));
 		p.drawLine(from, to);
 		from = to;
-		p.drawRect(to.x() - 5, to.y() - 5, 12, 12);
+// 		p.setPen(QPen(QColor(194, 194, 194), 1, Qt::SolidLine));
+// 		p.drawRect(to.x() - 5, to.y() - 5, 12, 12);
 	}
 }
 
@@ -106,6 +170,8 @@ void ConnectionManager::paint(QPainter &p) {
 
 
 		to = m_screen->mapFromGlobal(QCursor::pos());
+		to.setX(to.x() - to.x() % 12 + 6);
+		to.setY(to.y() - to.y() % 12 + 6);
 
 		QPointF fto(to);
 		QPointF ffrom(from);
@@ -170,7 +236,132 @@ Connection *ConnectionManager::getConnection(int x, int y, int &point, QPointF *
 	return 0;
 }
 
+void ConnectionManager::removeUselessNode(ConnectionNode *node) {
+	if (node->isUseless()) {
+		Connection *c1 = 0;
+		Connection *c2 = 0;
+		int c1pin = 0;
+		int c2pin = 0;
+		for (int i = 0; i < 4; ++i) {
+			Connection *c = node->getConnection(i);
+			if (!c) {
+				continue;
+			}
+
+			if (!c1) { c1 = c; c1pin = i;}
+			else if (!c2) { c2 = c; c2pin = i; }
+		}
+
+		if (c1->to == node) {
+			if (c1pin == 0) {
+				c1->points[c1->points.size() - 1].setX(c1->points[c1->points.size() - 1].x() + 12);
+			}
+			else if (c1pin == 1) {
+				c1->points[c1->points.size() - 1].setY(c1->points[c1->points.size() - 1].y() - 12);
+			}
+			else if (c1pin == 2) {
+				c1->points[c1->points.size() - 1].setX(c1->points[c1->points.size() - 1].x() - 12);
+			}
+			else if (c1pin == 3) {
+				c1->points[c1->points.size() - 1].setY(c1->points[c1->points.size() - 1].y() + 12);
+			}
+			if (c2->to == node) {
+				qDebug() << "1x";
+				c1->to = c2->from;
+				c1->tpin = c2->fpin;
+				c2->to = 0;
+				for (int i = c2->points.size() - 1; i != -1; i--) {
+					qDebug() << "push" << c2->points[i];
+					c1->points.push_back(c2->points[i]);
+				}
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "got" << c1->points[i];
+				}
+			}
+			else {
+				qDebug() << "2x";
+				c1->to = c2->to;
+				c1->tpin = c2->tpin;
+				c2->from = 0;
+				for (int i = 0; i != c2->points.size(); i++) {
+					qDebug() << "push" << c2->points[i];
+					c1->points.push_back(c2->points[i]);
+				}
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "got" << c1->points[i];
+				}
+			}
+		}
+		else {
+			if (c1pin == 0) {
+				c1->points[0].setX(c1->points[0].x() + 12);
+			}
+			else if (c1pin == 1) {
+				c1->points[0].setY(c1->points[0].y() - 12);
+			}
+			else if (c1pin == 2) {
+				c1->points[0].setX(c1->points[0].x() - 12);
+			}
+			else if (c1pin == 3) {
+				c1->points[0].setY(c1->points[0].y() + 12);
+			}
+			if (c2->to == node) {
+				qDebug() << "3x";
+				c1->from = c2->from;
+				c1->fpin = c2->fpin;
+				c2->to = 0;
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "push" << c1->points[i];
+					c2->points.push_back(c1->points[i]);
+				}
+				c1->points = c2->points;
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "got" << c1->points[i];
+				}
+			}
+			else {
+				qDebug() << "4x";
+				c1->from = c2->to;
+				c1->fpin = c2->tpin;
+				c2->from = 0;
+				std::reverse(c2->points.begin(), c2->points.end());
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "push" << c1->points[i];
+					c2->points.push_back(c1->points[i]);
+				}
+				c1->points = c2->points;
+				for (int i = 0; i != c1->points.size(); i++) {
+					qDebug() << "got" << c1->points[i];
+				}
+			}
+		}
+		removeConnection(c2);
+		removeDuplicatePoints(c1);
+		if (!m_removingUselessNode) {
+			m_removingUselessNode = true;
+			m_screen->removeObject(node);
+			m_removingUselessNode = false;
+		}
+	}
+}
+
 void ConnectionManager::removeConnection(Connection *c) {
+	ConnectionNode *node = 0;
+
+	node = dynamic_cast<ConnectionNode *>(c->to);
+	if (node) {
+		node->removeConnection(c->tpin);
+		c->to = 0;
+		removeUselessNode(node);
+	}
+
+	node = dynamic_cast<ConnectionNode *>(c->from);
+	if (node) {
+		node->removeConnection(c->fpin);
+		c->from = 0;
+		removeUselessNode(node);
+	}
+
 	m_conns.remove(c);
 	delete c;
 }
@@ -180,12 +371,37 @@ void ConnectionManager::removePoint(Connection *c, int point) {
 	if (c->points.size() < 2) {
 		removeConnection(c);
 	}
+	movePins(c->from);
+	movePins(c->to);
 }
 
 void ConnectionManager::removeDuplicatePoints(Connection *c) {
 	bool removedSome = false;
 	bool remove = true;
 
+	// If we have three points in single line, we can remove the
+	// middle one
+	for (int point1 = 1; point1 < c->points.size(); ++point1) {
+		int point0 = point1 - 1;
+		int point2 = point1 + 1;
+		if (point2 == c->points.size()) {
+			break;
+		}
+
+		// if (p1.x == p2.x == p3.x) or (p1.y == p2.y == p3.y)
+		if ((NORM(c->points[point0].x()) == NORM(c->points[point1].x()) &&
+			NORM(c->points[point2].x()) == NORM(c->points[point1].x())) ||
+			(NORM(c->points[point0].y()) == NORM(c->points[point1].y()) &&
+			NORM(c->points[point2].y()) == NORM(c->points[point1].y()))) {
+			removedSome = true;
+			qDebug() << "removing duplicate" << point1;
+			removePoint(c, point1);
+			point1--;
+		}
+	}
+
+	// If we have two points on the same field in grid, we can remove
+	// the second one.
 	while(remove) {
 		remove = false;
 		for (int point1 = 0; point1 < c->points.size(); ++point1) {
@@ -196,7 +412,7 @@ void ConnectionManager::removeDuplicatePoints(Connection *c) {
 				QRect r2(c->points[point2].x() - 6, c->points[point2].y() - 6, 12, 12);
 
 				if (r1.intersects(r2)) {
-					remove = true;
+// 					remove = true;
 					break;
 				}
 			}
@@ -216,6 +432,60 @@ void ConnectionManager::removeDuplicatePoints(Connection *c) {
 	}
 }
 
+void ConnectionManager::addConnectionNode(Connection *c, int point, int x, int y, std::vector<QPoint> &points) {
+	ConnectionNode *node = new ConnectionNode();
+	node->setX(NORM(x) - node->width()/2);
+	node->setY(NORM(y) - node->height()/2);
+
+	std::vector<QPoint> newPoints;
+	newPoints.push_back(QPoint(NORM(x), NORM(y)));
+	while (c->points.size() != point + 1) {
+		qDebug() << c->points[point + 1];
+		newPoints.push_back(c->points[point + 1]);
+		c->points.erase(c->points.begin() + point + 1);
+	}
+
+	m_screen->addObject(node);
+
+	int addpin1 = 0;
+	int addpin2 = 0;
+	int addpin3 = 0;
+#define PINPOS(POINT, VAR)\
+qDebug() << abs(POINT.y() - NORM(y)) << abs(POINT.x() - NORM(x));\
+if (abs(POINT.y() - NORM(y)) < abs(POINT.x() - NORM(x))) { \
+	if (POINT.x() < NORM(x)) \
+		VAR = 0; \
+	else \
+		VAR = 2; \
+} \
+else { \
+	if (POINT.y() < NORM(y)) \
+		VAR = 3; \
+	else \
+		VAR = 1; \
+} \
+qDebug() << VAR;
+
+	qDebug() << newPoints[0] << newPoints[1] << newPoints[newPoints.size() - 1];
+	PINPOS(c->points[c->points.size() - 2], addpin1);
+	PINPOS(newPoints[newPoints.size() - 1], addpin2);
+	PINPOS(points[points.size() - 2], addpin3);
+
+	Connection *c2 = addConnection(node, addpin2, c->to, c->tpin, newPoints);
+	node->setConnection(addpin2, c2);
+
+	c->to = node;
+	c->tpin = addpin1;
+
+	movePins(c->to);
+	movePins(c->from);
+
+	node->setConnection(addpin1, c);
+
+	Connection *c3 = addConnection(m_fromObject, m_fromPin, node, addpin3, points);
+	node->setConnection(addpin3, c3);
+}
+
 bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		if (m_fromPin != -1) {
@@ -225,7 +495,7 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 		}
 
 		int point;
-		Connection *c = getPoint(event->x(), event->y(), point);
+		Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
 		if (point != -1) {
 			QList<QAction *> actions;
 			actions.append(new QAction("Remove point", 0));
@@ -236,7 +506,7 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 			return true;
 		}
 
-		c = getConnection(event->x(), event->y(), point);
+		c = getConnection(NORM(event->x()), NORM(event->y()), point);
 		if (c) {
 			QList<QAction *> actions;
 			actions.append(new QAction("Remove connection", 0));
@@ -250,10 +520,10 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 	else if (event->button() == Qt::LeftButton) {
 		if (m_fromPin != -1) {
 			QPoint from = QPoint(m_movingX, m_movingY);
-			QPoint to = event->pos();
-			ScreenObject *object = m_screen->getObject(event->x(), event->y());
+			QPoint to(NORM(event->pos().x()), NORM(event->pos().y()));
+			ScreenObject *object = m_screen->getObject(NORM(event->x()), NORM(event->y()));
 			if (object) {
-				int pin = m_screen->getPin(object, event->x(), event->y());
+				int pin = m_screen->getPin(object, NORM(event->x()), NORM(event->y()));
 				if (pin != -1) {
 					to = object->getPins()[pin].rect.center();
 				}
@@ -273,10 +543,37 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 				m_points.push_back(QPoint(from.x(), to.y()));
 			}
 
-			m_points.push_back(to);
+// 			if (!firstPoints) {
+				m_points.push_back(to);
+// 			}
+
+			int point;
+			Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
+			if (point != -1) {
+				addConnectionNode(c, point, event->x(), event->y(), m_points);
+
+				m_fromPin = -1;
+				m_points.clear();
+// 				qDebug() << newPoints.size() << c->points.size() << "\n";
+				return true;
+			}
+			else {
+				QPointF intersectPnt;
+				int point;
+				c = getConnection(NORM(event->x()), NORM(event->y()), point, &intersectPnt);
+				if (c) {
+					QPoint p = intersectPnt.toPoint();
+					p = QPoint(NORM(p.x()), NORM(p.y()));
+					c->points.insert(c->points.begin() + point, p);
+					addConnectionNode(c, point, event->x(), event->y(), m_points);
+					m_fromPin = -1;
+					m_points.clear();
+					return true;
+				}
+			}
 
 			if (object) {
-				int pin = m_screen->getPin(object, event->x(), event->y());
+				int pin = m_screen->getPin(object, NORM(event->x()), NORM(event->y()));
 				if (pin != -1) {
 					addConnection(m_fromObject, m_fromPin, object, pin, m_points);
 					m_fromPin = -1;
@@ -285,13 +582,14 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 				}
 			}
 
-			m_movingX = event->x();
-			m_movingY = event->y();
+			m_movingX = NORM(event->x());
+			m_movingY = NORM(event->y());
 			return true;
 		}
 
+// 		qDebug() << NORM(event->x()) << NORM(event->y());
 		int point;
-		Connection *c = getPoint(event->x(), event->y(), point);
+		Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
 		if (point != -1) {
 			if (point == 0) {
 				m_fromObject = c->from;
@@ -304,17 +602,17 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 			}
 			m_movingConn = c;
 			m_moving = &c->points[point];
-			m_movingX = event->x();
-			m_movingY = event->y();
+			m_movingX = NORM(event->x());
+			m_movingY = NORM(event->y());
 			return true;
 		}
 
-		ScreenObject *object = m_screen->getObject(event->x(), event->y());
+		ScreenObject *object = m_screen->getObject(NORM(event->x()), NORM(event->y()));
 		if (!object) {
 			return false;
 		}
 
-		m_fromPin = m_screen->getPin(object, event->x(), event->y());
+		m_fromPin = m_screen->getPin(object, NORM(event->x()), NORM(event->y()));
 		if (m_fromPin != -1) {
 			m_fromObject = object;
 			m_movingX = object->getPins()[m_fromPin].rect.center().x();
@@ -328,17 +626,33 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 bool ConnectionManager::mouseReleaseEvent(QMouseEvent *event) {
 	if (event->button() == Qt::LeftButton) {
 		if (m_moving && m_fromObject && m_movingConn) {
-			ScreenObject *object = m_screen->getObject(event->x(), event->y());
+			ScreenObject *object = m_screen->getObject(NORM(event->x()), NORM(event->y()));
 			if (object) {
-				int pin = m_screen->getPin(object, event->x(), event->y());
+				int pin = m_screen->getPin(object, NORM(event->x()), NORM(event->y()));
 				if (pin != -1) {
 					if (m_fromObject == m_movingConn->to) {
+						ConnectionNode *node = dynamic_cast<ConnectionNode *>(m_movingConn->to);
+						if (node) {
+							node->removeConnection(m_movingConn->tpin);
+						}
 						m_movingConn->tpin = pin;
 						m_movingConn->to = object;
+						node = dynamic_cast<ConnectionNode *>(m_movingConn->to);
+						if (node) {
+							node->setConnection(m_movingConn->tpin, m_movingConn);
+						}
 					}
 					else {
+						ConnectionNode *node = dynamic_cast<ConnectionNode *>(m_movingConn->from);
+						if (node) {
+							node->removeConnection(m_movingConn->fpin);
+						}
 						m_movingConn->fpin = pin;
 						m_movingConn->from = object;
+						node = dynamic_cast<ConnectionNode *>(m_movingConn->from);
+						if (node) {
+							node->setConnection(m_movingConn->fpin, m_movingConn);
+						}
 					}
 					m_moving->setX(object->getPins()[pin].rect.center().x());
 					m_moving->setY(object->getPins()[pin].rect.center().y());
@@ -376,52 +690,53 @@ bool ConnectionManager::mouseReleaseEvent(QMouseEvent *event) {
 
 bool ConnectionManager::mouseMoveEvent(QMouseEvent *event) {
 	if (m_fromPin != -1) {
+// 		qDebug() << NORM(event->x()) << NORM(event->y());
 		m_screen->repaint();
 		return true;
 	}
 
 	if (event->buttons() & Qt::LeftButton) {
 		if (m_moving) {
-			m_moving->setX(m_moving->x() - (m_movingX - event->x()));
-			m_moving->setY(m_moving->y() - (m_movingY - event->y()));
-			m_movingX = event->x();
-			m_movingY = event->y();
+			m_moving->setX(m_moving->x() - (m_movingX - NORM(event->x())));
+			m_moving->setY(m_moving->y() - (m_movingY - NORM(event->y())));
+			m_movingX = NORM(event->x());
+			m_movingY = NORM(event->y());
 			m_screen->repaint();
 			return true;
 		}
 		else {
-			int point;
-			Connection *c = getPoint(event->x(), event->y(), point);
-			if (point != -1) {
-				m_moving = &c->points[point];
-			}
-			else {
-				QPointF intersectPnt;
-				int point;
-				c = getConnection(event->x(), event->y(), point, &intersectPnt);
-				if (c) {
-					m_fromObject = 0;
-					m_movingConn = c;
-					QPoint p = intersectPnt.toPoint();
-					c->points.insert(c->points.begin() + point, p);
-					m_moving = &(c->points[point]);
-				}
-			}
+// 			int point;
+// 			Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
+// 			if (point != -1) {
+// 				m_moving = &c->points[point];
+// 			}
+// 			else {
+// 				QPointF intersectPnt;
+// 				int point;
+// 				c = getConnection(NORM(event->x()), NORM(event->y()), point, &intersectPnt);
+// 				if (c) {
+// 					m_fromObject = 0;
+// 					m_movingConn = c;
+// 					QPoint p = intersectPnt.toPoint();
+// 					c->points.insert(c->points.begin() + point, p);
+// 					m_moving = &(c->points[point]);
+// 				}
+// 			}
 		}
 
-		m_movingX = event->x();
-		m_movingY = event->y();
+		m_movingX = NORM(event->x());
+		m_movingY = NORM(event->y());
 	}
 	else {
 		int point;
-		Connection *c = getPoint(event->x(), event->y(), point);
+		Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
 		if (point != -1) {
 			return true;
 		}
 		else {
 			QPointF intersectPnt;
 			int point;
-			c = getConnection(event->x(), event->y(), point, &intersectPnt);
+			c = getConnection(NORM(event->x()), NORM(event->y()), point, &intersectPnt);
 			if (c) {
 				return true;
 			}

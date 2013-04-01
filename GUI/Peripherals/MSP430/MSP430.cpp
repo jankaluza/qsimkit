@@ -124,10 +124,10 @@ double MSP430::timeAdvance() {
 }
 
 bool MSP430::loadXML(const QString &file) {
-	int font_w = QApplication::fontMetrics().width("99") -3;
-	int font_h = QApplication::fontMetrics().height() - 3;
-	int width = 4*font_w;
-	int height = 4*font_w;
+	int font_w = 10;
+	int font_h = 10;
+	int width = 48;
+	int height = 48;
     int errorLine, errorColumn;
     QString errorMsg;
 
@@ -171,18 +171,18 @@ bool MSP430::loadXML(const QString &file) {
 		int y = 0;
 		if (side == 'l') {
 			x = 0;
-			y = 2*font_w;
+			y = 25;
 		}
 		else if (side == 'r') {
 			x = width - font_w;
-			y = height - 3 * font_w;
+			y = height - font_w - 24;
 		}
 		else if (side == 'd') {
 			x = 2*font_w;
 			y = height - font_w;
 		}
 		else if (side == 'u') {
-			x = width - 3 * font_w;
+			x = width - font_w - 24;
 			y = 0;
 		}
 
@@ -227,19 +227,20 @@ bool MSP430::loadXML(const QString &file) {
 }
 
 void MSP430::paint(QPainter &qp) {
-	int font_w = QApplication::fontMetrics().width("99") - 3;
-	int font_h = QApplication::fontMetrics().height() - 3;
+	int font_w = 10;
+	int font_h = 10;
 
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
-	qp.drawRect(m_x + font_w, m_y + font_w, width() - 2*font_w, height() - 2*font_w);
-	qp.fillRect(QRect(m_x + font_w, m_y + font_w, width() - 2*font_w, height() - 2*font_w), QBrush(QColor(226, 206, 255)));
+	qp.drawRect(m_x + font_w + 1, m_y + font_w, width() - 2*font_w - 1, height() - 2*font_w);
+	qp.fillRect(QRect(m_x + font_w + 1, m_y + font_w, width() - 2*font_w - 1, height() - 2*font_w), QBrush(QColor(226, 206, 255)));
 
 	QPen pen2(Qt::black, 1, Qt::SolidLine);
 	qp.setPen(pen2);
 
 	int even = -1;
 	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+// 		qDebug() << it->second.rect;
 		if (m_states[it->first].high) {
 			qp.fillRect(it->second.rect, QBrush(QColor(0,255,0)));
 		}

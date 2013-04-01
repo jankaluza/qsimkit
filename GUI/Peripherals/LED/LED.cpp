@@ -1,5 +1,5 @@
 /**
- * QSimKit - LED simulator
+ * QSimKit - MSP430 simulator
  * Copyright (C) 2013 Jan "HanzZ" Kaluza (hanzz.k@gmail.com)
  *
  * This program is free software; you can redistribute it and/or
@@ -27,12 +27,13 @@
 #include <QPainter>
 #include <QDebug>
 #include <QDomDocument>
+#include <QtCore/qplugin.h>
 
 LED::LED() : m_state(0) {
-	resize(30, 50);
+	resize(30, 36);
 
 	Pin p;
-	p.rect = QRect(5, 30, 20, 20);
+	p.rect = QRect(12, 24, 12, 12);
 	p.name = "LED";
 	p.high = 0;
 
@@ -64,7 +65,7 @@ double LED::timeAdvance() {
 void LED::paint(QPainter &qp) {
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
-	qp.drawEllipse(m_x, m_y, 30, 30);
+	qp.drawEllipse(m_x + 6, m_y, m_width - 6, m_height - 12);
 
 	int even = -1;
 	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
@@ -74,3 +75,9 @@ void LED::paint(QPainter &qp) {
 		qp.drawRect(it->second.rect);
 	}
 }
+
+Peripheral *LEDInterface::create() {
+	return new LED();
+}
+
+Q_EXPORT_PLUGIN2(ledperipheral, LEDInterface);

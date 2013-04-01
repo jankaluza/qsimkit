@@ -22,6 +22,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 #include "Peripherals/MSP430/MSP430.h"
+#include "Peripherals/PeripheralManager.h"
 
 #include <QWidget>
 #include <QTime>
@@ -37,6 +38,9 @@
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
 m_dig(0), m_sim(0) {
 	setupUi(this);
+
+	m_peripherals = new PeripheralManager();
+	m_peripherals->loadPeripherals();
 
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
 

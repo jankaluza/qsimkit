@@ -21,7 +21,7 @@
 
 #include <QPainter>
 #include <map>
-#include "Peripherals/SimulationObject.h"
+// #include "Peripherals/SimulationObject.h"
 
 
 typedef struct {
@@ -30,7 +30,7 @@ typedef struct {
 	bool high;
 } Pin;
 
-class ScreenObject : public QObject, public SimulationObject
+class ScreenObject : public QObject
 {
 	Q_OBJECT
 

@@ -19,44 +19,49 @@
 
 #pragma once
 
-#include <QMainWindow>
-#include <QString>
-#include <QTimer>
+#include <QPainter>
+#include <map>
+#include "ScreenObject.h"
+#include "ConnectionManager.h"
+#include <QDebug>
 
-#include "ui_QSimKit.h"
-
-#include "adevs.h"
-
-class Variant;
-class CPU;
-class SimulationEvent;
-class PeripheralManager;
-
-class QSimKit : public QMainWindow, public Ui::QSimKit
+class ConnectionNode : public ScreenObject
 {
 	Q_OBJECT
 
 	public:
-		QSimKit(QWidget *parent = 0);
+		ConnectionNode();
+		virtual ~ConnectionNode();
 
-		void setVariant(const QString &variant);
-		bool loadA43File(const QString &file);
+		void paint(QPainter &p);
 
-	public slots:
-		void loadA43();
-		void chooseVariant();
-		void simulationStep();
+		void setConnection(int pin, Connection *c) {
+			qDebug() << "adding" << pin;
+			m_conns[pin] = c;
+		}
 
-		void startSimulation();
-		void stopSimulation();
-		void pauseSimulation(bool pause);
-		void resetSimulation();
+		void removeConnection(int pin) {
+			m_conns.erase(pin);
+		}
+
+		Connection *getConnection(int pin) {
+			if (m_conns.find(pin) == m_conns.end()) {
+				return 0;
+			}
+			return m_conns[pin];
+		}
+
+		bool isUseless() {
+			return m_conns.size() < 3;
+		}
+
+		std::map<int, Pin> &getPins() {
+			return m_pins;
+		}
 
 	private:
-		Variant *m_variant;
-		adevs::Digraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
-		QTimer *m_timer;
-		PeripheralManager *m_peripherals;
+		std::map<int, Pin> m_pins;
+		std::map<int, Connection *> m_conns;
+
 };
 

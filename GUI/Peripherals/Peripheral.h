@@ -26,9 +26,10 @@
 #include <map>
 
 #include "ui/ScreenObject.h"
+#include "SimulationObject.h"
 
 
-class Peripheral : public ScreenObject {
+class Peripheral : public ScreenObject, public SimulationObject {
 	public:
 		Peripheral() {}
 
