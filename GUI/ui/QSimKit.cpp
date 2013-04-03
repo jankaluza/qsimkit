@@ -48,6 +48,7 @@ m_dig(0), m_sim(0) {
 
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
 	connect(actionNew_project, SIGNAL(triggered()), this, SLOT(newProject()) );
+	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
 
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -109,9 +110,26 @@ void QSimKit::pauseSimulation(bool checked) {
 void QSimKit::newProject() {
 	ProjectConfiguration dialog(this);
 	if (dialog.exec() == QDialog::Accepted) {
+		m_filename = "";
 		screen->clear();
 		screen->setCPU(dialog.getMSP430());
 	}
+}
+
+void QSimKit::saveProject() {
+	if (m_filename.isEmpty()) {
+		m_filename = QFileDialog::getSaveFileName(this);
+		if (m_filename.isEmpty()) {
+			return;
+		}
+	}
+
+	QFile file(m_filename);
+	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
+		return;
+
+	QTextStream stream(&file);
+	screen->save(stream);
 }
 
 bool QSimKit::loadA43File(const QString &f) {

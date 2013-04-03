@@ -17,6 +17,7 @@ output = """#pragma once
 
 class Variant {
 	public:
+		virtual const char *getName() = 0;
 """
 
 for define in defines:
@@ -52,7 +53,8 @@ class Variant_%s : public Variant {
 	public:
 		Variant_%s() {}
 		virtual ~Variant_%s() {}
-""" % (name, name, name)
+		const char *getName() { return "%s"; }
+""" % (name, name, name, name)
 
 	for define in defines:
 		output += """

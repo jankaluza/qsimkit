@@ -22,6 +22,10 @@
 ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0) {
 }
 
+void ScreenObject::save(QTextStream &stream) {
+	stream << "    <position x='" << m_x << "' y='" << m_y << "'/>\n";
+}
+
 void ScreenObject::setX(int x) {
 	movePins(x, m_y);
 	m_x = x;

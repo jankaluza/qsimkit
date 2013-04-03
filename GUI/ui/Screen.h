@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QTextStream>
 #include <QList>
 
 #include "adevs.h"
@@ -42,15 +43,19 @@ class Screen : public QWidget
 		void setCPU(MSP430 *cpu);
 		MSP430 *getCPU();
 
-		void addObject(ScreenObject *obj) {
-			m_objects.append(obj);
-		}
+		void addObject(ScreenObject *obj);
 
 		void addObject(const QPoint &pos);
+
+		int objectId(ScreenObject *obj) {
+			return m_objects.indexOf(obj);
+		}
 
 		void removeObject(ScreenObject *obj);
 
 		void clear();
+
+		void save(QTextStream &stream);
 
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 

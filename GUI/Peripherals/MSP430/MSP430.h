@@ -75,6 +75,8 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void executeOption(int option);
 
+		virtual void save(QTextStream &stream);
+
 	private:
 		void addMemoryWatchers();
 

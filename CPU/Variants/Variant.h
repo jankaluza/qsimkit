@@ -2,6 +2,7 @@
 
 class Variant {
 	public:
+		virtual const char *getName() = 0;
 		virtual unsigned int getP1DIR() = 0;
 		virtual unsigned int getP1IE() = 0;
 		virtual unsigned int getP1IES() = 0;

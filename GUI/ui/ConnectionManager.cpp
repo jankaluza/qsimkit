@@ -39,6 +39,26 @@ ConnectionManager::ConnectionManager(Screen *screen) {
 	m_removingUselessNode = false;
 }
 
+void ConnectionManager::save(QTextStream &stream) {
+	stream << "<connections>\n";
+	int id = 0;
+	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
+		Connection *c = *it;
+		stream << "    <connection id='" << id++ << "' ";
+		stream << "from='" << m_screen->objectId(c->from) << "' ";
+		stream << "fpin='" << c->fpin << "' ";
+		stream << "to='" << m_screen->objectId(c->to) << "' ";
+		stream << "tpin='" << c->tpin << "'>\n";
+
+		for (int i = 0; i < c->points.size(); ++i) {
+			stream << "        <point x='" << c->points[i].x() << "' y='" << c->points[i].y() << "'/>\n";
+		}
+
+		stream << "    </connection>\n";
+	}
+	stream << "</connections>\n";
+}
+
 Connection *ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points) {
 	if (points.size() < 2) {
 		return 0;

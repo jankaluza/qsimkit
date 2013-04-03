@@ -2036,6 +2036,7 @@ class Variant_msp430x241x : public Variant {
 	public:
 		Variant_msp430x241x() {}
 		virtual ~Variant_msp430x241x() {}
+		const char *getName() { return "msp430x241x"; }
 
 		unsigned int getP1DIR() {
 #ifdef P1DIR_

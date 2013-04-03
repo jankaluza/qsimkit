@@ -27,6 +27,8 @@
 #include <vector>
 #include <map>
 
+#include <QTextStream>
+
 #include "adevs.h"
 
 class ScreenObject;
@@ -65,6 +67,8 @@ class ConnectionManager
 		void movePins(ScreenObject *object);
 		void objectMoved(ScreenObject *object);
 		void objectRemoved(ScreenObject *object);
+
+		void save(QTextStream &stream);
 
 	private:
 		void paint(QPainter &p, Connection *c);

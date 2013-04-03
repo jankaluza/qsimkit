@@ -169,6 +169,17 @@ void Screen::clear() {
 	}
 }
 
+void Screen::save(QTextStream &stream) {
+	stream << "<objects>\n";
+	for (int i = 0; i < m_objects.size(); ++i) {
+		stream << "<object id='" << i << "'>\n";
+		m_objects[i]->save(stream);
+		stream << "</object>\n";
+	}
+
+	m_conns->save(stream);
+}
+
 void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
 	QList<QAction *> actions;
 	int index = 0;
@@ -191,6 +202,10 @@ void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
 	else if (action) {
 		object->executeOption(action->data().toInt());
 	}
+}
+
+void Screen::addObject(ScreenObject *obj) {
+	m_objects.append(obj);
 }
 
 void Screen::addObject(const QPoint &pos) {

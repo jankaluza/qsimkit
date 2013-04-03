@@ -45,6 +45,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 	public slots:
 		void loadA43();
 		void newProject();
+		void saveProject();
 		void chooseVariant();
 		void simulationStep();
 
@@ -59,5 +60,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
 		QTimer *m_timer;
 		PeripheralManager *m_peripherals;
+		QString m_filename;
 };
 

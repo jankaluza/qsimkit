@@ -127,6 +127,16 @@ void MSP430::executeOption(int option) {
 	
 }
 
+void MSP430::save(QTextStream &stream) {
+	ScreenObject::save(stream);
+	stream << "<code>";
+	stream << QString::fromStdString(m_code);
+	stream << "</code>\n";
+	stream << "<variant>";
+	stream << QString(m_variant->getName());
+	stream << "</variant>\n";
+}
+
 bool MSP430::loadXML(const QString &file) {
 	int font_w = 10;
 	int font_h = 10;

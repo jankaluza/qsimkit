@@ -21,6 +21,7 @@
 
 #include <QPainter>
 #include <map>
+#include <QTextStream>
 // #include "Peripherals/SimulationObject.h"
 
 
@@ -55,6 +56,8 @@ class ScreenObject : public QObject
 
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
+		virtual void save(QTextStream &stream);
+
 		virtual void paint(QWidget *screen) = 0;
 
 		virtual void objectMoved(int x, int y) {}
@@ -76,6 +79,7 @@ class ScreenObject : public QObject
 		int m_y;
 		int m_width;
 		int m_height;
+		int m_id;
 
 };
 
