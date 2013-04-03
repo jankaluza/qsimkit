@@ -85,7 +85,8 @@ MSP430 *Screen::getCPU() {
 }
 
 void Screen::paintEvent(QPaintEvent *e) {
-	QPainter p(this);
+	QPainter p;
+	p.begin(this);
 	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
 	p.setPen(QPen(QColor(245, 245, 245), 1, Qt::SolidLine));
 	for (int i = 0; i < 1500; i += 12) {
@@ -96,10 +97,13 @@ void Screen::paintEvent(QPaintEvent *e) {
 		p.drawLine(0, i, 1500, i);
 	}
 
+	p.end();
 
 	for (int i = 0; i < m_objects.size(); ++i) {
 		m_objects[i]->paint(this);
 	}
+
+	p.begin(this);
 
 	m_conns->paint(p);
 }

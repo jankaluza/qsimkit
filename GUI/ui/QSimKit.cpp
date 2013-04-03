@@ -39,7 +39,7 @@ QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
 m_dig(0), m_sim(0) {
 	setupUi(this);
 
-	m_peripherals = new PeripheralManager();
+	m_peripherals = new PeripheralManager(screen);
 	m_peripherals->loadPeripherals();
 
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
@@ -113,6 +113,7 @@ bool QSimKit::loadA43File(const QString &f) {
 	MSP430 *cpu = new MSP430(m_variant);
 	cpu->loadXML("Packages/msp430x241x.xml");
 	screen->setCPU(cpu);
+	screen->addObject(m_peripherals->getPeripheralInfo("libled").create());
 
 	return screen->getCPU()->loadA43(file.readAll().data());
 }

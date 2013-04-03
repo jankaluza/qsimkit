@@ -62,7 +62,7 @@ QVariant Script::getVariable(const QString& name)
 
 QVariant Script::eval(const QString& code)
 {
-   return m_context.evalScript(code);
+   return m_context.evalScript(code, Py_eval_input);
 }
 
 void Script::evalFile(const QString& file)

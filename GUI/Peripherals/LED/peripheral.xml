@@ -1,4 +1,4 @@
-<peripheral type='binary'>
+<peripheral type='python'>
    <name>LED</name>
    <comment>LED</comment>
    <author>Jan Kaluza</author>

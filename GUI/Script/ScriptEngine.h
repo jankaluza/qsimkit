@@ -63,7 +63,7 @@ class ScriptEngine : public QObject {
 		Script* load(const QString& file, const QString& module = QString());
 		QVariant eval(const QString& script);
 
-		void  unload(Script* script);
+		void unload(Script* script);
 
 		/* Object registration */
 		void registerObject(const QString& name, QObject* obj);

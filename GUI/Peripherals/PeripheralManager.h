@@ -33,7 +33,7 @@ class ScriptEngine;
 
 class PeripheralInfo {
 	public:
-		PeripheralInfo() {}
+		PeripheralInfo() : m_peripheral(0) {}
 		virtual ~PeripheralInfo() {}
 
 		Peripheral *create();
@@ -48,11 +48,16 @@ class PeripheralManager : public QObject {
 	Q_OBJECT
 
 	public:
-		PeripheralManager();
+		PeripheralManager(QWidget *screen);
 		~PeripheralManager();
 
 		void loadPeripherals();
 		PeripheralInterface *loadBinaryPeripheral(QString dir);
+		PeripheralInterface *loadPythonPeripheral(QString dir, QString name);
+
+		PeripheralInfo &getPeripheralInfo(const QString &name) {
+			return m_peripherals[name];
+		}
 
 	private:
 		bool loadXML(QString xml);

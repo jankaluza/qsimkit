@@ -24,11 +24,16 @@
 // #include "Peripherals/SimulationObject.h"
 
 
-typedef struct {
-	QRect rect;
-	QString name;
-	bool high;
-} Pin;
+class Pin {
+	public:
+		Pin() {}
+		Pin(const QRect &rect, const QString &name, bool high) :
+			rect(rect), name(name), high(high) { }
+
+		QRect rect;
+		QString name;
+		bool high;
+};
 
 class ScreenObject : public QObject
 {
@@ -51,6 +56,8 @@ class ScreenObject : public QObject
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
 		virtual void paint(QWidget *screen) = 0;
+
+		virtual void objectMoved(int x, int y) {}
 
 		virtual std::map<int, Pin> &getPins() = 0;
 

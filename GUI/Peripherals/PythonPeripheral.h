@@ -17,29 +17,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "ScreenObject.h"
+#pragma once
 
-ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0) {
-}
+#include <QWidget>
+#include <QString>
+#include <QChar>
+#include <QRect>
+#include <map>
 
-void ScreenObject::setX(int x) {
-	movePins(x, m_y);
-	m_x = x;
-}
+#include "Peripheral.h"
 
-void ScreenObject::setY(int y) {
-	movePins(m_x, y);
-	m_y = y;
-}
+class Script;
 
-void ScreenObject::movePins(int x, int y) {
-	std::map<int, Pin> &pins = getPins();
-	int mx = x - m_x;
-	int my = y - m_y;
+class PythonPeripheral : public Peripheral {
+	public:
+		PythonPeripheral(Script *script);
+		~PythonPeripheral();
 
-	for (std::map<int, Pin>::iterator it = pins.begin(); it != pins.end(); ++it) {
-		it->second.rect.adjust(mx, my, mx, my);
-	}
+		void internalTransition();
 
-	objectMoved(x, y);
-}
+		void externalEvent(const std::vector<SimulationEvent *> &);
+
+		void output(std::vector<SimulationEvent *> &output);
+
+		double timeAdvance();
+
+		void reset();
+
+		void paint(QWidget *screen);
+
+		std::map<int, Pin> &getPins() {
+			return m_pins;
+		}
+
+		void objectMoved(int x, int y);
+
+	private:
+		Script *m_script;
+		std::map<int, Pin> m_pins;
+
+};
+

@@ -19,6 +19,7 @@
 
 #include "PeripheralManager.h"
 #include "PeripheralInterface.h"
+#include "PythonPeripheralInterface.h"
 #include "Peripheral.h"
 #include "Script/ScriptEngine.h"
 #include <QPluginLoader>
@@ -30,8 +31,9 @@ Peripheral *PeripheralInfo::create() {
 	return m_peripheral->create();
 }
 
-PeripheralManager::PeripheralManager() {
+PeripheralManager::PeripheralManager(QWidget *screen) {
 	m_scriptEngine = new ScriptEngine();
+	m_scriptEngine->registerObject("screen", screen);
 }
 
 PeripheralManager::~PeripheralManager() {
@@ -60,6 +62,8 @@ bool PeripheralManager::loadXML(QString file) {
 		return false;
 	}
 
+	QString type = peripheral.attribute("type");
+
 	QString library;
 	PeripheralInfo info;
 
@@ -67,12 +71,18 @@ bool PeripheralManager::loadXML(QString file) {
 		QDomElement element = node.toElement();
 
 		if (element.nodeName() == "library") {
-			library = file + "/" + element.text();
-			info.m_peripheral = loadBinaryPeripheral(file + "/" + element.text());
+			library = element.text();
+			if (type == "binary") {
+				info.m_peripheral = loadBinaryPeripheral(file + "/" + element.text());
+			}
+			else {
+				info.m_peripheral = loadPythonPeripheral(file + "/" + element.text(), element.text());
+			}
 		}
 	}
 
 	if (info.m_peripheral) {
+		qDebug() << "adding peripheral" << library;
 		m_peripherals[library] = info;
 	}
 }
@@ -93,6 +103,19 @@ PeripheralInterface *PeripheralManager::loadBinaryPeripheral(QString f) {
 	}
 
 	return 0;
+}
+
+PeripheralInterface *PeripheralManager::loadPythonPeripheral(QString f, QString name) {
+	Script *script = 0;
+	QString moduleName = QString("Plugin") + name;
+
+	if((script = m_scriptEngine->load(f + ".py", moduleName)) == 0) {
+		return 0;
+	}
+
+	qDebug() << "Loaded peripheral:" << (f + ".py");
+	PythonPeripheralInterface *p = new PythonPeripheralInterface(script);
+	return p;
 }
 
 void PeripheralManager::loadPeripherals() {

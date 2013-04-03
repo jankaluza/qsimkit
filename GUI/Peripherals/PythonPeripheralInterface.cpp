@@ -17,29 +17,25 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "ScreenObject.h"
+#include "PythonPeripheralInterface.h"
+#include "PythonPeripheral.h"
+#include "Script/Script.h"
+#include <QApplication>
+#include <QDebug>
 
-ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0) {
+PythonPeripheralInterface::PythonPeripheralInterface(Script *script) : m_script(script) {
+
 }
 
-void ScreenObject::setX(int x) {
-	movePins(x, m_y);
-	m_x = x;
+PythonPeripheralInterface::~PythonPeripheralInterface() {
+	delete m_script;
 }
 
-void ScreenObject::setY(int y) {
-	movePins(m_x, y);
-	m_y = y;
-}
+Peripheral *PythonPeripheralInterface::create() {
+	qDebug() << "create";
+	PythonQtObjectPtr p = m_script->eval("Peripheral()\n");
+	Script *script = new Script(p);
 
-void ScreenObject::movePins(int x, int y) {
-	std::map<int, Pin> &pins = getPins();
-	int mx = x - m_x;
-	int my = y - m_y;
-
-	for (std::map<int, Pin>::iterator it = pins.begin(); it != pins.end(); ++it) {
-		it->second.rect.adjust(mx, my, mx, my);
-	}
-
-	objectMoved(x, y);
+	PythonPeripheral *peripheral = new PythonPeripheral(script);
+	return peripheral;
 }
