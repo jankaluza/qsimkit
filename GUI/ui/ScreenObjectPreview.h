@@ -21,46 +21,25 @@
 
 #include <QWidget>
 #include <QString>
-#include <QChar>
-#include <QRect>
-#include <map>
+#include <QList>
 
-#include "Peripheral.h"
 
-class Script;
+class ScreenObject;
 
-class PythonPeripheral : public Peripheral {
+class ScreenObjectPreview : public QWidget
+{
+	Q_OBJECT
+
 	public:
-		PythonPeripheral(Script *script);
-		~PythonPeripheral();
+		ScreenObjectPreview(QWidget *parent = 0);
+		virtual ~ScreenObjectPreview();
 
-		void internalTransition();
+		void setObject(ScreenObject *object);
 
-		void externalEvent(const std::vector<SimulationEvent *> &);
-
-		void output(std::vector<SimulationEvent *> &output);
-
-		double timeAdvance();
-
-		void reset();
-
-		void paint(QWidget *screen);
-
-		std::map<int, Pin> &getPins() {
-			return m_pins;
-		}
-
-		const QStringList &getOptions();
-
-		void executeOption(int option);
-
-		void objectMoved(int x, int y);
+	protected:
+		void paintEvent(QPaintEvent *e);
 
 	private:
-		Script *m_script;
-		std::map<int, Pin> m_pins;
-		QStringList m_options;
-		bool m_screenRegistered;
-
+		ScreenObject *m_object;
 };
 

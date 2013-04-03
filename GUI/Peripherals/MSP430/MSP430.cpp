@@ -123,6 +123,10 @@ double MSP430::timeAdvance() {
 	return m_instructionCycles;
 }
 
+void MSP430::executeOption(int option) {
+	
+}
+
 bool MSP430::loadXML(const QString &file) {
 	int font_w = 10;
 	int font_h = 10;

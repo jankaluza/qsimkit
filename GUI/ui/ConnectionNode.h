@@ -59,9 +59,16 @@ class ConnectionNode : public ScreenObject
 			return m_pins;
 		}
 
+		const QStringList &getOptions() {
+			return m_options;
+		}
+
+		void executeOption(int) {}
+
 	private:
 		std::map<int, Pin> m_pins;
 		std::map<int, Connection *> m_conns;
+		QStringList m_options;
 
 };
 

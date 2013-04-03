@@ -20,7 +20,7 @@ class Peripheral():
 
 	def paint(self):
 		p = QPainter();
-		p.begin(screen);
+		p.begin(self.screen);
 		p.drawEllipse(self.x + 6, self.y, self.width - 6, self.height - 12);
 
 		for rect in self.pins:

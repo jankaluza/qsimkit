@@ -20,11 +20,13 @@
 #include "Screen.h"
 
 #include "Peripherals/Peripheral.h"
+#include "Peripherals/PeripheralManager.h"
 #include "Peripherals/MSP430/MSP430.h"
 // #include "Peripherals/LED/LED.h"
 #include "ConnectionNode.h"
 #include "ScreenObject.h"
 #include "ConnectionManager.h"
+#include "AddPeripheral.h"
 
 
 #include <QWidget>
@@ -46,6 +48,7 @@
 
 Screen::Screen(QWidget *parent) : QWidget(parent) {
 	m_moving = 0;
+	m_peripherals = 0;
 	m_conns = new ConnectionManager(this);
 	setMouseTracking(true);
 }
@@ -68,8 +71,6 @@ void Screen::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig) {
 void Screen::setCPU(MSP430 *cpu) {
 	if (m_objects.empty()) {
 		m_objects.append(cpu);
-// 		m_objects.append(new LED());
-// 		m_objects.append(new ConnectionNode());
 	}
 	else {
 		disconnect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
@@ -162,6 +163,51 @@ void Screen::removeObject(ScreenObject *object) {
 	delete object;
 }
 
+void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
+	QList<QAction *> actions;
+	int index = 0;
+	foreach (const QString &str, object->getOptions()) {
+		QAction *action = new QAction(str, 0);
+		action->setData(index++);
+		actions.append(action);
+	}
+
+	if (object != m_objects[0]) {
+		QAction *action = new QAction("Remove object", 0);
+		action->setData(index);
+		actions.append(action);
+	}
+
+	QAction *action = QMenu::exec(actions, pos, 0, 0);
+	if (action && action->data() == index) {
+		removeObject(object);
+	}
+	else if (action) {
+		object->executeOption(action->data().toInt());
+	}
+}
+
+void Screen::addObject(const QPoint &pos) {
+	AddPeripheral dialog(m_peripherals, this);
+	if (dialog.exec() == QDialog::Accepted) {
+		QString name = dialog.getPeripheral();
+		Peripheral *p = m_peripherals->getPeripheral(name).create();
+		p->setX(NORM(pos.x()));
+		p->setY(NORM(pos.y()));
+		addObject(p);
+	}
+}
+
+void Screen::showScreenMenu(const QPoint &pos) {
+	QList<QAction *> actions;
+	actions.append(new QAction("Add peripheral", 0));
+
+	QAction *action = QMenu::exec(actions, pos, 0, 0);
+	if (action) {
+		addObject(pos);
+	}
+}
+
 void Screen::mousePressEvent(QMouseEvent *event) {
 	if (m_conns->mousePressEvent(event)) {
 		repaint();
@@ -170,15 +216,11 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 
 	if (event->button() == Qt::RightButton) {
 		ScreenObject *object = getObject(event->x(), event->y());
-		if (!object) {
-			return;
+		if (object) {
+			showObjectMenu(object, event->globalPos());
 		}
-
-		QList<QAction *> actions;
-		actions.append(new QAction("Remove object", 0));
-		QAction *action = QMenu::exec(actions, event->globalPos(), 0, 0);
-		if (action) {
-			removeObject(object);
+		else {
+			showScreenMenu(event->globalPos());
 		}
 	}
 	else if (event->button() == Qt::LeftButton) {

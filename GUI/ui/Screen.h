@@ -30,6 +30,7 @@ class ScreenObject;
 class MSP430;
 class SimulationEvent;
 class ConnectionManager;
+class PeripheralManager;
 
 class Screen : public QWidget
 {
@@ -45,12 +46,18 @@ class Screen : public QWidget
 			m_objects.append(obj);
 		}
 
+		void addObject(const QPoint &pos);
+
 		void removeObject(ScreenObject *obj);
 
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 
 		ScreenObject *getObject(int x, int y);
 		int getPin(ScreenObject *object, int x, int y);
+
+		void setPeripheralManager(PeripheralManager *peripherals) {
+			m_peripherals = peripherals;
+		}
 
 	protected:
 		void paintEvent(QPaintEvent *e);
@@ -60,6 +67,8 @@ class Screen : public QWidget
 
 	private:
 		void resizeAccordingToObjects();
+		void showObjectMenu(ScreenObject *object, const QPoint &pos);
+		void showScreenMenu(const QPoint &pos);
 
 	private:
 		QList<ScreenObject *> m_objects;
@@ -67,5 +76,6 @@ class Screen : public QWidget
 		int m_movingX;
 		int m_movingY;		
 		ConnectionManager *m_conns;
+		PeripheralManager *m_peripherals;
 };
 

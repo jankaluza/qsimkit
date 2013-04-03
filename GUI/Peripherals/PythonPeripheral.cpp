@@ -22,7 +22,7 @@
 #include <QApplication>
 #include <QDebug>
 
-PythonPeripheral::PythonPeripheral(Script *script) : m_script(script) {
+PythonPeripheral::PythonPeripheral(Script *script) : m_script(script), m_screenRegistered(false) {
 	m_script->setVariable("x", m_x);
 	m_script->setVariable("y", m_y);
 	resize(m_script->getVariable("width").toInt(), m_script->getVariable("height").toInt());
@@ -31,6 +31,8 @@ PythonPeripheral::PythonPeripheral(Script *script) : m_script(script) {
 	for (int i = 0; i < pins.size(); ++i) {
 		m_pins[i].rect = pins[i].toRect();
 	}
+
+	m_options = m_script->getVariable("options").toStringList();
 }
 
 PythonPeripheral::~PythonPeripheral() {
@@ -72,9 +74,21 @@ void PythonPeripheral::objectMoved(int x, int y) {
 }
 
 void PythonPeripheral::paint(QWidget *screen) {
+	if (!m_screenRegistered) {
+		m_screenRegistered = true;
+		m_script->registerObject("screen", screen);
+	}
 	m_script->call("paint");
 }
 
 void PythonPeripheral::reset() {
 	m_script->call("reset");
+}
+
+const QStringList &PythonPeripheral::getOptions() {
+	return m_options;
+}
+
+void PythonPeripheral::executeOption(int option) {
+	m_script->call("executeOption", QVariantList() << option);
 }

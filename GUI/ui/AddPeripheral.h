@@ -19,48 +19,27 @@
 
 #pragma once
 
-#include <QWidget>
+#include <QDialog>
 #include <QString>
-#include <QChar>
-#include <QRect>
-#include <map>
+#include <QTimer>
 
-#include "Peripheral.h"
+#include "ui_AddPeripheral.h"
 
-class Script;
+class PeripheralManager;
 
-class PythonPeripheral : public Peripheral {
+class AddPeripheral : public QDialog, public Ui::AddPeripheral
+{
+	Q_OBJECT
+
 	public:
-		PythonPeripheral(Script *script);
-		~PythonPeripheral();
+		AddPeripheral(PeripheralManager *peripherals, QWidget *parent = 0);
 
-		void internalTransition();
+		QString getPeripheral();
 
-		void externalEvent(const std::vector<SimulationEvent *> &);
-
-		void output(std::vector<SimulationEvent *> &output);
-
-		double timeAdvance();
-
-		void reset();
-
-		void paint(QWidget *screen);
-
-		std::map<int, Pin> &getPins() {
-			return m_pins;
-		}
-
-		const QStringList &getOptions();
-
-		void executeOption(int option);
-
-		void objectMoved(int x, int y);
+	private slots:
+		void handleItemActivated(QTreeWidgetItem *, int);
 
 	private:
-		Script *m_script;
-		std::map<int, Pin> m_pins;
-		QStringList m_options;
-		bool m_screenRegistered;
-
+		PeripheralManager *m_peripherals;
 };
 

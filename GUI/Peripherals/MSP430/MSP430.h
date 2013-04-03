@@ -69,6 +69,12 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
 
+		const QStringList &getOptions() {
+			return m_options;
+		}
+
+		void executeOption(int option);
+
 	private:
 		void addMemoryWatchers();
 
@@ -90,6 +96,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		double m_step;
 		std::string m_code;
 		std::vector<SimulationEvent *> m_output;
+		QStringList m_options;
 		
 };
 

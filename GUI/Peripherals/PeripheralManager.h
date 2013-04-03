@@ -38,31 +38,42 @@ class PeripheralInfo {
 
 		Peripheral *create();
 
+		const QString &getName() const { return m_name; }
+		const QString &getLibrary() const { return m_library; }
+
 	private:
 		PeripheralInterface *m_peripheral;
+		QString m_name;
+		QString m_library;
 
 	friend class PeripheralManager;
 };
+
+typedef QMap<QString, PeripheralInfo> PeripheralList;
 
 class PeripheralManager : public QObject {
 	Q_OBJECT
 
 	public:
-		PeripheralManager(QWidget *screen);
+		PeripheralManager();
 		~PeripheralManager();
 
 		void loadPeripherals();
 		PeripheralInterface *loadBinaryPeripheral(QString dir);
 		PeripheralInterface *loadPythonPeripheral(QString dir, QString name);
 
-		PeripheralInfo &getPeripheralInfo(const QString &name) {
+		PeripheralInfo &getPeripheral(const QString &name) {
 			return m_peripherals[name];
+		}
+
+		const PeripheralList &getPeripherals() {
+			return m_peripherals;
 		}
 
 	private:
 		bool loadXML(QString xml);
 
-		QMap<QString, PeripheralInfo> m_peripherals;
+		PeripheralList m_peripherals;
 		ScriptEngine *m_scriptEngine;
 
 };

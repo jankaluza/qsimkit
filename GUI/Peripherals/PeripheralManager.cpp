@@ -31,9 +31,8 @@ Peripheral *PeripheralInfo::create() {
 	return m_peripheral->create();
 }
 
-PeripheralManager::PeripheralManager(QWidget *screen) {
+PeripheralManager::PeripheralManager() {
 	m_scriptEngine = new ScriptEngine();
-	m_scriptEngine->registerObject("screen", screen);
 }
 
 PeripheralManager::~PeripheralManager() {
@@ -72,12 +71,16 @@ bool PeripheralManager::loadXML(QString file) {
 
 		if (element.nodeName() == "library") {
 			library = element.text();
+			info.m_library = library;
 			if (type == "binary") {
 				info.m_peripheral = loadBinaryPeripheral(file + "/" + element.text());
 			}
 			else {
 				info.m_peripheral = loadPythonPeripheral(file + "/" + element.text(), element.text());
 			}
+		}
+		else if (element.nodeName() == "name") {
+			info.m_name = element.text();
 		}
 	}
 

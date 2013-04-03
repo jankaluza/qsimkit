@@ -61,6 +61,10 @@ class ScreenObject : public QObject
 
 		virtual std::map<int, Pin> &getPins() = 0;
 
+		virtual const QStringList &getOptions() = 0;
+
+		virtual void executeOption(int option) = 0;
+
 	signals:
 		void onUpdated();
 
