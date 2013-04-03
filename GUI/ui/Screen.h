@@ -50,6 +50,8 @@ class Screen : public QWidget
 
 		void removeObject(ScreenObject *obj);
 
+		void clear();
+
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 
 		ScreenObject *getObject(int x, int y);

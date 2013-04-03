@@ -19,45 +19,28 @@
 
 #pragma once
 
-#include <QMainWindow>
+#include <QDialog>
 #include <QString>
 #include <QTimer>
 
-#include "ui_QSimKit.h"
+#include "ui_ProjectConfiguration.h"
 
-#include "adevs.h"
+#include "Peripherals/MSP430/MSP430.h"
 
-class Variant;
-class CPU;
-class SimulationEvent;
-class PeripheralManager;
-
-class QSimKit : public QMainWindow, public Ui::QSimKit
+class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
 {
 	Q_OBJECT
 
 	public:
-		QSimKit(QWidget *parent = 0);
+		ProjectConfiguration(QWidget *parent = 0);
 
-		void setVariant(const QString &variant);
-		bool loadA43File(const QString &file);
+		MSP430 *getMSP430();
 
-	public slots:
-		void loadA43();
-		void newProject();
-		void chooseVariant();
-		void simulationStep();
+		int getFrequency();
 
-		void startSimulation();
-		void stopSimulation();
-		void pauseSimulation(bool pause);
-		void resetSimulation();
 
-	private:
-		Variant *m_variant;
-		adevs::Digraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
-		QTimer *m_timer;
-		PeripheralManager *m_peripherals;
+	private slots:
+		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);
+
 };
 

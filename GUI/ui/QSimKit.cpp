@@ -19,6 +19,8 @@
 
 #include "QSimKit.h"
 
+#include "ProjectConfiguration.h"
+
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 #include "Peripherals/MSP430/MSP430.h"
@@ -45,6 +47,7 @@ m_dig(0), m_sim(0) {
 	screen->setPeripheralManager(m_peripherals);
 
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
+	connect(actionNew_project, SIGNAL(triggered()), this, SLOT(newProject()) );
 
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -100,6 +103,14 @@ void QSimKit::pauseSimulation(bool checked) {
 	}
 	else {
 		m_timer->start(100);
+	}
+}
+
+void QSimKit::newProject() {
+	ProjectConfiguration dialog(this);
+	if (dialog.exec() == QDialog::Accepted) {
+		screen->clear();
+		screen->setCPU(dialog.getMSP430());
 	}
 }
 

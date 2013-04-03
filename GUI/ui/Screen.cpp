@@ -163,6 +163,12 @@ void Screen::removeObject(ScreenObject *object) {
 	delete object;
 }
 
+void Screen::clear() {
+	while (!m_objects.empty()) {
+		removeObject(m_objects[0]);
+	}
+}
+
 void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
 	QList<QAction *> actions;
 	int index = 0;
