@@ -49,7 +49,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void internalTransition();
 
-		void externalEvent(const std::vector<SimulationEvent *> &);
+		void externalEvent(double t, const std::vector<SimulationEvent *> &);
 
 		void output(std::vector<SimulationEvent *> &output);
 
@@ -76,6 +76,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		void executeOption(int option);
 
 		virtual void save(QTextStream &stream);
+		virtual void load(QDomElement &object);
 
 	private:
 		void addMemoryWatchers();

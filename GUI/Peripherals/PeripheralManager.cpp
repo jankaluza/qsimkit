@@ -28,7 +28,9 @@
 #include <QDomDocument>
 
 Peripheral *PeripheralInfo::create() {
-	return m_peripheral->create();
+	Peripheral *p = m_peripheral->create();
+	p->setType(m_library);
+	return p;
 }
 
 PeripheralManager::PeripheralManager() {

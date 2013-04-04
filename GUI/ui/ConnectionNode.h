@@ -21,11 +21,11 @@
 
 #include <QPainter>
 #include <map>
-#include "ScreenObject.h"
+#include "Peripherals/Peripheral.h"
 #include "ConnectionManager.h"
 #include <QDebug>
 
-class ConnectionNode : public ScreenObject
+class ConnectionNode : public Peripheral
 {
 	Q_OBJECT
 
@@ -43,6 +43,8 @@ class ConnectionNode : public ScreenObject
 		void removeConnection(int pin) {
 			m_conns.erase(pin);
 		}
+
+// 		void getAllConnectedObjects(std::vector<ScreenObject *> &objects);
 
 		Connection *getConnection(int pin) {
 			if (m_conns.find(pin) == m_conns.end()) {
@@ -65,10 +67,22 @@ class ConnectionNode : public ScreenObject
 
 		void executeOption(int) {}
 
+		void internalTransition();
+
+		void externalEvent(double t, const std::vector<SimulationEvent *> &);
+
+		void output(std::vector<SimulationEvent *> &output);
+
+		double timeAdvance();
+
+		void reset();
+
 	private:
 		std::map<int, Pin> m_pins;
 		std::map<int, Connection *> m_conns;
 		QStringList m_options;
+		std::vector<SimulationEvent *> m_output;
+		double m_advance;
 
 };
 

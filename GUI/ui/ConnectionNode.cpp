@@ -23,6 +23,8 @@
 #include <QWidget>
 
 ConnectionNode::ConnectionNode() {
+	m_type = "ConnectionNode";
+	m_advance = 365;
 	m_width = 36;
 	m_height = 36;
 
@@ -46,6 +48,51 @@ ConnectionNode::ConnectionNode() {
 ConnectionNode::~ConnectionNode() {
 
 }
+
+void ConnectionNode::internalTransition() {}
+
+void ConnectionNode::externalEvent(double t, const std::vector<SimulationEvent *> &events) {
+	for (std::vector<SimulationEvent *>::const_iterator it = events.begin(); it != events.end(); ++it) {
+		for (std::map<int, Connection *>::iterator it2 = m_conns.begin(); it2 != m_conns.end(); ++it2) {
+			m_output.push_back(new SimulationEvent(it2->first, (*it)->high));
+		}
+	}
+	m_advance = 0;
+}
+
+void ConnectionNode::output(std::vector<SimulationEvent *> &output) {
+	output.swap(m_output);
+}
+
+double ConnectionNode::timeAdvance() {
+	double r = m_advance;
+	m_advance = 365;
+	return r;
+}
+
+
+void ConnectionNode::reset() {}
+
+// void ConnectionNode::getAllConnectedObjects(std::vector<ScreenObject *> &objects) {
+// 	for (std::map<int, Connection *>::iterator it = m_conns.begin(); it != m_conns.end; ++it) {
+// 		Connection *c = it->second;
+// 		ConnectionNode *node = dynamic_cast<ConnectionNode *>(c->from);
+// 		if (node) {
+// 			node->getAllConnectedObject(c->from);
+// 		}
+// 		else {
+// 			objects.push_back(c->from);
+// 		}
+// 
+// 		node = dynamic_cast<ConnectionNode *>(c->to);
+// 		if (node) {
+// 			node->getAllConnectedObject(c->to);
+// 		}
+// 		else {
+// 			objects.push_back(c->to);
+// 		}
+// 	}
+// }
 
 void ConnectionNode::paint(QWidget *screen) {
 	QPainter p(screen);

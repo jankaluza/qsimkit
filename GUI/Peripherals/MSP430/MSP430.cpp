@@ -41,7 +41,9 @@ m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0),
 m_instruction(new Instruction), m_variant(variant) {
 
+	m_type = "MSP430";
 	m_step = 1.0/frequency;
+	loadXML("Packages/msp430x241x.xml");
 	reset();
 }
 
@@ -103,7 +105,7 @@ void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
 	onUpdated();
 }
 
-void MSP430::externalEvent(const std::vector<SimulationEvent *> &) {
+void MSP430::externalEvent(double t, const std::vector<SimulationEvent *> &) {
 
 }
 
@@ -135,6 +137,10 @@ void MSP430::save(QTextStream &stream) {
 	stream << "<variant>";
 	stream << QString(m_variant->getName());
 	stream << "</variant>\n";
+}
+
+void MSP430::load(QDomElement &object) {
+	loadA43(object.firstChildElement("code").text().toStdString());
 }
 
 bool MSP430::loadXML(const QString &file) {

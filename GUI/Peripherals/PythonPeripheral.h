@@ -36,7 +36,7 @@ class PythonPeripheral : public Peripheral {
 
 		void internalTransition();
 
-		void externalEvent(const std::vector<SimulationEvent *> &);
+		void externalEvent(double t, const std::vector<SimulationEvent *> &);
 
 		void output(std::vector<SimulationEvent *> &output);
 

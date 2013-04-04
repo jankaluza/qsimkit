@@ -36,6 +36,7 @@
 #include <QIcon>
 #include <QIODevice>
 #include <QDebug>
+#include <QDomDocument>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
 m_dig(0), m_sim(0) {
@@ -49,6 +50,7 @@ m_dig(0), m_sim(0) {
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
 	connect(actionNew_project, SIGNAL(triggered()), this, SLOT(newProject()) );
 	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
+	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
 
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -129,7 +131,41 @@ void QSimKit::saveProject() {
 		return;
 
 	QTextStream stream(&file);
+	stream << "<qsimkit_project>\n";
 	screen->save(stream);
+	stream << "</qsimkit_project>\n";
+}
+
+bool QSimKit::loadProject(const QString &file) {
+    int errorLine, errorColumn;
+    QString errorMsg;
+
+	QFile modelFile(file);
+	QDomDocument document;
+	if (!document.setContent(&modelFile, &errorMsg, &errorLine, &errorColumn))
+	{
+			QString error("Syntax error line %1, column %2:\n%3");
+			error = error
+					.arg(errorLine)
+					.arg(errorColumn)
+					.arg(errorMsg);
+			qDebug() << error;
+			return false;
+	}
+
+	screen->load(document);
+	m_filename = file;
+
+	return true;
+}
+
+void QSimKit::loadProject() {
+	QString filename = QFileDialog::getOpenFileName(this);
+	if (filename.isEmpty()) {
+		return;
+	}
+
+	loadProject(filename);
 }
 
 bool QSimKit::loadA43File(const QString &f) {

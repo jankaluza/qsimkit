@@ -19,6 +19,8 @@
 
 #include "Screen.h"
 
+#include "CPU/Variants/Variant.h"
+#include "CPU/Variants/VariantManager.h"
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
 #include "Peripherals/MSP430/MSP430.h"
@@ -172,12 +174,55 @@ void Screen::clear() {
 void Screen::save(QTextStream &stream) {
 	stream << "<objects>\n";
 	for (int i = 0; i < m_objects.size(); ++i) {
-		stream << "<object id='" << i << "'>\n";
+		stream << "<object id='" << i << "' type='" << m_objects[i]->type() << "'>\n";
 		m_objects[i]->save(stream);
 		stream << "</object>\n";
 	}
+	stream << "</objects>\n";
 
 	m_conns->save(stream);
+}
+
+void Screen::load(QDomDocument &doc) {
+	QDomElement root = doc.firstChild().toElement();
+	QDomElement objects = root.firstChildElement("objects");
+
+	for(QDomNode node = objects.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement object = node.toElement();
+		QString type = object.attribute("type");
+
+		ScreenObject *obj = 0;
+		if (type == "MSP430") {
+			QString variant = object.firstChildElement("variant").text();
+			obj = new MSP430(getVariant(variant.toStdString().c_str()));
+		}
+		else if (type == "ConnectionNode") {
+			obj = new ConnectionNode();
+		}
+		else {
+			obj = m_peripherals->getPeripheral(type).create();
+		}
+
+		if (!obj) {
+			continue;
+		}
+
+		QDomElement position = object.firstChildElement("position");
+		obj->setX(position.attribute("x").toInt());
+		obj->setY(position.attribute("y").toInt());
+
+		obj->load(object);
+		if (m_objects.empty()) {
+			setCPU(dynamic_cast<MSP430 *>(obj));
+		}
+		else {
+			m_objects.append(obj);
+		}
+	}
+
+	m_conns->load(doc);
+
+	repaint();
 }
 
 void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {

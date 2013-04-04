@@ -41,11 +41,13 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 
 		void setVariant(const QString &variant);
 		bool loadA43File(const QString &file);
+		bool loadProject(const QString &file);
 
 	public slots:
 		void loadA43();
 		void newProject();
 		void saveProject();
+		void loadProject();
 		void chooseVariant();
 		void simulationStep();
 

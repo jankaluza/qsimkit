@@ -59,10 +59,33 @@ void ConnectionManager::save(QTextStream &stream) {
 	stream << "</connections>\n";
 }
 
+void ConnectionManager::load(QDomDocument &doc) {
+	QDomElement root = doc.firstChild().toElement();
+	QDomElement connections = root.firstChildElement("connections");
+
+	for(QDomNode node = connections.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement c = node.toElement();
+
+		ScreenObject *from = m_screen->objectFromId(c.attribute("from").toInt());
+		ScreenObject *to = m_screen->objectFromId(c.attribute("to").toInt());
+		int fpin = c.attribute("fpin").toInt();
+		int tpin = c.attribute("tpin").toInt();
+
+		std::vector<QPoint> points;
+		for(QDomNode pnode = c.firstChild(); !pnode.isNull(); pnode = pnode.nextSibling()) {
+			QDomElement point = pnode.toElement();
+			points.push_back(QPoint(point.attribute("x").toInt(), point.attribute("y").toInt()));
+		}
+
+		addConnection(from, fpin, to, tpin, points);
+	}
+}
+
 Connection *ConnectionManager::addConnection(ScreenObject *from, int fpin, ScreenObject *to, int tpin, const std::vector<QPoint> &points) {
 	if (points.size() < 2) {
 		return 0;
 	}
+	
 
 	Connection *c = new Connection;
 	c->from = from;
@@ -90,8 +113,10 @@ Connection *ConnectionManager::addConnection(ScreenObject *from, int fpin, Scree
 
 void ConnectionManager::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers) {
 	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
-		dig->couple(wrappers[(*it)->from], (*it)->fpin, wrappers[(*it)->to], (*it)->tpin);
-		dig->couple(wrappers[(*it)->to], (*it)->tpin, wrappers[(*it)->from], (*it)->fpin);
+		Connection *c = *it;
+		qDebug() << "connecting" << c->from << c->fpin << c->to << c->tpin;
+		dig->couple(wrappers[c->from], c->fpin, wrappers[c->to], c->tpin);
+		dig->couple(wrappers[c->to], c->tpin, wrappers[c->from], c->fpin);
 	}
 }
 

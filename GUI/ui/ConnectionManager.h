@@ -28,6 +28,7 @@
 #include <map>
 
 #include <QTextStream>
+#include <QDomDocument>
 
 #include "adevs.h"
 
@@ -69,6 +70,7 @@ class ConnectionManager
 		void objectRemoved(ScreenObject *object);
 
 		void save(QTextStream &stream);
+		void load(QDomDocument &doc);
 
 	private:
 		void paint(QPainter &p, Connection *c);

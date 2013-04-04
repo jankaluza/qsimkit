@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QString>
 #include <QTextStream>
+#include <QDomDocument>
 #include <QList>
 
 #include "adevs.h"
@@ -51,11 +52,16 @@ class Screen : public QWidget
 			return m_objects.indexOf(obj);
 		}
 
+		ScreenObject *objectFromId(int id) {
+			return m_objects[id];
+		}
+
 		void removeObject(ScreenObject *obj);
 
 		void clear();
 
 		void save(QTextStream &stream);
+		void load(QDomDocument &doc);
 
 		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
 

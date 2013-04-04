@@ -30,7 +30,7 @@ void SimulationObjectWrapper::delta_ext(double e, const adevs::Bag<adevs::PortVa
 		(*iter).value->port = (*iter).port;
 		events.push_back((*iter).value);
 	}
-	m_obj->externalEvent(events);
+	m_obj->externalEvent(e, events);
 }
 
 void SimulationObjectWrapper::delta_conf(const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb) {

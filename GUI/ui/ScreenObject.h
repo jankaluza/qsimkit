@@ -22,6 +22,7 @@
 #include <QPainter>
 #include <map>
 #include <QTextStream>
+#include <QDomElement>
 // #include "Peripherals/SimulationObject.h"
 
 
@@ -48,15 +49,18 @@ class ScreenObject : public QObject
 		int y() { return m_y; }
 		int width() { return m_width; }
 		int height() { return m_height; }
+		const QString &type() { return m_type; }
 
 		void setX(int x);
 		void setY(int y);
 		void setWidth(int width) { m_width = width; }
 		void setHeight(int height) { m_height = height; }
+		void setType(const QString &type) { m_type = type; }
 
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
 		virtual void save(QTextStream &stream);
+		virtual void load(QDomElement &object) {}
 
 		virtual void paint(QWidget *screen) = 0;
 
@@ -80,6 +84,7 @@ class ScreenObject : public QObject
 		int m_width;
 		int m_height;
 		int m_id;
+		QString m_type;
 
 };
 

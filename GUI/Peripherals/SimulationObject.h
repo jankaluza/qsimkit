@@ -43,7 +43,7 @@ class SimulationObject {
 
 		virtual void internalTransition() = 0;
 
-		virtual void externalEvent(const std::vector<SimulationEvent *> &) = 0;
+		virtual void externalEvent(double t, const std::vector<SimulationEvent *> &) = 0;
 
 		virtual void output(std::vector<SimulationEvent *> &output) = 0;
 
