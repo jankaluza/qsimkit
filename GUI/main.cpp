@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
 	QApplication a(argc, argv);
 	QSimKit w;
 
-	w.show();
+	w.showMaximized();
 
 	if (argc == 2) {
 		w.loadProject(argv[1]);

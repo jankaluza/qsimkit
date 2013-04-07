@@ -84,7 +84,7 @@ m_dig(0), m_sim(0) {
 	addDockWidget(Qt::RightDockWidgetArea, m_disassembler);
 
 	m_registers = new Registers(this);
-	addDockWidget(Qt::RightDockWidgetArea, m_registers);
+	addDockWidget(Qt::LeftDockWidgetArea, m_registers);
 }
 
 void QSimKit::setVariant(const QString &variant) {
