@@ -17,32 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
+#pragma once
+
+#include <QString>
+#include <QList>
+
+#include "Breakpoint.h"
 #include "CPU/Memory/Register.h"
 
+class Register;
 
-Instruction::Instruction () : m_src(0), m_dst(0) {
+class RegisterBreakpoint : public Breakpoint, public RegisterWatcher {
+	public:
+		RegisterBreakpoint(BreakpointManager *m, Register *reg);
+		~RegisterBreakpoint();
 
-}
+		uint16_t getValue();
 
-Instruction::~Instruction() {
+		void handleRegisterChanged(Register *reg, uint16_t value);
 
-}
-
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
-}
-
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
-}
-
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
-
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
+	private:
+		Register *m_reg;
+};
 

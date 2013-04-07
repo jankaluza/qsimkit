@@ -17,32 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
-#include "CPU/Memory/Register.h"
+#include "Breakpoint.h"
+#include "BreakpointManager.h"
 
-
-Instruction::Instruction () : m_src(0), m_dst(0) {
+Breakpoint::Breakpoint(BreakpointManager *manager) : m_breakValue(0), m_mode(-1), m_manager(manager) {
 
 }
 
-Instruction::~Instruction() {
+Breakpoint::~Breakpoint() {
 
 }
 
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
+void Breakpoint::breakWhenEqual(uint16_t value) {
+	m_mode = 0;
+	m_breakValue = value;
 }
 
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
+void Breakpoint::shouldBreak() {
+	switch (m_mode) {
+		case -1: return;
+		case 0: if (getValue() == m_breakValue) m_manager->breakNow(); return;
+		default: return;
+	}
 }
-
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
-
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
-

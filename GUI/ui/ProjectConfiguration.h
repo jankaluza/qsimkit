@@ -32,11 +32,11 @@ class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
 	Q_OBJECT
 
 	public:
-		ProjectConfiguration(QWidget *parent = 0);
+		ProjectConfiguration(QWidget *parent = 0, MSP430 *cpu = 0);
 
 		MSP430 *getMSP430();
 
-		int getFrequency();
+		unsigned long getFrequency();
 
 
 	private slots:

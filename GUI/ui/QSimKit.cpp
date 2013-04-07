@@ -23,8 +23,15 @@
 
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
+#include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
 #include "Peripherals/MSP430/MSP430.h"
 #include "Peripherals/PeripheralManager.h"
+
+#include "DockWidgets/Disassembler/Disassembler.h"
+#include "DockWidgets/Registers/Registers.h"
+
+#include "Breakpoints/BreakpointManager.h"
 
 #include <QWidget>
 #include <QTime>
@@ -47,10 +54,14 @@ m_dig(0), m_sim(0) {
 
 	screen->setPeripheralManager(m_peripherals);
 
+	m_breakpointManager = new BreakpointManager();
+
 	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
+	connect(actionLoad_ELF, SIGNAL(triggered()), this, SLOT(loadELF()) );
 	connect(actionNew_project, SIGNAL(triggered()), this, SLOT(newProject()) );
 	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
 	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
+	connect(actionProject_options, SIGNAL(triggered()), this, SLOT(projectOptions()) );
 
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -58,41 +69,83 @@ m_dig(0), m_sim(0) {
 	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
 	action->setCheckable(true);
 	connect(action, SIGNAL(triggered(bool)), this, SLOT(pauseSimulation(bool)));
+	m_pauseAction = action;
 
 	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-stop.png"), tr("Sto&p simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(stopSimulation()));
 
+	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
+	connect(action, SIGNAL(triggered()), this, SLOT(singleStep()));
+
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(simulationStep()));
+
+	m_disassembler = new Disassembler(this);
+	addDockWidget(Qt::RightDockWidgetArea, m_disassembler);
+
+	m_registers = new Registers(this);
+	addDockWidget(Qt::RightDockWidgetArea, m_registers);
 }
 
 void QSimKit::setVariant(const QString &variant) {
 	m_variant = getVariant(variant.toStdString().c_str());
 }
 
-void QSimKit::simulationStep() {
+void QSimKit::refreshDockWidgets() {
+	m_disassembler->updatePC();
+	m_registers->refresh();
+
 	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
-// 	QTime perf;
-// 	perf.start();
-	for (int i = 0; i < 20000; ++i) {
+}
+
+void QSimKit::singleStep() {
+	if (!m_dig) {
+		resetSimulation();
+	}
+
+	double t = m_sim->nextEventTime();
+
+	do {
 		m_sim->execNextEvent();
 	}
-// 	qDebug() << perf.elapsed();
+	while (t == m_sim->nextEventTime());
+	refreshDockWidgets();
+}
+
+void QSimKit::simulationStep() {
+	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
+	QTime perf;
+	perf.start();
+	for (int i = 0; i < 10000; ++i) {
+		m_sim->execNextEvent();
+		if (m_breakpointManager->shouldBreak()) {
+			m_pauseAction->setChecked(true);
+			pauseSimulation(true);
+			return;
+		}
+	}
+	qDebug() << perf.elapsed();
 }
 
 void QSimKit::resetSimulation() {
 	m_timer->stop();
+	m_pauseAction->setChecked(false);
 
 	delete m_dig;
 	delete m_sim;
 
-	m_dig = new adevs::Digraph<SimulationEvent *>();
+	m_dig = new adevs::Digraph<double>();
 	screen->prepareSimulation(m_dig);
-	m_sim = new adevs::Simulator<adevs::PortValue<SimulationEvent *> >(m_dig);
+	m_sim = new adevs::Simulator<SimulationEvent>(m_dig);
 }
 
 void QSimKit::startSimulation() {
-	resetSimulation();
+	if (m_pauseAction->isChecked()) {
+		m_pauseAction->setChecked(false);
+	}
+	else {
+		resetSimulation();
+	}
 	m_timer->start(100);
 }
 
@@ -103,6 +156,7 @@ void QSimKit::stopSimulation() {
 void QSimKit::pauseSimulation(bool checked) {
 	if (checked) {
 		m_timer->stop();
+		refreshDockWidgets();
 	}
 	else {
 		m_timer->start(100);
@@ -115,6 +169,9 @@ void QSimKit::newProject() {
 		m_filename = "";
 		screen->clear();
 		screen->setCPU(dialog.getMSP430());
+		m_disassembler->setCPU(screen->getCPU());
+		m_registers->setCPU(screen->getCPU());
+		m_breakpointManager->setCPU(screen->getCPU());
 	}
 }
 
@@ -155,6 +212,9 @@ bool QSimKit::loadProject(const QString &file) {
 
 	screen->load(document);
 	m_filename = file;
+	m_disassembler->setCPU(screen->getCPU());
+	m_registers->setCPU(screen->getCPU());
+	m_breakpointManager->setCPU(screen->getCPU());
 
 	return true;
 }
@@ -169,17 +229,16 @@ void QSimKit::loadProject() {
 }
 
 bool QSimKit::loadA43File(const QString &f) {
-	if (!m_variant) {
-		chooseVariant();
+	if (!screen->getCPU()) {
+		newProject();
+		if (!screen->getCPU()) {
+			return false;
+		}
 	}
 
 	QFile file(f);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
-
-	MSP430 *cpu = new MSP430(m_variant);
-	cpu->loadXML("Packages/msp430x241x.xml");
-	screen->setCPU(cpu);
 
 	return screen->getCPU()->loadA43(file.readAll().data());
 }
@@ -193,16 +252,38 @@ void QSimKit::loadA43() {
 	loadA43File(filename);
 }
 
-void QSimKit::chooseVariant() {
-	QStringList items;
-	std::vector<_msp430_variant *> variants = getVariants();
-	for (std::vector<_msp430_variant *>::iterator it = variants.begin(); it != variants.end(); it++) {
-		items.append((*it)->name);
+bool QSimKit::loadELFFile(const QString &f) {
+	if (!screen->getCPU()) {
+		newProject();
+		if (!screen->getCPU()) {
+			return false;
+		}
 	}
 
-	bool ok = false;
-	QString item = QInputDialog::getItem(this, "Choose MSP430 variant", "MSP430 Variant:", items, 0, false, &ok);
-	if (ok && !item.isEmpty()) {
-		setVariant(item);
+	QFile file(f);
+	if (!file.open(QIODevice::ReadOnly))
+		return false;
+
+	QByteArray elf = file.readAll();
+	QString a43 = m_disassembler->ELFToA43(elf);
+
+	screen->getCPU()->setELF(elf);
+
+	return screen->getCPU()->loadA43(a43.toAscii().data());
+}
+
+void QSimKit::loadELF() {
+	QString filename = QFileDialog::getOpenFileName(this);
+	if (filename.isEmpty()) {
+		return;
+	}
+
+	loadELFFile(filename);
+}
+
+void QSimKit::projectOptions() {
+	ProjectConfiguration dialog(this, screen->getCPU());
+	if (dialog.exec() == QDialog::Accepted) {
+		screen->getCPU()->setFrequency(dialog.getFrequency());
 	}
 }

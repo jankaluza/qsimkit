@@ -39,6 +39,8 @@ class MemoryArgument : public InstructionArgument {
 		uint8_t getByte();
 		void setByte(uint8_t value);
 
+		void reinitialize(uint16_t address) { m_address = address; }
+
 	private:
 		Memory *m_mem;
 		uint16_t m_address;

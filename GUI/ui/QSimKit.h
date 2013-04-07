@@ -25,12 +25,15 @@
 
 #include "ui_QSimKit.h"
 
+#include "Peripherals/Peripheral.h"
 #include "adevs.h"
 
 class Variant;
 class CPU;
-class SimulationEvent;
 class PeripheralManager;
+class Disassembler;
+class Registers;
+class BreakpointManager;
 
 class QSimKit : public QMainWindow, public Ui::QSimKit
 {
@@ -41,15 +44,23 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 
 		void setVariant(const QString &variant);
 		bool loadA43File(const QString &file);
+		bool loadELFFile(const QString &file);
 		bool loadProject(const QString &file);
+
+		BreakpointManager *getBreakpointManager() {
+			return m_breakpointManager;
+		}
 
 	public slots:
 		void loadA43();
+		void loadELF();
 		void newProject();
 		void saveProject();
 		void loadProject();
-		void chooseVariant();
+		void projectOptions();
+
 		void simulationStep();
+		void singleStep();
 
 		void startSimulation();
 		void stopSimulation();
@@ -57,11 +68,18 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void resetSimulation();
 
 	private:
+		void refreshDockWidgets();
+
+	private:
 		Variant *m_variant;
-		adevs::Digraph<SimulationEvent *> *m_dig;
-		adevs::Simulator<adevs::PortValue<SimulationEvent *> > *m_sim;
+		adevs::Digraph<double> *m_dig;
+		adevs::Simulator<SimulationEvent> *m_sim;
 		QTimer *m_timer;
 		PeripheralManager *m_peripherals;
 		QString m_filename;
+		Disassembler *m_disassembler;
+		Registers *m_registers;
+		QAction *m_pauseAction;
+		BreakpointManager *m_breakpointManager;
 };
 

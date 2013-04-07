@@ -21,6 +21,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 
 #include "CPU/Instructions/InstructionArgument.h"
 
@@ -35,9 +36,16 @@
 #define SR_Z 2
 #define SR_C 1
 
+class Register;
+
+class RegisterWatcher {
+	public:
+		virtual void handleRegisterChanged(Register *reg, int id, uint16_t value) = 0;
+};
+
 class Register : public InstructionArgument {
 	public:
-		Register(const std::string &name, uint16_t value, const std::string &desc = "");
+		Register(int id, const std::string &name, uint16_t value, const std::string &desc = "");
 		virtual ~Register();
 
 		uint16_t get();
@@ -51,9 +59,15 @@ class Register : public InstructionArgument {
 		bool isBitSet(uint16_t bit);
 		bool setBit(uint16_t bit, bool value = true);
 
+		void addWatcher(RegisterWatcher *watcher);
+		void callWatchers();
+		void removeWatcher(RegisterWatcher *watcher);
+
 	private:
+		int m_id;
 		uint16_t m_value;
 		std::string m_name;
 		std::string m_desc;
+		std::vector<RegisterWatcher *> m_watchers;
 		
 };

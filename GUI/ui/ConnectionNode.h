@@ -69,9 +69,9 @@ class ConnectionNode : public Peripheral
 
 		void internalTransition();
 
-		void externalEvent(double t, const std::vector<SimulationEvent *> &);
+		void externalEvent(double t, const SimulationEventList &);
 
-		void output(std::vector<SimulationEvent *> &output);
+		void output(SimulationEventList &output);
 
 		double timeAdvance();
 
@@ -81,7 +81,7 @@ class ConnectionNode : public Peripheral
 		std::map<int, Pin> m_pins;
 		std::map<int, Connection *> m_conns;
 		QStringList m_options;
-		std::vector<SimulationEvent *> m_output;
+		SimulationEventList m_output;
 		double m_advance;
 
 };

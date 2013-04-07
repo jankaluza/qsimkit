@@ -17,32 +17,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
+#pragma once
+
+#include <stdint.h>
+#include <QList>
 #include "CPU/Memory/Register.h"
 
+class Breakpoint;
+class MSP430;
 
-Instruction::Instruction () : m_src(0), m_dst(0) {
+class BreakpointManager : public RegisterWatcher {
+	public:
+		BreakpointManager();
+		~BreakpointManager();
 
-}
+		void setCPU(MSP430 *cpu);
 
-Instruction::~Instruction() {
+		void addRegisterBreak(int reg, uint16_t value);
+		void removeRegisterBreak(int reg, uint16_t value);
 
-}
+		void addBreakpoint(Breakpoint *b);
+		void removeBreakpoint(Breakpoint *b);
 
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
-}
+		bool shouldBreak();
 
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
-}
+		void breakNow() {
+			m_break = true;
+		}
 
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
+		void handleRegisterChanged(Register *reg, int id, uint16_t value);
 
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
+	private:
+		MSP430 *m_cpu;
+		QList<QList<uint16_t> > m_breaks;
+		QList<Breakpoint *> m_breakpoints;
+		bool m_break;
+
+};
 

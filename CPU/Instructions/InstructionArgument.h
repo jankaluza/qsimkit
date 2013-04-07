@@ -24,6 +24,7 @@
 
 class InstructionArgument {
 	public:
+		InstructionArgument() : m_deleteLater(false) {}
 		virtual uint16_t get() = 0;
 		virtual uint16_t getBigEndian() = 0;
 		virtual void set(uint16_t value) = 0;
@@ -31,4 +32,12 @@ class InstructionArgument {
 
 		virtual uint8_t getByte() = 0;
 		virtual void setByte(uint8_t) = 0;
+
+		virtual void callWatchers() {};
+
+		void deleteLater() { m_deleteLater = true; }
+		bool shouldDeleteLater() {return m_deleteLater; }
+
+	private:
+		bool m_deleteLater;
 };

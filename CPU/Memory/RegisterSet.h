@@ -33,6 +33,10 @@ class RegisterSet {
 		void addRegister(const std::string &name, uint16_t value, const std::string &desc = "");
 		void addDefaultRegisters();
 
+		int size() {
+			return m_registers.size();
+		}
+
 		Register *get(unsigned int reg);
 		Register *operator[](unsigned int reg);
 

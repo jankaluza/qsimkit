@@ -36,9 +36,9 @@ class PythonPeripheral : public Peripheral {
 
 		void internalTransition();
 
-		void externalEvent(double t, const std::vector<SimulationEvent *> &);
+		void externalEvent(double t, const SimulationEventList &);
 
-		void output(std::vector<SimulationEvent *> &output);
+		void output(SimulationEventList &output);
 
 		double timeAdvance();
 

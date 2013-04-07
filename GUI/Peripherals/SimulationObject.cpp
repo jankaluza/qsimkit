@@ -19,39 +19,30 @@
 
 #include "SimulationObject.h"
 
+#include <QDebug>
+
 
 void SimulationObjectWrapper::delta_int() {
 	m_obj->internalTransition();
 }
 
-void SimulationObjectWrapper::delta_ext(double e, const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb) {
-	std::vector<SimulationEvent *> events;
-	for (adevs::Bag<adevs::PortValue<SimulationEvent *> >::iterator iter = xb.begin(); iter != xb.end(); iter++) {
-		(*iter).value->port = (*iter).port;
-		events.push_back((*iter).value);
-	}
-	m_obj->externalEvent(e, events);
+void SimulationObjectWrapper::delta_ext(double e, const SimulationEventList& xb) {
+	m_obj->externalEvent(e, xb);
 }
 
-void SimulationObjectWrapper::delta_conf(const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb) {
+void SimulationObjectWrapper::delta_conf(const SimulationEventList& xb) {
 	delta_int();
 	delta_ext(0.0, xb);
 }
 
-void SimulationObjectWrapper::output_func(adevs::Bag<adevs::PortValue<SimulationEvent *> >& yb) {
-	std::vector<SimulationEvent *> events;
-	m_obj->output(events);
-
-	for (std::vector<SimulationEvent *>::iterator it = events.begin(); it != events.end(); ++it) {
-		adevs::PortValue<SimulationEvent *> p((*it)->port, *it);
-		yb.insert(p);
-	}
+void SimulationObjectWrapper::output_func(SimulationEventList& yb) {
+	m_obj->output(yb);
 }
 
 double SimulationObjectWrapper::ta() {
 	return m_obj->timeAdvance();
 }
 
-void SimulationObjectWrapper::gc_output(adevs::Bag<adevs::PortValue<SimulationEvent *> >& g) {
+void SimulationObjectWrapper::gc_output(SimulationEventList& g) {
 
 }

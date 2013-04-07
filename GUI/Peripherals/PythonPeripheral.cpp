@@ -43,16 +43,16 @@ void PythonPeripheral::internalTransition() {
 	m_script->call("internalTransition");
 }
 
-void PythonPeripheral::externalEvent(double t, const std::vector<SimulationEvent *> &events) {
-	for (std::vector<SimulationEvent *>::const_iterator it = events.begin(); it != events.end(); ++it) {
-		m_script->call("externalEvent", QVariantList() << (*it)->port << (*it)->high);
+void PythonPeripheral::externalEvent(double t, const SimulationEventList &events) {
+	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
+		m_script->call("externalEvent", QVariantList() << (*it).port << (*it).value);
 	}
 }
 
-void PythonPeripheral::output(std::vector<SimulationEvent *> &output) {
+void PythonPeripheral::output(SimulationEventList &output) {
 	QVariantList v = m_script->call("output").toList();
 	while (!v.empty()) {
-		output.push_back(new SimulationEvent(v[0].toInt(), v[1].toBool()));
+		output.insert(SimulationEvent(v[0].toInt(), v[1].toBool()));
 		v = m_script->call("output").toList();
 	}
 }

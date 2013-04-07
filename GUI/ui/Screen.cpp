@@ -55,7 +55,7 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 	setMouseTracking(true);
 }
 
-void Screen::prepareSimulation(adevs::Digraph<SimulationEvent *> *dig) {
+void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
 	std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
 	for (int i = 0; i < m_objects.size(); ++i) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
@@ -84,6 +84,10 @@ void Screen::setCPU(MSP430 *cpu) {
 }
 
 MSP430 *Screen::getCPU() {
+	if (m_objects.empty()) {
+		return 0;
+	}
+
 	return static_cast<MSP430 *>(m_objects[0]);
 }
 

@@ -17,32 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
+#include "RegisterBreakpoint.h"
+#include <QApplication>
+#include <QDebug>
+
 #include "CPU/Memory/Register.h"
 
+RegisterBreakpoint::RegisterBreakpoint(BreakpointManager *m, Register *reg) : Breakpoint(m), m_reg(reg) {
+	m_reg->addWatcher(this);
+}
 
-Instruction::Instruction () : m_src(0), m_dst(0) {
+
+RegisterBreakpoint::~RegisterBreakpoint() {
 
 }
 
-Instruction::~Instruction() {
-
+void RegisterBreakpoint::handleRegisterChanged(Register *reg, uint16_t value) {
+	shouldBreak();
 }
 
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
-}
 
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
+uint16_t RegisterBreakpoint::getValue() {
+	return m_reg->getBigEndian();
 }
-
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
-
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
-

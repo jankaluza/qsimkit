@@ -17,32 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
-#include "CPU/Memory/Register.h"
+#pragma once
 
+#include <QDialog>
+#include <QString>
+#include <QTimer>
+#include <QDockWidget>
+#include <QTreeWidgetItem>
 
-Instruction::Instruction () : m_src(0), m_dst(0) {
+#include "ui_Registers.h"
 
-}
+class MSP430;
+class QSimKit;
 
-Instruction::~Instruction() {
+class Registers : public QDockWidget, public Ui::Registers
+{
+	Q_OBJECT
 
-}
+	public:
+		Registers(QSimKit *simkit);
 
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
-}
+		void setCPU(MSP430 *cpu);
 
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
-}
+		void refresh();
 
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
-
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
+	private:
+		MSP430 *m_cpu;
+		QSimKit *m_simkit;
+};
 

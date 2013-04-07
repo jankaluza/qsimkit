@@ -20,30 +20,35 @@
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Instructions/Instruction.h"
 #include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
 
 #include <iostream>
 #include <sstream>
-#include <map>
+#include <vector>
 
-#define TYPE_OFFSET 100
+#define TYPE_OFFSET 15
 
-static std::map<unsigned int, _msp430_instruction *> *instructions;
+static std::vector<_msp430_instruction *> *instructions;
 
 void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction) {
 	if (instructions == 0) {
-		instructions = new std::map<unsigned int, _msp430_instruction *>;
+		instructions = new std::vector<_msp430_instruction *>;
+		instructions->resize(TYPE_OFFSET*3);
 	}
 	(*instructions)[((int) type) * TYPE_OFFSET + opcode] = instruction;
 	std::cout << "Loaded instruction: " << (*instructions)[((int) type) * TYPE_OFFSET + opcode]->name << "\n";
 }
 
 int executeInstruction(RegisterSet *reg, Memory *mem, Instruction *i) {
-	std::map<unsigned int, _msp430_instruction *>::iterator it = instructions->find(((int) i->type) * TYPE_OFFSET + i->opcode);
-	if (it == instructions->end()) {
+	_msp430_instruction *instruction = (*instructions)[((int) i->type) * TYPE_OFFSET + i->opcode];
+
+	if (!instruction) {
 		return -1;
 	}
-
-	return it->second->callback(reg, mem, i);
+	
+	int cycles = instruction->callback(reg, mem, i);
+	reg->get(0)->callWatchers();
+	return cycles;
 }
 
 _msp430_instruction::_msp430_instruction(const char *name, InstructionType type, unsigned int opcode, InstructionCallback callback) {

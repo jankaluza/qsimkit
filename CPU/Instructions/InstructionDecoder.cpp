@@ -41,12 +41,22 @@
 #define IS_INSTRUCTION_COND(X) (X & INSTRUCTION_COND_MASK == INSTRUCTION_COND_MAGIC)
 
 InstructionDecoder::InstructionDecoder(RegisterSet *reg, Memory *mem) :
-	m_reg(reg), m_mem(mem) {
-
+m_reg(reg), m_mem(mem) {
+	m_srcMemArg = new MemoryArgument(mem, 0);
+	m_srcConstArg = new ConstantArgument(0);
+	m_srcIndexedArg = new IndexedArgument(mem, 0, 0);
+	m_srcIndirectAutoArg = new IndirectAutoincrementArgument(mem, 0, 0);
+	m_dstMemArg = new MemoryArgument(mem, 0);
+	m_dstIndexedArg = new IndexedArgument(mem, 0, 0);
 }
 
 InstructionDecoder::~InstructionDecoder() {
-
+	delete m_srcMemArg;
+	delete m_srcConstArg;
+	delete m_srcIndexedArg;
+	delete m_srcIndirectAutoArg;
+	delete m_dstMemArg;
+	delete m_dstIndexedArg;
 }
 
 InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc, bool bw, uint8_t as, uint8_t source_reg) {
@@ -60,17 +70,20 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 				break;
 			// Absolute mode
 			case 1:
-				arg = new MemoryArgument(m_mem, m_mem->getBigEndian(pc));
+				arg = m_srcMemArg;
+				m_srcMemArg->reinitialize(m_mem->getBigEndian(pc));
 				pc += 2;
 				cycles += 2; // fetch + read from memory
 				break;
 			// Const 4
 			case 2:
-				arg = new ConstantArgument(0x0400);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0x0400);
 				break;
 			// Const 8
 			case 3:
-				arg = new ConstantArgument(0x0800);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0x0800);
 				break;
 			default:
 				break;
@@ -80,19 +93,23 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 		switch (as) {
 			// Const 0
 			case 0:
-				arg = new ConstantArgument(0);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0);
 				break;
 			// Const 1
 			case 1:
-				arg = new ConstantArgument(0x0100);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0x0100);
 				break;
 			// Const 2
 			case 2:
-				arg = new ConstantArgument(0x0200);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0x0200);
 				break;
 			// Const -1
 			case 3:
-				arg = new ConstantArgument(0xffff);
+				arg = m_srcConstArg;
+				m_srcConstArg->reinitialize(0xffff);
 				break;
 			default:
 				break;
@@ -106,26 +123,30 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 				break;
 			// Indexed mode
 			case 1:
-				arg = new IndexedArgument(m_mem, m_reg->get(source_reg), m_mem->getBigEndian(pc));
+				arg = m_srcIndexedArg;
+				m_srcIndexedArg->reinitialize(m_reg->get(source_reg), m_mem->getBigEndian(pc));
 				pc += 2;
 				cycles += 2; // fetch + read
 				break;
 			// Indirect
 			case 2:
 				// simulate Indirect with indexed with offset 0
-				arg = new IndexedArgument(m_mem, m_reg->get(source_reg), 0);
+				arg = m_srcIndexedArg;
+				m_srcIndexedArg->reinitialize(m_reg->get(source_reg), 0);
 				cycles += 1; // target mem read
 				break;
 			case 3:
 				if (source_reg == 0) {
 					// Immediate mode
-					arg = new ConstantArgument(m_mem->get(pc));
+					arg = m_srcConstArg;
+					m_srcConstArg->reinitialize(m_mem->get(pc));
 					pc += 2;
 					cycles += 1; // fetch
 				}
 				else {
 					// Indirect autoincrement
-					arg = new IndirectAutoincrementArgument(m_mem, m_reg->get(source_reg), bw);
+					arg = m_srcIndirectAutoArg;
+					m_srcIndirectAutoArg->reinitialize(m_reg->get(source_reg), bw);
 					cycles += 1; // read
 				}
 				break;
@@ -149,13 +170,15 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 	else {
 		if (dest_reg == 2) {
 			// Absolute address
-			arg = new MemoryArgument(m_mem, m_mem->getBigEndian(pc));
+			arg = m_dstMemArg;
+			m_dstMemArg->reinitialize(m_mem->getBigEndian(pc));
 			pc += 2;
 			cycles += 3; // fetch, read from memory, write back
 		}
 		else {
 			// Indexed
-			arg = new IndexedArgument(m_mem, m_reg->get(dest_reg), m_mem->getBigEndian(pc));
+			arg = m_dstIndexedArg;
+			m_dstIndexedArg->reinitialize(m_reg->get(dest_reg), m_mem->getBigEndian(pc));
 			pc += 2;
 			cycles += 3; // fetch, read from memory, write back
 		}

@@ -37,6 +37,8 @@ class ConstantArgument : public InstructionArgument {
 		uint8_t getByte();
 		void setByte(uint8_t value);
 
+		void reinitialize(uint16_t value) { m_value = value; }
+
 	private:
 		uint16_t m_value;
 };

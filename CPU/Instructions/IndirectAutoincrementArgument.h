@@ -40,6 +40,11 @@ class IndirectAutoincrementArgument : public InstructionArgument {
 		uint8_t getByte();
 		void setByte(uint8_t value);
 
+		void reinitialize(Register *reg, bool bw) {
+			m_reg = reg;
+			m_bw = bw;
+		}
+
 	private:
 		Register *m_reg;
 		bool m_bw;

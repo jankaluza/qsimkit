@@ -39,12 +39,19 @@
 MSP430::MSP430(Variant *variant, unsigned long frequency) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0),
-m_instruction(new Instruction), m_variant(variant) {
+m_instruction(new Instruction), m_variant(variant),
+m_ignoreNextStep(false) {
 
+	setFrequency(frequency);
 	m_type = "MSP430";
-	m_step = 1.0/frequency;
 	loadXML("Packages/msp430x241x.xml");
 	reset();
+}
+
+void MSP430::setFrequency(unsigned long freq) {
+	qDebug() << "setting frequency" << freq;
+	m_freq = freq;
+	m_step = 1.0 / m_freq;
 }
 
 void MSP430::reset() {
@@ -88,11 +95,11 @@ bool MSP430::loadA43(const std::string &data) {
 		QString p2 = QString(PREFIX) + "." + QString::number(i); \
 		if (b & (1 << i)) { \
 			m_states[m_map[p2]].high = true; \
-			m_output.push_back(new SimulationEvent(m_map[p2], true)); \
+			m_output.insert(SimulationEvent(m_map[p2], true)); \
 		} \
 		else { \
 			m_states[m_map[p2]].high = false; \
-			m_output.push_back(new SimulationEvent(m_map[p2], false)); \
+			m_output.insert(SimulationEvent(m_map[p2], false)); \
 		} \
 	} \
 }
@@ -105,23 +112,37 @@ void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
 	onUpdated();
 }
 
-void MSP430::externalEvent(double t, const std::vector<SimulationEvent *> &) {
+void MSP430::externalEvent(double t, const SimulationEventList &) {
 
 }
 
-void MSP430::output(std::vector<SimulationEvent *> &output) {
-	output.swap(m_output);
+void MSP430::output(SimulationEventList &output) {
+	if (!m_output.empty()) {
+		output = m_output;
+		m_output.clear();
+	}
 }
 
 void MSP430::internalTransition() {
-	m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
-	m_instructionCycles += executeInstruction(m_reg, m_mem, m_instruction);
-	m_instructionCycles *= m_step;
+	if (!m_ignoreNextStep) {
+		m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
+		m_instructionCycles += executeInstruction(m_reg, m_mem, m_instruction);
+		m_instructionCycles *= m_step;
 
-	m_time += m_instructionCycles;
+	// 	m_time += m_instructionCycles;
+	}
+	else {
+		m_ignoreNextStep = false;
+	}
 }
 
 double MSP430::timeAdvance() {
+	if (!m_output.empty()) {
+// 		qDebug() << "MSP430 ta=" << 0;
+		m_ignoreNextStep = true;
+		return 0;
+	}
+// 	qDebug() << "MSP430 ta=" << m_instructionCycles;
 	return m_instructionCycles;
 }
 
@@ -137,10 +158,18 @@ void MSP430::save(QTextStream &stream) {
 	stream << "<variant>";
 	stream << QString(m_variant->getName());
 	stream << "</variant>\n";
+	stream << "<frequency>";
+	stream << m_freq;
+	stream << "</frequency>\n";
+	stream << "<elf>";
+	stream << m_elf.toBase64();
+	stream << "</elf>";
 }
 
 void MSP430::load(QDomElement &object) {
 	loadA43(object.firstChildElement("code").text().toStdString());
+	setFrequency(object.firstChildElement("frequency").text().toULong());
+	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 
 bool MSP430::loadXML(const QString &file) {

@@ -48,8 +48,9 @@ class Memory {
 		void setByte(uint16_t address, uint8_t value);
 
 		void addWatcher(uint16_t address, MemoryWatcher *watcher);
+		void callWatcher(uint16_t address);
 
 	private:
 		std::vector<uint8_t> m_memory;
-		std::map<uint16_t, MemoryWatcher *> m_watchers;
+		std::vector<std::vector<MemoryWatcher *> > m_watchers;
 };

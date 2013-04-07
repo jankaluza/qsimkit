@@ -18,9 +18,10 @@
  **/
 
 #include "CPU/Memory/Register.h"
+#include <algorithm>
 
-Register::Register(const std::string &name, uint16_t value, const std::string &desc) :
-	m_value(value), m_name(name), m_desc(desc) { }
+Register::Register(int id, const std::string &name, uint16_t value, const std::string &desc) :
+	m_id(id), m_value(value), m_name(name), m_desc(desc) { }
 
 Register::~Register() {
 
@@ -69,6 +70,28 @@ bool Register::setBit(uint16_t bit, bool value) {
 	}
 	else {
 		m_value = m_value & (~bit);
+	}
+}
+
+void Register::addWatcher(RegisterWatcher *watcher) {
+	if (std::find(m_watchers.begin(), m_watchers.end(), watcher) == m_watchers.end()) {
+		m_watchers.push_back(watcher);
+	}
+}
+
+void Register::callWatchers() {
+	if (m_watchers.empty())
+		return;
+
+	for (std::vector<RegisterWatcher *>::const_iterator it = m_watchers.begin(); it != m_watchers.end(); ++it) {
+		(*it)->handleRegisterChanged(this, m_id, m_value);
+	}
+}
+
+void Register::removeWatcher(RegisterWatcher *watcher) {
+	std::vector<RegisterWatcher *>::iterator it = std::find(m_watchers.begin(), m_watchers.end(), watcher);
+	if (it != m_watchers.end()) {
+		m_watchers.erase(it);
 	}
 }
 

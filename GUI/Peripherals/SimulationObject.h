@@ -27,14 +27,18 @@
 
 #include "adevs.h"
 
-class SimulationEvent {
-	public:
-		SimulationEvent(int port, bool high) : port(port), high(high) {}
-		virtual ~SimulationEvent() {}
+typedef adevs::PortValue<double> SimulationEvent;
 
-		int port;
-		bool high;
-};
+// class SimulationEvent {
+// 	public:
+// 		SimulationEvent(int port = -1, bool high = false) : port(port), high(high) {}
+// 		virtual ~SimulationEvent() {}
+// 
+// 		int port;
+// 		bool high;
+// };
+
+typedef adevs::Bag<SimulationEvent> SimulationEventList;
 
 class SimulationObject {
 	public:
@@ -43,15 +47,15 @@ class SimulationObject {
 
 		virtual void internalTransition() = 0;
 
-		virtual void externalEvent(double t, const std::vector<SimulationEvent *> &) = 0;
+		virtual void externalEvent(double t, const SimulationEventList &) = 0;
 
-		virtual void output(std::vector<SimulationEvent *> &output) = 0;
+		virtual void output(SimulationEventList &output) = 0;
 
 		virtual double timeAdvance() = 0;
 
 };
 
-class SimulationObjectWrapper : public adevs::Atomic<adevs::PortValue<SimulationEvent *> > {
+class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 	public:
 		SimulationObjectWrapper(SimulationObject *obj) : m_obj(obj) {}
 		~SimulationObjectWrapper() {}
@@ -60,19 +64,19 @@ class SimulationObjectWrapper : public adevs::Atomic<adevs::PortValue<Simulation
 		void delta_int();
 
 		/// Handles external changes (change on PINs or interrupts)
-		void delta_ext(double e, const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb);
+		void delta_ext(double e, const SimulationEventList &xb);
 
 		/// Confluent transition function.
-		void delta_conf(const adevs::Bag<adevs::PortValue<SimulationEvent *> >& xb);
+		void delta_conf(const SimulationEventList &xb);
 
 		/// Output function.
-		void output_func(adevs::Bag<adevs::PortValue<SimulationEvent *> >& yb);
+		void output_func(SimulationEventList &yb);
 
 		/// Time advance function.
 		double ta();
 
 		/// Output value garbage collection.
-		void gc_output(adevs::Bag<adevs::PortValue<SimulationEvent *> >& g);
+		void gc_output(SimulationEventList& g);
 
 	private:
 		SimulationObject *m_obj;

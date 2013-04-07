@@ -40,6 +40,11 @@ class IndexedArgument : public InstructionArgument {
 		uint8_t getByte();
 		void setByte(uint8_t value);
 
+		void reinitialize(Register *reg, uint16_t offset) {
+			m_reg = reg;
+			m_offset = offset;
+		}
+
 	private:
 		Register *m_reg;
 		uint16_t m_offset;

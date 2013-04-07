@@ -25,12 +25,12 @@
 #include <QDomDocument>
 #include <QList>
 
+#include "Peripherals/Peripheral.h"
 #include "adevs.h"
 
 class Package;
 class ScreenObject;
 class MSP430;
-class SimulationEvent;
 class ConnectionManager;
 class PeripheralManager;
 
@@ -63,7 +63,7 @@ class Screen : public QWidget
 		void save(QTextStream &stream);
 		void load(QDomDocument &doc);
 
-		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig);
+		void prepareSimulation(adevs::Digraph<double> *dig);
 
 		ScreenObject *getObject(int x, int y);
 		int getPin(ScreenObject *object, int x, int y);

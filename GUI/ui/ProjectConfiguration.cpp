@@ -36,27 +36,36 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-ProjectConfiguration::ProjectConfiguration(QWidget *parent) :
+ProjectConfiguration::ProjectConfiguration(QWidget *parent, MSP430 *cpu) :
 QDialog(parent) {
 	setupUi(this);
 
 	std::vector<_msp430_variant *> variants = getVariants();
 	for (std::vector<_msp430_variant *>::iterator it = variants.begin(); it != variants.end(); it++) {
 		MSP430Variants->addItem((*it)->name);
+		if (cpu && QString((*it)->name) == QString(cpu->getVariant()->getName())) {
+			MSP430Variants->setCurrentRow(MSP430Variants->count() - 1);
+		}
 	}
 
 	connect(MSP430Variants, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *)));
+
+	if (cpu) {
+		MSP430Variants->setEnabled(false);
+		handleCurrentItemChanged(0, 0);
+		frequency->setValue(cpu->getFrequency() / 1000);
+	}
 }
 
 MSP430 *ProjectConfiguration::getMSP430() {
 	Variant *v = getVariant(MSP430Variants->currentItem()->text().toStdString().c_str());
-	MSP430 *cpu = new MSP430(v);
+	MSP430 *cpu = new MSP430(v, getFrequency());
 	cpu->loadXML("Packages/msp430x241x.xml");
 	return cpu;
 }
 
-int ProjectConfiguration::getFrequency() {
-	frequency->value();
+unsigned long ProjectConfiguration::getFrequency() {
+	return frequency->value() * 1000;
 }
 
 

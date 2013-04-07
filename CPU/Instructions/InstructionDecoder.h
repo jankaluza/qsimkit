@@ -29,6 +29,10 @@ class RegisterSet;
 class Memory;
 class InstructionArgument;
 class Instruction;
+class MemoryArgument;
+class ConstantArgument;
+class IndexedArgument;
+class IndirectAutoincrementArgument;
 
 class InstructionDecoder {
 	public:
@@ -44,4 +48,10 @@ class InstructionDecoder {
 	private:
 		RegisterSet *m_reg;
 		Memory *m_mem;
+		MemoryArgument *m_srcMemArg;
+		ConstantArgument *m_srcConstArg;
+		IndexedArgument *m_srcIndexedArg;
+		IndirectAutoincrementArgument *m_srcIndirectAutoArg;
+		MemoryArgument *m_dstMemArg;
+		IndexedArgument *m_dstIndexedArg;
 };

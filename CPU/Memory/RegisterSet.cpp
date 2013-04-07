@@ -31,7 +31,7 @@ RegisterSet::~RegisterSet() {
 }
 
 void RegisterSet::addRegister(const std::string &name, uint16_t value, const std::string &desc) {
-	Register *reg = new Register(name, value, desc);
+	Register *reg = new Register(m_registers.size(), name, value, desc);
 	m_registers.push_back(reg);
 }
 

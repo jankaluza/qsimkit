@@ -34,6 +34,7 @@ static unsigned int hexToInt(const std::string &str) {
 
 Memory::Memory(unsigned int size) {
 	m_memory.resize(size);
+	m_watchers.resize(size);
 }
 
 Memory::~Memory() {
@@ -121,22 +122,24 @@ uint16_t Memory::getBigEndian(uint16_t address) {
 	return w;
 }
 
+void Memory::callWatcher(uint16_t address) {
+	std::vector<MemoryWatcher *> &watchers = m_watchers[address];
+	if (watchers.empty())
+		return;
+
+	
+	for (std::vector<MemoryWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
+		(*it)->handleMemoryChanged(this, address);
+	}
+}
+
 void Memory::set(uint16_t address, uint16_t value) {
 	uint8_t *ptr2 = (uint8_t *) &value;
 	m_memory[address] = *(ptr2 + 1);
 	m_memory[address + 1] = *ptr2;
 
-	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
-
-	it = m_watchers.find(address);
-	if (it != m_watchers.end()) {
-		it->second->handleMemoryChanged(this, address);
-	}
-
-	it = m_watchers.find(address + 1);
-	if (it != m_watchers.end()) {
-		it->second->handleMemoryChanged(this, address + 1);
-	}
+	callWatcher(address);
+	callWatcher(address + 1);
 }
 
 void Memory::setBigEndian(uint16_t address, uint16_t value) {
@@ -144,17 +147,8 @@ void Memory::setBigEndian(uint16_t address, uint16_t value) {
 	m_memory[address] = *(ptr2);
 	m_memory[address + 1] = *(ptr2 + 1);
 
-	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
-
-	it = m_watchers.find(address);
-	if (it != m_watchers.end()) {
-		it->second->handleMemoryChanged(this, address);
-	}
-
-	it = m_watchers.find(address + 1);
-	if (it != m_watchers.end()) {
-		it->second->handleMemoryChanged(this, address + 1);
-	}
+	callWatcher(address);
+	callWatcher(address + 1);
 }
 
 uint8_t Memory::getByte(uint16_t address) {
@@ -163,16 +157,10 @@ uint8_t Memory::getByte(uint16_t address) {
 
 void Memory::setByte(uint16_t address, uint8_t value) {
 	m_memory[address] = value;
-
-	std::map<uint16_t, MemoryWatcher *>::const_iterator it;
-
-	it = m_watchers.find(address);
-	if (it != m_watchers.end()) {
-		it->second->handleMemoryChanged(this, address);
-	}
+	callWatcher(address);
 }
 
 void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher) {
-	m_watchers[address] = watcher;
+	m_watchers[address].push_back(watcher);
 }
 

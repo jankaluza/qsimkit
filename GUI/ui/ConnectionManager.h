@@ -31,10 +31,10 @@
 #include <QDomDocument>
 
 #include "adevs.h"
+#include "Peripherals/SimulationObject.h"
 
 class ScreenObject;
 class SimulationObjectWrapper;
-class SimulationEvent;
 class Screen;
 class ConnectionNode;
 
@@ -63,7 +63,7 @@ class ConnectionManager
 		bool mousePressEvent(QMouseEvent *event);
 		bool mouseReleaseEvent(QMouseEvent *event);
 
-		void prepareSimulation(adevs::Digraph<SimulationEvent *> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
+		void prepareSimulation(adevs::Digraph<double> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 		void movePins(ScreenObject *object);
 		void objectMoved(ScreenObject *object);

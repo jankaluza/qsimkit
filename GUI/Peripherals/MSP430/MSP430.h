@@ -43,17 +43,22 @@ class MSP430 : public Peripheral, public MemoryWatcher
 	public:
 		MSP430(Variant *variant, unsigned long freq = 1000000);
 
+		Variant *getVariant() { return m_variant; }
+
 		bool loadXML(const QString &file);
 
 		bool loadA43(const std::string &data);
 
 		void internalTransition();
 
-		void externalEvent(double t, const std::vector<SimulationEvent *> &);
+		void externalEvent(double t, const SimulationEventList &);
 
-		void output(std::vector<SimulationEvent *> &output);
+		void output(SimulationEventList &output);
 
 		double timeAdvance();
+
+		void setFrequency(unsigned long freq);
+		unsigned long getFrequency() { return m_freq; }
 
 		void reset();
 
@@ -78,6 +83,26 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		virtual void save(QTextStream &stream);
 		virtual void load(QDomElement &object);
 
+		RegisterSet *getRegisterSet() {
+			return m_reg;
+		}
+
+		Memory *getMemory() {
+			return m_mem;
+		}
+
+		const std::string &getCode() {
+			return m_code;
+		}
+
+		void setELF(const QByteArray &elf) {
+			m_elf = elf;
+		}
+
+		const QByteArray &getELF() {
+			return m_elf;
+		}
+
 	private:
 		void addMemoryWatchers();
 
@@ -98,8 +123,11 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		Variant *m_variant;
 		double m_step;
 		std::string m_code;
-		std::vector<SimulationEvent *> m_output;
+		SimulationEventList m_output;
 		QStringList m_options;
+		unsigned long m_freq;
+		bool m_ignoreNextStep;
+		QByteArray m_elf;
 		
 };
 

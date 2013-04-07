@@ -34,6 +34,18 @@
     </item>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolbar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -52,32 +64,12 @@
     <addaction name="actionSave_project"/>
     <addaction name="separator"/>
     <addaction name="actionLoad_A43"/>
+    <addaction name="actionLoad_ELF"/>
     <addaction name="actionProject_options"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
-   <widget class="QMenu" name="menuSimulation">
-    <property name="title">
-     <string>Simulation</string>
-    </property>
-    <addaction name="actionStart"/>
-    <addaction name="actionStop"/>
-    <addaction name="actionStep"/>
-   </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuSimulation"/>
-  </widget>
-  <widget class="QStatusBar" name="statusbar"/>
-  <widget class="QToolBar" name="toolbar">
-   <property name="windowTitle">
-    <string>toolBar</string>
-   </property>
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <action name="actionLoad_A43">
    <property name="text">
@@ -122,6 +114,11 @@
   <action name="actionProject_options">
    <property name="text">
     <string>Project options</string>
+   </property>
+  </action>
+  <action name="actionLoad_ELF">
+   <property name="text">
+    <string>Load ELF</string>
    </property>
   </action>
  </widget>

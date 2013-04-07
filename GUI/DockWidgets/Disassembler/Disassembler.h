@@ -17,32 +17,47 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "CPU/Instructions/Instruction.h"
-#include "CPU/Instructions/InstructionArgument.h"
-#include "CPU/Memory/Register.h"
+#pragma once
 
+#include <QDialog>
+#include <QString>
+#include <QTimer>
+#include <QDockWidget>
+#include <QTreeWidgetItem>
+#include <QList>
 
-Instruction::Instruction () : m_src(0), m_dst(0) {
+#include "ui_Disassembler.h"
 
-}
+class MSP430;
+class QSimKit;
 
-Instruction::~Instruction() {
+class Disassembler : public QDockWidget, public Ui::Disassembler
+{
+	Q_OBJECT
 
-}
+	public:
+		Disassembler(QSimKit *simkit);
 
-void Instruction::setSrc(InstructionArgument *src) {
-	m_src = src;
-}
+		void setCPU(MSP430 *cpu);
 
-InstructionArgument *Instruction::getSrc() {
-	return m_src;
-}
+		void reloadCode();
 
-void Instruction::setDst(InstructionArgument *dst) {
-	m_dst = dst;
-}
+		void updatePC();
 
-InstructionArgument *Instruction::getDst() {
-	return m_dst;
-}
+		QString ELFToA43(const QByteArray &elf);
+
+	public slots:
+		void handleContextMenu(const QPoint &point);
+
+	private:
+		void parseCode(const QString &code);
+		void addBreakpoint();
+		void removeBreakpoint();
+
+	private:
+		MSP430 *m_cpu;
+		QSimKit *m_simkit;
+		QTreeWidgetItem *m_currentItem;
+		QList<QTreeWidgetItem *> m_breakpoints;
+};
 

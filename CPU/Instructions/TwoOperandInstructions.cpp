@@ -30,9 +30,11 @@
 static int execMOV(RegisterSet *reg, Memory *mem, Instruction *i) {
 	if (i->bw) {
 		i->getDst()->setByte(i->getSrc()->getByte());
+		i->getDst()->callWatchers();
 	}
 	else {
 		i->getDst()->set(i->getSrc()->get());
+		i->getDst()->callWatchers();
 	}
 	return 0;
 }
@@ -52,11 +54,13 @@ static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 		s = (int32_t) i->getSrc()->getByte();
 		r = d + s + carry;
 		i->getDst()->setByte(r);
+		i->getDst()->callWatchers();
 
 		SET_ADD_OVERFLOW(reg, r, d, s, 0x80);
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
 		SET_C(reg, r, 0xff);
+		reg->get(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r;
@@ -64,11 +68,13 @@ static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 		s = (int32_t) i->getSrc()->getBigEndian();
 		r = d + s + carry;
 		i->getDst()->setBigEndian(r);
+		i->getDst()->callWatchers();
 
 		SET_ADD_OVERFLOW(reg, r, d, s, 0x8000);
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
 		SET_C(reg, r, 0xffff);
+		reg->get(2)->callWatchers();
 	}
 	return 0;	
 }
@@ -95,12 +101,14 @@ static int sub(RegisterSet *reg, Memory *mem, Instruction *i, bool store, bool c
 		r = d - s + carry;
 		if (store) {
 			i->getDst()->setByte(r);
+			i->getDst()->callWatchers();
 		}
 
 		SET_SUB_OVERFLOW(reg, r, d, s, 0x80);
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
 		SET_SUB_C(reg, r, 0xff);
+		reg->get(2)->callWatchers();
 	}
 	else {
 		int16_t d, s, r;
@@ -109,12 +117,14 @@ static int sub(RegisterSet *reg, Memory *mem, Instruction *i, bool store, bool c
 		r = d - s + carry;
 		if (store) {
 			i->getDst()->setBigEndian(r);
+			i->getDst()->callWatchers();
 		}
 
 		SET_SUB_OVERFLOW(reg, r, d, s, 0x8000);
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
 		SET_SUB_C(reg, r, 0xffff);
+		reg->get(2)->callWatchers();
 	}
 	return 0;
 }

@@ -34,6 +34,7 @@ static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
 	sp -= 2;
 	mem->setBigEndian(sp, reg->get(0)->getBigEndian());
 	reg->get(1)->setBigEndian(sp);
+	reg->get(1)->callWatchers();
 	reg->get(0)->setBigEndian(i->getDst()->getBigEndian());
 	return 3;
 }
@@ -47,6 +48,7 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 	sp += 2;
 
 	reg->get(1)->setBigEndian(sp);
+	reg->get(1)->callWatchers();
 	return 4;
 }
 
