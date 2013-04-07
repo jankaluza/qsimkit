@@ -46,6 +46,8 @@ class Disassembler : public QDockWidget, public Ui::Disassembler
 
 		QString ELFToA43(const QByteArray &elf);
 
+		void showSourceCode(bool show);
+
 	public slots:
 		void handleContextMenu(const QPoint &point);
 
@@ -53,11 +55,13 @@ class Disassembler : public QDockWidget, public Ui::Disassembler
 		void parseCode(const QString &code);
 		void addBreakpoint();
 		void removeBreakpoint();
+		void addSourceLine(const QString &line);
 
 	private:
 		MSP430 *m_cpu;
 		QSimKit *m_simkit;
 		QTreeWidgetItem *m_currentItem;
 		QList<QTreeWidgetItem *> m_breakpoints;
+		bool m_showSource;
 };
 

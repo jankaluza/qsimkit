@@ -39,10 +39,19 @@
 #include <QDebug>
 
 Disassembler::Disassembler(QSimKit *simkit) :
-QDockWidget(simkit), m_cpu(0), m_simkit(simkit), m_currentItem(0) {
+QDockWidget(simkit), m_cpu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
+}
+
+void Disassembler::showSourceCode(bool show) {
+	QList<QTreeWidgetItem *> items = view->findItems("", Qt::MatchExactly);
+	for (int i = 0; i < items.size(); ++i) {
+		items[i]->setHidden(!show);
+	}
+
+	m_showSource = show;
 }
 
 void Disassembler::handleContextMenu(const QPoint &pos) {
@@ -61,6 +70,11 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 		actions.append(remove);
 	}
 
+	QAction *showSource = new QAction("Show source code", 0);
+	showSource->setCheckable(true);
+	showSource->setChecked(m_showSource);
+	actions.append(showSource);
+
 	QAction *action = QMenu::exec(actions, view->mapToGlobal(pos), 0, 0);
 	if (!action) {
 		return;
@@ -71,6 +85,9 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 	}
 	else if (action == remove) {
 		removeBreakpoint();
+	}
+	else if (action == showSource) {
+		showSourceCode(action->isChecked());
 	}
 }
 
@@ -92,6 +109,18 @@ void Disassembler::removeBreakpoint() {
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->removeRegisterBreak(0, item->text(0).toInt(0, 16));
 	qDebug() << "removing break when PC is" << item->text(0).toInt(0, 16);
+}
+
+void Disassembler::addSourceLine(const QString &line) {
+	QTreeWidgetItem *item = new QTreeWidgetItem(view);
+	item->setText(0, "");
+	item->setText(1, line);
+	item->setBackground(0, QBrush(QColor(200, 255, 200)));
+	item->setBackground(1, QBrush(QColor(200, 255, 200)));
+	QFont f = item->font(1);
+	f.setPointSize(f.pointSize() - 2);
+	item->setFont(0, f);
+	item->setFont(1, f);
 }
 
 void Disassembler::parseCode(const QString &code) {
@@ -130,16 +159,7 @@ void Disassembler::parseCode(const QString &code) {
 				item->setBackground(0, view->palette().window());
 			}
 			else {
-				QTreeWidgetItem *item = new QTreeWidgetItem(view);
-				item->setText(0, "");
-				item->setText(1, line);
-				item->setBackground(0, QBrush(QColor(200, 255, 200)));
-				item->setBackground(1, QBrush(QColor(200, 255, 200)));
-				QFont f = item->font(1);
-				f.setPointSize(f.pointSize() - 2);
-				item->setFont(0, f);
-				item->setFont(1, f);
-				qDebug() << line;
+				addSourceLine(line);
 			}
 		}
 		else if (line[0] == '0') {
@@ -154,8 +174,8 @@ void Disassembler::parseCode(const QString &code) {
 			item->setBackground(0, view->palette().window());
 			item->setBackground(1, view->palette().window());
 		}
-		else {
-
+		else if (i > 2) {
+			addSourceLine(line);
 		}
 	}
 
@@ -163,6 +183,8 @@ void Disassembler::parseCode(const QString &code) {
 }
 
 void Disassembler::reloadCode() {
+	view->clear();
+
 	if (!m_cpu) {
 		return;
 	}

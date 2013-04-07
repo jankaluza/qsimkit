@@ -240,7 +240,9 @@ bool QSimKit::loadA43File(const QString &f) {
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	return screen->getCPU()->loadA43(file.readAll().data());
+	bool ret = screen->getCPU()->loadA43(file.readAll().data());
+	m_disassembler->reloadCode();
+	return ret;
 }
 
 void QSimKit::loadA43() {
@@ -269,7 +271,9 @@ bool QSimKit::loadELFFile(const QString &f) {
 
 	screen->getCPU()->setELF(elf);
 
-	return screen->getCPU()->loadA43(a43.toAscii().data());
+	bool ret = screen->getCPU()->loadA43(a43.toAscii().data());
+	m_disassembler->reloadCode();
+	return ret;
 }
 
 void QSimKit::loadELF() {
