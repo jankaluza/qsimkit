@@ -57,7 +57,7 @@ class ConnectionNode : public Peripheral
 			return m_conns.size() < 3;
 		}
 
-		std::map<int, Pin> &getPins() {
+		PinList &getPins() {
 			return m_pins;
 		}
 
@@ -78,7 +78,7 @@ class ConnectionNode : public Peripheral
 		void reset();
 
 	private:
-		std::map<int, Pin> m_pins;
+		PinList m_pins;
 		std::map<int, Connection *> m_conns;
 		QStringList m_options;
 		SimulationEventList m_output;

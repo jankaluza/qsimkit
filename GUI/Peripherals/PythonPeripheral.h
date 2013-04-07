@@ -46,7 +46,7 @@ class PythonPeripheral : public Peripheral {
 
 		void paint(QWidget *screen);
 
-		std::map<int, Pin> &getPins() {
+		PinList &getPins() {
 			return m_pins;
 		}
 
@@ -58,7 +58,7 @@ class PythonPeripheral : public Peripheral {
 
 	private:
 		Script *m_script;
-		std::map<int, Pin> m_pins;
+		PinList m_pins;
 		QStringList m_options;
 		bool m_screenRegistered;
 

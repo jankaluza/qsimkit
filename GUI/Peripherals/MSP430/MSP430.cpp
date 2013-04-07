@@ -44,7 +44,7 @@ m_ignoreNextStep(false) {
 
 	setFrequency(frequency);
 	m_type = "MSP430";
-	loadXML("Packages/msp430x241x.xml");
+	loadPackage("Packages/msp430x241x.xml");
 	reset();
 }
 
@@ -76,10 +76,18 @@ void MSP430::reset() {
 
 void MSP430::addMemoryWatchers() {
 #define ADD_WATCHER(METHOD) \
-	if (METHOD != 0) m_mem->addWatcher(METHOD, this);
+	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 
-	ADD_WATCHER(m_variant->getP1DIR());
 	ADD_WATCHER(m_variant->getP1OUT());
+	ADD_WATCHER(m_variant->getP2OUT());
+	ADD_WATCHER(m_variant->getP3OUT());
+	ADD_WATCHER(m_variant->getP4OUT());
+	ADD_WATCHER(m_variant->getP5OUT());
+	ADD_WATCHER(m_variant->getP6OUT());
+	ADD_WATCHER(m_variant->getP7OUT());
+	ADD_WATCHER(m_variant->getP8OUT());
+	ADD_WATCHER(m_variant->getP9OUT());
+	ADD_WATCHER(m_variant->getP10OUT());
 
 #undef ADD_WATCHER
 }
@@ -93,13 +101,14 @@ bool MSP430::loadA43(const std::string &data) {
 	uint16_t b = m_mem->getBigEndian(ADDRESS);\
 	for (int i = 0; i < 8; i++) { \
 		QString p2 = QString(PREFIX) + "." + QString::number(i); \
+		int pin_id = m_map[p2]; \
 		if (b & (1 << i)) { \
-			m_states[m_map[p2]].high = true; \
-			m_output.insert(SimulationEvent(m_map[p2], true)); \
+			m_pins[pin_id].value = 1; \
+			m_output.insert(SimulationEvent(pin_id, 1)); \
 		} \
 		else { \
-			m_states[m_map[p2]].high = false; \
-			m_output.insert(SimulationEvent(m_map[p2], false)); \
+			m_pins[pin_id].value = 0; \
+			m_output.insert(SimulationEvent(pin_id, 0)); \
 		} \
 	} \
 }
@@ -107,6 +116,27 @@ bool MSP430::loadA43(const std::string &data) {
 void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
 	if (address == m_variant->getP1OUT()) {
 		REFRESH_GP("P1", in, m_variant->getP1OUT());
+	}
+	else if (address == m_variant->getP2OUT()) {
+		REFRESH_GP("P2", in, m_variant->getP2OUT());
+	}
+	else if (address == m_variant->getP3OUT()) {
+		REFRESH_GP("P3", in, m_variant->getP3OUT());
+	}
+	else if (address == m_variant->getP4OUT()) {
+		REFRESH_GP("P4", in, m_variant->getP4OUT());
+	}
+	else if (address == m_variant->getP5OUT()) {
+		REFRESH_GP("P5", in, m_variant->getP5OUT());
+	}
+	else if (address == m_variant->getP6OUT()) {
+		REFRESH_GP("P6", in, m_variant->getP6OUT());
+	}
+	else if (address == m_variant->getP7OUT()) {
+		REFRESH_GP("P7", in, m_variant->getP7OUT());
+	}
+	else if (address == m_variant->getP8OUT()) {
+		REFRESH_GP("P8", in, m_variant->getP8OUT());
 	}
 
 	onUpdated();
@@ -128,8 +158,6 @@ void MSP430::internalTransition() {
 		m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
 		m_instructionCycles += executeInstruction(m_reg, m_mem, m_instruction);
 		m_instructionCycles *= m_step;
-
-	// 	m_time += m_instructionCycles;
 	}
 	else {
 		m_ignoreNextStep = false;
@@ -172,13 +200,13 @@ void MSP430::load(QDomElement &object) {
 	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 
-bool MSP430::loadXML(const QString &file) {
-	int font_w = 10;
-	int font_h = 10;
+bool MSP430::loadPackage(const QString &file) {
+	m_pins.clear();
+	int pin_size = 10;
 	int width = 48;
 	int height = 48;
-    int errorLine, errorColumn;
-    QString errorMsg;
+	int errorLine, errorColumn;
+	QString errorMsg;
 
 	QFile modelFile(file);
 	QDomDocument document;
@@ -199,15 +227,16 @@ bool MSP430::loadXML(const QString &file) {
 		return false;
 	}
 
+	// Compute width and height according to number of pins on each side
 	for(QDomNode node = package.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		QDomElement element = node.toElement();
 		QChar side = element.nodeName()[0];
 		for(QDomNode pin = element.firstChild(); !pin.isNull(); pin = pin.nextSibling()) {
 			if (side == 'd') {
-				width += font_w + 2;
+				width += pin_size + 2;
 			}
 			else if (side == 'l') {
-				height += font_w + 2;
+				height += pin_size + 2;
 			}
 		}
 	}
@@ -223,121 +252,100 @@ bool MSP430::loadXML(const QString &file) {
 			y = 25;
 		}
 		else if (side == 'r') {
-			x = width - font_w;
-			y = height - font_w - 24;
+			x = width - pin_size;
+			y = height - pin_size - 24;
 		}
 		else if (side == 'd') {
-			x = 2*font_w;
-			y = height - font_w;
+			x = 25;
+			y = height - pin_size;
 		}
 		else if (side == 'u') {
-			x = width - font_w - 24;
+			x = width - pin_size - 24;
 			y = 0;
 		}
 
 		for(QDomNode pin = element.firstChild(); !pin.isNull(); pin = pin.nextSibling()) {
-			int id = pin.toElement().attribute("id").toInt();
+			int id = pin.toElement().attribute("id").toInt() - 1;
 			m_sides[id] = side;
 			QString n;
 			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
 				n += name.toElement().text() + "/";
 				m_map[name.toElement().text()] = id;
 			}
-// 			qDebug() << n;
 			m_names[id] = n;
-			m_pins[id].rect = QRect(x, y, font_w, font_h);
-			m_pins[id].high = false;
-			m_pins[id].name = n;
-			
-
-			PinState p;
-			p.high = false;
-			p.in = false;
-			m_states[id] = p;
+			m_pins.push_back(Pin(QRect(x, y, pin_size, pin_size), n, 0));
 
 			if (side == 'd') {
-				x += font_w + 2;
+				x += pin_size + 2;
 			}
 			else if (side == 'l') {
-				y += font_w + 2;
+				y += pin_size + 2;
 			}
 			else if (side == 'r') {
-				y -= font_w + 2;
+				y -= pin_size + 2;
 			}
 			else if (side == 'u') {
-				x -= font_w + 2;
+				x -= pin_size + 2;
 			}
 		}
 	}
 
 	resize(width, height);
-	qDebug() << "loaded " << width << height;
 	return true;
 }
 
 void MSP430::paint(QWidget *screen) {
 	QPainter qp(screen);
-	int font_w = 10;
-	int font_h = 10;
-
+	int pin_size = 10;
 	QPen pen(Qt::black, 2, Qt::SolidLine);
 	qp.setPen(pen);
-	qp.drawRect(m_x + font_w + 1, m_y + font_w, width() - 2*font_w - 1, height() - 2*font_w);
-	qp.fillRect(QRect(m_x + font_w + 1, m_y + font_w, width() - 2*font_w - 1, height() - 2*font_w), QBrush(QColor(226, 206, 255)));
+	qp.drawRect(m_x + pin_size + 1, m_y + pin_size, width() - 2*pin_size - 1, height() - 2*pin_size);
+	qp.fillRect(QRect(m_x + pin_size + 1, m_y + pin_size, width() - 2*pin_size - 1, height() - 2*pin_size), QBrush(QColor(226, 206, 255)));
 
 	QPen pen2(Qt::black, 1, Qt::SolidLine);
 	qp.setPen(pen2);
 
 	int even = -1;
-	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
-// 		qDebug() << it->second.rect;
-		if (m_states[it->first].high) {
-			qp.fillRect(it->second.rect, QBrush(QColor(0,255,0)));
+	int id = 0;
+	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); ++it, ++id) {
+		if (it->value) {
+			qp.fillRect(it->rect, QBrush(QColor(0,255,0)));
 		}
-		qp.drawRect(it->second.rect);
-		if (m_sides[it->first] == 'l') {
-			qp.drawText(it->second.rect.adjusted(0 + font_w - 3, 0 , 0 + 2*font_w, 0 + 2), Qt::AlignCenter, QString::number(it->first));
+		qp.drawRect(it->rect);
+		if (m_sides[id] == 'l') {
+			qp.drawText(it->rect.adjusted(pin_size - 3, 0 , 2*pin_size, 0 + 2), Qt::AlignCenter, QString::number(id + 1));
 		}
-		else if (m_sides[it->first] == 'r') {
-			qp.drawText(it->second.rect.adjusted(0 - font_w - 5, 0, 0 - font_w, 0 + 2), Qt::AlignCenter, QString::number(it->first));
+		else if (m_sides[id] == 'r') {
+			qp.drawText(it->rect.adjusted(-pin_size - 5, 0, -pin_size, 0 + 2), Qt::AlignCenter, QString::number(id + 1));
 			even = -1;
 		}
-		else if (m_sides[it->first] == 'd') {
+		else if (m_sides[id] == 'd') {
 			if (even == -1) {
 				even = 0;
 			}
 			if (even) {
-				std::map<int, Pin>::iterator next = it;
-				next++;
-				if (m_sides[next->first] != 'r') {
-					qp.drawText(it->second.rect.adjusted(0, 0 - font_h - 13 - font_h, 0 + 5, 0 - font_h), Qt::AlignCenter, QString::number(it->first));
+				if (m_sides[id + 1] != 'r') {
+					qp.drawText(it->rect.adjusted(0, -2 * pin_size - 13, 5, -pin_size), Qt::AlignCenter, QString::number(id + 1));
 				}
 			}
 			else {
-				qp.drawText(it->second.rect.adjusted(0, 0 - font_h - 13, 0 + 5, 0), Qt::AlignCenter, QString::number(it->first));
+				qp.drawText(it->rect.adjusted(0, -pin_size - 13, 5, 0), Qt::AlignCenter, QString::number(id + 1));
 			}
 			even = not even;
 		}
-		else if (m_sides[it->first] == 'u') {
+		else if (m_sides[id] == 'u') {
 			if (even == -1) {
 				even = 0;
 			}
 			if (even) {
-				std::map<int, Pin>::iterator next = it;
-				next++;
-				if (next != m_pins.end()) {
-					qp.drawText(it->second.rect.adjusted(0, 0 + font_h + 18 + font_h, 0 + 5, 0 + font_h), Qt::AlignCenter, QString::number(it->first));
+				if (id + 1 != m_pins.size()) {
+					qp.drawText(it->rect.adjusted(0, 2*pin_size + 18, 5, pin_size), Qt::AlignCenter, QString::number(id + 1));
 				}
 			}
 			else {
-				qp.drawText(it->second.rect.adjusted(0, 0 + font_h + 18, 0 + 5, 0), Qt::AlignCenter, QString::number(it->first));
+				qp.drawText(it->rect.adjusted(0, pin_size + 18, 5, 0), Qt::AlignCenter, QString::number(id + 1));
 			}
 			even = not even;
 		}
-// 		}
-// 		if (m_sides[it->first] == 'l') {
-// 			qp.drawText(QRect(0 + it->second.x() + it->second.width() + 4, 0 + it->second.y(), 100, font_h), Qt::AlignCenter, m_names[it->first]);
-// 		}
-		
 	}
 }

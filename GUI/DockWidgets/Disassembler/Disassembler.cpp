@@ -184,6 +184,7 @@ void Disassembler::parseCode(const QString &code) {
 
 void Disassembler::reloadCode() {
 	view->clear();
+	m_currentItem = 0;
 
 	if (!m_cpu) {
 		return;
@@ -223,8 +224,15 @@ void Disassembler::reloadCode() {
 }
 
 QString Disassembler::ELFToA43(const QByteArray &elf) {
+	QFile file("test.dump");
+	if (!file.open(QFile::WriteOnly | QFile::Truncate))
+		return "";
+
+	file.write(elf);
+	file.close();
+
 	QProcess objdump;
-	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << "test.a43");
+	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << "test.dump" << "test.a43");
 	if (!objdump.waitForStarted()) {
 		return "";
 	}
@@ -232,11 +240,11 @@ QString Disassembler::ELFToA43(const QByteArray &elf) {
 	if (!objdump.waitForFinished())
 		return "";
 
-	QFile file("test.a43");
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+	QFile file2("test.a43");
+	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text))
 		return "";
 
-	return file.readAll();
+	return file2.readAll();
 }
 
 void Disassembler::updatePC() {

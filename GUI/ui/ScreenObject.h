@@ -29,13 +29,15 @@
 class Pin {
 	public:
 		Pin() {}
-		Pin(const QRect &rect, const QString &name, bool high) :
-			rect(rect), name(name), high(high) { }
+		Pin(const QRect &rect, const QString &name, double value) :
+			rect(rect), name(name), value(value) { }
 
 		QRect rect;
 		QString name;
-		bool high;
+		double value;
 };
+
+typedef std::vector<Pin> PinList;
 
 class ScreenObject : public QObject
 {
@@ -66,7 +68,7 @@ class ScreenObject : public QObject
 
 		virtual void objectMoved(int x, int y) {}
 
-		virtual std::map<int, Pin> &getPins() = 0;
+		virtual PinList &getPins() = 0;
 
 		virtual const QStringList &getOptions() = 0;
 

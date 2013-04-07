@@ -20,7 +20,7 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 		}
 
 		void setget() {
-			Register r("R0", 55, "desc");
+			Register r(0, "R0", 55, "desc");
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 55, r.get());
 			r.set(0xff00);
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xff00, r.get());
@@ -31,7 +31,7 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 		}
 
 		void setByte() {
-			Register r("R0", 0x0203, "desc");
+			Register r(0, "R0", 0x0203, "desc");
 			CPPUNIT_ASSERT_EQUAL((int) 3, (int) r.getByte());
 			r.setByte(0x04);
 			CPPUNIT_ASSERT_EQUAL((int) 4, (int) r.getByte());
@@ -39,7 +39,7 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 		}
 
 		void setBit() {
-			Register r("R0", 0x0203, "desc");
+			Register r(0, "R0", 0x0203, "desc");
 			r.setBit(SR_V, false);
 			CPPUNIT_ASSERT_EQUAL(false, r.isBitSet(SR_V));
 			r.setBit(SR_V, true);

@@ -127,7 +127,6 @@ void Memory::callWatcher(uint16_t address) {
 	if (watchers.empty())
 		return;
 
-	
 	for (std::vector<MemoryWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
 		(*it)->handleMemoryChanged(this, address);
 	}

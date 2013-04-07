@@ -271,6 +271,7 @@ bool QSimKit::loadELFFile(const QString &f) {
 
 	screen->getCPU()->setELF(elf);
 
+	qDebug() << a43;
 	bool ret = screen->getCPU()->loadA43(a43.toAscii().data());
 	m_disassembler->reloadCode();
 	return ret;
@@ -282,7 +283,9 @@ void QSimKit::loadELF() {
 		return;
 	}
 
-	loadELFFile(filename);
+	if (!loadELFFile(filename)) {
+		qDebug() << "Error while loading ELF file";
+	}
 }
 
 void QSimKit::projectOptions() {

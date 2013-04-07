@@ -29,7 +29,7 @@ PythonPeripheral::PythonPeripheral(Script *script) : m_script(script), m_screenR
 
 	QVariantList pins = m_script->getVariable("pins").toList();
 	for (int i = 0; i < pins.size(); ++i) {
-		m_pins[i].rect = pins[i].toRect();
+		m_pins.push_back(Pin(pins[i].toRect(), "", 0));
 	}
 
 	m_options = m_script->getVariable("options").toStringList();
@@ -66,8 +66,8 @@ void PythonPeripheral::objectMoved(int x, int y) {
 	m_script->setVariable("y", y);
 
 	QVariantList pins;
-	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
-		pins << it->second.rect;
+	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+		pins << it->rect;
 	}
 
 	m_script->setVariable("pins", pins);

@@ -144,10 +144,10 @@ ScreenObject *Screen::getObject(int x, int y) {
 }
 
 int Screen::getPin(ScreenObject *object, int x, int y) {
-	std::map<int, Pin> &pins = object->getPins();
-	for (std::map<int, Pin>::const_iterator it = pins.begin(); it != pins.end(); ++it) {
-		if (it->second.rect.contains(x,y)) {
-			return it->first;
+	PinList &pins = object->getPins();
+	for (PinList::const_iterator it = pins.begin(); it != pins.end(); ++it) {
+		if (it->rect.contains(x,y)) {
+			return it - pins.begin();
 		}
 	}
 

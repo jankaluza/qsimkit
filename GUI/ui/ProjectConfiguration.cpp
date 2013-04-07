@@ -60,7 +60,7 @@ QDialog(parent) {
 MSP430 *ProjectConfiguration::getMSP430() {
 	Variant *v = getVariant(MSP430Variants->currentItem()->text().toStdString().c_str());
 	MSP430 *cpu = new MSP430(v, getFrequency());
-	cpu->loadXML("Packages/msp430x241x.xml");
+	cpu->loadPackage("Packages/msp430x241x.xml");
 	return cpu;
 }
 

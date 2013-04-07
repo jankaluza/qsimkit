@@ -28,21 +28,10 @@ ConnectionNode::ConnectionNode() {
 	m_width = 36;
 	m_height = 36;
 
-	m_pins[0].rect = QRect(0, 12, 12, 12);
-	m_pins[0].name = "West pin";
-	m_pins[0].high = 0;
-
-	m_pins[1].rect = QRect(12, 24, 12, 12);
-	m_pins[1].name = "South pin";
-	m_pins[1].high = 0;
-
-	m_pins[2].rect = QRect(24, 12, 12, 12);
-	m_pins[2].name = "East pin";
-	m_pins[2].high = 0;
-
-	m_pins[3].rect = QRect(12, 0, 12, 12);
-	m_pins[3].name = "North pin";
-	m_pins[3].high = 0;
+	m_pins.push_back(Pin(QRect(0, 12, 12, 12), "West pin", 0));
+	m_pins.push_back(Pin(QRect(12, 24, 12, 12), "South pin", 0));
+	m_pins.push_back(Pin(QRect(24, 12, 12, 12), "East pin", 0));
+	m_pins.push_back(Pin(QRect(12, 0, 12, 12), "North pin", 0));
 }
 
 ConnectionNode::~ConnectionNode() {
@@ -109,8 +98,8 @@ void ConnectionNode::paint(QWidget *screen) {
 	p.setBrush(b);
 
  	p.setPen(QPen(QColor(194, 194, 194), 1, Qt::SolidLine));
-	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
-		p.drawRect(it->second.rect);
+	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+		p.drawRect(it->rect);
 	}
 
 	p.setPen(QPen(Qt::black, 2, Qt::SolidLine));

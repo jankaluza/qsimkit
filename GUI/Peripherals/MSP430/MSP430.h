@@ -33,11 +33,6 @@ class InstructionDecoder;
 class Instruction;
 class Variant;
 
-struct PinState {
-	bool high;
-	bool in;
-};
-
 class MSP430 : public Peripheral, public MemoryWatcher
 {
 	public:
@@ -45,7 +40,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		Variant *getVariant() { return m_variant; }
 
-		bool loadXML(const QString &file);
+		bool loadPackage(const QString &file);
 
 		bool loadA43(const std::string &data);
 
@@ -64,7 +59,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void paint(QWidget *screen);
 
-		std::map<int, Pin> &getPins() {
+		PinList &getPins() {
 			return m_pins;
 		}
 
@@ -108,8 +103,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 	private:
 		std::map<int, QChar> m_sides;
-		std::map<int, Pin> m_pins;
-		std::map<int, PinState> m_states;
+		PinList m_pins;
 		std::map<int, QString> m_names;
 		std::map<QString, int> m_map;
 

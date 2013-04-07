@@ -37,12 +37,12 @@ void ScreenObject::setY(int y) {
 }
 
 void ScreenObject::movePins(int x, int y) {
-	std::map<int, Pin> &pins = getPins();
+	PinList &pins = getPins();
 	int mx = x - m_x;
 	int my = y - m_y;
 
-	for (std::map<int, Pin>::iterator it = pins.begin(); it != pins.end(); ++it) {
-		it->second.rect.adjust(mx, my, mx, my);
+	for (PinList::iterator it = pins.begin(); it != pins.end(); ++it) {
+		it->rect.adjust(mx, my, mx, my);
 	}
 
 	objectMoved(x, y);
