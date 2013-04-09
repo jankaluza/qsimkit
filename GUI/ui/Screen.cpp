@@ -262,8 +262,9 @@ void Screen::addObject(const QPoint &pos) {
 	if (dialog.exec() == QDialog::Accepted) {
 		QString name = dialog.getPeripheral();
 		Peripheral *p = m_peripherals->getPeripheral(name).create();
-		p->setX(NORM(pos.x()));
-		p->setY(NORM(pos.y()));
+		QPoint local = mapFromGlobal(pos);
+		p->setX(NORM(local.x()));
+		p->setY(NORM(local.y()));
 		addObject(p);
 	}
 }
