@@ -6,12 +6,14 @@ find_package(cppunit)
 
 FIND_PACKAGE(Qt4 COMPONENTS QtCore QtGui QtXml REQUIRED)
 
+set(Python_ADDITIONAL_VERSIONS 2.7 2.6 2.5 2.4 2.3 2.2 2.1 2.0)
 find_package(PythonLibs REQUIRED)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 # Find PythonQt
+set(PythonQt_DIR "${CMAKE_SOURCE_DIR}/cmake_modules")
 find_package(PythonQt REQUIRED)
-include_directories(${LIBPYTHONQT_INCLUDE_PATH})
+include_directories(${PYTHONQT_INCLUDE_PATH})
 
 message(STATUS "Using PythonQt: ${PYTHONQT_LIBRARIES} ${PYTHONQT_INCLUDE_PATH}")
 
