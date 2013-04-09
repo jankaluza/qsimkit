@@ -18,9 +18,29 @@
  **/
 
 #include "SimulationObject.h"
+#include "History/PinHistory.h"
 
 #include <QDebug>
 
+SimulationObjectWrapper::SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins) :
+m_obj(obj), m_monitoredPins(monitoredPins) {
+
+	qSort(m_monitoredPins);
+
+	for (int i = 0; i < m_monitoredPins.back() + 1; ++i) {
+		m_history.append(0);
+	}
+
+	for (int i = 0; i < m_monitoredPins.size(); ++i) {
+		m_history[m_monitoredPins[i]] = new PinHistory();
+	}
+}
+
+SimulationObjectWrapper::~SimulationObjectWrapper() {
+	for (int i = 0; i < m_history.size(); ++i) {
+		delete m_history[i];
+	}
+}
 
 void SimulationObjectWrapper::delta_int() {
 	m_obj->internalTransition();
@@ -28,6 +48,21 @@ void SimulationObjectWrapper::delta_int() {
 
 void SimulationObjectWrapper::delta_ext(double e, const SimulationEventList& xb) {
 	m_obj->externalEvent(e, xb);
+
+	if (!m_monitoredPins.empty()) {
+		for (SimulationEventList::const_iterator it = xb.begin(); it != xb.end(); ++it) {
+			if ((*it).port >= m_history.size()) {
+				continue;
+			}
+
+			PinHistory *h = m_history[(*it).port];
+			if (!h) {
+				continue;
+			}
+
+			h->addEvent(e, (*it).value);
+		}
+	}
 }
 
 void SimulationObjectWrapper::delta_conf(const SimulationEventList& xb) {

@@ -23,9 +23,12 @@
 #include <QString>
 #include <QChar>
 #include <QRect>
+#include <QList>
 #include <map>
 
 #include "adevs.h"
+
+class PinHistory;
 
 typedef adevs::PortValue<double> SimulationEvent;
 
@@ -58,7 +61,8 @@ class SimulationObject {
 class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 	public:
 		SimulationObjectWrapper(SimulationObject *obj) : m_obj(obj) {}
-		~SimulationObjectWrapper() {}
+		SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins);
+		~SimulationObjectWrapper();
 
 		/// Internal transition function.
 		void delta_int();
@@ -80,5 +84,7 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 
 	private:
 		SimulationObject *m_obj;
+		QList<int> m_monitoredPins;
+		QList<PinHistory *> m_history;
 };
 
