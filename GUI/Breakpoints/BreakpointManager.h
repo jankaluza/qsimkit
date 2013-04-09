@@ -23,7 +23,6 @@
 #include <QList>
 #include "CPU/Memory/Register.h"
 
-class Breakpoint;
 class MSP430;
 
 class BreakpointManager : public RegisterWatcher {
@@ -36,9 +35,6 @@ class BreakpointManager : public RegisterWatcher {
 		void addRegisterBreak(int reg, uint16_t value);
 		void removeRegisterBreak(int reg, uint16_t value);
 
-		void addBreakpoint(Breakpoint *b);
-		void removeBreakpoint(Breakpoint *b);
-
 		bool shouldBreak();
 
 		void breakNow() {
@@ -50,7 +46,6 @@ class BreakpointManager : public RegisterWatcher {
 	private:
 		MSP430 *m_cpu;
 		QList<QList<uint16_t> > m_breaks;
-		QList<Breakpoint *> m_breakpoints;
 		bool m_break;
 
 };

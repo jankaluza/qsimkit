@@ -25,7 +25,6 @@
 #include "CPU/Memory/Register.h"
 
 #include "Breakpoints/BreakpointManager.h"
-#include "Breakpoints/RegisterBreakpoint.h"
 
 #include <QWidget>
 #include <QTime>

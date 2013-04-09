@@ -18,7 +18,6 @@
  **/
 
 #include "BreakpointManager.h"
-#include "Breakpoint.h"
 #include "CPU/Memory/Register.h"
 #include "CPU/Memory/RegisterSet.h"
 #include "Peripherals/MSP430/MSP430.h"
@@ -86,12 +85,4 @@ bool BreakpointManager::shouldBreak() {
 // 	}
 // 
 // 	return false;
-}
-
-void BreakpointManager::addBreakpoint(Breakpoint *b) {
-	m_breakpoints.append(b);
-}
-
-void BreakpointManager::removeBreakpoint(Breakpoint *b) {
-	m_breakpoints.removeAll(b);
 }
