@@ -25,14 +25,16 @@
 SimulationObjectWrapper::SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins) :
 m_obj(obj), m_monitoredPins(monitoredPins) {
 
-	qSort(m_monitoredPins);
+	if (!m_monitoredPins.empty()) {
+		qSort(m_monitoredPins);
 
-	for (int i = 0; i < m_monitoredPins.back() + 1; ++i) {
-		m_history.append(0);
-	}
+		for (int i = 0; i < m_monitoredPins.back() + 1; ++i) {
+			m_history.append(0);
+		}
 
-	for (int i = 0; i < m_monitoredPins.size(); ++i) {
-		m_history[m_monitoredPins[i]] = new PinHistory();
+		for (int i = 0; i < m_monitoredPins.size(); ++i) {
+			m_history[m_monitoredPins[i]] = new PinHistory();
+		}
 	}
 }
 
