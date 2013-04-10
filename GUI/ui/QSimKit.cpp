@@ -116,7 +116,7 @@ void QSimKit::simulationStep() {
 	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
 	QTime perf;
 	perf.start();
-	for (int i = 0; i < 10000; ++i) {
+	for (int i = 0; i < 2500; ++i) {
 		m_sim->execNextEvent();
 		if (m_breakpointManager->shouldBreak()) {
 			m_pauseAction->setChecked(true);
@@ -148,7 +148,7 @@ void QSimKit::startSimulation() {
 	else {
 		resetSimulation();
 	}
-	m_timer->start(100);
+	m_timer->start(50);
 }
 
 void QSimKit::stopSimulation() {
@@ -161,7 +161,7 @@ void QSimKit::pauseSimulation(bool checked) {
 		refreshDockWidgets();
 	}
 	else {
-		m_timer->start(100);
+		m_timer->start(50);
 	}
 }
 
