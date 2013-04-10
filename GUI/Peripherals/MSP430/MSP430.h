@@ -25,7 +25,7 @@
 #include <QRect>
 #include <map>
 #include "Peripherals/Peripheral.h"
-#include "CPU/Memory/Memory.h"
+#include "CPU/Pins/PinManager.h"
 
 class Memory;
 class RegisterSet;
@@ -33,7 +33,16 @@ class InstructionDecoder;
 class Instruction;
 class Variant;
 
-class MSP430 : public Peripheral, public MemoryWatcher
+class PinAddr {
+	public:
+		PinAddr() : addr(0), bit(0) {}
+		PinAddr(uint16_t addr, uint8_t bit) : addr(addr), bit(bit) {}
+		
+		uint16_t addr;
+		uint8_t bit;
+};
+
+class MSP430 : public Peripheral, public PinWatcher
 {
 	public:
 		MSP430(Variant *variant, unsigned long freq = 1000000);
@@ -67,7 +76,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 		void refreshGP(const QString &prefix, uint16_t dir, uint16_t out);
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handlePinChanged(int id, double value);
 
 		const QStringList &getOptions() {
 			return m_options;
@@ -100,10 +109,12 @@ class MSP430 : public Peripheral, public MemoryWatcher
 
 	private:
 		void addMemoryWatchers();
+		void setPinType(const QString &name, PinType &type, int &subtype);
 
 	private:
 		std::map<int, QChar> m_sides;
 		PinList m_pins;
+		std::vector<PinAddr> m_pin2addr;
 		std::map<int, QString> m_names;
 		std::map<QString, int> m_map;
 
@@ -115,6 +126,7 @@ class MSP430 : public Peripheral, public MemoryWatcher
 		InstructionDecoder *m_decoder;
 		Instruction *m_instruction;
 		Variant *m_variant;
+		PinManager *m_pinManager;
 		double m_step;
 		std::string m_code;
 		SimulationEventList m_output;

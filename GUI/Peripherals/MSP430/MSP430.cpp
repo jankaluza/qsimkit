@@ -26,6 +26,7 @@
 #include "CPU/Instructions/InstructionDecoder.h"
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Variants/Variant.h"
+#include "CPU/Pins/PinManager.h"
 
 #include <QWidget>
 #include <QApplication>
@@ -38,12 +39,15 @@
 
 MSP430::MSP430(Variant *variant, unsigned long frequency) :
 m_time(0), m_instructionCycles(0),
-m_mem(0), m_reg(0), m_decoder(0),
+m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0),
 m_instruction(new Instruction), m_variant(variant),
 m_ignoreNextStep(false) {
 
 	setFrequency(frequency);
 	m_type = "MSP430";
+
+	m_pinManager = new PinManager(0, m_variant);
+	m_pinManager->setWatcher(this);
 	loadPackage("Packages/msp430x241x.xml");
 	reset();
 }
@@ -63,10 +67,10 @@ void MSP430::reset() {
 	m_reg = new RegisterSet();
 	m_decoder = new InstructionDecoder(m_reg, m_mem);
 
+	m_pinManager->setMemory(m_mem);
+
 
 	m_reg->addDefaultRegisters();
-
-	addMemoryWatchers();
 
 	if (!m_code.empty()) {
 		loadA43(m_code);
@@ -74,76 +78,21 @@ void MSP430::reset() {
 	
 }
 
-void MSP430::addMemoryWatchers() {
-#define ADD_WATCHER(METHOD) \
-	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
-
-	ADD_WATCHER(m_variant->getP1OUT());
-	ADD_WATCHER(m_variant->getP2OUT());
-	ADD_WATCHER(m_variant->getP3OUT());
-	ADD_WATCHER(m_variant->getP4OUT());
-	ADD_WATCHER(m_variant->getP5OUT());
-	ADD_WATCHER(m_variant->getP6OUT());
-	ADD_WATCHER(m_variant->getP7OUT());
-	ADD_WATCHER(m_variant->getP8OUT());
-	ADD_WATCHER(m_variant->getP9OUT());
-	ADD_WATCHER(m_variant->getP10OUT());
-
-#undef ADD_WATCHER
+void MSP430::handlePinChanged(int id, double value) {
+	m_pins[id].value = value;
+	m_output.insert(SimulationEvent(id, value));
 }
+
 
 bool MSP430::loadA43(const std::string &data) {
 	m_code = data;
 	return m_mem->loadA43(data, m_reg);
 }
 
-#define REFRESH_GP(PREFIX, VAR, ADDRESS) { \
-	uint16_t b = m_mem->getBigEndian(ADDRESS);\
-	for (int i = 0; i < 8; i++) { \
-		QString p2 = QString(PREFIX) + "." + QString::number(i); \
-		int pin_id = m_map[p2]; \
-		if (b & (1 << i)) { \
-			m_pins[pin_id].value = 1; \
-			m_output.insert(SimulationEvent(pin_id, 1)); \
-		} \
-		else { \
-			m_pins[pin_id].value = 0; \
-			m_output.insert(SimulationEvent(pin_id, 0)); \
-		} \
-	} \
-}
-
-void MSP430::handleMemoryChanged(Memory *memory, uint16_t address) {
-	if (address == m_variant->getP1OUT()) {
-		REFRESH_GP("P1", in, m_variant->getP1OUT());
+void MSP430::externalEvent(double t, const SimulationEventList &events) {
+	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
+		m_pinManager->handlePinInput((*it).port, (*it).value);
 	}
-	else if (address == m_variant->getP2OUT()) {
-		REFRESH_GP("P2", in, m_variant->getP2OUT());
-	}
-	else if (address == m_variant->getP3OUT()) {
-		REFRESH_GP("P3", in, m_variant->getP3OUT());
-	}
-	else if (address == m_variant->getP4OUT()) {
-		REFRESH_GP("P4", in, m_variant->getP4OUT());
-	}
-	else if (address == m_variant->getP5OUT()) {
-		REFRESH_GP("P5", in, m_variant->getP5OUT());
-	}
-	else if (address == m_variant->getP6OUT()) {
-		REFRESH_GP("P6", in, m_variant->getP6OUT());
-	}
-	else if (address == m_variant->getP7OUT()) {
-		REFRESH_GP("P7", in, m_variant->getP7OUT());
-	}
-	else if (address == m_variant->getP8OUT()) {
-		REFRESH_GP("P8", in, m_variant->getP8OUT());
-	}
-
-	onUpdated();
-}
-
-void MSP430::externalEvent(double t, const SimulationEventList &) {
-
 }
 
 void MSP430::output(SimulationEventList &output) {
@@ -198,6 +147,24 @@ void MSP430::load(QDomElement &object) {
 	loadA43(object.firstChildElement("code").text().toStdString());
 	setFrequency(object.firstChildElement("frequency").text().toULong());
 	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
+}
+
+void MSP430::setPinType(const QString &n, PinType &type, int &subtype) {
+#define SET_GP_PIN(PREFIX, T) { \
+		if (n.startsWith(PREFIX)) { \
+			type = T;\
+			subtype = n.right(1).toInt();\
+		} \
+	}
+
+	SET_GP_PIN("P1.", P1)
+	SET_GP_PIN("P2.", P2)
+	SET_GP_PIN("P3.", P3)
+	SET_GP_PIN("P4.", P4)
+	SET_GP_PIN("P5.", P5)
+	SET_GP_PIN("P6.", P6)
+	SET_GP_PIN("P7.", P7)
+	SET_GP_PIN("P8.", P8)
 }
 
 bool MSP430::loadPackage(const QString &file) {
@@ -268,12 +235,17 @@ bool MSP430::loadPackage(const QString &file) {
 			int id = pin.toElement().attribute("id").toInt() - 1;
 			m_sides[id] = side;
 			QString n;
+			PinType type = UNKNOWN;
+			int subtype = -1;
 			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
-				n += name.toElement().text() + "/";
-				m_map[name.toElement().text()] = id;
+				QString n_ = name.toElement().text();
+				n += n_ + "/";
+				m_map[n_] = id;
+				setPinType(n_, type, subtype);
 			}
 			m_names[id] = n;
 			m_pins.push_back(Pin(QRect(x, y, pin_size, pin_size), n, 0));
+			m_pinManager->addPin(type, subtype);
 
 			if (side == 'd') {
 				x += pin_size + 2;

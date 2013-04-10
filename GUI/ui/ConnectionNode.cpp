@@ -43,7 +43,9 @@ void ConnectionNode::internalTransition() {}
 void ConnectionNode::externalEvent(double t, const SimulationEventList &events) {
 	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
 		for (std::map<int, Connection *>::iterator it2 = m_conns.begin(); it2 != m_conns.end(); ++it2) {
-			m_output.insert(SimulationEvent(it2->first, (*it).value));
+			if (it2->first != (*it).port) {
+				m_output.insert(SimulationEvent(it2->first, (*it).value));
+			}
 		}
 	}
 	m_advance = 0;
