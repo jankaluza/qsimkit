@@ -123,7 +123,7 @@ void QSimKit::simulationStep() {
 			return;
 		}
 	}
-	statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(2500/perf.elapsed()*1000) + " ms" + " instructions/s");
+	statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", 2500 instructions per " + QString::number(perf.elapsed()) + " ms");
 }
 
 void QSimKit::resetSimulation() {
