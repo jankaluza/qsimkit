@@ -82,7 +82,16 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 		/// Output value garbage collection.
 		void gc_output(SimulationEventList& g);
 
+		void setSimulator(adevs::Simulator<SimulationEvent> *sim) {
+			m_sim = sim;
+		}
+
+		void reschedule() {
+			m_sim->addModel(this);
+		}
+
 	private:
+		adevs::Simulator<SimulationEvent> *m_sim;
 		SimulationObject *m_obj;
 		QList<int> m_monitoredPins;
 		QList<PinHistory *> m_history;

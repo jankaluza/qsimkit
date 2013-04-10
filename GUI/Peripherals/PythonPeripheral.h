@@ -56,6 +56,8 @@ class PythonPeripheral : public Peripheral {
 
 		void objectMoved(int x, int y);
 
+		bool clicked(const QPoint &p);
+
 	private:
 		Script *m_script;
 		PinList m_pins;

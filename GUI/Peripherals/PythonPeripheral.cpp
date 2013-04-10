@@ -92,3 +92,8 @@ const QStringList &PythonPeripheral::getOptions() {
 void PythonPeripheral::executeOption(int option) {
 	m_script->call("executeOption", QVariantList() << option);
 }
+
+bool PythonPeripheral::clicked(const QPoint &p) {
+	m_script->call("clicked", QVariantList() << p);
+	return m_script->getVariable("hasNewOutput").toBool();
+}

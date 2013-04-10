@@ -74,6 +74,8 @@ class ScreenObject : public QObject
 
 		virtual void executeOption(int option) = 0;
 
+		virtual bool clicked(const QPoint &p) { return false; }
+
 	signals:
 		void onUpdated();
 

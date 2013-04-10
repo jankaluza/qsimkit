@@ -137,6 +137,8 @@ void QSimKit::resetSimulation() {
 	m_dig = new adevs::Digraph<double>();
 	screen->prepareSimulation(m_dig);
 	m_sim = new adevs::Simulator<SimulationEvent>(m_dig);
+	screen->setSimulator(m_sim);
+	
 }
 
 void QSimKit::startSimulation() {

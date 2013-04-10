@@ -1,0 +1,9 @@
+<peripheral type='python'>
+   <name>Button</name>
+   <comment>Button</comment>
+   <author>Jan Kaluza</author>
+   <email>hanzz.k@gmail.com</email>
+   <version>0.1</version>
+   <license>GNU/GPL</license>
+   <library>button</library>
+</peripheral>

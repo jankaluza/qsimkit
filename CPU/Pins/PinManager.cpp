@@ -20,6 +20,7 @@
 #include "PinManager.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
+#include <iostream>
 
 PinManager::PinManager(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant) {
 	setMemory(mem);
@@ -107,4 +108,41 @@ void PinManager::addPin(PinType type, int subtype) {
 
 void PinManager::handlePinInput(int id, double value) {
 	InternalPin &p = m_pins[id];
+
+#define SET_GP(PIN, I, VALUE) if (!(m_mem->getByte(m_variant->get##PIN##DIR()) & (1 << I))) { \
+		std::cout << "setting\n";\
+		m_mem->setBit(m_variant->get##PIN##IN(), 1 << I, VALUE == 1); \
+	}
+
+	switch (p.type) {
+		case P1:
+			SET_GP(P1, p.subtype, value)
+			else {
+				std::cout << "not setting " << (int) m_mem->getByte(m_variant->getP1DIR()) << "\n";
+			}
+			break;
+		case P2:
+			SET_GP(P2, p.subtype, value)
+			break;
+		case P3:
+			SET_GP(P3, p.subtype, value)
+			break;
+		case P4:
+			SET_GP(P4, p.subtype, value)
+			break;
+		case P5:
+			SET_GP(P5, p.subtype, value)
+			break;
+		case P6:
+			SET_GP(P6, p.subtype, value)
+			break;
+		case P7:
+			SET_GP(P7, p.subtype, value)
+			break;
+		case P8:
+			SET_GP(P8, p.subtype, value)
+			break;
+		default:
+			break;
+	}
 }

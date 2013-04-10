@@ -22,7 +22,7 @@
 
 #include <QDebug>
 
-SimulationObjectWrapper::SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins) :
+SimulationObjectWrapper::SimulationObjectWrapper( SimulationObject *obj, const QList<int> &monitoredPins) :
 m_obj(obj), m_monitoredPins(monitoredPins) {
 
 	if (!m_monitoredPins.empty()) {

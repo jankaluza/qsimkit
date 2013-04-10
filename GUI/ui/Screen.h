@@ -33,6 +33,7 @@ class ScreenObject;
 class MSP430;
 class ConnectionManager;
 class PeripheralManager;
+class SimulationObjectWrapper;
 
 class Screen : public QWidget
 {
@@ -64,6 +65,7 @@ class Screen : public QWidget
 		void load(QDomDocument &doc);
 
 		void prepareSimulation(adevs::Digraph<double> *dig);
+		void setSimulator(adevs::Simulator<SimulationEvent> *sim);
 
 		ScreenObject *getObject(int x, int y);
 		int getPin(ScreenObject *object, int x, int y);
@@ -90,5 +92,6 @@ class Screen : public QWidget
 		int m_movingY;		
 		ConnectionManager *m_conns;
 		PeripheralManager *m_peripherals;
+		std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
 };
 

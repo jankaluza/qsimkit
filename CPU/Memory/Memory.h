@@ -50,6 +50,9 @@ class Memory {
 		void addWatcher(uint16_t address, MemoryWatcher *watcher);
 		void callWatcher(uint16_t address);
 
+		bool isBitSet(uint16_t address, uint16_t bit);
+		bool setBit(uint16_t address, uint16_t bit, bool value);
+
 	private:
 		std::vector<uint8_t> m_memory;
 		std::vector<std::vector<MemoryWatcher *> > m_watchers;

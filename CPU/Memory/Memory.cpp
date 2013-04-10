@@ -35,6 +35,10 @@ static unsigned int hexToInt(const std::string &str) {
 Memory::Memory(unsigned int size) {
 	m_memory.resize(size);
 	m_watchers.resize(size);
+
+	for (int i = 0; i < size; ++i) {
+		m_memory[i] = 0;
+	}
 }
 
 Memory::~Memory() {
@@ -161,5 +165,18 @@ void Memory::setByte(uint16_t address, uint8_t value) {
 
 void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher) {
 	m_watchers[address].push_back(watcher);
+}
+
+bool Memory::isBitSet(uint16_t address, uint16_t bit) {
+	return m_memory[address] & bit;
+}
+
+bool Memory::setBit(uint16_t address, uint16_t bit, bool value) {
+	if (value) {
+		m_memory[address] = m_memory[address] | bit;
+	}
+	else {
+		m_memory[address] = m_memory[address] & (~bit);
+	}
 }
 

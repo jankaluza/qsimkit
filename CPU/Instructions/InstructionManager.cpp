@@ -26,7 +26,7 @@
 #include <sstream>
 #include <vector>
 
-#define TYPE_OFFSET 15
+#define TYPE_OFFSET 20
 
 static std::vector<_msp430_instruction *> *instructions;
 
@@ -34,6 +34,9 @@ void addInstruction(InstructionType type, unsigned int opcode, _msp430_instructi
 	if (instructions == 0) {
 		instructions = new std::vector<_msp430_instruction *>;
 		instructions->resize(TYPE_OFFSET*3);
+		for (int i = 0; i < TYPE_OFFSET*3; ++i) {
+			(*instructions)[i] = 0;
+		}
 	}
 	(*instructions)[((int) type) * TYPE_OFFSET + opcode] = instruction;
 	std::cout << "Loaded instruction: " << (*instructions)[((int) type) * TYPE_OFFSET + opcode]->name << "\n";

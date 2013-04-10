@@ -105,7 +105,7 @@ template <class X, class T = double> class Simulator:
 		 */
 		void addModel(Atomic<X,T>* model) 
 		{
-			schedule(model,adevs_zero<T>());
+			schedule(model,nextEventTime());
 		}
 		/**
 		 * Create a simulator that will be used by an LP as part of a parallel

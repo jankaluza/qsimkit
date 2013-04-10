@@ -56,10 +56,11 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 }
 
 void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
-	std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
+	wrappers.clear();
 	for (int i = 0; i < m_objects.size(); ++i) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
 		if (p) {
+			p->reset();
 			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p);
 			dig->add(wrapper);
 
@@ -68,6 +69,12 @@ void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
 	}
 
 	m_conns->prepareSimulation(dig, wrappers);
+}
+
+void Screen::setSimulator(adevs::Simulator<SimulationEvent> *sim) {
+	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
+		it->second->setSimulator(sim);
+	}
 }
 
 void Screen::setCPU(MSP430 *cpu) {
@@ -295,7 +302,14 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 		}
 	}
 	else if (event->button() == Qt::LeftButton) {
+		ScreenObject *object = getObject(event->x(), event->y());
+		if (!object) {
+			return;
+		}
 
+		if (object->clicked(event->pos())) {
+			wrappers[object]->reschedule();
+		}
 	}
 }
 

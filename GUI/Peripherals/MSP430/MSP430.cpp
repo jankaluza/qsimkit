@@ -105,7 +105,13 @@ void MSP430::output(SimulationEventList &output) {
 void MSP430::internalTransition() {
 	if (!m_ignoreNextStep) {
 		m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
-		m_instructionCycles += executeInstruction(m_reg, m_mem, m_instruction);
+		int cycles = executeInstruction(m_reg, m_mem, m_instruction);
+		if (cycles == -1) {
+			qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;
+			m_instructionCycles = DBL_MAX;
+			return;
+		}
+		m_instructionCycles += cycles;
 		m_instructionCycles *= m_step;
 	}
 	else {
