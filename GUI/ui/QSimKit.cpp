@@ -113,7 +113,6 @@ void QSimKit::singleStep() {
 }
 
 void QSimKit::simulationStep() {
-	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
 	QTime perf;
 	perf.start();
 	for (int i = 0; i < 2500; ++i) {
@@ -124,7 +123,7 @@ void QSimKit::simulationStep() {
 			return;
 		}
 	}
-	qDebug() << perf.elapsed();
+	statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(2500/perf.elapsed()*1000) + " ms" + " instructions/s");
 }
 
 void QSimKit::resetSimulation() {
