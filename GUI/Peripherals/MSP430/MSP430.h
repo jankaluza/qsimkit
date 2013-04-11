@@ -49,8 +49,6 @@ class MSP430 : public Peripheral, public PinWatcher
 
 		Variant *getVariant() { return m_variant; }
 
-		bool loadPackage(const QString &file);
-
 		bool loadA43(const std::string &data);
 
 		void internalTransition();
@@ -107,16 +105,15 @@ class MSP430 : public Peripheral, public PinWatcher
 			return m_elf;
 		}
 
+		void loadPackage(const QString &file);
+
 	private:
-		void addMemoryWatchers();
 		void setPinType(const QString &name, PinType &type, int &subtype);
 
 	private:
 		std::map<int, QChar> m_sides;
 		PinList m_pins;
 		std::vector<PinAddr> m_pin2addr;
-		std::map<int, QString> m_names;
-		std::map<QString, int> m_map;
 
 		double m_time;
 		double m_instructionCycles;

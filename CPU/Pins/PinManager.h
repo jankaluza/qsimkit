@@ -42,11 +42,12 @@ typedef enum {
 
 class InternalPin {
 	public:
-		InternalPin() : type(P1), subtype(-1) {}
-		InternalPin(PinType type, int subtype) : type(type), subtype(subtype) {}
+		InternalPin() : type(P1), subtype(-1), value(0) {}
+		InternalPin(PinType type, int subtype) : type(type), subtype(subtype), value(0) {}
 
 	PinType type;
 	int subtype;
+	double value;
 };
 
 class PinWatcher {
@@ -63,7 +64,7 @@ class PinManager : public MemoryWatcher {
 
 		void addPin(PinType type, int subtype = -1);
 
-		void handlePinInput(int id, double value);
+		bool handlePinInput(int id, double value);
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
 

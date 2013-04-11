@@ -32,7 +32,6 @@ PythonPeripheral::PythonPeripheral(Script *script) : m_script(script), m_screenR
 		m_pins.push_back(Pin(pins[i].toRect(), "", 0));
 	}
 
-	m_options = m_script->getVariable("options").toStringList();
 }
 
 PythonPeripheral::~PythonPeripheral() {
@@ -86,6 +85,7 @@ void PythonPeripheral::reset() {
 }
 
 const QStringList &PythonPeripheral::getOptions() {
+	m_options = m_script->getVariable("options").toStringList();
 	return m_options;
 }
 
@@ -96,4 +96,17 @@ void PythonPeripheral::executeOption(int option) {
 bool PythonPeripheral::clicked(const QPoint &p) {
 	m_script->call("clicked", QVariantList() << p);
 	return m_script->getVariable("hasNewOutput").toBool();
+}
+
+void PythonPeripheral::save(QTextStream &stream) {
+	ScreenObject::save(stream);
+	QString str = m_script->call("save").toString();
+	stream << str;
+}
+
+void PythonPeripheral::load(QDomElement &object) {
+	QString str;
+	QTextStream stream(&str);
+	object.save(stream, 0);
+	m_script->call("load", QVariantList() << str);
 }

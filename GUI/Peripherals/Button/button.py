@@ -8,10 +8,43 @@ class Peripheral():
 		self.pins = []
 		self.pins.append(QRect(24, 12, 12, 12))
 		self.state = False
+		self.highWhenPushed = True
 		self.out = []
-		
+		self.options = []
+		self.options.append("+High when pushed")
+
+	def executeOption(self, option):
+		if (option == 0):
+			if self.options[0][0] == "-":
+				self.options[0] = "+" + self.options[0][1:]
+				self.highWhenPushed = True
+			else:
+				self.options[0] = "-" + self.options[0][1:]
+				self.highWhenPushed = False
+
+	def save(self):
+		return "<highWhenPushed>" + str(self.highWhenPushed) + "</highWhenPushed>"
+
+	def simpleParser(self, xml, tag):
+		start = xml.find("<" + tag + ">")
+		end = xml.find("</" + tag + ">")
+		if start == -1 or end == -1:
+			return None
+
+		return xml[start + len(tag) + 2 : end]
+
+	def load(self, xml):
+		c = self.simpleParser(xml, "highWhenPushed")
+		if c != None and c == "False":
+			self.highWhenPushed = False
+
 	def reset(self):
 		self.state = False;
+
+		if self.highWhenPushed:
+			self.out.append((0, 0.0))
+		else:
+			self.out.append((0, 1.0))
 
 	def output(self):
 		if len(self.out) == 0:
@@ -30,9 +63,15 @@ class Peripheral():
 		self.state = not self.state
 		self.screen.update()
 		if self.state:
-			self.out.append((0, 1.0))
+			if self.highWhenPushed:
+				self.out.append((0, 1.0))
+			else:
+				self.out.append((0, 0.0))
 		else:
-			self.out.append((0, 0))
+			if self.highWhenPushed:
+				self.out.append((0, 0.0))
+			else:
+				self.out.append((0, 1.0))
 		self.hasNewOutput = True
 
 	def paint(self):
@@ -66,7 +105,7 @@ class Peripheral():
 		
 
 		for rect in self.pins:
-			if self.state:
+			if self.state == self.highWhenPushed:
 				p.fillRect(rect, QBrush(QColor(0,255,0)))
 			p.drawRect(rect)
 

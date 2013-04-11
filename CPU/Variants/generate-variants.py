@@ -13,6 +13,13 @@ defines += ["P8DIR_", "P8IN_","P8OUT_","P8REN_","P8SEL_"]
 defines += ["P9DIR_", "P9IN_","P9OUT_","P9REN_","P9SEL_"]
 defines += ["P10DIR_", "P10IN_","P10OUT_","P10REN_","P10SEL_"]
 
+defines += ["PORT1_VECTOR", "PORT2_VECTOR"]
+
+def pdef(define):
+	if (define[-1] == "_"):
+		return define[:-1]
+	return define
+
 output = """#pragma once
 
 class Variant {
@@ -21,7 +28,7 @@ class Variant {
 """
 
 for define in defines:
-	output += "		virtual unsigned int get%s() = 0;\n" % (define[:-1])
+	output += "		virtual unsigned int get%s() = 0;\n" % (pdef(define))
 
 output += """
 };
@@ -66,7 +73,7 @@ class Variant_%s : public Variant {
 #endif
 		}
 
-""" % (define[:-1], define, define)
+""" % (pdef(define), define, define)
 
 	output += """
 };

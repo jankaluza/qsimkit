@@ -32,13 +32,21 @@ PinManager::~PinManager() {
 
 #define REFRESH_GP(TYPE, VAR, ADDRESS) { \
 	uint16_t b = m_mem->getBigEndian(ADDRESS);\
+	uint8_t dir =  m_mem->getByte(m_variant->get##TYPE##DIR()); \
 	for (int i = 0; i < 8; ++i) { \
+		if (!(dir & (1 << i))) continue; \
 		int pin_id = m_gpCache[((int) TYPE) * 10 + i]; \
 		if (b & (1 << i)) { \
-			m_watcher->handlePinChanged(pin_id, 1.0); \
+			if (m_pins[pin_id].value != 1.0) { \
+				m_pins[pin_id].value = 1.0; \
+				m_watcher->handlePinChanged(pin_id, 1.0); \
+			} \
 		} \
 		else { \
-			m_watcher->handlePinChanged(pin_id, 0.0); \
+			if (m_pins[pin_id].value != 0) { \
+				m_pins[pin_id].value = 0; \
+				m_watcher->handlePinChanged(pin_id, 0.0); \
+			} \
 		} \
 	} \
 }
@@ -106,43 +114,69 @@ void PinManager::addPin(PinType type, int subtype) {
 	}
 }
 
-void PinManager::handlePinInput(int id, double value) {
+bool PinManager::handlePinInput(int id, double value) {
 	InternalPin &p = m_pins[id];
+	bool handled = false;
 
-#define SET_GP(PIN, I, VALUE) if (!(m_mem->getByte(m_variant->get##PIN##DIR()) & (1 << I))) { \
-		std::cout << "setting\n";\
+	// Checks if the pin is input and stores the value in the
+	// proper address in memory
+#define SET_GP_IN(PIN, I, VALUE) \
+	if (!(m_mem->getByte(m_variant->get##PIN##DIR()) & (1 << I))) { \
 		m_mem->setBit(m_variant->get##PIN##IN(), 1 << I, VALUE == 1); \
+		handled = true; \
+	}
+
+	// 1. Check if interrupts are enabled for given pin (PxIE)
+	// 2. Check if the condition for interrupt was met (PxIES)
+	// 3. Set the PxIFG value according to given pin
+	// 4. Inform InterruptManager that we have interrupt here.
+#define RUN_GP_INTERRUPT(PIN, I, VALUE) \
+	if (!(m_mem->getByte(m_variant->get##PIN##IE()) & (1 << I))) { \
+		/* Interrupt enabled */ \
+		if (m_mem->getByte(m_variant->get##PIN##IES()) & (1 << I)) { \
+			/* Low to high */ \
+			if (m_pins[id].value == 0 && value == 1.0) { \
+				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
+			}\
+		} \
+		else { \
+			/* High to low */ \
+			if (m_pins[id].value == 1.0 && value == 0) { \
+				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
+			}\
+		} \
 	}
 
 	switch (p.type) {
 		case P1:
-			SET_GP(P1, p.subtype, value)
-			else {
-				std::cout << "not setting " << (int) m_mem->getByte(m_variant->getP1DIR()) << "\n";
-			}
+			SET_GP_IN(P1, p.subtype, value)
+			RUN_GP_INTERRUPT(P1, p.subtype, value);
 			break;
 		case P2:
-			SET_GP(P2, p.subtype, value)
+			SET_GP_IN(P2, p.subtype, value)
+			RUN_GP_INTERRUPT(P2, p.subtype, value);
 			break;
 		case P3:
-			SET_GP(P3, p.subtype, value)
+			SET_GP_IN(P3, p.subtype, value)
 			break;
 		case P4:
-			SET_GP(P4, p.subtype, value)
+			SET_GP_IN(P4, p.subtype, value)
 			break;
 		case P5:
-			SET_GP(P5, p.subtype, value)
+			SET_GP_IN(P5, p.subtype, value)
 			break;
 		case P6:
-			SET_GP(P6, p.subtype, value)
+			SET_GP_IN(P6, p.subtype, value)
 			break;
 		case P7:
-			SET_GP(P7, p.subtype, value)
+			SET_GP_IN(P7, p.subtype, value)
 			break;
 		case P8:
-			SET_GP(P8, p.subtype, value)
-			break;
+			SET_GP_IN(P8, p.subtype, value)
 		default:
 			break;
 	}
+
+	m_pins[id].value = value;
+	return handled;
 }

@@ -27,6 +27,7 @@
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Pins/PinManager.h"
+#include "Package.h"
 
 #include <QWidget>
 #include <QApplication>
@@ -48,8 +49,12 @@ m_ignoreNextStep(false) {
 
 	m_pinManager = new PinManager(0, m_variant);
 	m_pinManager->setWatcher(this);
-	loadPackage("Packages/msp430x241x.xml");
+	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 	reset();
+}
+
+void MSP430::loadPackage(const QString &file) {
+	Package::loadPackage(this, m_pinManager, file, m_pins, m_sides);
 }
 
 void MSP430::setFrequency(unsigned long freq) {
@@ -81,6 +86,7 @@ void MSP430::reset() {
 void MSP430::handlePinChanged(int id, double value) {
 	m_pins[id].value = value;
 	m_output.insert(SimulationEvent(id, value));
+	onUpdated();
 }
 
 
@@ -91,7 +97,11 @@ bool MSP430::loadA43(const std::string &data) {
 
 void MSP430::externalEvent(double t, const SimulationEventList &events) {
 	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
-		m_pinManager->handlePinInput((*it).port, (*it).value);
+		if (!m_pinManager->handlePinInput((*it).port, (*it).value)) {
+			qDebug() << "WARN: input on output PIN";
+		}
+		m_pins[(*it).port].value = (*it).value;
+		onUpdated();
 	}
 }
 
@@ -173,104 +183,6 @@ void MSP430::setPinType(const QString &n, PinType &type, int &subtype) {
 	SET_GP_PIN("P8.", P8)
 }
 
-bool MSP430::loadPackage(const QString &file) {
-	m_pins.clear();
-	int pin_size = 10;
-	int width = 48;
-	int height = 48;
-	int errorLine, errorColumn;
-	QString errorMsg;
-
-	QFile modelFile(file);
-	QDomDocument document;
-	if (!document.setContent(&modelFile, &errorMsg, &errorLine, &errorColumn))
-	{
-			QString error("Syntax error line %1, column %2:\n%3");
-			error = error
-					.arg(errorLine)
-					.arg(errorColumn)
-					.arg(errorMsg);
-			qDebug() << error;
-			return false;
-	}
-
-	QDomElement rootElement = document.firstChild().toElement();
-	QDomNode package = rootElement.firstChild();
-	if (package.nodeName() != "package") {
-		return false;
-	}
-
-	// Compute width and height according to number of pins on each side
-	for(QDomNode node = package.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		QDomElement element = node.toElement();
-		QChar side = element.nodeName()[0];
-		for(QDomNode pin = element.firstChild(); !pin.isNull(); pin = pin.nextSibling()) {
-			if (side == 'd') {
-				width += pin_size + 2;
-			}
-			else if (side == 'l') {
-				height += pin_size + 2;
-			}
-		}
-	}
-
-	for(QDomNode node = package.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		QDomElement element = node.toElement();
-		QChar side = element.nodeName()[0];
-
-		int x = 0;
-		int y = 0;
-		if (side == 'l') {
-			x = 0;
-			y = 25;
-		}
-		else if (side == 'r') {
-			x = width - pin_size;
-			y = height - pin_size - 24;
-		}
-		else if (side == 'd') {
-			x = 25;
-			y = height - pin_size;
-		}
-		else if (side == 'u') {
-			x = width - pin_size - 24;
-			y = 0;
-		}
-
-		for(QDomNode pin = element.firstChild(); !pin.isNull(); pin = pin.nextSibling()) {
-			int id = pin.toElement().attribute("id").toInt() - 1;
-			m_sides[id] = side;
-			QString n;
-			PinType type = UNKNOWN;
-			int subtype = -1;
-			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
-				QString n_ = name.toElement().text();
-				n += n_ + "/";
-				m_map[n_] = id;
-				setPinType(n_, type, subtype);
-			}
-			m_names[id] = n;
-			m_pins.push_back(Pin(QRect(x, y, pin_size, pin_size), n, 0));
-			m_pinManager->addPin(type, subtype);
-
-			if (side == 'd') {
-				x += pin_size + 2;
-			}
-			else if (side == 'l') {
-				y += pin_size + 2;
-			}
-			else if (side == 'r') {
-				y -= pin_size + 2;
-			}
-			else if (side == 'u') {
-				x -= pin_size + 2;
-			}
-		}
-	}
-
-	resize(width, height);
-	return true;
-}
 
 void MSP430::paint(QWidget *screen) {
 	QPainter qp(screen);

@@ -59,5 +59,7 @@ class Variant {
 		virtual unsigned int getP10OUT() = 0;
 		virtual unsigned int getP10REN() = 0;
 		virtual unsigned int getP10SEL() = 0;
+		virtual unsigned int getPORT1_VECTOR() = 0;
+		virtual unsigned int getPORT2_VECTOR() = 0;
 
 };

@@ -7,3 +7,8 @@ CMakeFiles
 CMakeCache.txt
 *.cxx
 ui_*
+qsimkit
+*.a43
+*.elf
+callgrind*
+*.pyc

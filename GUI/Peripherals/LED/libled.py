@@ -8,7 +8,31 @@ class Peripheral():
 		self.pins = []
 		self.pins.append(QRect(24, 12, 12, 12))
 		self.state = False
-		
+		self.color = QColor(Qt.green);
+
+		self.options = []
+		self.options.append("Set color");
+
+	def executeOption(self, option):
+		if (option == 0):
+			self.color = QColorDialog.getColor(self.color)
+
+	def save(self):
+		return "<color>" + self.color.name() + "</color>"
+
+	def simpleParser(self, xml, tag):
+		start = xml.find("<" + tag + ">")
+		end = xml.find("</" + tag + ">")
+		if start == -1 or end == -1:
+			return None
+
+		return xml[start + len(tag) + 2 : end]
+
+	def load(self, xml):
+		c = self.simpleParser(xml, "color")
+		if c != None:
+			self.color.setNamedColor(c)
+
 	def reset(self):
 		self.state = False;
 
@@ -26,7 +50,7 @@ class Peripheral():
 
 		color = Qt.black
 		if self.state:
-			color = Qt.green
+			color = self.color
 
 		p.setPen(QPen(Qt.black, 2, Qt.SolidLine))
 		p.setBrush(QBrush(color))

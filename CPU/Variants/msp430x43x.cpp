@@ -2518,6 +2518,24 @@ class Variant_msp430x43x : public Variant {
 		}
 
 
+		unsigned int getPORT1_VECTOR() {
+#ifdef PORT1_VECTOR
+			return PORT1_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getPORT2_VECTOR() {
+#ifdef PORT2_VECTOR
+			return PORT2_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 };
 
 MSP430_VARIANT("msp430x43x", msp430x43x);

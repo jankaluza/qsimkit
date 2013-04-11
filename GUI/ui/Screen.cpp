@@ -240,7 +240,22 @@ void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
 	QList<QAction *> actions;
 	int index = 0;
 	foreach (const QString &str, object->getOptions()) {
-		QAction *action = new QAction(str, 0);
+		QString name = str;
+		bool checkable = false;
+		bool checked = false;
+		if (str[0] == '+') {
+			name = name.mid(1);
+			checkable = true;
+			checked = true;
+		}
+		else if (str[0] == '-') {
+			name = name.mid(1);
+			checkable = true;
+		}
+
+		QAction *action = new QAction(name, 0);
+		action->setCheckable(checkable);
+		action->setChecked(checked);
 		action->setData(index++);
 		actions.append(action);
 	}

@@ -23,49 +23,17 @@
 #include <QString>
 #include <QChar>
 #include <QRect>
-#include <map>
 
-#include "Peripheral.h"
+#include "Peripherals/Peripheral.h"
+#include "CPU/Pins/PinManager.h"
 
-class Script;
+class MSP430;
 
-class PythonPeripheral : public Peripheral {
-	public:
-		PythonPeripheral(Script *script);
-		~PythonPeripheral();
+namespace Package {
 
-		void internalTransition();
+	bool loadPackage(MSP430 *cpu, PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides);
 
-		void externalEvent(double t, const SimulationEventList &);
+	void setPinType(const QString &name, PinType &type, int &subtype);
 
-		void output(SimulationEventList &output);
-
-		double timeAdvance();
-
-		void reset();
-
-		void paint(QWidget *screen);
-
-		PinList &getPins() {
-			return m_pins;
-		}
-
-		const QStringList &getOptions();
-
-		void executeOption(int option);
-
-		void objectMoved(int x, int y);
-
-		bool clicked(const QPoint &p);
-
-		void save(QTextStream &stream);
-		void load(QDomElement &object);
-
-	private:
-		Script *m_script;
-		PinList m_pins;
-		QStringList m_options;
-		bool m_screenRegistered;
-
-};
+}
 
