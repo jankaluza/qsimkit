@@ -19,34 +19,34 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <QList>
+#include <QDialog>
+#include <QString>
+#include <QTimer>
+#include <QDockWidget>
+#include <QTreeWidgetItem>
+
+#include "ui_Stack.h"
 #include "CPU/Memory/Register.h"
 
 class MSP430;
+class QSimKit;
 
-class BreakpointManager : public RegisterWatcher {
+class Stack : public QDockWidget, public Ui::Stack, public RegisterWatcher
+{
+	Q_OBJECT
+
 	public:
-		BreakpointManager();
-		~BreakpointManager();
+		Stack(QSimKit *simkit);
 
 		void setCPU(MSP430 *cpu);
 
-		void addRegisterBreak(int reg, uint16_t value);
-		void removeRegisterBreak(int reg, uint16_t value);
-
-		bool shouldBreak();
-
-		void breakNow() {
-			m_break = true;
-		}
+		void refresh();
 
 		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
 
 	private:
 		MSP430 *m_cpu;
-		QList<QList<uint16_t> > m_breaks;
-		bool m_break;
-
+		QSimKit *m_simkit;
+		uint16_t m_defaultSP;
 };
 

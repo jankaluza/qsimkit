@@ -83,9 +83,18 @@ void Register::callWatchers() {
 	if (m_watchers.empty())
 		return;
 
+	std::vector<RegisterWatcher *> toRemove;
+
 	for (std::vector<RegisterWatcher *>::const_iterator it = m_watchers.begin(); it != m_watchers.end(); ++it) {
-		(*it)->handleRegisterChanged(this, m_id, m_value);
+		if (!(*it)->handleRegisterChanged(this, m_id, m_value)) {
+			toRemove.push_back(*it);
+		}
 	}
+
+	for (std::vector<RegisterWatcher *>::const_iterator it = toRemove.begin(); it != toRemove.end(); ++it) {
+		removeWatcher(*it);
+	}
+
 }
 
 void Register::removeWatcher(RegisterWatcher *watcher) {

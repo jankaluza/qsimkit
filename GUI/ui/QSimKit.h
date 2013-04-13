@@ -33,6 +33,8 @@ class CPU;
 class PeripheralManager;
 class Disassembler;
 class Registers;
+class Stack;
+class MemoryTracker;
 class BreakpointManager;
 
 class QSimKit : public QMainWindow, public Ui::QSimKit
@@ -81,5 +83,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		Registers *m_registers;
 		QAction *m_pauseAction;
 		BreakpointManager *m_breakpointManager;
+		Stack *m_stack;
+		MemoryTracker *m_memTracker;
 };
 

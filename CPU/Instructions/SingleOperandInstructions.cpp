@@ -28,6 +28,22 @@
 #include <sstream>
 #include <map>
 
+static int execPUSH(RegisterSet *reg, Memory *mem, Instruction *i) {
+	// Decrease SP, Store current PC, change PC
+	uint16_t sp = reg->get(1)->getBigEndian() - 2;
+	reg->get(1)->setBigEndian(sp);
+	if (i->bw) {
+		mem->set(sp, i->getDst()->getByte());
+	}
+	else {
+		mem->setBigEndian(sp, i->getDst()->getBigEndian());
+	}
+
+	reg->get(1)->callWatchers();
+	
+	return 3;
+}
+
 static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
 	// Decrease SP, Store current PC, change PC
 	uint16_t sp = reg->get(1)->getBigEndian();
@@ -41,9 +57,13 @@ static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 	uint16_t sp = reg->get(1)->getBigEndian();
-	reg->get(1)->setBigEndian(mem->getBigEndian(sp));
+
+	// POP SR from stack
+	reg->get(2)->setBigEndian(mem->getBigEndian(sp));
+	reg->get(2)->callWatchers();
 	sp += 2;
 
+	// POP PC from stack
 	reg->get(0)->setBigEndian(mem->getBigEndian(sp));
 	sp += 2;
 
@@ -52,5 +72,6 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 	return 4;
 }
 
+MSP430_INSTRUCTION("push", Instruction1, 4, &execPUSH);
 MSP430_INSTRUCTION("call", Instruction1, 5, &execCALL);
 MSP430_INSTRUCTION("reti", Instruction1, 6, &execRETI);

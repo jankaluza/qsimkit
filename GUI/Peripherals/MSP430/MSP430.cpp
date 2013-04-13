@@ -27,6 +27,7 @@
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Pins/PinManager.h"
+#include "CPU/Interrupts/InterruptManager.h"
 #include "Package.h"
 
 #include <QWidget>
@@ -40,12 +41,16 @@
 
 MSP430::MSP430(Variant *variant, unsigned long frequency) :
 m_time(0), m_instructionCycles(0),
-m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0),
+m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
 m_instruction(new Instruction), m_variant(variant),
 m_ignoreNextStep(false) {
 
 	setFrequency(frequency);
 	m_type = "MSP430";
+
+	m_mem = new Memory(512000);
+	m_reg = new RegisterSet();
+	m_reg->addDefaultRegisters();
 
 	m_pinManager = new PinManager(0, m_variant);
 	m_pinManager->setWatcher(this);
@@ -64,18 +69,16 @@ void MSP430::setFrequency(unsigned long freq) {
 }
 
 void MSP430::reset() {
-	delete m_mem;
-	delete m_reg;
 	delete m_decoder;
+	delete m_intManager;
 
-	m_mem = new Memory(512000);
-	m_reg = new RegisterSet();
+	// TODO; m_mem->reset(); m_reg->reset();
+
 	m_decoder = new InstructionDecoder(m_reg, m_mem);
+	m_intManager = new InterruptManager(m_reg, m_mem);
 
 	m_pinManager->setMemory(m_mem);
-
-
-	m_reg->addDefaultRegisters();
+	m_pinManager->setInterruptManager(m_intManager);
 
 	if (!m_code.empty()) {
 		loadA43(m_code);
@@ -114,14 +117,21 @@ void MSP430::output(SimulationEventList &output) {
 
 void MSP430::internalTransition() {
 	if (!m_ignoreNextStep) {
-		m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
-		int cycles = executeInstruction(m_reg, m_mem, m_instruction);
-		if (cycles == -1) {
-			qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;
-			m_instructionCycles = DBL_MAX;
-			return;
+		if (m_intManager->runQueuedInterrupts()) {
+			m_instructionCycles = 5;
 		}
-		m_instructionCycles += cycles;
+		else {
+			m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
+			int cycles = executeInstruction(m_reg, m_mem, m_instruction);
+			if (cycles == -1) {
+				qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;
+				m_instructionCycles = DBL_MAX;
+				return;
+			}
+
+			m_intManager->handleInstruction(m_instruction);
+			m_instructionCycles += cycles;
+		}
 		m_instructionCycles *= m_step;
 	}
 	else {

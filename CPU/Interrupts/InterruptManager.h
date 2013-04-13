@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -20,33 +20,30 @@
 #pragma once
 
 #include <stdint.h>
-#include <QList>
-#include "CPU/Memory/Register.h"
+#include <string>
+#include <vector>
+#include "CPU/Memory/Memory.h"
 
-class MSP430;
+class Memory;
+class RegisterSet;
+class Instruction;
 
-class BreakpointManager : public RegisterWatcher {
+class InterruptManager {
 	public:
-		BreakpointManager();
-		~BreakpointManager();
+		InterruptManager(RegisterSet *reg, Memory *mem);
+		virtual ~InterruptManager();
 
-		void setCPU(MSP430 *cpu);
+		void queueInterrupt(int vector);
 
-		void addRegisterBreak(int reg, uint16_t value);
-		void removeRegisterBreak(int reg, uint16_t value);
+		bool runQueuedInterrupts();
 
-		bool shouldBreak();
+		void runInterrupt(int vector);
 
-		void breakNow() {
-			m_break = true;
-		}
-
-		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
+		void handleInstruction(Instruction *instruction);
 
 	private:
-		MSP430 *m_cpu;
-		QList<QList<uint16_t> > m_breaks;
-		bool m_break;
-
+		RegisterSet *m_reg;
+		Memory *m_mem;
+		std::vector<int> m_interrupts;
+		std::vector<int> m_runningInterrupts;
 };
-

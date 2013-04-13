@@ -49,7 +49,7 @@ class Peripheral():
 	def output(self):
 		if len(self.out) == 0:
 			return ()
-		return self.out.pop()
+		return self.out.pop(0)
 
 	def externalEvent(self, pin, value):
 		pass

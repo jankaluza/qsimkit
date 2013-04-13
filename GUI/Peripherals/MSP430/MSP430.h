@@ -32,6 +32,7 @@ class RegisterSet;
 class InstructionDecoder;
 class Instruction;
 class Variant;
+class InterruptManager;
 
 class PinAddr {
 	public:
@@ -124,6 +125,7 @@ class MSP430 : public Peripheral, public PinWatcher
 		Instruction *m_instruction;
 		Variant *m_variant;
 		PinManager *m_pinManager;
+		InterruptManager *m_intManager;
 		double m_step;
 		std::string m_code;
 		SimulationEventList m_output;

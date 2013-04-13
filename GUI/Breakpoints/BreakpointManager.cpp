@@ -30,20 +30,22 @@ BreakpointManager::~BreakpointManager() {
 
 }
 
-void BreakpointManager::handleRegisterChanged(Register *reg, int id, uint16_t value) {
+bool BreakpointManager::handleRegisterChanged(Register *reg, int id, uint16_t value) {
 	if (m_break) {
-		return;
+		return true;
 	}
 	QList<uint16_t> &b = m_breaks[id];
 	if (b.empty())
-		return;
+		return true;
 
 	QList<uint16_t>::iterator it;
 	it = qBinaryFind(b.begin(), b.end(), reg->getBigEndian());
 	if (it != b.end()) {
 		m_break = true;
-		return;
+		return true;
 	}
+
+	return true;
 }
 
 void BreakpointManager::setCPU(MSP430 *cpu) {

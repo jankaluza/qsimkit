@@ -26,6 +26,7 @@
 
 class Variant;
 class Memory;
+class InterruptManager;
 
 typedef enum {
 	UNKNOWN,
@@ -72,10 +73,15 @@ class PinManager : public MemoryWatcher {
 			m_watcher = watcher;
 		}
 
+		void setInterruptManager(InterruptManager *intManager) {
+			m_intManager = intManager;
+		}
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
 		std::vector<InternalPin> m_pins;
 		std::map<int, int> m_gpCache;
 		PinWatcher *m_watcher;
+		InterruptManager *m_intManager;
 };

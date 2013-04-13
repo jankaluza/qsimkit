@@ -19,34 +19,36 @@
 
 #pragma once
 
-#include <stdint.h>
-#include <QList>
-#include "CPU/Memory/Register.h"
+#include <QDialog>
+#include <QString>
+#include <QTimer>
+#include <QDockWidget>
+#include <QTreeWidgetItem>
+
+#include "ui_Memory.h"
+#include "CPU/Memory/Memory.h"
 
 class MSP430;
+class QSimKit;
 
-class BreakpointManager : public RegisterWatcher {
+class MemoryTracker : public QDockWidget, public Ui::Memory
+{
+	Q_OBJECT
+
 	public:
-		BreakpointManager();
-		~BreakpointManager();
+		MemoryTracker(QSimKit *simkit);
 
 		void setCPU(MSP430 *cpu);
 
-		void addRegisterBreak(int reg, uint16_t value);
-		void removeRegisterBreak(int reg, uint16_t value);
+		void refresh();
 
-		bool shouldBreak();
-
-		void breakNow() {
-			m_break = true;
-		}
-
-		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
+	public slots:
+		void handleTrackClicked(bool);
 
 	private:
-		MSP430 *m_cpu;
-		QList<QList<uint16_t> > m_breaks;
-		bool m_break;
+		void initComboBox();
 
+		MSP430 *m_cpu;
+		QSimKit *m_simkit;
 };
 

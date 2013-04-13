@@ -20,6 +20,7 @@
 #include "PinManager.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
+#include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
 PinManager::PinManager(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant) {
@@ -130,31 +131,35 @@ bool PinManager::handlePinInput(int id, double value) {
 	// 2. Check if the condition for interrupt was met (PxIES)
 	// 3. Set the PxIFG value according to given pin
 	// 4. Inform InterruptManager that we have interrupt here.
-#define RUN_GP_INTERRUPT(PIN, I, VALUE) \
-	if (!(m_mem->getByte(m_variant->get##PIN##IE()) & (1 << I))) { \
+#define RUN_GP_INTERRUPT(PIN, PORT, I, VALUE) \
+	if (m_mem->getByte(m_variant->get##PIN##IE()) & (1 << I)) { \
 		/* Interrupt enabled */ \
 		if (m_mem->getByte(m_variant->get##PIN##IES()) & (1 << I)) { \
 			/* Low to high */ \
 			if (m_pins[id].value == 0 && value == 1.0) { \
 				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
+				m_intManager->queueInterrupt(m_variant->get##PORT##_VECTOR()); \
 			}\
 		} \
 		else { \
 			/* High to low */ \
+			std::cerr << "xxxxx\n"; \
 			if (m_pins[id].value == 1.0 && value == 0) { \
 				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
+				m_intManager->queueInterrupt(m_variant->get##PORT##_VECTOR()); \
 			}\
 		} \
-	}
+	} \
+	else { std::cerr << "IE NOT ENABLED " << (int) m_mem->getByte(m_variant->get##PIN##IE()) << "\n"; }
 
 	switch (p.type) {
 		case P1:
 			SET_GP_IN(P1, p.subtype, value)
-			RUN_GP_INTERRUPT(P1, p.subtype, value);
+			RUN_GP_INTERRUPT(P1, PORT1, p.subtype, value)
 			break;
 		case P2:
 			SET_GP_IN(P2, p.subtype, value)
-			RUN_GP_INTERRUPT(P2, p.subtype, value);
+			RUN_GP_INTERRUPT(P2, PORT2, p.subtype, value);
 			break;
 		case P3:
 			SET_GP_IN(P3, p.subtype, value)

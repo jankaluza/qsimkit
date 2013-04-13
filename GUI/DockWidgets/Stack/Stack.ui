@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Stack</class>
+ <widget class="QDockWidget" name="Stack">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Stack</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="margin">
+     <number>0</number>
+    </property>
+    <item>
+     <widget class="QTreeWidget" name="view">
+      <property name="indentation">
+       <number>0</number>
+      </property>
+      <column>
+       <property name="text">
+        <string>#</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Dec</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Hex</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Bin</string>
+       </property>
+      </column>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
