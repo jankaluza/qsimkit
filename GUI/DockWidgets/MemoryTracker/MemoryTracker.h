@@ -22,7 +22,7 @@
 #include <QDialog>
 #include <QString>
 #include <QTimer>
-#include <QDockWidget>
+#include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
 #include "ui_Memory.h"
@@ -31,7 +31,7 @@
 class MSP430;
 class QSimKit;
 
-class MemoryTracker : public QDockWidget, public Ui::Memory
+class MemoryTracker : public DockWidget, public Ui::Memory
 {
 	Q_OBJECT
 

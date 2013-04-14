@@ -38,7 +38,7 @@
 #include <QDebug>
 
 Disassembler::Disassembler(QSimKit *simkit) :
-QDockWidget(simkit), m_cpu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
+DockWidget(simkit), m_cpu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -246,7 +246,7 @@ QString Disassembler::ELFToA43(const QByteArray &elf) {
 	return file2.readAll();
 }
 
-void Disassembler::updatePC() {
+void Disassembler::refresh() {
 	QString addr = QString("%1").arg(m_cpu->getRegisterSet()->get(0)->getBigEndian(), 0, 16);
 	QList<QTreeWidgetItem *> item = view->findItems(addr, Qt::MatchExactly);
 	if (item.empty()) {
@@ -265,5 +265,5 @@ void Disassembler::updatePC() {
 void Disassembler::setCPU(MSP430 *cpu) {
 	m_cpu = cpu;
 	reloadCode();
-	updatePC();
+	refresh();
 }

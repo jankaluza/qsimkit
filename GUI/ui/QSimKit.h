@@ -21,6 +21,7 @@
 
 #include <QMainWindow>
 #include <QString>
+#include <QList>
 #include <QTimer>
 
 #include "ui_QSimKit.h"
@@ -32,10 +33,8 @@ class Variant;
 class CPU;
 class PeripheralManager;
 class Disassembler;
-class Registers;
-class Stack;
-class MemoryTracker;
 class BreakpointManager;
+class DockWidget;
 
 class QSimKit : public QMainWindow, public Ui::QSimKit
 {
@@ -52,6 +51,8 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		BreakpointManager *getBreakpointManager() {
 			return m_breakpointManager;
 		}
+
+		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
 
 	public slots:
 		void loadA43();
@@ -71,6 +72,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 
 	private:
 		void refreshDockWidgets();
+		void setDockWidgetsCPU(MSP430 *cpu);
 
 	private:
 		Variant *m_variant;
@@ -80,10 +82,8 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		PeripheralManager *m_peripherals;
 		QString m_filename;
 		Disassembler *m_disassembler;
-		Registers *m_registers;
 		QAction *m_pauseAction;
 		BreakpointManager *m_breakpointManager;
-		Stack *m_stack;
-		MemoryTracker *m_memTracker;
+		QList<DockWidget *> m_dockWidgets;
 };
 

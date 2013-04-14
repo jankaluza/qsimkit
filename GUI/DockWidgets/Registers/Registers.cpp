@@ -36,7 +36,7 @@
 #include <QDebug>
 
 Registers::Registers(QSimKit *simkit) :
-QDockWidget(simkit), m_cpu(0), m_simkit(simkit) {
+DockWidget(simkit), m_cpu(0), m_simkit(simkit) {
 	setupUi(this);
 
 	for (int r = 0; r < 16; r++) {
@@ -75,8 +75,8 @@ void Registers::refresh() {
 		}
 		else {
 			dec = QString::number(n);
-			hex = QString("0x%1").arg(n, 0, 16);
-			bin = QString("%1").arg(n, 0, 2);
+			hex = QString("0x%1").arg((uint16_t) n, 0, 16);
+			bin = QString("%1").arg((uint16_t) n, 0, 2);
 		}
 
 		QTreeWidgetItem *it = view->topLevelItem(r);

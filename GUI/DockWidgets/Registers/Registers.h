@@ -22,7 +22,7 @@
 #include <QDialog>
 #include <QString>
 #include <QTimer>
-#include <QDockWidget>
+#include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
 #include "ui_Registers.h"
@@ -30,7 +30,7 @@
 class MSP430;
 class QSimKit;
 
-class Registers : public QDockWidget, public Ui::Registers
+class Registers : public DockWidget, public Ui::Registers
 {
 	Q_OBJECT
 

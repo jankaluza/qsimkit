@@ -19,49 +19,26 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QMainWindow>
 #include <QString>
-#include <QTimer>
-#include <DockWidgets/DockWidget.h>
-#include <QTreeWidgetItem>
-#include <QList>
+#include <QChar>
+#include <QRect>
+#include <map>
 
-#include "ui_Disassembler.h"
+#include <QDockWidget>
 
 class MSP430;
-class QSimKit;
 
-class Disassembler : public DockWidget, public Ui::Disassembler
-{
+class DockWidget : public QDockWidget {
+
 	Q_OBJECT
 
 	public:
-		Disassembler(QSimKit *simkit);
+		DockWidget(QMainWindow *parent) : QDockWidget(parent) {}
 
-		void setCPU(MSP430 *cpu);
+		virtual void setCPU(MSP430 *cpu) = 0;
 
-		void reloadCode();
+		virtual void refresh() = 0;
 
-		void refresh();
-
-		QString ELFToA43(const QByteArray &elf);
-
-		void showSourceCode(bool show);
-
-	public slots:
-		void handleContextMenu(const QPoint &point);
-
-	private:
-		void parseCode(const QString &code);
-		void addBreakpoint();
-		void removeBreakpoint();
-		void addSourceLine(const QString &line);
-
-	private:
-		MSP430 *m_cpu;
-		QSimKit *m_simkit;
-		QTreeWidgetItem *m_currentItem;
-		QList<QTreeWidgetItem *> m_breakpoints;
-		bool m_showSource;
 };
 

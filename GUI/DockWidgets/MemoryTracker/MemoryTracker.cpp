@@ -38,7 +38,7 @@
 #include <QDebug>
 
 MemoryTracker::MemoryTracker(QSimKit *simkit) :
-QDockWidget(simkit), m_cpu(0), m_simkit(simkit) {
+DockWidget(simkit), m_cpu(0), m_simkit(simkit) {
 	setupUi(this);
 
 	connect(track, SIGNAL(clicked(bool)), this, SLOT(handleTrackClicked(bool)));
@@ -84,8 +84,8 @@ void MemoryTracker::refresh() {
 // 		}
 // 		else {
 			dec = QString::number(n);
-			hex = QString("0x%1").arg(n, 0, 16);
-			bin = QString("%1").arg(n, 0, 2);
+			hex = QString("0x%1").arg((uint16_t) n, 0, 16);
+			bin = QString("%1").arg((uint16_t) n, 0, 2);
 // 		}
 
 		item->setText(1, dec);

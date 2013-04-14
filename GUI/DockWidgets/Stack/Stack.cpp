@@ -36,7 +36,7 @@
 #include <QDebug>
 
 Stack::Stack(QSimKit *simkit) :
-QDockWidget(simkit), m_cpu(0), m_simkit(simkit), m_defaultSP(0) {
+DockWidget(simkit), m_cpu(0), m_simkit(simkit), m_defaultSP(0) {
 	setupUi(this);
 
 }
@@ -50,7 +50,6 @@ void Stack::refresh() {
 
 
 	uint16_t sp = m_cpu->getRegisterSet()->get(1)->getBigEndian();
-	qDebug() << sp << m_defaultSP;
 
 	for (; sp < m_defaultSP; sp += 2) {
 		int16_t n = m_cpu->getMemory()->getBigEndian(sp);
@@ -64,8 +63,8 @@ void Stack::refresh() {
 // 		}
 // 		else {
 			dec = QString::number(n);
-			hex = QString("0x%1").arg(n, 0, 16);
-			bin = QString("%1").arg(n, 0, 2);
+			hex = QString("0x%1").arg((uint16_t) n, 0, 16);
+			bin = QString("%1").arg((uint16_t) n, 0, 2);
 // 		}
 
 		QTreeWidgetItem *it = new QTreeWidgetItem(view);

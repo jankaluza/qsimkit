@@ -83,29 +83,33 @@ m_dig(0), m_sim(0) {
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(simulationStep()));
 
 	m_disassembler = new Disassembler(this);
-	addDockWidget(Qt::RightDockWidgetArea, m_disassembler);
-
-	m_registers = new Registers(this);
-	addDockWidget(Qt::LeftDockWidgetArea, m_registers);
-
-	m_memTracker = new MemoryTracker(this);
-	addDockWidget(Qt::LeftDockWidgetArea, m_memTracker);
-
-	m_stack = new Stack(this);
-	addDockWidget(Qt::LeftDockWidgetArea, m_stack);
+	addDockWidget(m_disassembler, Qt::RightDockWidgetArea);
+	addDockWidget(new Registers(this), Qt::LeftDockWidgetArea);
+	addDockWidget(new MemoryTracker(this), Qt::LeftDockWidgetArea);
+	addDockWidget(new Stack(this), Qt::LeftDockWidgetArea);
 }
 
 void QSimKit::setVariant(const QString &variant) {
 	m_variant = getVariant(variant.toStdString().c_str());
 }
 
+void QSimKit::addDockWidget(DockWidget *widget, Qt::DockWidgetArea area) {
+	QMainWindow::addDockWidget(area, widget);
+	m_dockWidgets.append(widget);
+}
+
 void QSimKit::refreshDockWidgets() {
-	m_disassembler->updatePC();
-	m_registers->refresh();
-	m_stack->refresh();
-	m_memTracker->refresh();
+	for (int i = 0; i < m_dockWidgets.size(); ++i) {
+		m_dockWidgets[i]->refresh();
+	}
 
 	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
+}
+
+void QSimKit::setDockWidgetsCPU(MSP430 *cpu) {
+	for (int i = 0; i < m_dockWidgets.size(); ++i) {
+		m_dockWidgets[i]->setCPU(cpu);
+	}
 }
 
 void QSimKit::singleStep() {
@@ -180,10 +184,8 @@ void QSimKit::newProject() {
 		m_filename = "";
 		screen->clear();
 		screen->setCPU(dialog.getMSP430());
-		m_disassembler->setCPU(screen->getCPU());
-		m_registers->setCPU(screen->getCPU());
-		m_stack->setCPU(screen->getCPU());
-		m_memTracker->setCPU(screen->getCPU());
+		setDockWidgetsCPU(screen->getCPU());
+
 		m_breakpointManager->setCPU(screen->getCPU());
 	}
 }
@@ -225,10 +227,7 @@ bool QSimKit::loadProject(const QString &file) {
 
 	screen->load(document);
 	m_filename = file;
-	m_disassembler->setCPU(screen->getCPU());
-	m_registers->setCPU(screen->getCPU());
-	m_stack->setCPU(screen->getCPU());
-	m_memTracker->setCPU(screen->getCPU());
+	setDockWidgetsCPU(screen->getCPU());
 	m_breakpointManager->setCPU(screen->getCPU());
 
 	return true;

@@ -22,7 +22,7 @@
 #include <QDialog>
 #include <QString>
 #include <QTimer>
-#include <QDockWidget>
+#include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
 #include "ui_Stack.h"
@@ -31,7 +31,7 @@
 class MSP430;
 class QSimKit;
 
-class Stack : public QDockWidget, public Ui::Stack, public RegisterWatcher
+class Stack : public DockWidget, public Ui::Stack, public RegisterWatcher
 {
 	Q_OBJECT
 
