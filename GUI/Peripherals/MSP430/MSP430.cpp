@@ -29,6 +29,7 @@
 #include "CPU/Pins/PinManager.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/Clocks/DCO.h"
+#include "CPU/Clocks/MCLK.h"
 #include "Package.h"
 
 #include <QWidget>
@@ -58,7 +59,7 @@ m_ignoreNextStep(false) {
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 
 	m_dco = new DCO(m_mem, m_variant);
-	m_mclk = m_dco;
+	m_mclk = new MCLK(m_mem, m_variant, m_dco);
 	reset();
 }
 
@@ -73,6 +74,7 @@ void MSP430::reset() {
 	// TODO; m_mem->reset(); m_reg->reset();
 
 	m_dco->reset();
+	m_mclk->reset();
 
 	m_decoder = new InstructionDecoder(m_reg, m_mem);
 	m_intManager = new InterruptManager(m_reg, m_mem);

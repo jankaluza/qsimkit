@@ -34,7 +34,7 @@ class Instruction;
 class Variant;
 class InterruptManager;
 class DCO;
-class Clock;
+class MCLK;
 
 class PinAddr {
 	public:
@@ -126,7 +126,7 @@ class MSP430 : public Peripheral, public PinWatcher
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
 		DCO *m_dco;
-		Clock *m_mclk;
+		MCLK *m_mclk;
 		std::string m_code;
 		SimulationEventList m_output;
 		QStringList m_options;
