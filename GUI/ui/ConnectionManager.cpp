@@ -542,6 +542,10 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 		int point;
 		Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
 		if (point != -1) {
+			// User can't remove first or last point like that
+			if (point == 0 || point == c->points.size() - 1) {
+				return false;
+			}
 			QList<QAction *> actions;
 			actions.append(new QAction("Remove point", 0));
 			QAction *action = QMenu::exec(actions, event->globalPos(), 0, 0);

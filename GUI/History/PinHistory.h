@@ -35,6 +35,10 @@ class PinHistory {
 
 		void addEvent(double t, double value);
 
+		QLinkedList<PinEvent> &getEvents() {
+			return m_events;
+		}
+
 	private:
 		QLinkedList<PinEvent> m_events;
 

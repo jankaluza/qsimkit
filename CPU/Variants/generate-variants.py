@@ -15,6 +15,9 @@ defines += ["P10DIR_", "P10IN_","P10OUT_","P10REN_","P10SEL_"]
 
 defines += ["PORT1_VECTOR", "PORT2_VECTOR"]
 
+# Clock
+defines += ["DCOCTL_", "BCSCTL1_", "BCSCTL2_", "BCSCTL3_"]
+
 def pdef(define):
 	if (define[-1] == "_"):
 		return define[:-1]

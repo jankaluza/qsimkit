@@ -2728,6 +2728,42 @@ class Variant_msp430xG43x : public Variant {
 		}
 
 
+		unsigned int getDCOCTL() {
+#ifdef DCOCTL_
+			return DCOCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getBCSCTL1() {
+#ifdef BCSCTL1_
+			return BCSCTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getBCSCTL2() {
+#ifdef BCSCTL2_
+			return BCSCTL2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getBCSCTL3() {
+#ifdef BCSCTL3_
+			return BCSCTL3_;
+#else
+			return 0;
+#endif
+		}
+
+
 };
 
 MSP430_VARIANT("msp430xG43x", msp430xG43x);

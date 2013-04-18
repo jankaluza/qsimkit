@@ -305,6 +305,6 @@ void QSimKit::loadELF() {
 void QSimKit::projectOptions() {
 	ProjectConfiguration dialog(this, screen->getCPU());
 	if (dialog.exec() == QDialog::Accepted) {
-		screen->getCPU()->setFrequency(dialog.getFrequency());
+
 	}
 }

@@ -33,6 +33,8 @@ class InstructionDecoder;
 class Instruction;
 class Variant;
 class InterruptManager;
+class DCO;
+class Clock;
 
 class PinAddr {
 	public:
@@ -46,7 +48,7 @@ class PinAddr {
 class MSP430 : public Peripheral, public PinWatcher
 {
 	public:
-		MSP430(Variant *variant, unsigned long freq = 1000000);
+		MSP430(Variant *variant);
 
 		Variant *getVariant() { return m_variant; }
 
@@ -59,9 +61,6 @@ class MSP430 : public Peripheral, public PinWatcher
 		void output(SimulationEventList &output);
 
 		double timeAdvance();
-
-		void setFrequency(unsigned long freq);
-		unsigned long getFrequency() { return m_freq; }
 
 		void reset();
 
@@ -126,11 +125,11 @@ class MSP430 : public Peripheral, public PinWatcher
 		Variant *m_variant;
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
-		double m_step;
+		DCO *m_dco;
+		Clock *m_mclk;
 		std::string m_code;
 		SimulationEventList m_output;
 		QStringList m_options;
-		unsigned long m_freq;
 		bool m_ignoreNextStep;
 		QByteArray m_elf;
 		

@@ -28,6 +28,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Pins/PinManager.h"
 #include "CPU/Interrupts/InterruptManager.h"
+#include "CPU/Clocks/DCO.h"
 #include "Package.h"
 
 #include <QWidget>
@@ -39,13 +40,13 @@
 #include <QDebug>
 #include <QDomDocument>
 
-MSP430::MSP430(Variant *variant, unsigned long frequency) :
+MSP430::MSP430(Variant *variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
+m_dco(0), m_mclk(0),
 m_instruction(new Instruction), m_variant(variant),
 m_ignoreNextStep(false) {
 
-	setFrequency(frequency);
 	m_type = "MSP430";
 
 	m_mem = new Memory(512000);
@@ -55,6 +56,9 @@ m_ignoreNextStep(false) {
 	m_pinManager = new PinManager(0, m_variant);
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
+
+	m_dco = new DCO(m_mem, m_variant);
+	m_mclk = m_dco;
 	reset();
 }
 
@@ -62,17 +66,13 @@ void MSP430::loadPackage(const QString &file) {
 	Package::loadPackage(this, m_pinManager, file, m_pins, m_sides);
 }
 
-void MSP430::setFrequency(unsigned long freq) {
-	qDebug() << "setting frequency" << freq;
-	m_freq = freq;
-	m_step = 1.0 / m_freq;
-}
-
 void MSP430::reset() {
 	delete m_decoder;
 	delete m_intManager;
 
 	// TODO; m_mem->reset(); m_reg->reset();
+
+	m_dco->reset();
 
 	m_decoder = new InstructionDecoder(m_reg, m_mem);
 	m_intManager = new InterruptManager(m_reg, m_mem);
@@ -132,7 +132,8 @@ void MSP430::internalTransition() {
 			m_intManager->handleInstruction(m_instruction);
 			m_instructionCycles += cycles;
 		}
-		m_instructionCycles *= m_step;
+
+		m_instructionCycles *= m_mclk->getStep();
 	}
 	else {
 		m_ignoreNextStep = false;
@@ -161,9 +162,6 @@ void MSP430::save(QTextStream &stream) {
 	stream << "<variant>";
 	stream << QString(m_variant->getName());
 	stream << "</variant>\n";
-	stream << "<frequency>";
-	stream << m_freq;
-	stream << "</frequency>\n";
 	stream << "<elf>";
 	stream << m_elf.toBase64();
 	stream << "</elf>";
@@ -171,7 +169,6 @@ void MSP430::save(QTextStream &stream) {
 
 void MSP430::load(QDomElement &object) {
 	loadA43(object.firstChildElement("code").text().toStdString());
-	setFrequency(object.firstChildElement("frequency").text().toULong());
 	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 

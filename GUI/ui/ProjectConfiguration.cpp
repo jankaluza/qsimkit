@@ -53,19 +53,14 @@ QDialog(parent) {
 	if (cpu) {
 		MSP430Variants->setEnabled(false);
 		handleCurrentItemChanged(0, 0);
-		frequency->setValue(cpu->getFrequency() / 1000);
 	}
 }
 
 MSP430 *ProjectConfiguration::getMSP430() {
 	Variant *v = getVariant(MSP430Variants->currentItem()->text().toStdString().c_str());
-	MSP430 *cpu = new MSP430(v, getFrequency());
+	MSP430 *cpu = new MSP430(v);
 	cpu->loadPackage("Packages/msp430x241x.xml");
 	return cpu;
-}
-
-unsigned long ProjectConfiguration::getFrequency() {
-	return frequency->value() * 1000;
 }
 
 

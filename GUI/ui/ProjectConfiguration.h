@@ -36,8 +36,6 @@ class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
 
 		MSP430 *getMSP430();
 
-		unsigned long getFrequency();
-
 
 	private slots:
 		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);

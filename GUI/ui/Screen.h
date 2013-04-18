@@ -83,6 +83,7 @@ class Screen : public QWidget
 	private:
 		void resizeAccordingToObjects();
 		void showObjectMenu(ScreenObject *object, const QPoint &pos);
+		void showPinMenu(ScreenObject *object, int pin, const QPoint &pos);
 		void showScreenMenu(const QPoint &pos);
 
 	private:
@@ -93,5 +94,6 @@ class Screen : public QWidget
 		ConnectionManager *m_conns;
 		PeripheralManager *m_peripherals;
 		std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
+		std::map<ScreenObject *, QList<int> > m_trackedPins;
 };
 

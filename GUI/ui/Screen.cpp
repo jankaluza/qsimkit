@@ -61,7 +61,7 @@ void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
 		if (p) {
 			p->reset();
-			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p);
+			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p, m_trackedPins[m_objects[i]]);
 			dig->add(wrapper);
 
 			wrappers[m_objects[i]] = wrapper;
@@ -275,6 +275,28 @@ void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {
 	}
 }
 
+void Screen::showPinMenu(ScreenObject *object, int pin, const QPoint &pos) {
+	QList<QAction *> actions;
+
+	QAction *action = new QAction("Track pin", 0);
+	action->setCheckable(true);
+	if (m_trackedPins[object].contains(pin)) {
+		action->setChecked(true);
+	}
+	actions.append(action);
+
+	action = QMenu::exec(actions, pos, 0, 0);
+	if (action) {
+		if (action->isChecked()) {
+			m_trackedPins[object].append(pin);
+		}
+		else {
+			m_trackedPins[object].removeAll(pin);
+		}
+	}
+
+}
+
 void Screen::addObject(ScreenObject *obj) {
 	m_objects.append(obj);
 }
@@ -310,7 +332,14 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		ScreenObject *object = getObject(event->x(), event->y());
 		if (object) {
-			showObjectMenu(object, event->globalPos());
+			int pin = getPin(object, event->x(), event->y());
+			if (pin == -1) {
+				showObjectMenu(object, event->globalPos());
+			}
+			else {
+				showPinMenu(object, pin, event->globalPos());
+			}
+			
 		}
 		else {
 			showScreenMenu(event->globalPos());

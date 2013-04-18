@@ -91,6 +91,9 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 		}
 
 	private:
+		void addChangeToHistory(int pin, double value);
+
+	private:
 		adevs::Simulator<SimulationEvent> *m_sim;
 		SimulationObject *m_obj;
 		QList<int> m_monitoredPins;

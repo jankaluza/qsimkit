@@ -48,21 +48,25 @@ void SimulationObjectWrapper::delta_int() {
 	m_obj->internalTransition();
 }
 
+void SimulationObjectWrapper::addChangeToHistory(int pin, double value) {
+	if (pin >= m_history.size()) {
+		return;
+	}
+
+	PinHistory *h = m_history[pin];
+	if (!h) {
+		return;
+	}
+
+	h->addEvent(m_sim->nextEventTime(), value);
+}
+
 void SimulationObjectWrapper::delta_ext(double e, const SimulationEventList& xb) {
 	m_obj->externalEvent(e, xb);
 
 	if (!m_monitoredPins.empty()) {
 		for (SimulationEventList::const_iterator it = xb.begin(); it != xb.end(); ++it) {
-			if ((*it).port >= m_history.size()) {
-				continue;
-			}
-
-			PinHistory *h = m_history[(*it).port];
-			if (!h) {
-				continue;
-			}
-
-			h->addEvent(e, (*it).value);
+			addChangeToHistory((*it).port, (*it).value);
 		}
 	}
 }
@@ -74,6 +78,12 @@ void SimulationObjectWrapper::delta_conf(const SimulationEventList& xb) {
 
 void SimulationObjectWrapper::output_func(SimulationEventList& yb) {
 	m_obj->output(yb);
+
+	if (!m_monitoredPins.empty()) {
+		for (SimulationEventList::const_iterator it = yb.begin(); it != yb.end(); ++it) {
+			addChangeToHistory((*it).port, (*it).value);
+		}
+	}
 }
 
 double SimulationObjectWrapper::ta() {

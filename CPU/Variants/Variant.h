@@ -61,5 +61,9 @@ class Variant {
 		virtual unsigned int getP10SEL() = 0;
 		virtual unsigned int getPORT1_VECTOR() = 0;
 		virtual unsigned int getPORT2_VECTOR() = 0;
+		virtual unsigned int getDCOCTL() = 0;
+		virtual unsigned int getBCSCTL1() = 0;
+		virtual unsigned int getBCSCTL2() = 0;
+		virtual unsigned int getBCSCTL3() = 0;
 
 };
