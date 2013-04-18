@@ -28,14 +28,19 @@
 
 class Variant;
 class ACLK;
+class SMCLK;
 class Clock;
+class InterruptManager;
 
 class Timer : public Clock, public MemoryWatcher {
 	public:
-		Timer(Memory *mem, Variant *variant, ACLK *aclk);
+		Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
+			  ACLK *aclk, SMCLK *smclk);
 		virtual ~Timer();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+
+		void tick();
 
 		void reset();
 
@@ -44,8 +49,10 @@ class Timer : public Clock, public MemoryWatcher {
 		double getStep();
 
 	private:
+		InterruptManager *m_intManager;
 		Memory *m_mem;
 		Variant *m_variant;
 		Clock *m_source;
 		ACLK *m_aclk;
+		SMCLK *m_smclk;
 };

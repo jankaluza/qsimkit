@@ -25,8 +25,10 @@
 
 #include "ACLK.h"
 
-Timer::Timer(Memory *mem, Variant *variant, ACLK *aclk) :
-m_mem(mem), m_variant(variant), m_source(0), m_aclk(aclk) {
+Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
+			 ACLK *aclk, SMCLK *smclk) :
+m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
+m_aclk(aclk), m_smclk(smclk) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -36,6 +38,11 @@ m_mem(mem), m_variant(variant), m_source(0), m_aclk(aclk) {
 
 Timer::~Timer() {
 
+}
+
+void Timer::tick() {
+	// do what timer does...
+	std::cout << "tick()\n";
 }
 
 unsigned long Timer::getFrequency() {
