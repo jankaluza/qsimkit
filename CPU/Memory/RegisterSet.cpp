@@ -20,6 +20,8 @@
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
 
+namespace MCU {
+
 RegisterSet::RegisterSet() {
 
 }
@@ -60,4 +62,6 @@ Register *RegisterSet::operator[](unsigned int reg) {
 
 Register *RegisterSet::get(unsigned int reg) {
 	return m_registers[reg];
+}
+
 }

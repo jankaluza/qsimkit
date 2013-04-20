@@ -24,6 +24,7 @@
 #include <sstream>
 #include <map>
 
+
 static std::map<std::string, _msp430_variant *> *variants;
 
 std::vector<_msp430_variant*> getVariants() {

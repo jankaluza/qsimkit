@@ -24,6 +24,8 @@
 #include <vector>
 #include <map>
 
+namespace MCU {
+
 class RegisterSet;
 class Memory;
 
@@ -57,3 +59,5 @@ class Memory {
 		std::vector<uint8_t> m_memory;
 		std::vector<std::vector<MemoryWatcher *> > m_watchers;
 };
+
+}

@@ -10,6 +10,8 @@
 
 #include <algorithm>
 
+using namespace MCU;
+
 #if 0
 
 leds.elf:     file format elf32-msp430

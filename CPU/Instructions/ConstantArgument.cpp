@@ -19,6 +19,8 @@
 
 #include "CPU/Instructions/ConstantArgument.h"
 
+namespace MCU {
+
 ConstantArgument::ConstantArgument(uint16_t value) :
 	m_value(value) { }
 
@@ -59,3 +61,4 @@ void ConstantArgument::setByte(uint8_t value) {
 	*ptr = value;
 }
 
+}

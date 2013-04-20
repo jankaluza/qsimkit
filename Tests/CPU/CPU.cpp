@@ -8,6 +8,8 @@
 
 #include "adevs.h"
 
+using namespace MCU;
+
 class CPUTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(CPUTest);
 	CPPUNIT_TEST(simulation);

@@ -24,6 +24,8 @@
 #include <vector>
 #include "CPU/Memory/Memory.h"
 
+namespace MCU {
+
 class Memory;
 class RegisterSet;
 class Instruction;
@@ -47,3 +49,5 @@ class InterruptManager {
 		std::vector<int> m_interrupts;
 		std::vector<int> m_runningInterrupts;
 };
+
+}

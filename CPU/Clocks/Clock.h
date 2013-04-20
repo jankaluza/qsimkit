@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+namespace MCU {
+
 class Clock {
 	public:
 
@@ -32,3 +34,5 @@ class Clock {
 
 		virtual double getStep() = 0;
 };
+
+}

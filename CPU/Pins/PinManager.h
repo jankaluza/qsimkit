@@ -25,6 +25,9 @@
 #include "CPU/Memory/Memory.h"
 
 class Variant;
+
+namespace MCU {
+
 class Memory;
 class InterruptManager;
 
@@ -85,3 +88,5 @@ class PinManager : public MemoryWatcher {
 		PinWatcher *m_watcher;
 		InterruptManager *m_intManager;
 };
+
+}

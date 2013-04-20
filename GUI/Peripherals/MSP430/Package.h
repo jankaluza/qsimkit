@@ -31,9 +31,9 @@ class MSP430;
 
 namespace Package {
 
-	bool loadPackage(MSP430 *cpu, PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides);
+	bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides);
 
-	void setPinType(const QString &name, PinType &type, int &subtype);
+	void setPinType(const QString &name, MCU::PinType &type, int &subtype);
 
 }
 

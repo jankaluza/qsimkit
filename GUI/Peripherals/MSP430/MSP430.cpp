@@ -45,21 +45,21 @@ MSP430::MSP430(Variant *variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
 m_dco(0), m_mclk(0),
-m_instruction(new Instruction), m_variant(variant),
+m_instruction(new MCU::Instruction), m_variant(variant),
 m_ignoreNextStep(false) {
 
 	m_type = "MSP430";
 
-	m_mem = new Memory(512000);
-	m_reg = new RegisterSet();
+	m_mem = new MCU::Memory(512000);
+	m_reg = new MCU::RegisterSet();
 	m_reg->addDefaultRegisters();
 
-	m_pinManager = new PinManager(0, m_variant);
+	m_pinManager = new MCU::PinManager(0, m_variant);
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 
-	m_dco = new DCO(m_mem, m_variant);
-	m_mclk = new MCLK(m_mem, m_variant, m_dco);
+	m_dco = new MCU::DCO(m_mem, m_variant);
+	m_mclk = new MCU::MCLK(m_mem, m_variant, m_dco);
 	reset();
 }
 
@@ -76,8 +76,8 @@ void MSP430::reset() {
 	m_dco->reset();
 	m_mclk->reset();
 
-	m_decoder = new InstructionDecoder(m_reg, m_mem);
-	m_intManager = new InterruptManager(m_reg, m_mem);
+	m_decoder = new MCU::InstructionDecoder(m_reg, m_mem);
+	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
 
 	m_pinManager->setMemory(m_mem);
 	m_pinManager->setInterruptManager(m_intManager);
@@ -174,7 +174,7 @@ void MSP430::load(QDomElement &object) {
 	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 
-void MSP430::setPinType(const QString &n, PinType &type, int &subtype) {
+void MSP430::setPinType(const QString &n, MCU::PinType &type, int &subtype) {
 #define SET_GP_PIN(PREFIX, T) { \
 		if (n.startsWith(PREFIX)) { \
 			type = T;\
@@ -182,14 +182,14 @@ void MSP430::setPinType(const QString &n, PinType &type, int &subtype) {
 		} \
 	}
 
-	SET_GP_PIN("P1.", P1)
-	SET_GP_PIN("P2.", P2)
-	SET_GP_PIN("P3.", P3)
-	SET_GP_PIN("P4.", P4)
-	SET_GP_PIN("P5.", P5)
-	SET_GP_PIN("P6.", P6)
-	SET_GP_PIN("P7.", P7)
-	SET_GP_PIN("P8.", P8)
+	SET_GP_PIN("P1.", MCU::P1)
+	SET_GP_PIN("P2.", MCU::P2)
+	SET_GP_PIN("P3.", MCU::P3)
+	SET_GP_PIN("P4.", MCU::P4)
+	SET_GP_PIN("P5.", MCU::P5)
+	SET_GP_PIN("P6.", MCU::P6)
+	SET_GP_PIN("P7.", MCU::P7)
+	SET_GP_PIN("P8.", MCU::P8)
 }
 
 

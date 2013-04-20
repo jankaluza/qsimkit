@@ -31,7 +31,7 @@
 class MSP430;
 class QSimKit;
 
-class Stack : public DockWidget, public Ui::Stack, public RegisterWatcher
+class Stack : public DockWidget, public Ui::Stack, public MCU::RegisterWatcher
 {
 	Q_OBJECT
 
@@ -42,7 +42,7 @@ class Stack : public DockWidget, public Ui::Stack, public RegisterWatcher
 
 		void refresh();
 
-		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
+		bool handleRegisterChanged(MCU::Register *reg, int id, uint16_t value);
 
 	private:
 		MSP430 *m_cpu;

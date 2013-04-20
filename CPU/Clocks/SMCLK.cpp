@@ -25,6 +25,8 @@
 
 #include "DCO.h"
 
+namespace MCU {
+
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco) :
 m_mem(mem), m_variant(variant), m_source(0), m_dco(dco) {
 #define ADD_WATCHER(METHOD) \
@@ -55,3 +57,4 @@ void SMCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 	// Set divider and source
 }
 
+}

@@ -25,6 +25,8 @@
 
 #include "CPU/Instructions/InstructionDecoder.h"
 
+namespace MCU {
+
 class InstructionArgument;
 
 class Instruction {
@@ -50,3 +52,5 @@ class Instruction {
 		InstructionArgument *m_src;
 		InstructionArgument *m_dst;
 };
+
+}

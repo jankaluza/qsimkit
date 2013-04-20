@@ -28,6 +28,8 @@
 
 class Variant;
 
+namespace MCU {
+
 class DCO : public Clock, public MemoryWatcher {
 	public:
 		DCO(Memory *mem, Variant *variant);
@@ -49,3 +51,5 @@ class DCO : public Clock, public MemoryWatcher {
 		unsigned long m_freq;
 		double m_step;
 };
+
+}

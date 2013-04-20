@@ -3,6 +3,8 @@
 
 #include "CPU/Memory/Register.h"
 
+using namespace MCU;
+
 class RegisterTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(RegisterTest);
 	CPPUNIT_TEST(setget);

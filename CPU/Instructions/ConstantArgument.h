@@ -24,6 +24,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+namespace MCU {
+
 class ConstantArgument : public InstructionArgument {
 	public:
 		ConstantArgument(uint16_t value);
@@ -42,3 +44,5 @@ class ConstantArgument : public InstructionArgument {
 	private:
 		uint16_t m_value;
 };
+
+}

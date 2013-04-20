@@ -24,6 +24,7 @@
 // #include <map>
 #include <vector>
 
+
 class Variant;
 class _msp430_variant;
 
@@ -44,3 +45,4 @@ class _msp430_variant {
 	} \
 	static const char *variant_name_##CLASS = NAME;\
 	_msp430_variant _msp430_variant_##CLASS(variant_name_##CLASS, &create_##CLASS);
+

@@ -25,7 +25,7 @@
 
 class MSP430;
 
-class BreakpointManager : public RegisterWatcher {
+class BreakpointManager : public MCU::RegisterWatcher {
 	public:
 		BreakpointManager();
 		~BreakpointManager();
@@ -41,7 +41,7 @@ class BreakpointManager : public RegisterWatcher {
 			m_break = true;
 		}
 
-		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
+		bool handleRegisterChanged(MCU::Register *reg, int id, uint16_t value);
 
 	private:
 		MSP430 *m_cpu;

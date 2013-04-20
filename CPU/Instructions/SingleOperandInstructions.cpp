@@ -28,6 +28,8 @@
 #include <sstream>
 #include <map>
 
+namespace MCU {
+
 static int execPUSH(RegisterSet *reg, Memory *mem, Instruction *i) {
 	// Decrease SP, Store current PC, change PC
 	uint16_t sp = reg->get(1)->getBigEndian() - 2;
@@ -75,3 +77,5 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 MSP430_INSTRUCTION("push", Instruction1, 4, &execPUSH);
 MSP430_INSTRUCTION("call", Instruction1, 5, &execCALL);
 MSP430_INSTRUCTION("reti", Instruction1, 6, &execRETI);
+
+}

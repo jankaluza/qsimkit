@@ -23,6 +23,8 @@
 #include <string>
 #include <vector>
 
+namespace MCU {
+
 class Register;
 
 class RegisterSet {
@@ -43,3 +45,5 @@ class RegisterSet {
 	private:
 		std::vector<Register *> m_registers;
 };
+
+}

@@ -25,6 +25,8 @@
 
 #include "adevs.h"
 
+namespace MCU {
+
 class Event {
 	public:
 		Event() {}
@@ -70,3 +72,5 @@ class CPU : public adevs::Atomic<Event *> {
 		InstructionDecoder *m_decoder;
 		Instruction *m_instruction;
 };
+
+}

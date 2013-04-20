@@ -24,6 +24,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+namespace MCU {
+
 class Register;
 class Memory;
 
@@ -50,3 +52,5 @@ class IndirectAutoincrementArgument : public InstructionArgument {
 		bool m_bw;
 		Memory *m_mem;
 };
+
+}

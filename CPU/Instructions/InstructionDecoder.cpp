@@ -31,6 +31,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace MCU {
+
 // [1111110000000000]2
 #define INSTRUCTION1_MASK 64512
 #define INSTRUCTION1_MAGIC 4096
@@ -245,4 +247,6 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 	pc_reg->setBigEndian(pc);
 
 	return cycles;
+}
+
 }

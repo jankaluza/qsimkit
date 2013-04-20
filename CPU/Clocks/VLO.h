@@ -27,6 +27,8 @@
 
 class Variant;
 
+namespace MCU {
+
 class VLO : public Clock {
 	public:
 		VLO();
@@ -45,3 +47,5 @@ class VLO : public Clock {
 		unsigned long m_freq;
 		double m_step;
 };
+
+}

@@ -25,6 +25,8 @@
 
 #include "CPU/Instructions/InstructionManager.h"
 
+namespace MCU {
+
 class RegisterSet;
 class Memory;
 class InstructionArgument;
@@ -55,3 +57,5 @@ class InstructionDecoder {
 		MemoryArgument *m_dstMemArg;
 		IndexedArgument *m_dstIndexedArg;
 };
+
+}

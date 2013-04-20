@@ -27,6 +27,9 @@
 #include "CPU/Memory/Memory.h"
 
 class Variant;
+
+namespace MCU {
+
 class VLO;
 class Clock;
 
@@ -49,3 +52,5 @@ class ACLK : public Clock, public MemoryWatcher {
 		Clock *m_source;
 		VLO *m_vlo;
 };
+
+}

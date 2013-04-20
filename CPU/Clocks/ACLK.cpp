@@ -25,6 +25,8 @@
 
 #include "VLO.h"
 
+namespace MCU {
+
 ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo) :
 m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo) {
 #define ADD_WATCHER(METHOD) \
@@ -55,3 +57,4 @@ void ACLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 	// Set divider and source
 }
 
+}

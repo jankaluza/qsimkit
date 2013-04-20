@@ -24,6 +24,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+namespace MCU {
+
 class Memory;
 
 class MemoryArgument : public InstructionArgument {
@@ -45,3 +47,5 @@ class MemoryArgument : public InstructionArgument {
 		Memory *m_mem;
 		uint16_t m_address;
 };
+
+}

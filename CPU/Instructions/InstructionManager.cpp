@@ -28,6 +28,8 @@
 
 #define TYPE_OFFSET 20
 
+namespace MCU {
+
 static std::vector<_msp430_instruction *> *instructions;
 
 void addInstruction(InstructionType type, unsigned int opcode, _msp430_instruction *instruction) {
@@ -58,4 +60,6 @@ _msp430_instruction::_msp430_instruction(const char *name, InstructionType type,
 	this->name = name;
 	this->callback = callback;
 	addInstruction(type, opcode, this);
+}
+
 }

@@ -27,14 +27,19 @@
 #include "Peripherals/Peripheral.h"
 #include "CPU/Pins/PinManager.h"
 
+namespace MCU {
+
 class Memory;
 class RegisterSet;
 class InstructionDecoder;
 class Instruction;
-class Variant;
 class InterruptManager;
 class DCO;
 class MCLK;
+
+}
+
+class Variant;
 
 class PinAddr {
 	public:
@@ -45,7 +50,7 @@ class PinAddr {
 		uint8_t bit;
 };
 
-class MSP430 : public Peripheral, public PinWatcher
+class MSP430 : public Peripheral, public MCU::PinWatcher
 {
 	public:
 		MSP430(Variant *variant);
@@ -85,11 +90,11 @@ class MSP430 : public Peripheral, public PinWatcher
 		virtual void save(QTextStream &stream);
 		virtual void load(QDomElement &object);
 
-		RegisterSet *getRegisterSet() {
+		MCU::RegisterSet *getRegisterSet() {
 			return m_reg;
 		}
 
-		Memory *getMemory() {
+		MCU::Memory *getMemory() {
 			return m_mem;
 		}
 
@@ -108,7 +113,7 @@ class MSP430 : public Peripheral, public PinWatcher
 		void loadPackage(const QString &file);
 
 	private:
-		void setPinType(const QString &name, PinType &type, int &subtype);
+		void setPinType(const QString &name, MCU::PinType &type, int &subtype);
 
 	private:
 		std::map<int, QChar> m_sides;
@@ -118,15 +123,15 @@ class MSP430 : public Peripheral, public PinWatcher
 		double m_time;
 		double m_instructionCycles;
 
-		Memory *m_mem;
-		RegisterSet *m_reg;
-		InstructionDecoder *m_decoder;
-		Instruction *m_instruction;
+		MCU::Memory *m_mem;
+		MCU::RegisterSet *m_reg;
+		MCU::InstructionDecoder *m_decoder;
+		MCU::Instruction *m_instruction;
 		Variant *m_variant;
-		PinManager *m_pinManager;
-		InterruptManager *m_intManager;
-		DCO *m_dco;
-		MCLK *m_mclk;
+		MCU::PinManager *m_pinManager;
+		MCU::InterruptManager *m_intManager;
+		MCU::DCO *m_dco;
+		MCU::MCLK *m_mclk;
 		std::string m_code;
 		SimulationEventList m_output;
 		QStringList m_options;

@@ -27,6 +27,9 @@
 #include "CPU/Memory/Memory.h"
 
 class Variant;
+
+namespace MCU {
+
 class DCO;
 class Clock;
 
@@ -49,3 +52,5 @@ class SMCLK : public Clock, public MemoryWatcher {
 		Clock *m_source;
 		DCO *m_dco;
 };
+
+}

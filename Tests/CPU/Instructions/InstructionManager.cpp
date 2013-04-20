@@ -8,6 +8,8 @@
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Instructions/Instruction.h"
 
+using namespace MCU;
+
 class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 	CPPUNIT_TEST_SUITE(InstructionManagerTest);
 	CPPUNIT_TEST(executeADD1ToRegister);

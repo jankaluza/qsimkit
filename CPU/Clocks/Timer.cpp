@@ -25,6 +25,8 @@
 
 #include "ACLK.h"
 
+namespace MCU {
+
 Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk) :
 m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
@@ -62,3 +64,4 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 	// Set divider and source
 }
 
+}

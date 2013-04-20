@@ -26,6 +26,8 @@
 #include <iostream>
 #include <algorithm>
 
+namespace MCU {
+
 InterruptManager::InterruptManager(RegisterSet *reg, Memory *mem) : m_reg(reg), m_mem(mem) {
 
 }
@@ -85,4 +87,6 @@ bool InterruptManager::runQueuedInterrupts() {
 	runInterrupt(vector);
 
 	return true;
+}
+
 }

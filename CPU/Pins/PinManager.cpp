@@ -23,6 +23,8 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
+namespace MCU {
+
 PinManager::PinManager(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant) {
 	setMemory(mem);
 }
@@ -184,4 +186,6 @@ bool PinManager::handlePinInput(int id, double value) {
 
 	m_pins[id].value = value;
 	return handled;
+}
+
 }

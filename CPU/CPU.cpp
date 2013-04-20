@@ -28,6 +28,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace MCU {
+
 CPU::CPU() : m_cycles(0), m_instructionCycles(0),
 	m_mem(new Memory(512000)), m_reg(new RegisterSet()),
 	m_decoder(new InstructionDecoder(m_reg, m_mem)),
@@ -68,5 +70,7 @@ double CPU::ta() {
 }
 
 void CPU::gc_output(adevs::Bag<Event *>& g) {
+
+}
 
 }

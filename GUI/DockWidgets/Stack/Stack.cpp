@@ -80,7 +80,7 @@ void Stack::refresh() {
 	view->resizeColumnToContents(3);
 }
 
-bool Stack::handleRegisterChanged(Register *reg, int id, uint16_t value) {
+bool Stack::handleRegisterChanged(MCU::Register *reg, int id, uint16_t value) {
 	m_defaultSP = reg->getBigEndian();
 	return false;
 }

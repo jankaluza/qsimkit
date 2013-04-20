@@ -23,6 +23,8 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
+namespace MCU {
+
 VLO::VLO() : m_freq(12000), m_step(1.0/12000) {
 }
 
@@ -33,3 +35,4 @@ VLO::~VLO() {
 void VLO::reset() {
 }
 
+}

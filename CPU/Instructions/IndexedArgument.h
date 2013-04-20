@@ -24,6 +24,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+namespace MCU {
+
 class Register;
 class Memory;
 
@@ -50,3 +52,5 @@ class IndexedArgument : public InstructionArgument {
 		uint16_t m_offset;
 		Memory *m_mem;
 };
+
+}

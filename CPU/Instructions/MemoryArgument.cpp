@@ -23,6 +23,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace MCU {
+
 MemoryArgument::MemoryArgument(Memory *mem, uint16_t address) :
 	m_mem(mem), m_address(address) { }
 
@@ -54,3 +56,4 @@ void MemoryArgument::setByte(uint8_t value) {
 	m_mem->setByte(m_address, value);
 }
 
+}

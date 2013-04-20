@@ -27,6 +27,8 @@
 #include <sstream>
 #include <map>
 
+namespace MCU {
+
 static int execJNZ(RegisterSet *reg, Memory *mem, Instruction *i) {
 	if (!reg->get(2)->isBitSet(SR_Z)) {
 		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
@@ -89,3 +91,5 @@ MSP430_INSTRUCTION("jn", InstructionCond, 4, &execJN);
 MSP430_INSTRUCTION("jge", InstructionCond, 5, &execJGE);
 MSP430_INSTRUCTION("jl", InstructionCond, 6, &execJL);
 MSP430_INSTRUCTION("jmp", InstructionCond, 7, &execJMP);
+
+}

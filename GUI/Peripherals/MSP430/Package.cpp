@@ -33,7 +33,7 @@
 
 namespace Package {
 
-void setPinType(const QString &n, PinType &type, int &subtype) {
+void setPinType(const QString &n, MCU::PinType &type, int &subtype) {
 #define SET_GP_PIN(PREFIX, T) { \
 		if (n.startsWith(PREFIX)) { \
 			type = T;\
@@ -41,17 +41,17 @@ void setPinType(const QString &n, PinType &type, int &subtype) {
 		} \
 	}
 
-	SET_GP_PIN("P1.", P1)
-	SET_GP_PIN("P2.", P2)
-	SET_GP_PIN("P3.", P3)
-	SET_GP_PIN("P4.", P4)
-	SET_GP_PIN("P5.", P5)
-	SET_GP_PIN("P6.", P6)
-	SET_GP_PIN("P7.", P7)
-	SET_GP_PIN("P8.", P8)
+	SET_GP_PIN("P1.", MCU::P1)
+	SET_GP_PIN("P2.", MCU::P2)
+	SET_GP_PIN("P3.", MCU::P3)
+	SET_GP_PIN("P4.", MCU::P4)
+	SET_GP_PIN("P5.", MCU::P5)
+	SET_GP_PIN("P6.", MCU::P6)
+	SET_GP_PIN("P7.", MCU::P7)
+	SET_GP_PIN("P8.", MCU::P8)
 }
 
-bool loadPackage(MSP430 *cpu, PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides) {
+bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides) {
 	pins.clear();
 	int pin_size = 10;
 	int width = 48;
@@ -119,7 +119,7 @@ bool loadPackage(MSP430 *cpu, PinManager *pinManager, const QString &file, PinLi
 			int id = pin.toElement().attribute("id").toInt() - 1;
 			sides[id] = side;
 			QString n;
-			PinType type = UNKNOWN;
+			MCU::PinType type = MCU::UNKNOWN;
 			int subtype = -1;
 			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
 				QString n_ = name.toElement().text();

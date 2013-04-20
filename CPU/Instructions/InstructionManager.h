@@ -19,6 +19,8 @@
 
 #pragma once
 
+namespace MCU {
+
 class _msp430_instruction;
 class RegisterSet;
 class Memory;
@@ -46,3 +48,5 @@ class _msp430_instruction {
 #define MSP430_INSTRUCTION(NAME, TYPE, OPCODE, CALLBACK) \
 	static const char *instruction_name_##OPCODE = NAME;\
 	_msp430_instruction _msp430_instruction##TYPE##_##OPCODE(instruction_name_##OPCODE, TYPE, OPCODE, CALLBACK);
+
+}

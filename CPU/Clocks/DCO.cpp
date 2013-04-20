@@ -23,6 +23,8 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
+namespace MCU {
+
 DCO::DCO(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant),
 m_freq(1000000), m_step(1.0/1000000) {
 #define ADD_WATCHER(METHOD) \
@@ -56,3 +58,4 @@ void DCO::handleMemoryChanged(Memory *memory, uint16_t address) {
 	
 }
 
+}

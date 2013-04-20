@@ -21,6 +21,7 @@
 #include "CPU/Instructions/InstructionArgument.h"
 #include "CPU/Memory/Register.h"
 
+namespace MCU {
 
 Instruction::Instruction () : m_src(0), m_dst(0) {
 
@@ -46,3 +47,4 @@ InstructionArgument *Instruction::getDst() {
 	return m_dst;
 }
 
+}

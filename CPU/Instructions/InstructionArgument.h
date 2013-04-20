@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string>
 
+namespace MCU {
+
 class InstructionArgument {
 	public:
 		InstructionArgument() : m_deleteLater(false) {}
@@ -41,3 +43,5 @@ class InstructionArgument {
 	private:
 		bool m_deleteLater;
 };
+
+}

@@ -24,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace MCU {
+
 static unsigned int hexToInt(const std::string &str) {
 	unsigned int x;
 	std::stringstream ss;
@@ -180,3 +182,4 @@ bool Memory::setBit(uint16_t address, uint16_t bit, bool value) {
 	}
 }
 
+}

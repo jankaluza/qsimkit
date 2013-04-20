@@ -21,6 +21,8 @@
 #include "CPU/Memory/Register.h"
 #include "CPU/Memory/Memory.h"
 
+namespace MCU {
+
 IndexedArgument::IndexedArgument(Memory *mem, Register *reg, uint16_t offset) :
 	m_reg(reg), m_offset(offset), m_mem(mem) { }
 
@@ -52,3 +54,4 @@ void IndexedArgument::setByte(uint8_t value) {
 	m_mem->setByte(m_reg->getBigEndian() + m_offset, value);
 }
 
+}

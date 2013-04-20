@@ -24,6 +24,8 @@
 #include <iostream>
 #include <sstream>
 
+namespace MCU {
+
 IndirectAutoincrementArgument::IndirectAutoincrementArgument(Memory *mem, Register *reg, bool bw) :
 	m_reg(reg), m_bw(bw), m_mem(mem) { }
 
@@ -61,3 +63,4 @@ void IndirectAutoincrementArgument::setByte(uint8_t value) {
 
 }
 
+}

@@ -30,7 +30,7 @@ BreakpointManager::~BreakpointManager() {
 
 }
 
-bool BreakpointManager::handleRegisterChanged(Register *reg, int id, uint16_t value) {
+bool BreakpointManager::handleRegisterChanged(MCU::Register *reg, int id, uint16_t value) {
 	if (m_break) {
 		return true;
 	}

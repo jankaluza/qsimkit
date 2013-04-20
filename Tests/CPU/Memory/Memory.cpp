@@ -5,6 +5,8 @@
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
 
+using namespace MCU;
+
 class MemoryTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(MemoryTest);
 	CPPUNIT_TEST(loadA43);

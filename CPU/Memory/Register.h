@@ -25,6 +25,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+namespace MCU {
+
 /// Status register bits
 #define SR_V 256
 #define SR_SCG1 128
@@ -70,3 +72,5 @@ class Register : public InstructionArgument {
 		std::string m_desc;
 		std::vector<RegisterWatcher *> m_watchers;
 };
+
+}

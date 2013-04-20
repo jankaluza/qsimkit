@@ -27,6 +27,8 @@
 #include <sstream>
 #include <map>
 
+namespace MCU {
+
 static int execMOV(RegisterSet *reg, Memory *mem, Instruction *i) {
 	if (i->bw) {
 		i->getDst()->setByte(i->getSrc()->getByte());
@@ -290,3 +292,5 @@ MSP430_INSTRUCTION("bic", Instruction2, 12, &execBIC);
 MSP430_INSTRUCTION("bis", Instruction2, 13, &execBIS);
 MSP430_INSTRUCTION("xor", Instruction2, 14, &execXOR);
 MSP430_INSTRUCTION("and", Instruction2, 15, &execAND);
+
+}
