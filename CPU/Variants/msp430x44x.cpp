@@ -2743,9 +2743,207 @@ class Variant_msp430x44x : public Variant {
 		}
 
 
-		unsigned int getTAR() {
-#ifdef TAR_
-			return TAR_;
+		unsigned int getTA0R() {
+#ifdef TA0R_
+			return TA0R_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1R() {
+#ifdef TA1R_
+			return TA1R_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTACCR0() {
+#ifdef TACCR0_
+			return TACCR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CTL() {
+#ifdef TA0CTL_
+			return TA0CTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CTL() {
+#ifdef TA1CTL_
+			return TA1CTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCR1() {
+#ifdef TA0CCR1_
+			return TA0CCR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCR2() {
+#ifdef TA0CCR2_
+			return TA0CCR2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCR3() {
+#ifdef TA0CCR3_
+			return TA0CCR3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCR4() {
+#ifdef TA0CCR4_
+			return TA0CCR4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCR1() {
+#ifdef TA1CCR1_
+			return TA1CCR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCR2() {
+#ifdef TA1CCR2_
+			return TA1CCR2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCR3() {
+#ifdef TA1CCR3_
+			return TA1CCR3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCR4() {
+#ifdef TA1CCR4_
+			return TA1CCR4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCTL0() {
+#ifdef TA0CCTL0_
+			return TA0CCTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCTL1() {
+#ifdef TA0CCTL1_
+			return TA0CCTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCTL2() {
+#ifdef TA0CCTL2_
+			return TA0CCTL2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCTL3() {
+#ifdef TA0CCTL3_
+			return TA0CCTL3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0CCTL4() {
+#ifdef TA0CCTL4_
+			return TA0CCTL4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCTL0() {
+#ifdef TA1CCTL0_
+			return TA1CCTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCTL1() {
+#ifdef TA1CCTL1_
+			return TA1CCTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCTL2() {
+#ifdef TA1CCTL2_
+			return TA1CCTL2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCTL3() {
+#ifdef TA1CCTL3_
+			return TA1CCTL3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCTL4() {
+#ifdef TA1CCTL4_
+			return TA1CCTL4_;
 #else
 			return 0;
 #endif

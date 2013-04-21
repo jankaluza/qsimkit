@@ -18,8 +18,14 @@ defines += ["PORT1_VECTOR", "PORT2_VECTOR"]
 # Clock
 defines += ["DCOCTL_", "BCSCTL1_", "BCSCTL2_", "BCSCTL3_"]
 
-# Timer
-defines += ["TAR_"]
+# Timer A
+defines += ["TA0R_", "TA1R_", "TACCR0_"]
+defines += ["TA0CTL_", "TA1CTL_"]
+defines += ["TA0CCR1_", "TA0CCR2_", "TA0CCR3_", "TA0CCR4_"]
+defines += ["TA1CCR1_", "TA1CCR2_", "TA1CCR3_", "TA1CCR4_"]
+defines += ["TA0CCTL0_", "TA0CCTL1_", "TA0CCTL2_", "TA0CCTL3_", "TA0CCTL4_"]
+defines += ["TA1CCTL0_", "TA1CCTL1_", "TA1CCTL2_", "TA1CCTL3_", "TA1CCTL4_"]
+
 
 def pdef(define):
 	if (define[-1] == "_"):

@@ -30,7 +30,7 @@ namespace MCU {
 Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk) :
 m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_aclk(aclk), m_smclk(smclk) {
+m_aclk(aclk), m_smclk(smclk), m_up1(true), m_up2(true) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -42,9 +42,40 @@ Timer::~Timer() {
 
 }
 
+void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up) {
+	switch (mode) {
+		case 0:
+			break;
+		case 1:
+			m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+			break;
+		case 2:
+			m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+			break;
+		case 3:
+			if (up) {
+				m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+			}
+			else {
+				m_mem->setBigEndian(address, m_mem->getBigEndian(address) - 1);
+			}
+			break;
+		default:
+			break;
+	}
+}
+
 void Timer::tick() {
-	uint16_t address = m_variant->getTAR();
-	m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+	uint8_t mode = (m_mem->getByte(m_variant->getTA0CTL()) >> 4) & 3;
+	uint16_t address = m_variant->getTA0R();
+
+	changeTAR(address, mode, m_up1);
+
+	mode = (m_mem->getByte(m_variant->getTA1CTL()) >> 4) & 3;
+	if (mode) {
+		address = m_variant->getTA1R();
+		changeTAR(address, mode, m_up2);
+	}
 }
 
 unsigned long Timer::getFrequency() {
