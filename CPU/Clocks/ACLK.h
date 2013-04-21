@@ -31,11 +31,12 @@ class Variant;
 namespace MCU {
 
 class VLO;
+class LFXT1;
 class Clock;
 
 class ACLK : public Clock, public MemoryWatcher {
 	public:
-		ACLK(Memory *mem, Variant *variant, VLO *vlo);
+		ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1);
 		virtual ~ACLK();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
@@ -51,6 +52,8 @@ class ACLK : public Clock, public MemoryWatcher {
 		Variant *m_variant;
 		Clock *m_source;
 		VLO *m_vlo;
+		LFXT1 *m_lfxt1;
+		uint8_t m_divider;
 };
 
 }

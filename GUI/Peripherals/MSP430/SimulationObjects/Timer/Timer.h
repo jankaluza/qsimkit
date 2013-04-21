@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,39 +19,27 @@
 
 #pragma once
 
-#include "Clock.h"
+#include <QWidget>
+#include <QString>
+#include <QChar>
+#include <QRect>
+#include <QList>
+#include <map>
 
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include "CPU/Memory/Memory.h"
+#include "Peripherals/SimulationObject.h"
+#include "CPU/Clocks/Timer.h"
 
-class Variant;
-
-namespace MCU {
-
-class DCO;
-class Clock;
-
-class SMCLK : public Clock, public MemoryWatcher {
+class Timer : public SimulationObject, public MCU::Timer {
 	public:
-		SMCLK(Memory *mem, Variant *variant, DCO *dco);
-		virtual ~SMCLK();
+		Timer(MCU::InterruptManager *intManager, MCU::Memory *mem, Variant *variant,
+			  MCU::ACLK *aclk, MCU::SMCLK *smclk);
+		~Timer();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void internalTransition();
 
-		void reset();
+		void externalEvent(double t, const SimulationEventList &);
 
-		unsigned long getFrequency();
+		void output(SimulationEventList &output);
 
-		double getStep();
-
-	private:
-		Memory *m_mem;
-		Variant *m_variant;
-		Clock *m_source;
-		DCO *m_dco;
-		uint8_t m_divider;
+		double timeAdvance();
 };
-
-}

@@ -4,10 +4,10 @@ INCLUDE(${QT_USE_FILE})
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
-FILE(GLOB SRC ui/*.cpp Peripherals/*.cpp Peripherals/MSP430/*.cpp Script/*.cpp)
-FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp History/*.cpp)
-FILE(GLOB HEADERS ui/*.h Peripherals/*.h Peripherals/MSP430/*.h Script/*.h)
-FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h History/*.h)
+FILE(GLOB SRC ui/*.cpp Peripherals/*.cpp Script/*.cpp)
+FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Peripherals/MSP430/*.cpp Breakpoints/*.cpp History/*.cpp)
+FILE(GLOB HEADERS ui/*.h Peripherals/*.h Script/*.h)
+FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Peripherals/MSP430/*.h Breakpoints/*.h History/*.h)
 FILE(GLOB FORMS ui/*.ui)
 FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui History/*.ui)
 

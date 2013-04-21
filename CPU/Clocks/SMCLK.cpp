@@ -41,20 +41,30 @@ SMCLK::~SMCLK() {
 }
 
 unsigned long SMCLK::getFrequency() {
-	return m_source->getFrequency();
+	return m_source->getFrequency() / m_divider;
 }
 
 double SMCLK::getStep() {
-	return m_source->getStep();
+	return m_source->getStep() * m_divider;
 }
 
 void SMCLK::reset() {
+	handleMemoryChanged(m_mem, m_variant->getBCSCTL2());
 	m_source = m_dco;
 }
 
 
 void SMCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
-	// Set divider and source
+	uint16_t ctl2 = m_mem->getBigEndian(m_variant->getBCSCTL2());
+
+	// Choose divider - DIVSx
+	switch((ctl2 >> 1) & 3) {
+		case 0: m_divider = 1; break;
+		case 1: m_divider = 2; break;
+		case 2: m_divider = 4; break;
+		case 3: m_divider = 8; break;
+		default: break;
+	}
 }
 
 }

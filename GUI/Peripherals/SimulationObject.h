@@ -56,6 +56,7 @@ class SimulationObject {
 
 		virtual double timeAdvance() = 0;
 
+		virtual void getInternalSimulationObjects(std::vector<SimulationObject *> &) {}
 };
 
 class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {

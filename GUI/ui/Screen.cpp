@@ -61,10 +61,18 @@ void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
 		if (p) {
 			p->reset();
+			
 			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p, m_trackedPins[m_objects[i]]);
 			dig->add(wrapper);
 
 			wrappers[m_objects[i]] = wrapper;
+
+			std::vector<SimulationObject *> internalObjects;
+			p->getInternalSimulationObjects(internalObjects);
+			for (int x = 0; x < internalObjects.size(); ++x) {
+				SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(internalObjects[x]);
+				dig->add(wrapper);
+			}
 		}
 	}
 

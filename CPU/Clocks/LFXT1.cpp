@@ -17,51 +17,62 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "Timer.h"
+#include "LFXT1.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
-#include "ACLK.h"
-
 namespace MCU {
 
-Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
-			 ACLK *aclk, SMCLK *smclk) :
-m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_aclk(aclk), m_smclk(smclk) {
+LFXT1::LFXT1(Memory *mem, Variant *variant) :
+m_mem(mem), m_variant(variant), m_freq(12000), m_step(1.0/12000) {
+
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
-	ADD_WATCHER(m_variant->getBCSCTL2());
+
+	ADD_WATCHER(m_variant->getBCSCTL1());
+	ADD_WATCHER(m_variant->getBCSCTL3());
 
 	reset();
 }
 
-Timer::~Timer() {
+LFXT1::~LFXT1() {
 
 }
 
-void Timer::tick() {
-	uint16_t address = m_variant->getTAR();
-	m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+void LFXT1::reset() {
 }
 
-unsigned long Timer::getFrequency() {
-	return m_source->getFrequency();
+bool LFXT1::isChosen() {
+	uint16_t value = m_mem->getBigEndian(m_variant->getBCSCTL3());
+	// Choose between VLO and LFXT1
+	bool xts = m_mem->isBitSet(m_variant->getBCSCTL1(), 1 << 6);
+	if (xts) {
+		return true;
+	}
+	else {
+		switch((value >> 4) & 3) {
+			case 2: return false;
+			default:
+				return true;
+		}
+	}
 }
 
-double Timer::getStep() {
-	return m_source->getStep();
-}
+void LFXT1::handleMemoryChanged(Memory *memory, uint16_t address) {
+	uint16_t value = m_mem->getBigEndian(m_variant->getBCSCTL3());
 
-void Timer::reset() {
-	m_source = m_aclk;
-}
-
-
-void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
-	// Set divider and source
+	// TODO:
+// 	bool xts = m_mem->isBitSet(m_variant->getBCSCTL1(), 1 << 6);
+// 	if (xts) {
+// 		switch((value >> 4) & 3) {
+// 		}
+// 	}
+// 	else {
+// 		switch((value >> 4) & 3) {
+// 		}
+// 	}
 }
 
 }

@@ -36,8 +36,14 @@ class Instruction;
 class InterruptManager;
 class DCO;
 class MCLK;
+class VLO;
+class ACLK;
+class SMCLK;
+class LFXT1;
 
 }
+
+class Timer;
 
 class Variant;
 
@@ -58,6 +64,8 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 		Variant *getVariant() { return m_variant; }
 
 		bool loadA43(const std::string &data);
+
+		void getInternalSimulationObjects(std::vector<SimulationObject *> &objects);
 
 		void internalTransition();
 
@@ -132,6 +140,11 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 		MCU::InterruptManager *m_intManager;
 		MCU::DCO *m_dco;
 		MCU::MCLK *m_mclk;
+		MCU::VLO *m_vlo;
+		MCU::ACLK *m_aclk;
+		MCU::SMCLK *m_smclk;
+		MCU::LFXT1 *m_lfxt1;
+		Timer *m_timerA;
 		std::string m_code;
 		SimulationEventList m_output;
 		QStringList m_options;

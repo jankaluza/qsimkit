@@ -20,38 +20,39 @@
 #pragma once
 
 #include "Clock.h"
+#include "CPU/Memory/Memory.h"
 
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "CPU/Memory/Memory.h"
 
 class Variant;
 
 namespace MCU {
 
-class DCO;
-class Clock;
-
-class SMCLK : public Clock, public MemoryWatcher {
+class LFXT1 : public Clock, public MemoryWatcher {
 	public:
-		SMCLK(Memory *mem, Variant *variant, DCO *dco);
-		virtual ~SMCLK();
-
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		LFXT1(Memory *mem, Variant *variant);
+		virtual ~LFXT1();
 
 		void reset();
+		unsigned long getFrequency() {
+			return m_freq;
+		}
 
-		unsigned long getFrequency();
+		double getStep() {
+			return m_step;
+		}
 
-		double getStep();
+		bool isChosen();
+
+		void handleMemoryChanged(Memory *memory, uint16_t address);
 
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
-		Clock *m_source;
-		DCO *m_dco;
-		uint8_t m_divider;
+		unsigned long m_freq;
+		double m_step;
 };
 
 }

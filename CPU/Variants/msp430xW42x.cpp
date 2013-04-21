@@ -1951,6 +1951,15 @@ class Variant_msp430xW42x : public Variant {
 		}
 
 
+		unsigned int getTAR() {
+#ifdef TAR_
+			return TAR_;
+#else
+			return 0;
+#endif
+		}
+
+
 };
 
 MSP430_VARIANT("msp430xW42x", msp430xW42x);

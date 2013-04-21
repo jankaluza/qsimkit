@@ -65,5 +65,6 @@ class Variant {
 		virtual unsigned int getBCSCTL1() = 0;
 		virtual unsigned int getBCSCTL2() = 0;
 		virtual unsigned int getBCSCTL3() = 0;
+		virtual unsigned int getTAR() = 0;
 
 };

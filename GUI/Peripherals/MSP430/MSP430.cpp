@@ -30,7 +30,13 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/Clocks/DCO.h"
 #include "CPU/Clocks/MCLK.h"
+#include "CPU/Clocks/ACLK.h"
+#include "CPU/Clocks/SMCLK.h"
+#include "CPU/Clocks/VLO.h"
+#include "CPU/Clocks/LFXT1.h"
+
 #include "Package.h"
+#include "SimulationObjects/Timer/Timer.h"
 
 #include <QWidget>
 #include <QApplication>
@@ -44,8 +50,8 @@
 MSP430::MSP430(Variant *variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
-m_dco(0), m_mclk(0),
-m_instruction(new MCU::Instruction), m_variant(variant),
+m_dco(0), m_mclk(0), m_vlo(0), m_aclk(0), m_smclk(0), m_lfxt1(0),
+m_timerA(0), m_instruction(new MCU::Instruction), m_variant(variant),
 m_ignoreNextStep(false) {
 
 	m_type = "MSP430";
@@ -58,8 +64,15 @@ m_ignoreNextStep(false) {
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 
+	m_vlo = new MCU::VLO();
+	m_lfxt1 = new MCU::LFXT1(m_mem, m_variant);
+	m_aclk = new MCU::ACLK(m_mem, m_variant, m_vlo, m_lfxt1);
+	m_smclk = new MCU::SMCLK(m_mem, m_variant, m_dco);
 	m_dco = new MCU::DCO(m_mem, m_variant);
-	m_mclk = new MCU::MCLK(m_mem, m_variant, m_dco);
+	m_mclk = new MCU::MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
+
+	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
+	m_timerA = new Timer(m_intManager, m_mem, m_variant, m_aclk, m_smclk);
 	reset();
 }
 
@@ -69,15 +82,13 @@ void MSP430::loadPackage(const QString &file) {
 
 void MSP430::reset() {
 	delete m_decoder;
-	delete m_intManager;
 
-	// TODO; m_mem->reset(); m_reg->reset();
+	// TODO; m_mem->reset(); m_reg->reset(); m_intManager->reset();
 
 	m_dco->reset();
 	m_mclk->reset();
 
 	m_decoder = new MCU::InstructionDecoder(m_reg, m_mem);
-	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
 
 	m_pinManager->setMemory(m_mem);
 	m_pinManager->setInterruptManager(m_intManager);
@@ -98,6 +109,10 @@ void MSP430::handlePinChanged(int id, double value) {
 bool MSP430::loadA43(const std::string &data) {
 	m_code = data;
 	return m_mem->loadA43(data, m_reg);
+}
+
+void MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
+	objects.push_back(m_timerA);
 }
 
 void MSP430::externalEvent(double t, const SimulationEventList &events) {

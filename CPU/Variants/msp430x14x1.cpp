@@ -2065,6 +2065,15 @@ class Variant_msp430x14x1 : public Variant {
 		}
 
 
+		unsigned int getTAR() {
+#ifdef TAR_
+			return TAR_;
+#else
+			return 0;
+#endif
+		}
+
+
 };
 
 MSP430_VARIANT("msp430x14x1", msp430x14x1);

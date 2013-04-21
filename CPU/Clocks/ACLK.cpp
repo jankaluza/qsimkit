@@ -24,14 +24,19 @@
 #include <iostream>
 
 #include "VLO.h"
+#include "LFXT1.h"
 
 namespace MCU {
 
-ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo) :
-m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo) {
+ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1) :
+m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo),
+m_lfxt1(lfxt1), m_divider(1) {
+
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
-	ADD_WATCHER(m_variant->getBCSCTL2());
+
+	ADD_WATCHER(m_variant->getBCSCTL1());
+	ADD_WATCHER(m_variant->getBCSCTL3());
 
 	reset();
 }
@@ -41,20 +46,41 @@ ACLK::~ACLK() {
 }
 
 unsigned long ACLK::getFrequency() {
-	return m_source->getFrequency();
+	return m_source->getFrequency() / m_divider;
 }
 
 double ACLK::getStep() {
-	return m_source->getStep();
+	return m_source->getStep() * m_divider;
 }
 
 void ACLK::reset() {
+	handleMemoryChanged(m_mem, m_variant->getBCSCTL1());
+	handleMemoryChanged(m_mem, m_variant->getBCSCTL3());
 	m_source = m_vlo;
 }
 
 
 void ACLK::handleMemoryChanged(Memory *memory, uint16_t address) {
-	// Set divider and source
+	uint16_t value = m_mem->getBigEndian(address);
+	if (address == m_variant->getBCSCTL1()) {
+		// Set divider according DIVAx bits
+		switch((value >> 4) & 3) {
+			case 0: m_divider = 1; break;
+			case 1: m_divider = 2; break;
+			case 2: m_divider = 4; break;
+			case 3: m_divider = 8; break;
+			default: break;
+		}
+	}
+	else if (address == m_variant->getBCSCTL3()) {
+		// Choose between VLO and LFXT1
+		if (m_lfxt1->isChosen()) {
+			m_source = m_lfxt1;
+		}
+		else {
+			m_source = m_vlo;
+		}
+	}
 }
 
 }
