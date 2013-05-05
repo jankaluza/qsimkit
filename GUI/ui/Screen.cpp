@@ -359,7 +359,7 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 			return;
 		}
 
-		if (object->clicked(event->pos())) {
+		if (object->clicked(event->pos()) && wrappers[object]) {
 			wrappers[object]->reschedule();
 		}
 	}

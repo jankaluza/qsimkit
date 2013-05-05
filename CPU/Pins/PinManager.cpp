@@ -188,4 +188,9 @@ bool PinManager::handlePinInput(int id, double value) {
 	return handled;
 }
 
+void PinManager::reset() {
+	m_pins.clear();
+	m_gpCache.clear();
+}
+
 }

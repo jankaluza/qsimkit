@@ -32,8 +32,7 @@ class Memory;
 class InterruptManager;
 
 typedef enum {
-	UNKNOWN,
-	P1,
+	P1 = 0,
 	P2,
 	P3,
 	P4,
@@ -41,6 +40,7 @@ typedef enum {
 	P6,
 	P7,
 	P8,
+	UNKNOWN,
 } PinType;
 
 
@@ -67,6 +67,8 @@ class PinManager : public MemoryWatcher {
 		void setMemory(Memory *mem);
 
 		void addPin(PinType type, int subtype = -1);
+
+		void reset();
 
 		bool handlePinInput(int id, double value);
 

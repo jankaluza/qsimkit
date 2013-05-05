@@ -77,6 +77,7 @@ m_ignoreNextStep(false) {
 }
 
 void MSP430::loadPackage(const QString &file) {
+	m_pinManager->reset();
 	Package::loadPackage(this, m_pinManager, file, m_pins, m_sides);
 }
 
@@ -222,7 +223,7 @@ void MSP430::paint(QWidget *screen) {
 	int even = -1;
 	int id = 0;
 	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); ++it, ++id) {
-		if (it->value) {
+		if (it->value >= 0.5) {
 			qp.fillRect(it->rect, QBrush(QColor(0,255,0)));
 		}
 		qp.drawRect(it->rect);
