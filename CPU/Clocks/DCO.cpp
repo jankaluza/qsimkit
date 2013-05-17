@@ -22,13 +22,15 @@
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
+#include <math.h>
 
 namespace MCU {
 
-DCO::DCO(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant),
-m_freq(1000000), m_step(1.0/1000000) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
+
+DCO::DCO(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant),
+m_freq(1000000), m_step(1.0/1000000) {
 	ADD_WATCHER(m_variant->getDCOCTL());
 	ADD_WATCHER(m_variant->getBCSCTL1());
 
@@ -45,17 +47,32 @@ double DCO::getStep() {
 
 void DCO::reset() {
 	if (m_variant->getDCOCTL() != 0) {
-		m_mem->setBigEndian(m_variant->getDCOCTL(), 0x60);
+		m_mem->setByte(m_variant->getDCOCTL(), 0x60);
 	}
 
 	if (m_variant->getBCSCTL1() != 0) {
-		m_mem->setBigEndian(m_variant->getBCSCTL1(), 0x87);
+		m_mem->setByte(m_variant->getBCSCTL1(), 0x87);
 	}
 }
 
 
 void DCO::handleMemoryChanged(Memory *memory, uint16_t address) {
-	
+	int rsel = m_mem->getByte(m_variant->getBCSCTL1()) & 0x0f;
+	int dco = (m_mem->getByte(m_variant->getDCOCTL()) >> 5) & 0x7;
+	int mod = m_mem->getByte(m_variant->getDCOCTL()) & 0x1f;
+
+	// TODO: MOD
+	m_freq = m_variant->getDCOZERO();
+
+	if (dco == 0) {
+		m_freq *= pow(m_variant->getSDCO(), dco);
+	}
+
+	if (rsel == 0) {
+		m_freq *= pow(m_variant->getSRSEL(), rsel);
+	}
+
+	m_step = 1.0 / m_freq;
 }
 
 }

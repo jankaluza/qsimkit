@@ -88,5 +88,8 @@ class Variant {
 		virtual unsigned int getTA1CCTL2() = 0;
 		virtual unsigned int getTA1CCTL3() = 0;
 		virtual unsigned int getTA1CCTL4() = 0;
+		virtual double getSRSEL() = 0;
+		virtual double getSDCO() = 0;
+		virtual double getDCOZERO() = 0;
 
 };

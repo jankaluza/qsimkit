@@ -1,6 +1,9 @@
 import os
 import sys
 import subprocess
+from configobj import ConfigObj
+
+double_defines = []
 
 defines = ["P1DIR_","P1IE_","P1IES_","P1IFG_","P1IN_","P1OUT_","P1REN_","P1SEL_"]
 defines += ["P2DIR_","P2IE_","P2IES_","P2IFG_","P2IN_","P2OUT_","P2REN_","P2SEL_"]
@@ -26,6 +29,9 @@ defines += ["TA1CCR1_", "TA1CCR2_", "TA1CCR3_", "TA1CCR4_"]
 defines += ["TA0CCTL0_", "TA0CCTL1_", "TA0CCTL2_", "TA0CCTL3_", "TA0CCTL4_"]
 defines += ["TA1CCTL0_", "TA1CCTL1_", "TA1CCTL2_", "TA1CCTL3_", "TA1CCTL4_"]
 
+# Config files
+double_defines += ["SRSEL", "SDCO", "DCOZERO"]
+
 
 def pdef(define):
 	if (define[-1] == "_"):
@@ -41,6 +47,8 @@ class Variant {
 
 for define in defines:
 	output += "		virtual unsigned int get%s() = 0;\n" % (pdef(define))
+for define in double_defines:
+	output += "		virtual double get%s() = 0;\n" % (pdef(define))
 
 output += """
 };
@@ -56,7 +64,7 @@ for header in os.listdir("../../3rdparty/msp430gcc"):
 
 	output = ""
 
-	child = subprocess.Popen("msp430-gcc -D__ASSEMBLER__=1 -E -dM ../../3rdparty/msp430gcc/" + header, shell=True, stdout=subprocess.PIPE)
+	child = subprocess.Popen("msp430-gcc -D__ASSEMBLER__=1 -E -dM -I../../3rdparty/msp430gcc/ ../../3rdparty/msp430gcc/" + header, shell=True, stdout=subprocess.PIPE)
 	for line in child.communicate()[0].split('\n'):
 		if len(line) == 0 or line.find("(") != -1:
 			continue
@@ -65,6 +73,12 @@ for header in os.listdir("../../3rdparty/msp430gcc"):
 		output += "#endif\n"
 
 	name = header[:-2]
+
+	if os.path.exists(name + ".cfg"):
+		config = ConfigObj(name + ".cfg")
+		for k, v in config.iteritems():
+			output += "#define " + k + " " + v + "\n";
+
 	output += """#include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 
@@ -78,6 +92,18 @@ class Variant_%s : public Variant {
 	for define in defines:
 		output += """
 		unsigned int get%s() {
+#ifdef %s
+			return %s;
+#else
+			return 0;
+#endif
+		}
+
+""" % (pdef(define), define, define)
+
+	for define in double_defines:
+		output += """
+		double get%s() {
 #ifdef %s
 			return %s;
 #else

@@ -30,6 +30,7 @@ class Variant;
 
 namespace MCU {
 
+/// Digitally-Controlled Osctillator
 class DCO : public Clock, public MemoryWatcher {
 	public:
 		DCO(Memory *mem, Variant *variant);
