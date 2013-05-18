@@ -55,13 +55,11 @@ void DCO::reset() {
 	}
 }
 
-
 void DCO::handleMemoryChanged(Memory *memory, uint16_t address) {
 	int rsel = m_mem->getByte(m_variant->getBCSCTL1()) & 0x0f;
 	int dco = (m_mem->getByte(m_variant->getDCOCTL()) >> 5) & 0x7;
 	int mod = m_mem->getByte(m_variant->getDCOCTL()) & 0x1f;
 
-	// TODO: MOD
 	m_freq = m_variant->getDCOZERO();
 
 	if (dco == 0) {

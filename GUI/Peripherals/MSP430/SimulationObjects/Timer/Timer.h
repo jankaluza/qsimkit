@@ -27,7 +27,7 @@
 #include <map>
 
 #include "Peripherals/SimulationObject.h"
-#include "CPU/Clocks/Timer.h"
+#include "CPU/BasicClock/Timer.h"
 
 class Timer : public SimulationObject, public MCU::Timer {
 	public:
