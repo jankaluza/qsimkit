@@ -34,16 +34,11 @@ class RegisterSet;
 class InstructionDecoder;
 class Instruction;
 class InterruptManager;
-class DCO;
-class MCLK;
-class VLO;
-class ACLK;
-class SMCLK;
-class LFXT1;
-
+class BasicClock;
 }
 
 class Timer;
+class AdevsTimerFactory;
 
 class Variant;
 
@@ -138,13 +133,8 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 		Variant *m_variant;
 		MCU::PinManager *m_pinManager;
 		MCU::InterruptManager *m_intManager;
-		MCU::DCO *m_dco;
-		MCU::MCLK *m_mclk;
-		MCU::VLO *m_vlo;
-		MCU::ACLK *m_aclk;
-		MCU::SMCLK *m_smclk;
-		MCU::LFXT1 *m_lfxt1;
-		Timer *m_timerA;
+		MCU::BasicClock *m_basicClock;
+		AdevsTimerFactory *m_timerFactory;
 		std::string m_code;
 		SimulationEventList m_output;
 		QStringList m_options;

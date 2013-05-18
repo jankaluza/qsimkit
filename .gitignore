@@ -12,3 +12,4 @@ qsimkit
 *.elf
 callgrind*
 *.pyc
+*~
