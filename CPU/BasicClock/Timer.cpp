@@ -25,6 +25,11 @@
 
 #include "ACLK.h"
 
+#define TIMER_STOPPED 0
+#define TIMER_UP 1
+#define TIMER_CONTINUOUS 2
+#define TIMER_UPDOWN 3
+
 namespace MCU {
 
 Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
@@ -42,17 +47,37 @@ Timer::~Timer() {
 
 }
 
-void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up) {
+void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up, uint16_t taccr_, uint16_t tacctl) {
+	uint16_t tar = m_mem->getBigEndian(address);
+	uint16_t taccr = m_mem->getBigEndian(taccr_);
 	switch (mode) {
-		case 0:
+		case TIMER_STOPPED:
 			break;
-		case 1:
+		case TIMER_UP:
+			if (taccr == 0) {
+				break;
+			}
+			if (tar == taccr) {
+				// set TAIFG
+				m_mem->setBigEndian(address, 0);
+				m_mem->setBit(m_variant->getTA0IV(), 4, true);
+				
+				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			}
+			else {
+				tar += 1;
+				if (tar == taccr) {
+					// set TACCR0 CCIFG
+					m_mem->setBit(tacctl, 1, true);
+					m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+				}
+				m_mem->setBigEndian(address, tar);
+			}
+			break;
+		case TIMER_CONTINUOUS:
 			m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
 			break;
-		case 2:
-			m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
-			break;
-		case 3:
+		case TIMER_UPDOWN:
 			if (up) {
 				m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
 			}
@@ -68,14 +93,17 @@ void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up) {
 void Timer::tick() {
 	uint8_t mode = (m_mem->getByte(m_variant->getTA0CTL()) >> 4) & 3;
 	uint16_t address = m_variant->getTA0R();
+	uint16_t taccr = m_variant->getTA0CCR0();
+	uint16_t tacctl = m_variant->getTA0CCTL0();
 
-	changeTAR(address, mode, m_up1);
+	changeTAR(address, mode, m_up1, taccr, tacctl);
 
-	mode = (m_mem->getByte(m_variant->getTA1CTL()) >> 4) & 3;
-	if (mode) {
-		address = m_variant->getTA1R();
-		changeTAR(address, mode, m_up2);
-	}
+// 	mode = (m_mem->getByte(m_variant->getTA1CTL()) >> 4) & 3;
+// 	if (mode) {
+// 		taccr = m_variant->getTA1CCR0_();
+// 		address = m_variant->getTA1R();
+// 		changeTAR(address, mode, m_up2);
+// 	}
 }
 
 unsigned long Timer::getFrequency() {

@@ -89,4 +89,8 @@ bool InterruptManager::runQueuedInterrupts() {
 	return true;
 }
 
+bool InterruptManager::hasQueuedInterrupts() {
+	return !m_interrupts.empty();
+}
+
 }

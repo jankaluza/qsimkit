@@ -52,7 +52,7 @@ class Timer : public Clock, public MemoryWatcher {
 		double getStep();
 
 	private:
-		void changeTAR(uint16_t address, uint8_t mode, bool &up);
+		void changeTAR(uint16_t address, uint8_t mode, bool &up, uint16_t taccr, uint16_t tacctl_address);
 
 		InterruptManager *m_intManager;
 		Memory *m_mem;

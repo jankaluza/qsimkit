@@ -62,5 +62,4 @@ void BasicClock::reset() {
 	m_mclk->reset();
 }
 
-
 }

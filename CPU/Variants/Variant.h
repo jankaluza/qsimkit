@@ -70,10 +70,12 @@ class Variant {
 		virtual unsigned int getTACCR0() = 0;
 		virtual unsigned int getTA0CTL() = 0;
 		virtual unsigned int getTA1CTL() = 0;
+		virtual unsigned int getTA0CCR0() = 0;
 		virtual unsigned int getTA0CCR1() = 0;
 		virtual unsigned int getTA0CCR2() = 0;
 		virtual unsigned int getTA0CCR3() = 0;
 		virtual unsigned int getTA0CCR4() = 0;
+		virtual unsigned int getTA1CCR0() = 0;
 		virtual unsigned int getTA1CCR1() = 0;
 		virtual unsigned int getTA1CCR2() = 0;
 		virtual unsigned int getTA1CCR3() = 0;
@@ -88,6 +90,10 @@ class Variant {
 		virtual unsigned int getTA1CCTL2() = 0;
 		virtual unsigned int getTA1CCTL3() = 0;
 		virtual unsigned int getTA1CCTL4() = 0;
+		virtual unsigned int getTA0IV() = 0;
+		virtual unsigned int getTA01V() = 0;
+		virtual unsigned int getTIMERA0_VECTOR() = 0;
+		virtual unsigned int getTIMERA1_VECTOR() = 0;
 		virtual double getSRSEL() = 0;
 		virtual double getSDCO() = 0;
 		virtual double getDCOZERO() = 0;

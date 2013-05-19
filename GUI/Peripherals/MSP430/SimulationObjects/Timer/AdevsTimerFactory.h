@@ -45,4 +45,3 @@ class AdevsTimerFactory : public MCU::TimerFactory {
 								Variant *variant, MCU::ACLK *aclk,
 								MCU::SMCLK *smclk);
 };
-

@@ -43,6 +43,8 @@ class InterruptManager {
 
 		void handleInstruction(Instruction *instruction);
 
+		bool hasQueuedInterrupts();
+
 	private:
 		RegisterSet *m_reg;
 		Memory *m_mem;

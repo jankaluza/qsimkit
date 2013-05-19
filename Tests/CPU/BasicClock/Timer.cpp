@@ -1,0 +1,90 @@
+#include <cppunit/TestFixture.h>
+#include <cppunit/extensions/HelperMacros.h>
+
+#include "CPU/Memory/Memory.h"
+#include "CPU/Memory/RegisterSet.h"
+#include "CPU/Interrupts/InterruptManager.h"
+#include "CPU/BasicClock/Timer.h"
+#include "CPU/BasicClock/TimerFactory.h"
+#include "CPU/BasicClock/BasicClock.h"
+#include "CPU/BasicClock/ACLK.h"
+#include "CPU/BasicClock/SMCLK.h"
+#include "CPU/Variants/Variant.h"
+#include "CPU/Variants/VariantManager.h"
+
+using namespace MCU;
+
+class DummyTimerFactory : public TimerFactory {
+	public:
+		Timer *createTimer(InterruptManager *intManager, Memory *mem,
+						   Variant *variant, ACLK *aclk,
+						   SMCLK *smclk) {
+			return new Timer(intManager, mem, variant, aclk, smclk);
+		}
+};
+
+class TimerTest : public CPPUNIT_NS :: TestFixture{
+	CPPUNIT_TEST_SUITE(TimerTest);
+	CPPUNIT_TEST(upMode);
+	CPPUNIT_TEST_SUITE_END();
+
+	Memory *m;
+	RegisterSet *r;
+	Variant *v;
+	InterruptManager *intManager;
+	BasicClock *bc;
+	TimerFactory *factory;
+
+	public:
+		void setUp (void) {
+			m = new Memory(120000);
+			r = new RegisterSet;
+			r->addDefaultRegisters();
+			v = getVariant("msp430x241x");
+			intManager = new InterruptManager(r, m);
+			factory = new DummyTimerFactory();
+			bc = new BasicClock(m, v, intManager, factory);
+		}
+
+		void tearDown (void) {
+			delete m;
+			delete r;
+			delete intManager;
+			delete bc;
+			delete factory;
+		}
+
+		void upMode() {
+			// timer stopped now - tick() has no effect
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+
+			// set UP mode and CCR2
+			m->setBigEndian(v->getTA0CTL(), 16);
+			m->setBigEndian(v->getTA0CCR0(), 2);
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+
+
+		}
+
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION (TimerTest);

@@ -2512,6 +2512,15 @@ class Variant_msp430xE42x : public Variant {
 		}
 
 
+		unsigned int getTA0CCR0() {
+#ifdef TA0CCR0_
+			return TA0CCR0_;
+#else
+			return 0;
+#endif
+		}
+
+
 		unsigned int getTA0CCR1() {
 #ifdef TA0CCR1_
 			return TA0CCR1_;
@@ -2542,6 +2551,15 @@ class Variant_msp430xE42x : public Variant {
 		unsigned int getTA0CCR4() {
 #ifdef TA0CCR4_
 			return TA0CCR4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA1CCR0() {
+#ifdef TA1CCR0_
+			return TA1CCR0_;
 #else
 			return 0;
 #endif
@@ -2668,6 +2686,42 @@ class Variant_msp430xE42x : public Variant {
 		unsigned int getTA1CCTL4() {
 #ifdef TA1CCTL4_
 			return TA1CCTL4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA0IV() {
+#ifdef TA0IV_
+			return TA0IV_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTA01V() {
+#ifdef TA01V_
+			return TA01V_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMERA0_VECTOR() {
+#ifdef TIMERA0_VECTOR
+			return TIMERA0_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMERA1_VECTOR() {
+#ifdef TIMERA1_VECTOR
+			return TIMERA1_VECTOR;
 #else
 			return 0;
 #endif
