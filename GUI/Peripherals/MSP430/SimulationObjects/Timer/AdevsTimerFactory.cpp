@@ -30,7 +30,8 @@ AdevsTimerFactory::AdevsTimerFactory() {}
 
 MCU::Timer *AdevsTimerFactory::createTimer(MCU::InterruptManager *intManager, MCU::Memory *mem,
 						Variant *variant, MCU::ACLK *aclk,
-						MCU::SMCLK *smclk) {
-	Timer *timer = new Timer(intManager, mem, variant, aclk, smclk);
+						MCU::SMCLK *smclk, uint16_t tactl, uint16_t tar,
+						uint16_t taiv) {
+	Timer *timer = new Timer(intManager, mem, variant, aclk, smclk, tactl, tar, taiv);
 	return timer;
 }

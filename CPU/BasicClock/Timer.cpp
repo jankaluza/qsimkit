@@ -33,9 +33,11 @@
 namespace MCU {
 
 Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
-			 ACLK *aclk, SMCLK *smclk) :
+			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
+			 uint16_t taiv) :
 m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_aclk(aclk), m_smclk(smclk), m_up1(true), m_up2(true) {
+m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl), m_tar(tar),
+m_taiv(taiv) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -47,42 +49,65 @@ Timer::~Timer() {
 
 }
 
-void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up, uint16_t taccr_, uint16_t tacctl) {
-	uint16_t tar = m_mem->getBigEndian(address);
-	uint16_t taccr = m_mem->getBigEndian(taccr_);
+void Timer::addCCR(uint16_t tacctl, uint16_t taccr) {
+	CCR ccr;
+	ccr.tacctl = tacctl;
+	ccr.taccr = taccr;
+	m_ccr.push_back(ccr);
+}
+
+void Timer::checkCCRInterrupts(uint16_t tar) {
+	for (int i = 1; i < m_ccr.size(); ++i) {
+		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr);
+		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
+		if (interrupt_enabled && ccr == tar) {
+			m_mem->setBigEndian(m_taiv, 2 * i);
+			m_mem->setBit(m_ccr[i].tacctl, 1, true);
+			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+		}
+	}
+}
+
+void Timer::changeTAR(uint8_t mode) {
+	uint16_t tar = m_mem->getBigEndian(m_tar);
+	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+	bool interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
+
 	switch (mode) {
 		case TIMER_STOPPED:
 			break;
 		case TIMER_UP:
-			if (taccr == 0) {
+			if (ccr0 == 0) {
 				break;
 			}
-			if (tar == taccr) {
+			if (tar == ccr0) {
 				// set TAIFG
-				m_mem->setBigEndian(address, 0);
-				m_mem->setBit(m_variant->getTA0IV(), 4, true);
-				
-				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				m_mem->setBigEndian(m_tar, 0);
+				if (interrupt_enabled) {
+					m_mem->setBit(m_taiv, 4, true);
+					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				}
 			}
 			else {
 				tar += 1;
-				if (tar == taccr) {
+				if (interrupt_enabled && tar == ccr0) {
 					// set TACCR0 CCIFG
-					m_mem->setBit(tacctl, 1, true);
+					m_mem->setBit(m_ccr[0].tacctl, 1, true);
 					m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
 				}
-				m_mem->setBigEndian(address, tar);
+				m_mem->setBigEndian(m_tar, tar);
 			}
+			checkCCRInterrupts(tar);
 			break;
 		case TIMER_CONTINUOUS:
-			m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+			m_mem->setBigEndian(m_tar, tar + 1);
 			break;
 		case TIMER_UPDOWN:
-			if (up) {
-				m_mem->setBigEndian(address, m_mem->getBigEndian(address) + 1);
+			if (m_up) {
+				m_mem->setBigEndian(m_tar, tar + 1);
 			}
 			else {
-				m_mem->setBigEndian(address, m_mem->getBigEndian(address) - 1);
+				m_mem->setBigEndian(m_tar, tar - 1);
 			}
 			break;
 		default:
@@ -91,19 +116,9 @@ void Timer::changeTAR(uint16_t address, uint8_t mode, bool &up, uint16_t taccr_,
 }
 
 void Timer::tick() {
-	uint8_t mode = (m_mem->getByte(m_variant->getTA0CTL()) >> 4) & 3;
-	uint16_t address = m_variant->getTA0R();
-	uint16_t taccr = m_variant->getTA0CCR0();
-	uint16_t tacctl = m_variant->getTA0CCTL0();
+	uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
+	changeTAR(mode);
 
-	changeTAR(address, mode, m_up1, taccr, tacctl);
-
-// 	mode = (m_mem->getByte(m_variant->getTA1CTL()) >> 4) & 3;
-// 	if (mode) {
-// 		taccr = m_variant->getTA1CCR0_();
-// 		address = m_variant->getTA1R();
-// 		changeTAR(address, mode, m_up2);
-// 	}
 }
 
 unsigned long Timer::getFrequency() {

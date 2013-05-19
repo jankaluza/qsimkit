@@ -38,10 +38,13 @@ class InterruptManager;
 class Timer : public Clock, public MemoryWatcher {
 	public:
 		Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
-			  ACLK *aclk, SMCLK *smclk);
+			  ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
+			  uint16_t taiv);
 		virtual ~Timer();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+
+		void addCCR(uint16_t tacctl, uint16_t taccr);
 
 		void tick();
 
@@ -52,7 +55,13 @@ class Timer : public Clock, public MemoryWatcher {
 		double getStep();
 
 	private:
-		void changeTAR(uint16_t address, uint8_t mode, bool &up, uint16_t taccr, uint16_t tacctl_address);
+		void checkCCRInterrupts(uint16_t tar);
+		void changeTAR(uint8_t mode);
+
+		typedef struct {
+			uint16_t tacctl;
+			uint16_t taccr;
+		} CCR;
 
 		InterruptManager *m_intManager;
 		Memory *m_mem;
@@ -60,8 +69,11 @@ class Timer : public Clock, public MemoryWatcher {
 		Clock *m_source;
 		ACLK *m_aclk;
 		SMCLK *m_smclk;
-		bool m_up1;
-		bool m_up2;
+		bool m_up;
+		uint16_t m_tactl;
+		uint16_t m_tar;
+		uint16_t m_taiv;
+		std::vector<CCR> m_ccr;
 };
 
 }

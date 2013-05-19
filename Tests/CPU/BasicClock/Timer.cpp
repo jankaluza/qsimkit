@@ -18,8 +18,9 @@ class DummyTimerFactory : public TimerFactory {
 	public:
 		Timer *createTimer(InterruptManager *intManager, Memory *mem,
 						   Variant *variant, ACLK *aclk,
-						   SMCLK *smclk) {
-			return new Timer(intManager, mem, variant, aclk, smclk);
+						   SMCLK *smclk, uint16_t tactl, uint16_t tar,
+						   uint16_t taiv) {
+			return new Timer(intManager, mem, variant, aclk, smclk, tactl, tar, taiv);
 		}
 };
 
@@ -60,14 +61,20 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
 
-			// set UP mode and CCR2
+			// set UP mode and CCR0 to 2
 			m->setBigEndian(v->getTA0CTL(), 16);
 			m->setBigEndian(v->getTA0CCR0(), 2);
+			m->setBigEndian(v->getTA0CCTL0(), 16);
+			// set CCR1 to 1, this should trigger interrupt later
+			m->setBigEndian(v->getTA0CCR1(), 1);
+			m->setBigEndian(v->getTA0CCTL1(), 16);
 
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
-			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
 
 			bc->getTimerA()->tick();
