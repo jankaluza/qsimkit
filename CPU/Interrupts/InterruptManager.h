@@ -29,6 +29,12 @@ namespace MCU {
 class Memory;
 class RegisterSet;
 class Instruction;
+class InterruptManager;
+
+class InterruptWatcher {
+	public:
+		virtual void handleInterruptFinished(InterruptManager *intManager, int vector) = 0;
+};
 
 class InterruptManager {
 	public:
@@ -45,11 +51,14 @@ class InterruptManager {
 
 		bool hasQueuedInterrupts();
 
+		void addWatcher(int vector, InterruptWatcher *watcher);
+
 	private:
 		RegisterSet *m_reg;
 		Memory *m_mem;
 		std::vector<int> m_interrupts;
 		std::vector<int> m_runningInterrupts;
+		std::map<int, std::vector<InterruptWatcher *> > m_watchers;
 };
 
 }

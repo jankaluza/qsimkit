@@ -36,11 +36,12 @@ Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
 			 uint16_t taiv) :
 m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl), m_tar(tar),
-m_taiv(taiv) {
-#define ADD_WATCHER(METHOD) \
-	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
-	ADD_WATCHER(m_variant->getBCSCTL2());
+m_divider(0), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
+m_tar(tar), m_taiv(taiv) {
+
+	m_mem->addWatcher(tactl, this);
+
+	m_intManager->addWatcher(m_variant->getTIMERA0_VECTOR(), this);
 
 	reset();
 }
@@ -118,15 +119,14 @@ void Timer::changeTAR(uint8_t mode) {
 void Timer::tick() {
 	uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
 	changeTAR(mode);
-
 }
 
 unsigned long Timer::getFrequency() {
-	return m_source->getFrequency();
+	return m_source->getFrequency() / m_divider;
 }
 
 double Timer::getStep() {
-	return m_source->getStep();
+	return m_source->getStep() * m_divider;
 }
 
 void Timer::reset() {
@@ -135,7 +135,33 @@ void Timer::reset() {
 
 
 void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
-	// Set divider and source
+	uint16_t val = memory->getBigEndian(address);
+
+	if (address == m_tactl) {
+		// TACLR
+		if (val & 4) {
+			memory->setBit(address, 4, false);
+			memory->setBigEndian(m_tar, 0);
+			m_up = true;
+			m_divider = 1;
+		}
+
+		// Choose divider
+		switch((val >> 6) & 3) {
+			case 0: m_divider = 1; break;
+			case 1: m_divider = 2; break;
+			case 2: m_divider = 4; break;
+			case 3: m_divider = 8; break;
+			default: break;
+		}
+	}
+}
+
+void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
+	if (vector == m_variant->getTIMERA0_VECTOR()) {
+		// CCR0 CCIFG is reset after interrupt routine
+		m_mem->setBit(m_ccr[0].tacctl, 1, false);
+	}
 }
 
 }

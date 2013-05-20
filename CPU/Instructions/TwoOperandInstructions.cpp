@@ -188,8 +188,8 @@ static int execBIC(RegisterSet *reg, Memory *mem, Instruction *i) {
 	}
 	else {
 		int32_t d, s, r;
-		d = (int32_t) i->getDst()->getByte();
-		s = (int32_t) i->getSrc()->getByte();
+		d = (int32_t) i->getDst()->getBigEndian();
+		s = (int32_t) i->getSrc()->getBigEndian();
 		r = d & ~s;
 		i->getDst()->setBigEndian(r);
 		i->getDst()->callWatchers();
@@ -208,8 +208,8 @@ static int execBIS(RegisterSet *reg, Memory *mem, Instruction *i) {
 	}
 	else {
 		int32_t d, s, r;
-		d = (int32_t) i->getDst()->getByte();
-		s = (int32_t) i->getSrc()->getByte();
+		d = (int32_t) i->getDst()->getBigEndian();
+		s = (int32_t) i->getSrc()->getBigEndian();
 		r = d | s;
 		i->getDst()->setBigEndian(r);
 		i->getDst()->callWatchers();

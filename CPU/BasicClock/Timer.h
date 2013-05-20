@@ -25,6 +25,7 @@
 #include <string>
 #include <vector>
 #include "CPU/Memory/Memory.h"
+#include "CPU/Interrupts/InterruptManager.h"
 
 class Variant;
 
@@ -35,7 +36,7 @@ class SMCLK;
 class Clock;
 class InterruptManager;
 
-class Timer : public Clock, public MemoryWatcher {
+class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 	public:
 		Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
 			  ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
@@ -43,6 +44,8 @@ class Timer : public Clock, public MemoryWatcher {
 		virtual ~Timer();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+
+		void handleInterruptFinished(InterruptManager *intManager, int vector);
 
 		void addCCR(uint16_t tacctl, uint16_t taccr);
 
@@ -67,6 +70,7 @@ class Timer : public Clock, public MemoryWatcher {
 		Memory *m_mem;
 		Variant *m_variant;
 		Clock *m_source;
+		uint8_t m_divider;
 		ACLK *m_aclk;
 		SMCLK *m_smclk;
 		bool m_up;

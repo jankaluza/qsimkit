@@ -45,12 +45,20 @@ void InterruptManager::queueInterrupt(int vector) {
 
 void InterruptManager::handleInstruction(Instruction *instruction) {
 	if (instruction->type == Instruction1 && instruction->opcode == 6) {
+		int vector = m_runningInterrupts.back();
+		if (m_watchers.find(vector) != m_watchers.end()) {
+			std::vector<InterruptWatcher *> &watchers = m_watchers[vector];			
+			for (std::vector<InterruptWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
+				(*it)->handleInterruptFinished(this, vector);
+			}
+		}
+
 		m_runningInterrupts.pop_back();
 	}
 }
 
 void InterruptManager::runInterrupt(int vector) {
-	std::cerr << "running interrupt vector " << vector << "\n";
+// 	std::cerr << "running interrupt vector " << vector << "\n";
 	uint16_t v;
 	Register *sp = m_reg->get(1);
 
@@ -91,6 +99,10 @@ bool InterruptManager::runQueuedInterrupts() {
 
 bool InterruptManager::hasQueuedInterrupts() {
 	return !m_interrupts.empty();
+}
+
+void InterruptManager::addWatcher(int vector, InterruptWatcher *watcher) {
+	m_watchers[vector].push_back(watcher);
 }
 
 }

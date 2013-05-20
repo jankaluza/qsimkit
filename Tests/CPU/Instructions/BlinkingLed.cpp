@@ -199,7 +199,7 @@ Disassembly of section .vectors:
 
 #endif
 
-std::string binary(unsigned n) {
+static std::string binary(unsigned n) {
 	std::string res;
 
 	while (n)
