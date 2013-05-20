@@ -20,8 +20,8 @@
 #define GRN_LED BIT6
 #define RED_LED BIT0
 
-#define ONE_SECOND	125	/*  125 = SMCLK/8/1000 */
-#define COMPARE_VAL	1000	/* 1000 = SMCLK/8/125  */
+#define ONE_SECOND	150	/*  125 = SMCLK/8/1000 */
+#define COMPARE_VAL	10000	/* 1000 = SMCLK/8/125  */
 
 volatile unsigned int count = 0;
 

@@ -32,6 +32,14 @@ VLO::~VLO() {
 
 }
 
+unsigned long VLO::getFrequency() {
+	return m_freq;
+}
+
+double VLO::getStep() {
+	return m_step;
+}
+
 void VLO::reset() {
 }
 

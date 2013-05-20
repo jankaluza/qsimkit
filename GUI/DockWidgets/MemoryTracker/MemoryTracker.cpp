@@ -49,7 +49,15 @@ void MemoryTracker::handleTrackClicked(bool clicked) {
 		return;
 	}
 
-	uint16_t addr = (uint16_t) comboBox->itemData(comboBox->currentIndex()).toInt();
+	uint16_t addr;
+	bool ok;
+
+	addr = comboBox->currentText().toInt(&ok, 16);
+
+	if (!ok) {
+		addr = (uint16_t) comboBox->itemData(comboBox->currentIndex()).toInt();
+	}
+
 	QTreeWidgetItem *it = new QTreeWidgetItem(view);
 	it->setData(0, Qt::UserRole, addr);
 	it->setText(0, comboBox->currentText());

@@ -35,13 +35,9 @@ class VLO : public Clock {
 		virtual ~VLO();
 
 		void reset();
-		unsigned long getFrequency() {
-			return m_freq;
-		}
+		unsigned long getFrequency();
 
-		double getStep() {
-			return m_step;
-		}
+		double getStep();
 
 	private:
 		unsigned long m_freq;

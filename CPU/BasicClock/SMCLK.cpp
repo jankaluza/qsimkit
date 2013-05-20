@@ -28,7 +28,7 @@
 namespace MCU {
 
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco) :
-m_mem(mem), m_variant(variant), m_source(0), m_dco(dco), m_divider(1) {
+m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_divider(1) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());

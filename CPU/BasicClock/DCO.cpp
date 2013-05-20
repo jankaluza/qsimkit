@@ -60,16 +60,17 @@ void DCO::handleMemoryChanged(Memory *memory, uint16_t address) {
 	int dco = (m_mem->getByte(m_variant->getDCOCTL()) >> 5) & 0x7;
 	int mod = m_mem->getByte(m_variant->getDCOCTL()) & 0x1f;
 
-	m_freq = m_variant->getDCOZERO();
+	double freq = m_variant->getDCOZERO() * 1000000;
 
-	if (dco == 0) {
-		m_freq *= pow(m_variant->getSDCO(), dco);
+	if (dco != 0) {
+		freq *= pow(m_variant->getSDCO(), dco);
 	}
 
-	if (rsel == 0) {
-		m_freq *= pow(m_variant->getSRSEL(), rsel);
+	if (rsel != 0) {
+		freq *= pow(m_variant->getSRSEL(), rsel);
 	}
 
+	m_freq = freq;
 	m_step = 1.0 / m_freq;
 }
 

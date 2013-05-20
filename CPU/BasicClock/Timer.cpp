@@ -24,6 +24,7 @@
 #include <iostream>
 
 #include "ACLK.h"
+#include "SMCLK.h"
 
 #define TIMER_STOPPED 0
 #define TIMER_UP 1
@@ -36,7 +37,7 @@ Timer::Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
 			 uint16_t taiv) :
 m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_divider(0), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
+m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
 m_tar(tar), m_taiv(taiv) {
 
 	m_mem->addWatcher(tactl, this);
@@ -117,6 +118,9 @@ void Timer::changeTAR(uint8_t mode) {
 }
 
 void Timer::tick() {
+// 	static int i;
+// 	i++;
+// 	std::cout << i << "\n";
 	uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
 	changeTAR(mode);
 }
@@ -152,6 +156,15 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			case 1: m_divider = 2; break;
 			case 2: m_divider = 4; break;
 			case 3: m_divider = 8; break;
+			default: break;
+		}
+
+		// Choose source
+		switch((val >> 8) & 3) {
+			case 0: break;
+			case 1: m_source = m_aclk; break;
+			case 2: m_source = m_smclk; break;
+			case 3: break;
 			default: break;
 		}
 	}
