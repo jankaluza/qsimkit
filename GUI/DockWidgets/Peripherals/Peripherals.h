@@ -19,26 +19,35 @@
 
 #pragma once
 
-#include <QWidget>
+#include <QDialog>
 #include <QString>
-#include <QChar>
-#include <QRect>
-#include <map>
+#include <QTimer>
+#include <DockWidgets/DockWidget.h>
+#include <QTreeWidgetItem>
 
-#include "ui/ScreenObject.h"
-#include "SimulationObject.h"
+#include "ui_Peripherals.h"
 
+class MSP430;
+class QSimKit;
 class PeripheralItem;
 
-class Peripheral : public ScreenObject, public SimulationObject {
+class Peripherals : public DockWidget, public Ui::Peripherals
+{
+	Q_OBJECT
+
 	public:
-		Peripheral() {}
+		Peripherals(QSimKit *simkit);
 
-	virtual void reset() = 0;
+		void setCPU(MSP430 *cpu);
 
-	virtual PeripheralItem *getPeripheralItem() { return 0; }
+		void refresh();
 
-	
+		void addPeripheralItem(PeripheralItem *item);
 
+		void removePeripheralItem(PeripheralItem *item);
+
+	private:
+		MSP430 *m_cpu;
+		QSimKit *m_simkit;
 };
 

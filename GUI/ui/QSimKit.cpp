@@ -32,6 +32,7 @@
 #include "DockWidgets/Registers/Registers.h"
 #include "DockWidgets/Stack/Stack.h"
 #include "DockWidgets/MemoryTracker/MemoryTracker.h"
+#include "DockWidgets/Peripherals/Peripherals.h"
 
 #include "Breakpoints/BreakpointManager.h"
 
@@ -84,9 +85,10 @@ m_dig(0), m_sim(0) {
 
 	m_disassembler = new Disassembler(this);
 	addDockWidget(m_disassembler, Qt::RightDockWidgetArea);
-	addDockWidget(new Registers(this), Qt::LeftDockWidgetArea);
-	addDockWidget(new MemoryTracker(this), Qt::LeftDockWidgetArea);
-	addDockWidget(new Stack(this), Qt::LeftDockWidgetArea);
+// 	addDockWidget(new Registers(this), Qt::LeftDockWidgetArea);
+// 	addDockWidget(new MemoryTracker(this), Qt::LeftDockWidgetArea);
+// 	addDockWidget(new Stack(this), Qt::LeftDockWidgetArea);
+	addDockWidget(new Peripherals(this), Qt::LeftDockWidgetArea);
 }
 
 void QSimKit::setVariant(const QString &variant) {

@@ -19,26 +19,19 @@
 
 #pragma once
 
-#include <QWidget>
+#include <QDialog>
 #include <QString>
-#include <QChar>
-#include <QRect>
-#include <map>
+#include <QTimer>
+#include <DockWidgets/DockWidget.h>
+#include <QTreeWidgetItem>
 
-#include "ui/ScreenObject.h"
-#include "SimulationObject.h"
 
-class PeripheralItem;
-
-class Peripheral : public ScreenObject, public SimulationObject {
+class PeripheralItem : public QTreeWidgetItem
+{
 	public:
-		Peripheral() {}
+		PeripheralItem() : QTreeWidgetItem(QTreeWidgetItem::UserType) {}
 
-	virtual void reset() = 0;
-
-	virtual PeripheralItem *getPeripheralItem() { return 0; }
-
-	
+		virtual void refresh() = 0;
 
 };
 
