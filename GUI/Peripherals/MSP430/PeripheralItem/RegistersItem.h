@@ -25,34 +25,19 @@
 #include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
-#include "ui_Peripherals.h"
+#include "DockWidgets/Peripherals/PeripheralItem.h"
 
 class MSP430;
-class QSimKit;
-class PeripheralItem;
 
-class Peripherals : public DockWidget, public Ui::Peripherals
+class RegistersItem : public QTreeWidgetItem
 {
-	Q_OBJECT
-
 	public:
-		Peripherals(QSimKit *simkit);
-
-		void setCPU(MSP430 *cpu);
+		RegistersItem(MSP430 *cpu);
+		~RegistersItem();
 
 		void refresh();
 
-		void addPeripheralItem(PeripheralItem *item);
-
-		void removePeripheralItem(PeripheralItem *item);
-
-	public slots:
-		void addPeripheral(QObject *peripheral);
-
-		void removePeripheral(QObject *peripheral);
-
 	private:
 		MSP430 *m_cpu;
-		QSimKit *m_simkit;
 };
 

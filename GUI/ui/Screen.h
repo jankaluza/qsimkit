@@ -74,6 +74,10 @@ class Screen : public QWidget
 			m_peripherals = peripherals;
 		}
 
+	signals:
+		void onPeripheralAdded(QObject *peripheral);
+		void onPeripheralRemoved(QObject *peripheral);
+
 	protected:
 		void paintEvent(QPaintEvent *e);
 		void mouseMoveEvent(QMouseEvent *event);

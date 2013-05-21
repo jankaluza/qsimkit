@@ -88,7 +88,11 @@ m_dig(0), m_sim(0) {
 // 	addDockWidget(new Registers(this), Qt::LeftDockWidgetArea);
 // 	addDockWidget(new MemoryTracker(this), Qt::LeftDockWidgetArea);
 // 	addDockWidget(new Stack(this), Qt::LeftDockWidgetArea);
-	addDockWidget(new Peripherals(this), Qt::LeftDockWidgetArea);
+	m_peripheralsWidget = new Peripherals(this);
+	addDockWidget(m_peripheralsWidget, Qt::LeftDockWidgetArea);
+
+	connect(screen, SIGNAL(onPeripheralAdded(QObject *)), m_peripheralsWidget, SLOT(addPeripheral(QObject *)));
+	connect(screen, SIGNAL(onPeripheralRemoved(QObject *)), m_peripheralsWidget, SLOT(removePeripheral(QObject *)));
 }
 
 void QSimKit::setVariant(const QString &variant) {

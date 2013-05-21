@@ -34,6 +34,7 @@
 #include "Package.h"
 #include "SimulationObjects/Timer/AdevsTimerFactory.h"
 #include "SimulationObjects/Timer/Timer.h"
+#include "PeripheralItem/MSP430PeripheralItem.h"
 
 #include <QWidget>
 #include <QApplication>
@@ -63,6 +64,8 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
 	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_timerFactory);
 	reset();
+
+	m_peripheralItem = new MSP430PeripheralItem(this);
 }
 
 void MSP430::loadPackage(const QString &file) {

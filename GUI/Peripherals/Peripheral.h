@@ -38,7 +38,5 @@ class Peripheral : public ScreenObject, public SimulationObject {
 
 	virtual PeripheralItem *getPeripheralItem() { return 0; }
 
-	
-
 };
 

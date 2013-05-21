@@ -35,6 +35,7 @@ class PeripheralManager;
 class Disassembler;
 class BreakpointManager;
 class DockWidget;
+class Peripherals;
 
 class QSimKit : public QMainWindow, public Ui::QSimKit
 {
@@ -53,6 +54,10 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		}
 
 		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
+
+		Peripherals *getPeripheralsWidget() {
+			return m_peripheralsWidget;
+		}
 
 	public slots:
 		void loadA43();
@@ -85,5 +90,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		QAction *m_pauseAction;
 		BreakpointManager *m_breakpointManager;
 		QList<DockWidget *> m_dockWidgets;
+		Peripherals *m_peripheralsWidget;
 };
 

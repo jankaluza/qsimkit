@@ -90,11 +90,13 @@ void Screen::setCPU(MSP430 *cpu) {
 		m_objects.append(cpu);
 	}
 	else {
+		onPeripheralRemoved(m_objects[0]);
 		disconnect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
 		m_objects[0]->deleteLater();
 		m_objects[0] = cpu;
 	}
 
+	onPeripheralAdded(m_objects[0]);
 	connect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
 }
 
@@ -177,10 +179,9 @@ void Screen::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 void Screen::removeObject(ScreenObject *object) {
+	onPeripheralRemoved(object);
 	m_conns->objectRemoved(object);
 	m_objects.removeAll(object);
-	qDebug() << "removing";
-	qDebug() << "removing" << object;
 	delete object;
 }
 
@@ -307,6 +308,7 @@ void Screen::showPinMenu(ScreenObject *object, int pin, const QPoint &pos) {
 
 void Screen::addObject(ScreenObject *obj) {
 	m_objects.append(obj);
+	onPeripheralAdded(obj);
 }
 
 void Screen::addObject(const QPoint &pos) {

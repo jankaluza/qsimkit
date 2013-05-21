@@ -72,6 +72,10 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 
 		void reset();
 
+		PeripheralItem *getPeripheralItem() {
+			return m_peripheralItem;
+		}
+
 		void paint(QWidget *screen);
 
 		PinList &getPins() {
@@ -140,6 +144,7 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 		QStringList m_options;
 		bool m_ignoreNextStep;
 		QByteArray m_elf;
+		PeripheralItem *m_peripheralItem;
 		
 };
 

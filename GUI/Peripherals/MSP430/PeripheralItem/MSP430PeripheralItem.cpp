@@ -17,42 +17,41 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "MSP430PeripheralItem.h"
 
-#include <QDialog>
+#include "ui/QSimKit.h"
+#include "Peripherals/MSP430/MSP430.h"
+#include "Peripherals/Peripheral.h"
+#include "CPU/Memory/RegisterSet.h"
+#include "CPU/Memory/Register.h"
+
+#include "RegistersItem.h"
+
+#include <QWidget>
+#include <QTime>
+#include <QMainWindow>
 #include <QString>
-#include <QTimer>
-#include <DockWidgets/DockWidget.h>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QFile>
+#include <QProcess>
 #include <QTreeWidgetItem>
+#include <QDebug>
 
-#include "ui_Peripherals.h"
+MSP430PeripheralItem::MSP430PeripheralItem(MSP430 *cpu) {
+	m_cpu = cpu;
+	setText(0, "MSP430");
+	setFirstColumnSpanned(true);
+	setExpanded(true);
 
-class MSP430;
-class QSimKit;
-class PeripheralItem;
+	m_registersItem = new RegistersItem(m_cpu);
+	addChild(m_registersItem);
+}
 
-class Peripherals : public DockWidget, public Ui::Peripherals
-{
-	Q_OBJECT
+MSP430PeripheralItem::~MSP430PeripheralItem() {
+	
+}
 
-	public:
-		Peripherals(QSimKit *simkit);
-
-		void setCPU(MSP430 *cpu);
-
-		void refresh();
-
-		void addPeripheralItem(PeripheralItem *item);
-
-		void removePeripheralItem(PeripheralItem *item);
-
-	public slots:
-		void addPeripheral(QObject *peripheral);
-
-		void removePeripheral(QObject *peripheral);
-
-	private:
-		MSP430 *m_cpu;
-		QSimKit *m_simkit;
-};
-
+void MSP430PeripheralItem::refresh() {
+	m_registersItem->refresh();
+}

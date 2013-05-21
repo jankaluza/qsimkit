@@ -20,6 +20,15 @@
     </property>
     <item>
      <widget class="QTreeWidget" name="view">
+      <property name="indentation">
+       <number>15</number>
+      </property>
+      <property name="rootIsDecorated">
+       <bool>false</bool>
+      </property>
+      <property name="itemsExpandable">
+       <bool>true</bool>
+      </property>
       <column>
        <property name="text">
         <string>Name</string>
@@ -27,17 +36,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Dec</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Hex</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>Bin</string>
+        <string>Value</string>
        </property>
       </column>
      </widget>

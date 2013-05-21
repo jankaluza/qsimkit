@@ -22,6 +22,7 @@
 
 #include "ui/QSimKit.h"
 #include "Peripherals/MSP430/MSP430.h"
+#include "Peripherals/Peripheral.h"
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
 
@@ -50,6 +51,29 @@ void Peripherals::refresh() {
 
 void Peripherals::addPeripheralItem(PeripheralItem *item) {
 	view->addTopLevelItem(item);
+	item->setExpanded(true);
+	for (int i = 0; i < item->childCount(); ++i) {
+		item->child(i)->setExpanded(true);
+	}
+
+	view->resizeColumnToContents(0);
+	view->resizeColumnToContents(1);
+	view->resizeColumnToContents(2);
+	view->resizeColumnToContents(3);
+}
+
+void Peripherals::addPeripheral(QObject *peripheral) {
+	Peripheral *p = dynamic_cast<Peripheral *>(peripheral);
+	if (!p) {
+		return;
+	}
+
+	PeripheralItem *item = p->getPeripheralItem();
+	if (!item) {
+		return;
+	}
+
+	addPeripheralItem(item);
 }
 
 void Peripherals::removePeripheralItem(PeripheralItem *item) {
@@ -57,9 +81,28 @@ void Peripherals::removePeripheralItem(PeripheralItem *item) {
 		PeripheralItem *item = dynamic_cast<PeripheralItem *>(view->topLevelItem(i));
 		if (item == item) {
 			view->takeTopLevelItem(i);
-			return;
+			break;
 		}
 	}
+
+	view->resizeColumnToContents(0);
+	view->resizeColumnToContents(1);
+	view->resizeColumnToContents(2);
+	view->resizeColumnToContents(3);
+}
+
+void Peripherals::removePeripheral(QObject *peripheral) {
+	Peripheral *p = dynamic_cast<Peripheral *>(peripheral);
+	if (!p) {
+		return;
+	}
+
+	PeripheralItem *item = p->getPeripheralItem();
+	if (!item) {
+		return;
+	}
+
+	removePeripheralItem(item);
 }
 
 void Peripherals::setCPU(MSP430 *cpu) {
