@@ -3052,9 +3052,9 @@ class Variant_msp430x47xx : public Variant {
 		}
 
 
-		unsigned int getTA01V() {
-#ifdef TA01V_
-			return TA01V_;
+		unsigned int getTA1IV() {
+#ifdef TA1IV_
+			return TA1IV_;
 #else
 			return 0;
 #endif

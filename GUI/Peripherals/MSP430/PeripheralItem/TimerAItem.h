@@ -17,46 +17,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "MSP430PeripheralItem.h"
+#pragma once
 
-#include "ui/QSimKit.h"
-#include "Peripherals/MSP430/MSP430.h"
-#include "Peripherals/Peripheral.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
-
-#include "RegistersItem.h"
-#include "TimerAItem.h"
-
-#include <QWidget>
-#include <QTime>
-#include <QMainWindow>
 #include <QString>
-#include <QFileDialog>
-#include <QInputDialog>
-#include <QFile>
-#include <QProcess>
 #include <QTreeWidgetItem>
-#include <QDebug>
 
-MSP430PeripheralItem::MSP430PeripheralItem(MSP430 *cpu) {
-	m_cpu = cpu;
-	setText(0, "MSP430");
-	setFirstColumnSpanned(true);
-	setExpanded(true);
+class MSP430;
 
-	m_registersItem = new RegistersItem(m_cpu);
-	addChild(m_registersItem);
+class TimerAItem : public QTreeWidgetItem
+{
+	public:
+		TimerAItem(MSP430 *cpu);
+		~TimerAItem();
 
-	m_timerAItem = new TimerAItem(m_cpu);
-	addChild(m_timerAItem);
-}
+		void refresh();
 
-MSP430PeripheralItem::~MSP430PeripheralItem() {
-	
-}
+	private:
+		MSP430 *m_cpu;
+};
 
-void MSP430PeripheralItem::refresh() {
-	m_registersItem->refresh();
-	m_timerAItem->refresh();
-}

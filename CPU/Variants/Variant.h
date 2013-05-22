@@ -91,7 +91,7 @@ class Variant {
 		virtual unsigned int getTA1CCTL3() = 0;
 		virtual unsigned int getTA1CCTL4() = 0;
 		virtual unsigned int getTA0IV() = 0;
-		virtual unsigned int getTA01V() = 0;
+		virtual unsigned int getTA1IV() = 0;
 		virtual unsigned int getTIMERA0_VECTOR() = 0;
 		virtual unsigned int getTIMERA1_VECTOR() = 0;
 		virtual double getSRSEL() = 0;

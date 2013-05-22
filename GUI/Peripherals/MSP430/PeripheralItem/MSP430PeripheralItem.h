@@ -29,6 +29,7 @@
 
 class MSP430;
 class RegistersItem;
+class TimerAItem;
 
 class MSP430PeripheralItem : public PeripheralItem
 {
@@ -41,5 +42,6 @@ class MSP430PeripheralItem : public PeripheralItem
 	private:
 		MSP430 *m_cpu;
 		RegistersItem *m_registersItem;
+		TimerAItem *m_timerAItem;
 };
 

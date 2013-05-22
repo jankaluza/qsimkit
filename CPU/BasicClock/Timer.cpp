@@ -86,7 +86,7 @@ void Timer::changeTAR(uint8_t mode) {
 				// set TAIFG
 				m_mem->setBigEndian(m_tar, 0);
 				if (interrupt_enabled) {
-					m_mem->setBit(m_taiv, 4, true);
+					m_mem->setBigEndian(m_taiv, 10);
 					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
 				}
 			}
