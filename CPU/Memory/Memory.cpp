@@ -37,6 +37,7 @@ static unsigned int hexToInt(const std::string &str) {
 Memory::Memory(unsigned int size) {
 	m_memory.resize(size);
 	m_watchers.resize(size);
+	m_readWatchers.resize(size);
 
 	for (int i = 0; i < size; ++i) {
 		m_memory[i] = 0;
@@ -117,6 +118,7 @@ uint16_t Memory::get(uint16_t address) {
 	uint8_t *ptr = (uint8_t *) &w;
 	*ptr++ = m_memory[address + 1];
 	*ptr++ = m_memory[address];
+	callReadWatcher(address, w);
 	return w;
 }
 
@@ -125,6 +127,7 @@ uint16_t Memory::getBigEndian(uint16_t address) {
 	uint8_t *ptr = (uint8_t *) &w;
 	*ptr++ = m_memory[address];
 	*ptr++ = m_memory[address + 1];
+	callReadWatcher(address, w);
 	return w;
 }
 
@@ -138,6 +141,26 @@ void Memory::callWatcher(uint16_t address) {
 	}
 }
 
+void Memory::callReadWatcher(uint16_t address, uint16_t &value) {
+	std::vector<MemoryWatcher *> &watchers = m_readWatchers[address];
+	if (watchers.empty())
+		return;
+
+	for (std::vector<MemoryWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
+		(*it)->handleMemoryRead(this, address, value);
+	}
+}
+
+void Memory::callReadWatcher(uint16_t address, uint8_t &value) {
+	std::vector<MemoryWatcher *> &watchers = m_readWatchers[address];
+	if (watchers.empty())
+		return;
+
+	for (std::vector<MemoryWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
+		(*it)->handleMemoryRead(this, address, value);
+	}
+}
+
 void Memory::set(uint16_t address, uint16_t value) {
 	uint8_t *ptr2 = (uint8_t *) &value;
 	m_memory[address] = *(ptr2 + 1);
@@ -147,17 +170,21 @@ void Memory::set(uint16_t address, uint16_t value) {
 	callWatcher(address + 1);
 }
 
-void Memory::setBigEndian(uint16_t address, uint16_t value) {
+void Memory::setBigEndian(uint16_t address, uint16_t value, bool watchers) {
 	uint8_t *ptr2 = (uint8_t *) &value;
 	m_memory[address] = *(ptr2);
 	m_memory[address + 1] = *(ptr2 + 1);
 
-	callWatcher(address);
-	callWatcher(address + 1);
+	if (watchers) {
+		callWatcher(address);
+		callWatcher(address + 1);
+	}
 }
 
 uint8_t Memory::getByte(uint16_t address) {
-	return m_memory[address];
+	uint8_t r = m_memory[address];
+	callReadWatcher(address, r);
+	return r;
 }
 
 void Memory::setByte(uint16_t address, uint8_t value) {
@@ -165,8 +192,12 @@ void Memory::setByte(uint16_t address, uint8_t value) {
 	callWatcher(address);
 }
 
-void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher) {
+void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, bool include_reading) {
 	m_watchers[address].push_back(watcher);
+
+	if (include_reading) {
+		m_readWatchers[address].push_back(watcher);
+	}
 }
 
 bool Memory::isBitSet(uint16_t address, uint16_t bit) {

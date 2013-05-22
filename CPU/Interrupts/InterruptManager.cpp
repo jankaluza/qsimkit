@@ -46,14 +46,13 @@ void InterruptManager::queueInterrupt(int vector) {
 void InterruptManager::handleInstruction(Instruction *instruction) {
 	if (instruction->type == Instruction1 && instruction->opcode == 6) {
 		int vector = m_runningInterrupts.back();
+		m_runningInterrupts.pop_back();
 		if (m_watchers.find(vector) != m_watchers.end()) {
 			std::vector<InterruptWatcher *> &watchers = m_watchers[vector];			
 			for (std::vector<InterruptWatcher *>::const_iterator it = watchers.begin(); it != watchers.end(); ++it) {
 				(*it)->handleInterruptFinished(this, vector);
 			}
 		}
-
-		m_runningInterrupts.pop_back();
 	}
 }
 

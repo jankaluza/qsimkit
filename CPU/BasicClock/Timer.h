@@ -44,6 +44,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 		virtual ~Timer();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value);
 
 		void handleInterruptFinished(InterruptManager *intManager, int vector);
 

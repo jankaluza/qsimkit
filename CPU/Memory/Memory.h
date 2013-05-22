@@ -32,6 +32,9 @@ class Memory;
 class MemoryWatcher {
 	public:
 		virtual void handleMemoryChanged(Memory *memory, uint16_t address) = 0;
+
+		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {}
+		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint8_t &value) {}
 };
 
 class Memory {
@@ -44,13 +47,15 @@ class Memory {
 		uint16_t get(uint16_t address);
 		uint16_t getBigEndian(uint16_t address);
 		void set(uint16_t address, uint16_t value);
-		void setBigEndian(uint16_t address, uint16_t value);
+		void setBigEndian(uint16_t address, uint16_t value, bool watchers = true);
 
 		uint8_t getByte(uint16_t address);
 		void setByte(uint16_t address, uint8_t value);
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher);
+		void addWatcher(uint16_t address, MemoryWatcher *watcher, bool include_reading = false);
 		void callWatcher(uint16_t address);
+		void callReadWatcher(uint16_t address, uint16_t &value);
+		void callReadWatcher(uint16_t address, uint8_t &value);
 
 		bool isBitSet(uint16_t address, uint16_t bit);
 		bool setBit(uint16_t address, uint16_t bit, bool value);
@@ -58,6 +63,7 @@ class Memory {
 	private:
 		std::vector<uint8_t> m_memory;
 		std::vector<std::vector<MemoryWatcher *> > m_watchers;
+		std::vector<std::vector<MemoryWatcher *> > m_readWatchers;
 };
 
 }

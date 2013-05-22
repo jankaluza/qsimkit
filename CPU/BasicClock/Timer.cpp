@@ -41,8 +41,10 @@ m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
 m_tar(tar), m_taiv(taiv) {
 
 	m_mem->addWatcher(tactl, this);
+	m_mem->addWatcher(taiv, this, true);
 
 	m_intManager->addWatcher(m_variant->getTIMERA0_VECTOR(), this);
+	m_intManager->addWatcher(m_variant->getTIMERA1_VECTOR(), this);
 
 	reset();
 }
@@ -63,7 +65,6 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr);
 		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
 		if (interrupt_enabled && ccr == tar) {
-			m_mem->setBigEndian(m_taiv, 2 * i);
 			m_mem->setBit(m_ccr[i].tacctl, 1, true);
 			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
 		}
@@ -73,7 +74,8 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 void Timer::changeTAR(uint8_t mode) {
 	uint16_t tar = m_mem->getBigEndian(m_tar);
 	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
-	bool interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
+	bool ccr0_interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
+	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
 
 	switch (mode) {
 		case TIMER_STOPPED:
@@ -85,14 +87,14 @@ void Timer::changeTAR(uint8_t mode) {
 			if (tar == ccr0) {
 				// set TAIFG
 				m_mem->setBigEndian(m_tar, 0);
-				if (interrupt_enabled) {
-					m_mem->setBigEndian(m_taiv, 10);
+				if (taifg_interrupt_enabled) {
+					m_mem->setBit(m_tactl, 1, true);
 					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
 				}
 			}
 			else {
 				tar += 1;
-				if (interrupt_enabled && tar == ccr0) {
+				if (ccr0_interrupt_enabled && tar == ccr0) {
 					// set TACCR0 CCIFG
 					m_mem->setBit(m_ccr[0].tacctl, 1, true);
 					m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
@@ -174,6 +176,40 @@ void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 	if (vector == m_variant->getTIMERA0_VECTOR()) {
 		// CCR0 CCIFG is reset after interrupt routine
 		m_mem->setBit(m_ccr[0].tacctl, 1, false);
+	}
+	else {
+		// Check if we have more interrupts queued and if any, queue them
+		for (int i = 1; i < m_ccr.size(); ++i) {
+			bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
+			if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
+				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				return;
+			}
+		}
+
+		bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
+		if (taifg_interrupt_enabled && m_mem->isBitSet(m_tactl, 1)) {
+			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+		}
+	}
+}
+
+void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {
+	// Check what interrupts we have queued and set TAIV to the one with highest
+	// priority.
+	for (int i = 1; i < m_ccr.size(); ++i) {
+		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
+		if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
+			value = 2 * i;
+			m_mem->setBit(m_ccr[i].tacctl, 1, false);
+			return;
+		}
+	}
+
+	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
+	if (taifg_interrupt_enabled && m_mem->isBitSet(m_tactl, 1)) {
+		m_mem->setBit(m_tactl, 1, false);
+		value = 10;
 	}
 }
 

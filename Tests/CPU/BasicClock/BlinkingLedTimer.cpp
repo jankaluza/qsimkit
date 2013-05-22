@@ -323,18 +323,19 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(0x162, 1));
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
-			// one more tick and we overlow, that generates TAIV interrupt
+			// one more tick and we overlow, no TAIV interrupt, because
+			// TAIFG interrupts are disabled
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(0x0170));
-			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
-			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf86c, r->get(0)->getBigEndian());
-		// f86c:       30 40 88 f8     br      #0xf888
-			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf888, r->get(0)->getBigEndian());
-		// f888:       00 13           reti
-			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			intManager->handleInstruction(i);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+// 			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());
+// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf86c, r->get(0)->getBigEndian());
+// 		// f86c:       30 40 88 f8     br      #0xf888
+// 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf888, r->get(0)->getBigEndian());
+// 		// f888:       00 13           reti
+// 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+// 			intManager->handleInstruction(i);
 		}
 			
 		

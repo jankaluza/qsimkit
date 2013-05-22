@@ -72,9 +72,11 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
-			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG 0
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
-			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG
+			// We have read TAIV, so CCIFG 1 is reset
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
 
 			bc->getTimerA()->tick();
@@ -87,8 +89,20 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
-			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0IV())); // TAIV
 
+			// and now again with TAIFG interrupt enabled
+			m->setBigEndian(v->getTA0CTL(), 18);
+			bc->getTimerA()->tick();
+			bc->getTimerA()->tick();
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			// Interrupt with biggest priority is CCIFG 1 => 2
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
+			// Next - with lower priority - is TAIFG
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 10, m->getBigEndian(v->getTA0IV()));
 
 		}
 
