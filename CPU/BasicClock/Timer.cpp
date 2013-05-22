@@ -61,6 +61,16 @@ void Timer::addCCR(uint16_t tacctl, uint16_t taccr) {
 }
 
 void Timer::checkCCRInterrupts(uint16_t tar) {
+	// If timer changes its value to CCR0, fire CCR0 interrupt if
+	// enabled.
+	bool ccr0_interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
+	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+	if (ccr0_interrupt_enabled && tar == ccr0) {
+		m_mem->setBit(m_ccr[0].tacctl, 1, true);
+		m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+	}
+
+	// Set CCIFG if TAR == CCR and CCIE is enabled
 	for (int i = 1; i < m_ccr.size(); ++i) {
 		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr);
 		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
@@ -72,39 +82,55 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 }
 
 void Timer::changeTAR(uint8_t mode) {
+	uint16_t ccr0;
 	uint16_t tar = m_mem->getBigEndian(m_tar);
-	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
-	bool ccr0_interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
 	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
 
 	switch (mode) {
 		case TIMER_STOPPED:
 			break;
 		case TIMER_UP:
+			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+
+			// CCR0 is 0, so timer is stopped
 			if (ccr0 == 0) {
 				break;
 			}
+
 			if (tar == ccr0) {
-				// set TAIFG
+				// Timer overflows, fire TAIFG interrupt if it's enabled
 				m_mem->setBigEndian(m_tar, 0);
 				if (taifg_interrupt_enabled) {
 					m_mem->setBit(m_tactl, 1, true);
 					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
 				}
+				tar = 0;
 			}
 			else {
 				tar += 1;
-				if (ccr0_interrupt_enabled && tar == ccr0) {
-					// set TACCR0 CCIFG
-					m_mem->setBit(m_ccr[0].tacctl, 1, true);
-					m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
-				}
 				m_mem->setBigEndian(m_tar, tar);
 			}
+
+			// Generate CCRx interrupts
 			checkCCRInterrupts(tar);
 			break;
 		case TIMER_CONTINUOUS:
-			m_mem->setBigEndian(m_tar, tar + 1);
+			if (tar == 0xffff) {
+				// Timer overflows, fire TAIFG interrupt if it's enabled
+				m_mem->setBigEndian(m_tar, 0);
+				if (taifg_interrupt_enabled) {
+					m_mem->setBit(m_tactl, 1, true);
+					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				}
+				tar = 0;
+			}
+			else {
+				tar += 1;
+				m_mem->setBigEndian(m_tar, tar);
+			}
+
+			// Generate CCRx interrupts
+			checkCCRInterrupts(tar);
 			break;
 		case TIMER_UPDOWN:
 			if (m_up) {
@@ -120,9 +146,6 @@ void Timer::changeTAR(uint8_t mode) {
 }
 
 void Timer::tick() {
-// 	static int i;
-// 	i++;
-// 	std::cout << i << "\n";
 	uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
 	changeTAR(mode);
 }
@@ -174,11 +197,12 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 
 void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 	if (vector == m_variant->getTIMERA0_VECTOR()) {
-		// CCR0 CCIFG is reset after interrupt routine
+		// We have to reset CCR0 CCIFG after interrupt routine
 		m_mem->setBit(m_ccr[0].tacctl, 1, false);
 	}
 	else {
-		// Check if we have more interrupts queued and if any, queue them
+		// Check if we have more interrupts queued and if any, generate the
+		// interrupt.
 		for (int i = 1; i < m_ccr.size(); ++i) {
 			bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
 			if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
@@ -195,8 +219,8 @@ void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 }
 
 void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {
-	// Check what interrupts we have queued and set TAIV to the one with highest
-	// priority.
+	// Check what interrupts we have queued and set 'value' to the one with highest
+	// priority. TAIV will remain 0.
 	for (int i = 1; i < m_ccr.size(); ++i) {
 		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
 		if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
