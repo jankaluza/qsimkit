@@ -26,8 +26,10 @@ class DummyTimerFactory : public TimerFactory {
 
 class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(TimerTest);
+	// TODO: Add tests for changing CCR0 in upMode and UpDownMode!
 	CPPUNIT_TEST(upMode);
 	CPPUNIT_TEST(continuousMode);
+	CPPUNIT_TEST(upDownMode);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -170,6 +172,56 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
 			// Next - with lower priority - is TAIFG
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 10, m->getBigEndian(v->getTA0IV()));
+		}
+
+		void upDownMode() {
+			// timer stopped now - tick() has no effect
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+
+			// set UP DOWN mode and CCR0 to 2
+			m->setBigEndian(v->getTA0CTL(), 48);
+			m->setBigEndian(v->getTA0CCR0(), 2);
+			m->setBigEndian(v->getTA0CCTL0(), 16);
+			// set CCR1 to 1, this should trigger interrupt later
+			m->setBigEndian(v->getTA0CCR1(), 1);
+			m->setBigEndian(v->getTA0CCTL1(), 16);
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG 0
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
+			// We have read TAIV, so CCIFG 1 is reset
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG
+			m->setBit(v->getTA0CCTL0(), 1, false);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0IV()));
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0IV())); // TAIV
+
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0R()));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 1, m->getBigEndian(v->getTA0R()));
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 1)); // CCIFG 0
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0IV()));
+			// We have read TAIV, so CCIFG 1 is reset
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
 		}
 
 };

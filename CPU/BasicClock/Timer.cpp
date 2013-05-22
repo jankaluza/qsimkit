@@ -133,12 +133,40 @@ void Timer::changeTAR(uint8_t mode) {
 			checkCCRInterrupts(tar);
 			break;
 		case TIMER_UPDOWN:
-			if (m_up) {
-				m_mem->setBigEndian(m_tar, tar + 1);
+			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+
+			// CCR0 is 0, so timer is stopped
+			if (ccr0 == 0) {
+				break;
+			}
+
+			if (tar == 1 && !m_up) {
+				// we are counting from 1 -> 0, so fire TAIFG interrupt
+				m_mem->setBigEndian(m_tar, 0);
+				if (taifg_interrupt_enabled) {
+					m_mem->setBit(m_tactl, 1, true);
+					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				}
+				tar = 0;
+				m_up = true;
 			}
 			else {
-				m_mem->setBigEndian(m_tar, tar - 1);
+				if (m_up) {
+					tar += 1;
+					// Generate CCRx interrupts only when changing from
+					// CCR - 1 to CCR (it means in UP mode)
+					checkCCRInterrupts(tar);
+				}
+				else {
+					tar -= 1;
+				}
+
+				if (tar == ccr0) {
+					m_up = false;
+				}
+				m_mem->setBigEndian(m_tar, tar);
 			}
+
 			break;
 		default:
 			break;
