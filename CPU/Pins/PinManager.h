@@ -44,17 +44,6 @@ typedef enum {
 	UNKNOWN,
 } PinType;
 
-
-class InternalPin {
-	public:
-		InternalPin() : type(P1), subtype(-1), value(0) {}
-		InternalPin(PinType type, int subtype) : type(type), subtype(subtype), value(0) {}
-
-	PinType type;
-	int subtype;
-	double value;
-};
-
 class PinWatcher {
 	public:
 		virtual void handlePinChanged(int id, double value) = 0;
@@ -80,8 +69,6 @@ class PinManager {
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
-		std::vector<InternalPin> m_pins;
-		std::map<int, int> m_gpCache;
 		PinWatcher *m_watcher;
 		InterruptManager *m_intManager;
 		std::vector<PinMultiplexer *> m_multiplexers;

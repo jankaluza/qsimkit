@@ -39,6 +39,7 @@ class PinMultiplexer : public MemoryWatcher {
 
 		PinMultiplexer(PinManager *manager, int id, Memory *mem,
 					   Variant *variant, uint16_t dir, uint16_t sel, uint8_t index);
+
 		virtual ~PinMultiplexer();
 
 		void addMultiplexing(Condition &c, const std::string &outputName);
