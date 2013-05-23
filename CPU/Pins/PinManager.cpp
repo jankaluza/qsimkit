@@ -36,7 +36,6 @@ PinManager::~PinManager() {
 
 }
 
-
 #define CREATE_MPX_AND_HANDLER_WITH_INT(TYPE, INDEX, VEC) {\
 	mpx = new PinMultiplexer(this, m_multiplexers.size(), m_mem, m_variant, m_variant->get##TYPE##DIR(), \
 							m_variant->get##TYPE##SEL(), subtype); \
@@ -90,6 +89,15 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 
 	m_multiplexers.push_back(mpx);
 	return mpx;
+}
+
+void PinManager::addPinHandler(const std::string &name, PinHandler *handler) {
+	for (std::vector<PinMultiplexer *>::iterator it = m_multiplexers.begin(); it != m_multiplexers.end(); ++it) {
+		if ((*it)->hasMultiplexing(name)) {
+			(*it)->addPinHandler(name, handler);
+			break;
+		}
+	}
 }
 
 bool PinManager::handlePinInput(int id, double value) {

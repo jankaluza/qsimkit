@@ -23,6 +23,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
 #include <iostream>
+#include <algorithm>
 
 namespace MCU {
 
@@ -46,6 +47,10 @@ void PinMultiplexer::addMultiplexing(Condition &c, const std::string &outputName
 
 	// By adding this Multiplexing the current handler can change
 	handleMemoryChanged(m_mem, 0);
+}
+
+bool PinMultiplexer::hasMultiplexing(const std::string &outputName) {
+	return std::find(m_outputs.begin(), m_outputs.end(), outputName) != m_outputs.end();
 }
 
 void PinMultiplexer::addPinHandler(const std::string &name, PinHandler *handler) {

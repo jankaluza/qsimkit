@@ -44,6 +44,8 @@ class PinMultiplexer : public MemoryWatcher {
 
 		void addMultiplexing(Condition &c, const std::string &outputName);
 
+		bool hasMultiplexing(const std::string &outputName);
+
 		void addPinHandler(const std::string &name, PinHandler *handler);
 
 		bool handleInput(double value);

@@ -31,6 +31,7 @@ namespace MCU {
 class Memory;
 class InterruptManager;
 class PinMultiplexer;
+class PinHandler;
 
 typedef enum {
 	P1 = 0,
@@ -58,6 +59,8 @@ class PinManager {
 		PinMultiplexer *addPin(PinType type, int subtype = -1);
 
 		void reset();
+
+		void addPinHandler(const std::string &name, PinHandler *handler);
 
 		bool handlePinInput(int id, double value);
 		void generateOutput(int id, double value);
