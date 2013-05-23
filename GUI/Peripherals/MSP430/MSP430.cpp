@@ -57,11 +57,12 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	m_reg = new MCU::RegisterSet();
 	m_reg->addDefaultRegisters();
 
-	m_pinManager = new MCU::PinManager(0, m_variant);
+	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
+	m_pinManager = new MCU::PinManager(m_mem, m_intManager, m_variant);
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 
-	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
+	
 	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_timerFactory);
 	reset();
 
@@ -69,6 +70,7 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 }
 
 void MSP430::loadPackage(const QString &file) {
+	std::cout << "LOAD PACKAGE " << this << "\n";
 	m_pinManager->reset();
 	Package::loadPackage(this, m_pinManager, file, m_pins, m_sides);
 }
@@ -81,9 +83,6 @@ void MSP430::reset() {
 	m_basicClock->reset();
 
 	m_decoder = new MCU::InstructionDecoder(m_reg, m_mem);
-
-	m_pinManager->setMemory(m_mem);
-	m_pinManager->setInterruptManager(m_intManager);
 
 	if (!m_code.empty()) {
 		loadA43(m_code);

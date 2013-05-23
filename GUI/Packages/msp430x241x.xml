@@ -2,88 +2,88 @@
 <package name="MSP430F241x, 80-pin PN package">
 	<left>
 		<pin id="1"><name>DVcc1</name></pin>
-		<pin id="2"><name>P6.3</name><name>A3</name></pin>
-		<pin id="3"><name>P6.4</name><name>A4</name></pin>
-		<pin id="4"><name>P6.5</name><name>A5</name></pin>
-		<pin id="5"><name>P6.6</name><name>A6</name></pin>
-		<pin id="6"><name>P6.7</name><name>A7</name><name>SVSIN</name></pin>
+		<pin id="2"><name sel="0">P6.3</name><name>A3</name></pin>
+		<pin id="3"><name sel="0">P6.4</name><name>A4</name></pin>
+		<pin id="4"><name sel="0">P6.5</name><name>A5</name></pin>
+		<pin id="5"><name sel="0">P6.6</name><name>A6</name></pin>
+		<pin id="6"><name sel="0">P6.7</name><name>A7</name><name>SVSIN</name></pin>
 		<pin id="7"><name>Vref+</name></pin>
 		<pin id="8"><name>XIN</name></pin>
 		<pin id="9"><name>XOUT</name></pin>
 		<pin id="10"><name>Veref+</name></pin>
 		<pin id="11"><name>Vref-</name><name>Veref-</name></pin>
-		<pin id="12"><name>P1.0</name><name>TACLK</name><name>CAOUT</name></pin>
-		<pin id="13"><name>P1.1</name><name>TA0</name></pin>
-		<pin id="14"><name>P1.2</name><name>TA1</name></pin>
-		<pin id="15"><name>P1.3</name><name>TA2</name></pin>
-		<pin id="16"><name>P1.4</name><name>SMCLK</name></pin>
-		<pin id="17"><name>P1.5</name><name>TA0</name></pin>
-		<pin id="18"><name>P1.6</name><name>TA1</name></pin>
-		<pin id="19"><name>P1.7</name><name>TA2</name></pin>
-		<pin id="20"><name>P2.0</name><name>ACLK</name><name>CA2</name></pin>
+		<pin id="12"><name sel="0">P1.0</name><name>TACLK</name><name>CAOUT</name></pin>
+		<pin id="13"><name sel="0">P1.1</name><name dir="0" sel="1">CCI0A</name></pin>
+		<pin id="14"><name sel="0">P1.2</name><name>TA1</name></pin>
+		<pin id="15"><name sel="0">P1.3</name><name>TA2</name></pin>
+		<pin id="16"><name sel="0">P1.4</name><name>SMCLK</name></pin>
+		<pin id="17"><name sel="0">P1.5</name><name>TA0</name></pin>
+		<pin id="18"><name sel="0">P1.6</name><name>TA1</name></pin>
+		<pin id="19"><name sel="0">P1.7</name><name>TA2</name></pin>
+		<pin id="20"><name sel="0">P2.0</name><name>ACLK</name><name>CA2</name></pin>
 	</left>
 	<down>
-		<pin id="21"><name>P2.1</name></pin>
-		<pin id="22"><name>P2.2</name></pin>
-		<pin id="23"><name>P2.3</name></pin>
-		<pin id="24"><name>P2.4</name></pin>
-		<pin id="25"><name>P2.5</name></pin>
-		<pin id="26"><name>P2.6</name></pin>
-		<pin id="27"><name>P2.7</name></pin>
-		<pin id="28"><name>P3.0</name></pin>
-		<pin id="29"><name>P3.1</name></pin>
-		<pin id="30"><name>P3.2</name></pin>
-		<pin id="31"><name>P3.3</name></pin>
-		<pin id="32"><name>P3.4</name></pin>
-		<pin id="33"><name>P3.5</name></pin>
-		<pin id="34"><name>P3.6</name></pin>
-		<pin id="35"><name>P3.7</name></pin>
-		<pin id="36"><name>P4.0</name></pin>
-		<pin id="37"><name>P4.1</name></pin>
-		<pin id="38"><name>P4.2</name></pin>
-		<pin id="39"><name>P4.3</name></pin>
-		<pin id="40"><name>P4.4</name></pin>
+		<pin id="21"><name sel="0">P2.1</name></pin>
+		<pin id="22"><name sel="0">P2.2</name></pin>
+		<pin id="23"><name sel="0">P2.3</name></pin>
+		<pin id="24"><name sel="0">P2.4</name></pin>
+		<pin id="25"><name sel="0">P2.5</name></pin>
+		<pin id="26"><name sel="0">P2.6</name></pin>
+		<pin id="27"><name sel="0">P2.7</name></pin>
+		<pin id="28"><name sel="0">P3.0</name></pin>
+		<pin id="29"><name sel="0">P3.1</name></pin>
+		<pin id="30"><name sel="0">P3.2</name></pin>
+		<pin id="31"><name sel="0">P3.3</name></pin>
+		<pin id="32"><name sel="0">P3.4</name></pin>
+		<pin id="33"><name sel="0">P3.5</name></pin>
+		<pin id="34"><name sel="0">P3.6</name></pin>
+		<pin id="35"><name sel="0">P3.7</name></pin>
+		<pin id="36"><name sel="0">P4.0</name></pin>
+		<pin id="37"><name sel="0">P4.1</name></pin>
+		<pin id="38"><name sel="0">P4.2</name></pin>
+		<pin id="39"><name sel="0">P4.3</name></pin>
+		<pin id="40"><name sel="0">P4.4</name></pin>
 	</down>
 	<right>
-		<pin id="41"><name>P4.5</name></pin>
-		<pin id="42"><name>P4.6</name></pin>
-		<pin id="43"><name>P4.7</name></pin>
-		<pin id="44"><name>P5.0</name></pin>
-		<pin id="45"><name>P5.1</name></pin>
-		<pin id="46"><name>P5.2</name></pin>
-		<pin id="47"><name>P5.3</name></pin>
-		<pin id="48"><name>P5.4</name></pin>
-		<pin id="49"><name>P5.5</name></pin>
-		<pin id="50"><name>P5.6</name></pin>
-		<pin id="51"><name>P5.7</name></pin>
+		<pin id="41"><name sel="0">P4.5</name></pin>
+		<pin id="42"><name sel="0">P4.6</name></pin>
+		<pin id="43"><name sel="0">P4.7</name></pin>
+		<pin id="44"><name sel="0">P5.0</name></pin>
+		<pin id="45"><name sel="0">P5.1</name></pin>
+		<pin id="46"><name sel="0">P5.2</name></pin>
+		<pin id="47"><name sel="0">P5.3</name></pin>
+		<pin id="48"><name sel="0">P5.4</name></pin>
+		<pin id="49"><name sel="0">P5.5</name></pin>
+		<pin id="50"><name sel="0">P5.6</name></pin>
+		<pin id="51"><name sel="0">P5.7</name></pin>
 		<pin id="52"><name>DVcc2</name></pin>
 		<pin id="53"><name>DVss2</name></pin>
-		<pin id="54"><name>P7.0</name></pin>
-		<pin id="55"><name>P7.1</name></pin>
-		<pin id="56"><name>P7.2</name></pin>
-		<pin id="57"><name>P7.3</name></pin>
-		<pin id="58"><name>P7.4</name></pin>
-		<pin id="59"><name>P7.5</name></pin>
-		<pin id="60"><name>P7.6</name></pin>
+		<pin id="54"><name sel="0">P7.0</name></pin>
+		<pin id="55"><name sel="0">P7.1</name></pin>
+		<pin id="56"><name sel="0">P7.2</name></pin>
+		<pin id="57"><name sel="0">P7.3</name></pin>
+		<pin id="58"><name sel="0">P7.4</name></pin>
+		<pin id="59"><name sel="0">P7.5</name></pin>
+		<pin id="60"><name sel="0">P7.6</name></pin>
 	</right>
 	<up>
-		<pin id="61"><name>P7.7</name></pin>
-		<pin id="62"><name>P8.0</name></pin>
-		<pin id="63"><name>P8.1</name></pin>
-		<pin id="64"><name>P8.2</name></pin>
-		<pin id="65"><name>P8.3</name></pin>
-		<pin id="66"><name>P8.4</name></pin>
-		<pin id="67"><name>P8.5</name></pin>
-		<pin id="68"><name>P8.6</name></pin>
-		<pin id="69"><name>P8.7</name></pin>
+		<pin id="61"><name sel="0">P7.7</name></pin>
+		<pin id="62"><name sel="0">P8.0</name></pin>
+		<pin id="63"><name sel="0">P8.1</name></pin>
+		<pin id="64"><name sel="0">P8.2</name></pin>
+		<pin id="65"><name sel="0">P8.3</name></pin>
+		<pin id="66"><name sel="0">P8.4</name></pin>
+		<pin id="67"><name sel="0">P8.5</name></pin>
+		<pin id="68"><name sel="0">P8.6</name></pin>
+		<pin id="69"><name sel="0">P8.7</name></pin>
 		<pin id="70"><name>TDO</name></pin>
 		<pin id="71"><name>TDI</name></pin>
 		<pin id="72"><name>TMS</name></pin>
 		<pin id="73"><name>TCK</name></pin>
 		<pin id="74"><name>RST</name></pin>
-		<pin id="75"><name>P6.0</name></pin>
-		<pin id="76"><name>P6.1</name></pin>
-		<pin id="77"><name>P6.2</name></pin>
+		<pin id="75"><name sel="0">P6.0</name></pin>
+		<pin id="76"><name sel="0">P6.1</name></pin>
+		<pin id="77"><name sel="0">P6.2</name></pin>
 		<pin id="78"><name>AVss</name></pin>
 		<pin id="79"><name>DVss</name></pin>
 		<pin id="80"><name>AVcc</name></pin>

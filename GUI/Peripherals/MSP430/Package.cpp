@@ -21,6 +21,7 @@
 #include "MSP430.h"
 
 #include "CPU/Variants/Variant.h"
+#include "CPU/Pins/PinMultiplexer.h"
 
 #include <QWidget>
 #include <QApplication>
@@ -121,6 +122,7 @@ bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, 
 			QString n;
 			MCU::PinType type = MCU::UNKNOWN;
 			int subtype = -1;
+
 			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
 				QString n_ = name.toElement().text();
 				n += n_ + "/";
@@ -128,7 +130,19 @@ bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, 
 			}
 
 			pins.push_back(Pin(QRect(x, y, pin_size, pin_size), n, 0));
-			pinManager->addPin(type, subtype);
+			MCU::PinMultiplexer *mpx = pinManager->addPin(type, subtype);
+			if (mpx) {
+				for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
+					MCU::PinMultiplexer::Condition c;
+					if (name.toElement().hasAttribute("sel")) {
+						c["sel"] = name.toElement().attribute("sel").toInt();
+					}
+					if (name.toElement().hasAttribute("dir")) {
+						c["dir"] = name.toElement().attribute("dir").toInt();
+					}
+					mpx->addMultiplexing(c, "GP");
+				}
+			}
 
 			if (side == 'd') {
 				x += pin_size + 2;

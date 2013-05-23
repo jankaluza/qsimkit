@@ -18,6 +18,8 @@
  **/
 
 #include "PinManager.h"
+#include "PinMultiplexer.h"
+#include "GPPinHandler.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
@@ -25,172 +27,82 @@
 
 namespace MCU {
 
-PinManager::PinManager(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant) {
-	setMemory(mem);
+PinManager::PinManager(Memory *mem, InterruptManager *intManager, Variant *variant) :
+m_mem(mem), m_intManager(intManager), m_variant(variant) {
+
 }
 
 PinManager::~PinManager() {
 
 }
 
-#define REFRESH_GP(TYPE, VAR, ADDRESS) { \
-	uint16_t b = m_mem->getBigEndian(ADDRESS);\
-	uint8_t dir =  m_mem->getByte(m_variant->get##TYPE##DIR()); \
-	for (int i = 0; i < 8; ++i) { \
-		if (!(dir & (1 << i))) continue; \
-		int pin_id = m_gpCache[((int) TYPE) * 10 + i]; \
-		if (b & (1 << i)) { \
-			if (m_pins[pin_id].value != 1.0) { \
-				m_pins[pin_id].value = 1.0; \
-				m_watcher->handlePinChanged(pin_id, 1.0); \
-			} \
-		} \
-		else { \
-			if (m_pins[pin_id].value != 0) { \
-				m_pins[pin_id].value = 0; \
-				m_watcher->handlePinChanged(pin_id, 0.0); \
-			} \
-		} \
-	} \
+
+#define CREATE_MPX_AND_HANDLER_WITH_INT(TYPE, INDEX) {\
+	mpx = new PinMultiplexer(this, m_multiplexers.size(), m_mem, m_variant, m_variant->get##TYPE##DIR(), \
+							m_variant->get##TYPE##SEL(), subtype); \
+	handler = new GPPinHandler(m_mem, mpx, m_intManager, m_variant->get##TYPE##DIR(), \
+				m_variant->get##TYPE##IN(), m_variant->get##TYPE##OUT(), \
+				m_variant->get##TYPE##IE(), m_variant->get##TYPE##IES(), \
+				m_variant->get##TYPE##IFG(), subtype);\
+	mpx->addPinHandler("GP", handler); \
 }
 
-void PinManager::handleMemoryChanged(Memory *memory, uint16_t address) {
-	if (address == m_variant->getP1OUT()) {
-		REFRESH_GP(P1, in, m_variant->getP1OUT());
-	}
-	else if (address == m_variant->getP2OUT()) {
-		REFRESH_GP(P2, in, m_variant->getP2OUT());
-	}
-	else if (address == m_variant->getP3OUT()) {
-		REFRESH_GP(P3, in, m_variant->getP3OUT());
-	}
-	else if (address == m_variant->getP4OUT()) {
-		REFRESH_GP(P4, in, m_variant->getP4OUT());
-	}
-	else if (address == m_variant->getP5OUT()) {
-		REFRESH_GP(P5, in, m_variant->getP5OUT());
-	}
-	else if (address == m_variant->getP6OUT()) {
-		REFRESH_GP(P6, in, m_variant->getP6OUT());
-	}
-	else if (address == m_variant->getP7OUT()) {
-		REFRESH_GP(P7, in, m_variant->getP7OUT());
-	}
-	else if (address == m_variant->getP8OUT()) {
-		REFRESH_GP(P8, in, m_variant->getP8OUT());
-	}
+#define CREATE_MPX_AND_HANDLER(TYPE, INDEX) {\
+	mpx = new PinMultiplexer(this, m_multiplexers.size(), m_mem, m_variant, m_variant->get##TYPE##DIR(), \
+							m_variant->get##TYPE##SEL(), subtype); \
+	handler = new GPPinHandler(m_mem, mpx, m_intManager, m_variant->get##TYPE##DIR(), \
+				m_variant->get##TYPE##IN(), m_variant->get##TYPE##OUT(), \
+				0, 0, 0, subtype);\
+	mpx->addPinHandler("GP", handler); \
 }
 
-void PinManager::setMemory(Memory *mem) {
-	m_mem = mem;
-	if (!m_mem) {
-		return;
-	}
-
-#define ADD_WATCHER(METHOD) \
-	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
-
-	ADD_WATCHER(m_variant->getP1OUT());
-	ADD_WATCHER(m_variant->getP2OUT());
-	ADD_WATCHER(m_variant->getP3OUT());
-	ADD_WATCHER(m_variant->getP4OUT());
-	ADD_WATCHER(m_variant->getP5OUT());
-	ADD_WATCHER(m_variant->getP6OUT());
-	ADD_WATCHER(m_variant->getP7OUT());
-	ADD_WATCHER(m_variant->getP8OUT());
-	ADD_WATCHER(m_variant->getP9OUT());
-	ADD_WATCHER(m_variant->getP10OUT());
-
-#undef ADD_WATCHER
-}
-
-void PinManager::addPin(PinType type, int subtype) {
-	m_pins.push_back(InternalPin(type, subtype));
-
+PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
+	PinMultiplexer *mpx = 0;
+	GPPinHandler *handler = 0;
 	switch (type) {
-		case P1: case P2: case P3: case P4: case P5:
-		case P6: case P7: case P8:
-			m_gpCache[((int) type * 10) + subtype] = m_pins.size() - 1;
+		case P1:
+			CREATE_MPX_AND_HANDLER_WITH_INT(P1, subtype);
+			break;
+		case P2:
+			CREATE_MPX_AND_HANDLER_WITH_INT(P2, subtype);
+			break;
+		case P3:
+			CREATE_MPX_AND_HANDLER(P3, subtype);
+			break;
+		case P4:
+			CREATE_MPX_AND_HANDLER(P4, subtype);
+			break;
+		case P5:
+			CREATE_MPX_AND_HANDLER(P5, subtype);
+			break;
+		case P6:
+			CREATE_MPX_AND_HANDLER(P6, subtype);
+			break;
+		case P7:
+			CREATE_MPX_AND_HANDLER(P7, subtype);
+			break;
+		case P8:
+			CREATE_MPX_AND_HANDLER(P8, subtype);
 			break;
 		default:
 			break;
 	}
+
+	m_multiplexers.push_back(mpx);
+	return mpx;
 }
 
 bool PinManager::handlePinInput(int id, double value) {
-	InternalPin &p = m_pins[id];
-	bool handled = false;
+	m_multiplexers[id]->handleInput(value);
+	return true;
+}
 
-	// Checks if the pin is input and stores the value in the
-	// proper address in memory
-#define SET_GP_IN(PIN, I, VALUE) \
-	if (!(m_mem->getByte(m_variant->get##PIN##DIR()) & (1 << I))) { \
-		m_mem->setBit(m_variant->get##PIN##IN(), 1 << I, VALUE == 1); \
-		handled = true; \
-	}
-
-	// 1. Check if interrupts are enabled for given pin (PxIE)
-	// 2. Check if the condition for interrupt was met (PxIES)
-	// 3. Set the PxIFG value according to given pin
-	// 4. Inform InterruptManager that we have interrupt here.
-#define RUN_GP_INTERRUPT(PIN, PORT, I, VALUE) \
-	if (m_mem->getByte(m_variant->get##PIN##IE()) & (1 << I)) { \
-		/* Interrupt enabled */ \
-		if (m_mem->getByte(m_variant->get##PIN##IES()) & (1 << I)) { \
-			/* Low to high */ \
-			if (m_pins[id].value == 0 && value == 1.0) { \
-				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
-				m_intManager->queueInterrupt(m_variant->get##PORT##_VECTOR()); \
-			}\
-		} \
-		else { \
-			/* High to low */ \
-			std::cerr << "xxxxx\n"; \
-			if (m_pins[id].value == 1.0 && value == 0) { \
-				m_mem->setBit(m_variant->get##PIN##IFG(), 1 << I, 1); \
-				m_intManager->queueInterrupt(m_variant->get##PORT##_VECTOR()); \
-			}\
-		} \
-	} \
-	else { std::cerr << "IE NOT ENABLED " << (int) m_mem->getByte(m_variant->get##PIN##IE()) << "\n"; }
-
-	switch (p.type) {
-		case P1:
-			SET_GP_IN(P1, p.subtype, value)
-			RUN_GP_INTERRUPT(P1, PORT1, p.subtype, value)
-			break;
-		case P2:
-			SET_GP_IN(P2, p.subtype, value)
-			RUN_GP_INTERRUPT(P2, PORT2, p.subtype, value);
-			break;
-		case P3:
-			SET_GP_IN(P3, p.subtype, value)
-			break;
-		case P4:
-			SET_GP_IN(P4, p.subtype, value)
-			break;
-		case P5:
-			SET_GP_IN(P5, p.subtype, value)
-			break;
-		case P6:
-			SET_GP_IN(P6, p.subtype, value)
-			break;
-		case P7:
-			SET_GP_IN(P7, p.subtype, value)
-			break;
-		case P8:
-			SET_GP_IN(P8, p.subtype, value)
-		default:
-			break;
-	}
-
-	m_pins[id].value = value;
-	return handled;
+void PinManager::generateOutput(int id, double value) {
+	m_watcher->handlePinChanged(id, value);
 }
 
 void PinManager::reset() {
-	m_pins.clear();
-	m_gpCache.clear();
+	m_multiplexers.clear();
 }
 
 }

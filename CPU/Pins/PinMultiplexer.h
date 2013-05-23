@@ -29,62 +29,44 @@ class Variant;
 namespace MCU {
 
 class Memory;
-class InterruptManager;
-class PinMultiplexer;
+class PinHandler;
+class PinManager;
 
-typedef enum {
-	P1 = 0,
-	P2,
-	P3,
-	P4,
-	P5,
-	P6,
-	P7,
-	P8,
-	UNKNOWN,
-} PinType;
-
-
-class InternalPin {
+class PinMultiplexer : public MemoryWatcher {
 	public:
-		InternalPin() : type(P1), subtype(-1), value(0) {}
-		InternalPin(PinType type, int subtype) : type(type), subtype(subtype), value(0) {}
 
-	PinType type;
-	int subtype;
-	double value;
-};
+		typedef std::map<std::string, uint8_t> Condition;
 
-class PinWatcher {
-	public:
-		virtual void handlePinChanged(int id, double value) = 0;
-};
+		PinMultiplexer(PinManager *manager, int id, Memory *mem,
+					   Variant *variant, uint16_t dir, uint16_t sel, uint8_t index);
+		virtual ~PinMultiplexer();
 
-class PinManager {
-	public:
-		PinManager(Memory *mem, InterruptManager *intManager, Variant *variant);
-		virtual ~PinManager();
+		void addMultiplexing(Condition &c, const std::string &outputName);
 
+		void addPinHandler(const std::string &name, PinHandler *handler);
 
-		PinMultiplexer *addPin(PinType type, int subtype = -1);
+		bool handleInput(double value);
+
+		void generateOutput(PinHandler *handler, double value);
 
 		void reset();
 
-		bool handlePinInput(int id, double value);
-		void generateOutput(int id, double value);
-
-		void setWatcher(PinWatcher *watcher) {
-			m_watcher = watcher;
-		}
+		void handleMemoryChanged(Memory *memory, uint16_t address);
 
 	private:
+		PinManager *m_manager;
+		int m_id;
 		Memory *m_mem;
 		Variant *m_variant;
-		std::vector<InternalPin> m_pins;
-		std::map<int, int> m_gpCache;
-		PinWatcher *m_watcher;
-		InterruptManager *m_intManager;
-		std::vector<PinMultiplexer *> m_multiplexers;
+		uint16_t m_dir;
+		uint16_t m_sel;
+		uint8_t m_index;
+		
+		std::vector<Condition> m_conds;
+		std::vector<std::string> m_outputs;
+		std::map<std::string, PinHandler *> m_handlers;
+		PinHandler *m_handler;
+		std::string m_handlerName;
 };
 
 }
