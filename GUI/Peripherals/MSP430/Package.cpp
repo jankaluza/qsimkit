@@ -140,7 +140,13 @@ bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, 
 					if (name.toElement().hasAttribute("dir")) {
 						c["dir"] = name.toElement().attribute("dir").toInt();
 					}
-					mpx->addMultiplexing(c, "GP");
+					QString n_ = name.toElement().text();
+					if (n_.startsWith("P")) {
+						mpx->addMultiplexing(c, "GP");
+					}
+					else {
+						mpx->addMultiplexing(c, n_.toStdString());
+					}
 				}
 			}
 

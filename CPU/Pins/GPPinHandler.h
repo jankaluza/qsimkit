@@ -35,7 +35,7 @@ class GPPinHandler : public PinHandler, public MemoryWatcher {
 		GPPinHandler(Memory *mem, PinMultiplexer *mpx,
 					 InterruptManager *intManager, uint16_t dir,
 					 uint16_t in, uint16_t out, uint16_t ie, uint16_t ies,
-					 uint16_t ifg, uint8_t id);
+					 uint16_t ifg, uint16_t intvec, uint8_t id);
 		virtual ~GPPinHandler();
 
 		void handlePinInput(const std::string &name, double value);
@@ -56,6 +56,7 @@ class GPPinHandler : public PinHandler, public MemoryWatcher {
 		uint16_t m_ie;
 		uint16_t m_ies;
 		uint16_t m_ifg;
+		uint16_t m_intvec;
 		uint8_t m_id;
 		bool m_active;
 		bool m_oldValue;

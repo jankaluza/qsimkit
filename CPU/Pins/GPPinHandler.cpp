@@ -28,10 +28,10 @@ namespace MCU {
 	
 GPPinHandler::GPPinHandler(Memory *mem, PinMultiplexer *mpx, InterruptManager *intManager,
 						   uint16_t dir, uint16_t in, uint16_t out,
-						   uint16_t ie, uint16_t ies, uint16_t ifg,
+						   uint16_t ie, uint16_t ies, uint16_t ifg, uint16_t intvec,
 						   uint8_t id) :
 m_mem(mem), m_mpx(mpx), m_intManager(intManager), m_dir(dir), m_in(in), m_out(out), m_ie(ie),
-m_ies(ies), m_ifg(ifg), m_id(id), m_active(true), m_oldValue(false) {
+m_ies(ies), m_ifg(ifg), m_intvec(intvec), m_id(id), m_active(true), m_oldValue(false) {
 	m_id = 1 << m_id;
 
 	m_mem->addWatcher(m_out, this);
@@ -81,16 +81,14 @@ void GPPinHandler::handlePinInput(const std::string &name, double value) {
 			// Low to high
 			if (old_value == 0 && value == 1.0) {
 				m_mem->setBit(m_ifg, m_id, 1);
-				// TODO: PORT VECTOR
-				m_intManager->queueInterrupt(0);
+				m_intManager->queueInterrupt(m_intvec);
 			}
 		}
 		else {
 			// High to low
 			if (old_value == 1 && value == 0) {
 				m_mem->setBit(m_ifg, m_id, 1);
-				// TODO: PORT VECTOR
-				m_intManager->queueInterrupt(0);
+				m_intManager->queueInterrupt(m_intvec);
 			}
 		}
 	}

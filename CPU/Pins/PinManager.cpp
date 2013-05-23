@@ -37,13 +37,13 @@ PinManager::~PinManager() {
 }
 
 
-#define CREATE_MPX_AND_HANDLER_WITH_INT(TYPE, INDEX) {\
+#define CREATE_MPX_AND_HANDLER_WITH_INT(TYPE, INDEX, VEC) {\
 	mpx = new PinMultiplexer(this, m_multiplexers.size(), m_mem, m_variant, m_variant->get##TYPE##DIR(), \
 							m_variant->get##TYPE##SEL(), subtype); \
 	handler = new GPPinHandler(m_mem, mpx, m_intManager, m_variant->get##TYPE##DIR(), \
 				m_variant->get##TYPE##IN(), m_variant->get##TYPE##OUT(), \
 				m_variant->get##TYPE##IE(), m_variant->get##TYPE##IES(), \
-				m_variant->get##TYPE##IFG(), subtype);\
+				m_variant->get##TYPE##IFG(), VEC, subtype);\
 	mpx->addPinHandler("GP", handler); \
 }
 
@@ -52,7 +52,7 @@ PinManager::~PinManager() {
 							m_variant->get##TYPE##SEL(), subtype); \
 	handler = new GPPinHandler(m_mem, mpx, m_intManager, m_variant->get##TYPE##DIR(), \
 				m_variant->get##TYPE##IN(), m_variant->get##TYPE##OUT(), \
-				0, 0, 0, subtype);\
+				0, 0, 0, 0, subtype);\
 	mpx->addPinHandler("GP", handler); \
 }
 
@@ -61,10 +61,10 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 	GPPinHandler *handler = 0;
 	switch (type) {
 		case P1:
-			CREATE_MPX_AND_HANDLER_WITH_INT(P1, subtype);
+			CREATE_MPX_AND_HANDLER_WITH_INT(P1, subtype, m_variant->getPORT1_VECTOR());
 			break;
 		case P2:
-			CREATE_MPX_AND_HANDLER_WITH_INT(P2, subtype);
+			CREATE_MPX_AND_HANDLER_WITH_INT(P2, subtype, m_variant->getPORT2_VECTOR());
 			break;
 		case P3:
 			CREATE_MPX_AND_HANDLER(P3, subtype);

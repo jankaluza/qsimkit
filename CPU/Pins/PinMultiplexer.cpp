@@ -42,6 +42,8 @@ void PinMultiplexer::addMultiplexing(Condition &c, const std::string &outputName
 	m_conds.push_back(c);
 	m_outputs.push_back(outputName);
 
+// 	std::cout << m_id << ": Adding multiplexing " << outputName << "\n";
+
 	// By adding this Multiplexing the current handler can change
 	handleMemoryChanged(m_mem, 0);
 }
