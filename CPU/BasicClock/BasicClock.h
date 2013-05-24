@@ -40,12 +40,13 @@ class SMCLK;
 class LFXT1;
 class Timer;
 class TimerFactory;
+class PinManager;
 
 /// Implements and includes all modules from Basic Clock Module.
 class BasicClock {
 	public:
 		BasicClock(Memory *mem, Variant *variant, InterruptManager *intManager,
-				   TimerFactory *factory);
+				   PinManager *pinManager, TimerFactory *factory);
 		virtual ~BasicClock();
 
 		void reset();
@@ -70,6 +71,7 @@ class BasicClock {
 		Timer *m_timerA;
 		InterruptManager *m_intManager;
 		TimerFactory *m_factory;
+		PinManager *m_pinManager;
 };
 
 }

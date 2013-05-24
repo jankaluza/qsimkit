@@ -35,8 +35,9 @@
 namespace MCU {
 
 BasicClock::BasicClock(Memory *mem, Variant *variant,
-					   InterruptManager *intManager, TimerFactory *factory) :
-m_mem(mem), m_variant(variant), m_intManager(intManager), m_factory(factory) {
+					   InterruptManager *intManager, PinManager *pinManager, TimerFactory *factory) :
+m_mem(mem), m_variant(variant), m_intManager(intManager), m_factory(factory),
+m_pinManager(pinManager) {
 
 	m_vlo = new VLO();
 	m_lfxt1 = new LFXT1(m_mem, m_variant);
@@ -44,10 +45,10 @@ m_mem(mem), m_variant(variant), m_intManager(intManager), m_factory(factory) {
 	m_dco = new DCO(m_mem, m_variant);
 	m_smclk = new SMCLK(m_mem, m_variant, m_dco);
 	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
-	m_timerA = m_factory->createTimer(m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+
+	m_timerA = m_factory->createTimer(m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 									  m_variant->getTA0CTL(), m_variant->getTA0R(),
 									  m_variant->getTA0IV());
-
 	m_timerA->addCCR(m_variant->getTA0CCTL0(), m_variant->getTA0CCR0());
 	m_timerA->addCCR(m_variant->getTA0CCTL1(), m_variant->getTA0CCR1());
 }

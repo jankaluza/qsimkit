@@ -30,7 +30,7 @@ namespace MCU {
 PinMultiplexer::PinMultiplexer(PinManager *manager, int id, Memory *mem, Variant *variant,
 							   uint16_t dir, uint16_t sel, uint8_t index) :
 m_manager(manager), m_id(id), m_mem(mem), m_variant(variant), m_dir(dir),
-m_sel(sel), m_index(1 << index) {
+m_sel(sel), m_index(1 << index), m_value(0) {
 	m_mem->addWatcher(m_dir, this);
 	m_mem->addWatcher(m_sel, this);
 }
@@ -64,6 +64,8 @@ bool PinMultiplexer::handleInput(double value) {
 	if (m_handler) {
 		m_handler->handlePinInput(m_handlerName, value);
 	}
+
+	m_value = value;
 }
 
 void PinMultiplexer::generateOutput(PinHandler *handler, double value) {
@@ -107,6 +109,7 @@ void PinMultiplexer::handleMemoryChanged(Memory *memory, uint16_t address) {
 
 			if (m_handler) {
 				m_handler->handlePinActivated(m_handlerName);
+				m_handler->handlePinInput(m_handlerName, m_value);
 			}
 			break;
 		}

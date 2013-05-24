@@ -63,7 +63,7 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
 
 	
-	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_timerFactory);
+	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);

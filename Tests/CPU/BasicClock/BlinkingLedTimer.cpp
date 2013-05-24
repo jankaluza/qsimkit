@@ -15,6 +15,7 @@
 #include "CPU/BasicClock/SMCLK.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
+#include "CPU/Pins/PinManager.h"
 
 #include <algorithm>
 
@@ -22,11 +23,11 @@ using namespace MCU;
 
 class DummyTimerFactory : public TimerFactory {
 	public:
-		Timer *createTimer(InterruptManager *intManager, Memory *mem,
+		Timer *createTimer(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
 						   Variant *variant, ACLK *aclk,
 						   SMCLK *smclk, uint16_t tactl, uint16_t tar,
 						   uint16_t taiv) {
-			return new Timer(intManager, mem, variant, aclk, smclk, tactl, tar, taiv);
+			return new Timer(pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv);
 		}
 };
 
@@ -137,6 +138,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 	InterruptManager *intManager;
 	BasicClock *bc;
 	TimerFactory *factory;
+	PinManager *pinManager;
 
 
 	public:
@@ -150,7 +152,8 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			v = getVariant("msp430x241x");
 			intManager = new InterruptManager(r, m);
 			factory = new DummyTimerFactory();
-			bc = new BasicClock(m, v, intManager, factory);
+			pinManager = new PinManager(m, intManager, v);
+			bc = new BasicClock(m, v, intManager, pinManager, factory);
 		}
 
 		void tearDown (void) {
@@ -161,6 +164,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			delete intManager;
 			delete bc;
 			delete factory;
+			delete pinManager;
 		}
 
 	void execute() {

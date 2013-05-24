@@ -33,11 +33,12 @@ class Clock;
 class InterruptManager;
 class Timer;
 class Memory;
+class PinManager;
 
 class TimerFactory {
 	public:
 		virtual ~TimerFactory() {}
-		virtual Timer *createTimer(InterruptManager *intManager, Memory *mem,
+		virtual Timer *createTimer(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
 								   Variant *variant, ACLK *aclk,
 								   SMCLK *smclk, uint16_t tactl, uint16_t tar,
 								   uint16_t taiv) = 0;

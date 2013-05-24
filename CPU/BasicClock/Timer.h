@@ -35,10 +35,11 @@ class ACLK;
 class SMCLK;
 class Clock;
 class InterruptManager;
+class PinManager;
 
 class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 	public:
-		Timer(InterruptManager *intManager, Memory *mem, Variant *variant,
+		Timer(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			  ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
 			  uint16_t taiv);
 		virtual ~Timer();
@@ -67,6 +68,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 			uint16_t taccr;
 		} CCR;
 
+		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
 		Memory *m_mem;
 		Variant *m_variant;

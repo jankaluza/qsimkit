@@ -108,16 +108,17 @@ class PinMultiplexerTest : public CPPUNIT_NS :: TestFixture{
 			// this pin input is forwarded to GP, not CCIOA
 			pinManager->handlePinInput(0, 1.0);
 			CPPUNIT_ASSERT_EQUAL(0.0, cci0a->value);
-
 			CPPUNIT_ASSERT_EQUAL(false, cci0a->active);
+
+			// switch to CCI0A, the value on PIN is still 1.0
 			m->setBitWatcher(v->getP1SEL(), 1, true);
 			// cci0a not set yet, because DIR is 1
 			CPPUNIT_ASSERT_EQUAL(false, cci0a->active);
 			m->setBitWatcher(v->getP1DIR(), 1, false);
 			CPPUNIT_ASSERT_EQUAL(true, cci0a->active);
 			// this pin input is forwarded CCIOA
-			pinManager->handlePinInput(0, 1.0);
 			CPPUNIT_ASSERT_EQUAL(1.0, cci0a->value);
+
 			m->setBitWatcher(v->getP1SEL(), 1, false);
 			CPPUNIT_ASSERT_EQUAL(false, cci0a->active);
 		}
