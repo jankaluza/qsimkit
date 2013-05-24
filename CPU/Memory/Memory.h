@@ -58,7 +58,8 @@ class Memory {
 		void callReadWatcher(uint16_t address, uint8_t &value);
 
 		bool isBitSet(uint16_t address, uint16_t bit);
-		bool setBit(uint16_t address, uint16_t bit, bool value);
+		void setBit(uint16_t address, uint16_t bit, bool value);
+		void setBitWatcher(uint16_t address, uint16_t bit, bool value);
 
 	private:
 		std::vector<uint8_t> m_memory;

@@ -204,13 +204,18 @@ bool Memory::isBitSet(uint16_t address, uint16_t bit) {
 	return m_memory[address] & bit;
 }
 
-bool Memory::setBit(uint16_t address, uint16_t bit, bool value) {
+void Memory::setBit(uint16_t address, uint16_t bit, bool value) {
 	if (value) {
 		m_memory[address] = m_memory[address] | bit;
 	}
 	else {
 		m_memory[address] = m_memory[address] & (~bit);
 	}
+}
+
+void Memory::setBitWatcher(uint16_t address, uint16_t bit, bool value) {
+	setBit(address, bit, value);
+	callWatcher(address);
 }
 
 }

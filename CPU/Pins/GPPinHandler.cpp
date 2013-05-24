@@ -35,6 +35,7 @@ m_ies(ies), m_ifg(ifg), m_intvec(intvec), m_id(id), m_active(true), m_oldValue(f
 	m_id = 1 << m_id;
 
 	m_mem->addWatcher(m_out, this);
+	m_mem->addWatcher(m_dir, this);
 }
 
 GPPinHandler::~GPPinHandler() {
