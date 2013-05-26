@@ -26,6 +26,7 @@
 #include <vector>
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
+#include "CPU/Pins/PinHandler.h"
 
 class Variant;
 
@@ -36,8 +37,9 @@ class SMCLK;
 class Clock;
 class InterruptManager;
 class PinManager;
+class PinMultiplexer;
 
-class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
+class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, public PinHandler {
 	public:
 		Timer(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			  ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
@@ -49,7 +51,13 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 
 		void handleInterruptFinished(InterruptManager *intManager, int vector);
 
-		void addCCR(uint16_t tacctl, uint16_t taccr);
+		void handlePinInput(const std::string &name, double value);
+
+		void handlePinActivated(const std::string &name);
+
+		void handlePinDeactivated(const std::string &name);
+
+		void addCCR(const std::string &taName, const std::string &cciaName, const std::string &ccibName, uint16_t tacctl, uint16_t taccr);
 
 		void tick();
 
@@ -61,11 +69,16 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 
 	private:
 		void checkCCRInterrupts(uint16_t tar);
+		void finishPendingCaptures(uint16_t tar);
 		void changeTAR(uint8_t mode);
 
 		typedef struct {
 			uint16_t tacctl;
 			uint16_t taccr;
+			std::vector<PinMultiplexer *> outputMpxs;
+			std::string ccia;
+			std::string ccib;
+			bool capturePending;
 		} CCR;
 
 		PinManager *m_pinManager;
@@ -81,6 +94,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher {
 		uint16_t m_tar;
 		uint16_t m_taiv;
 		std::vector<CCR> m_ccr;
+		std::map<std::string, int> m_cciNames;
 };
 
 }

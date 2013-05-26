@@ -49,8 +49,8 @@ m_pinManager(pinManager) {
 	m_timerA = m_factory->createTimer(m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 									  m_variant->getTA0CTL(), m_variant->getTA0R(),
 									  m_variant->getTA0IV());
-	m_timerA->addCCR(m_variant->getTA0CCTL0(), m_variant->getTA0CCR0());
-	m_timerA->addCCR(m_variant->getTA0CCTL1(), m_variant->getTA0CCR1());
+	m_timerA->addCCR("TA0.0", "TA0.CCI0A", "TA0.CCI0B", m_variant->getTA0CCTL0(), m_variant->getTA0CCR0());
+	m_timerA->addCCR("TA0.1", "TA0.CCI1A", "TA0.CCI1B", m_variant->getTA0CCTL1(), m_variant->getTA0CCR1());
 }
 
 BasicClock::~BasicClock() {

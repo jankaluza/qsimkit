@@ -21,6 +21,8 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
+#include "CPU/Pins/PinManager.h"
+#include "CPU/Pins/PinMultiplexer.h"
 #include <iostream>
 
 #include "ACLK.h"
@@ -53,11 +55,26 @@ Timer::~Timer() {
 
 }
 
-void Timer::addCCR(uint16_t tacctl, uint16_t taccr) {
+void Timer::addCCR(const std::string &taName, const std::string &cciaName, const std::string &ccibName, uint16_t tacctl, uint16_t taccr) {
+	m_cciNames[cciaName] = m_ccr.size();
+	m_cciNames[ccibName] = m_ccr.size();
+
+	std::vector<PinMultiplexer *> mpxs;
+	mpxs = m_pinManager->addPinHandler(taName, this);
+
 	CCR ccr;
 	ccr.tacctl = tacctl;
 	ccr.taccr = taccr;
+	ccr.outputMpxs = mpxs;
+	ccr.ccia = cciaName;
+	ccr.ccib = ccibName;
+	ccr.capturePending = false;
 	m_ccr.push_back(ccr);
+
+	// We don't have to store PinMultiplexers here, because we won't write
+	// any data there.
+	m_pinManager->addPinHandler(cciaName, this);
+	m_pinManager->addPinHandler(ccibName, this);
 }
 
 void Timer::checkCCRInterrupts(uint16_t tar) {
@@ -77,6 +94,21 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 		if (interrupt_enabled && ccr == tar) {
 			m_mem->setBit(m_ccr[i].tacctl, 1, true);
 			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+		}
+	}
+}
+
+void Timer::finishPendingCaptures(uint16_t tar) {
+	for (int i = 1; i < m_ccr.size(); ++i) {
+		CCR &ccr = m_ccr[i];
+		if (ccr.capturePending) {
+			if (m_mem->isBitSet(ccr.tacctl, 16)) {
+				// interrupts enabled
+				m_mem->setBigEndian(ccr.taccr, tar);
+				m_mem->setBit(m_ccr[i].tacctl, 1, true);
+				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			}
+			ccr.capturePending = false;
 		}
 	}
 }
@@ -111,6 +143,8 @@ void Timer::changeTAR(uint8_t mode) {
 				m_mem->setBigEndian(m_tar, tar);
 			}
 
+			finishPendingCaptures(tar);
+
 			// Generate CCRx interrupts
 			checkCCRInterrupts(tar);
 			break;
@@ -128,6 +162,8 @@ void Timer::changeTAR(uint8_t mode) {
 				tar += 1;
 				m_mem->setBigEndian(m_tar, tar);
 			}
+
+			finishPendingCaptures(tar);
 
 			// Generate CCRx interrupts
 			checkCCRInterrupts(tar);
@@ -166,6 +202,8 @@ void Timer::changeTAR(uint8_t mode) {
 				}
 				m_mem->setBigEndian(m_tar, tar);
 			}
+
+			finishPendingCaptures(tar);
 
 			break;
 		default:
@@ -263,6 +301,78 @@ void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) 
 		m_mem->setBit(m_tactl, 1, false);
 		value = 10;
 	}
+}
+
+void Timer::handlePinInput(const std::string &name, double value) {
+	std::map<std::string, int>::iterator it = m_cciNames.find(name);
+	if (it == m_cciNames.end()) {
+		return;
+	}
+
+	CCR &ccr = m_ccr[it->second];
+	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl);
+
+	// Running in compare mode, so return
+	if ((tacctl & (1 << 8)) == 0) {
+		return;
+	}
+
+	// Check input select
+	switch((tacctl >> 12) & 3) {
+		case 0:
+			// Input is set to ccia, but we have different input
+			if (ccr.ccia != name) {
+				return;
+			}
+			break;
+		case 1:
+			// Input is set to ccib, but we have different input
+			if (ccr.ccib != name) {
+				return;
+			}
+			break;
+		default:
+			break;
+	}
+
+	bool old_value = tacctl & 8;
+	m_mem->setBit(ccr.tacctl, 8, value == 1);
+
+	// Check capture mode
+	switch((tacctl >> 14) & 3) {
+		case 0:
+			// No capture
+			return;
+		case 1:
+			// Capture on rising edge
+			if (old_value == 0 && value == 1) {
+
+				if (tacctl & (1 << 11)) {
+					// SCS is 1, so we are in sync mode, therefore just set
+					// the capturePending flag.
+					ccr.capturePending = true;
+				}
+				else if (tacctl & 16) {
+					// Interrupts enabled and we are in async mode, so fire
+					// the interrupt.
+					m_mem->setBit(ccr.tacctl, 1, true);
+					m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar));
+					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				}
+			}
+		default:
+			break;
+	}
+
+	
+}
+
+void Timer::handlePinActivated(const std::string &name) {
+	
+}
+
+void Timer::handlePinDeactivated(const std::string &name) {
+	
 }
 
 }

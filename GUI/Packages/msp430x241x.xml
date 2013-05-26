@@ -13,7 +13,7 @@
 		<pin id="10"><name>Veref+</name></pin>
 		<pin id="11"><name>Vref-</name><name>Veref-</name></pin>
 		<pin id="12"><name sel="0">P1.0</name><name>TACLK</name><name>CAOUT</name></pin>
-		<pin id="13"><name sel="0">P1.1</name><name dir="0" sel="1">CCI0A</name></pin>
+		<pin id="13"><name sel="0">P1.1</name><name dir="0" sel="1">TA0.CCI0A</name></pin>
 		<pin id="14"><name sel="0">P1.2</name><name>TA1</name></pin>
 		<pin id="15"><name sel="0">P1.3</name><name>TA2</name></pin>
 		<pin id="16"><name sel="0">P1.4</name><name>SMCLK</name></pin>

@@ -91,13 +91,16 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 	return mpx;
 }
 
-void PinManager::addPinHandler(const std::string &name, PinHandler *handler) {
+std::vector<PinMultiplexer *> PinManager::addPinHandler(const std::string &name, PinHandler *handler) {
+	std::vector<PinMultiplexer *> multiplexers;
 	for (std::vector<PinMultiplexer *>::iterator it = m_multiplexers.begin(); it != m_multiplexers.end(); ++it) {
 		if ((*it)->hasMultiplexing(name)) {
 			(*it)->addPinHandler(name, handler);
-			break;
+			multiplexers.push_back(*it);
 		}
 	}
+
+	return multiplexers;
 }
 
 bool PinManager::handlePinInput(int id, double value) {

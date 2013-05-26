@@ -60,7 +60,7 @@ class PinManager {
 
 		void reset();
 
-		void addPinHandler(const std::string &name, PinHandler *handler);
+		std::vector<PinMultiplexer *> addPinHandler(const std::string &name, PinHandler *handler);
 
 		bool handlePinInput(int id, double value);
 		void generateOutput(int id, double value);
