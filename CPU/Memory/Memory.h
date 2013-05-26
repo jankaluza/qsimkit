@@ -39,20 +39,21 @@ class MemoryWatcher {
 
 class Memory {
 	public:
+		typedef enum { Read, Write, ReadWrite } Mode;
 		Memory(unsigned int size);
 		virtual ~Memory();
 
 		bool loadA43(const std::string &data, RegisterSet *reg);
 
 		uint16_t get(uint16_t address);
-		uint16_t getBigEndian(uint16_t address);
+		uint16_t getBigEndian(uint16_t address, bool watchers = true);
 		void set(uint16_t address, uint16_t value);
 		void setBigEndian(uint16_t address, uint16_t value, bool watchers = true);
 
 		uint8_t getByte(uint16_t address);
 		void setByte(uint16_t address, uint8_t value);
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher, bool include_reading = false);
+		void addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode = ReadWrite);
 		void callWatcher(uint16_t address);
 		void callReadWatcher(uint16_t address, uint16_t &value);
 		void callReadWatcher(uint16_t address, uint8_t &value);

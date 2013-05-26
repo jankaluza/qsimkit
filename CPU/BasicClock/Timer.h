@@ -79,6 +79,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 			std::string ccia;
 			std::string ccib;
 			bool capturePending;
+			bool ccrRead;
 		} CCR;
 
 		PinManager *m_pinManager;

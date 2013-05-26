@@ -122,12 +122,14 @@ uint16_t Memory::get(uint16_t address) {
 	return w;
 }
 
-uint16_t Memory::getBigEndian(uint16_t address) {
+uint16_t Memory::getBigEndian(uint16_t address, bool watchers) {
 	uint16_t w;
 	uint8_t *ptr = (uint8_t *) &w;
 	*ptr++ = m_memory[address];
 	*ptr++ = m_memory[address + 1];
-	callReadWatcher(address, w);
+	if (watchers) {
+		callReadWatcher(address, w);
+	}
 	return w;
 }
 
@@ -192,11 +194,18 @@ void Memory::setByte(uint16_t address, uint8_t value) {
 	callWatcher(address);
 }
 
-void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, bool include_reading) {
-	m_watchers[address].push_back(watcher);
-
-	if (include_reading) {
-		m_readWatchers[address].push_back(watcher);
+void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode) {
+	switch (mode) {
+		case Read:
+			m_readWatchers[address].push_back(watcher);
+			break;
+		case Write:
+			m_watchers[address].push_back(watcher);
+			break;
+		case ReadWrite:
+			m_readWatchers[address].push_back(watcher);
+			m_watchers[address].push_back(watcher);
+			break;
 	}
 }
 

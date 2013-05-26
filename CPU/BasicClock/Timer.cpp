@@ -43,7 +43,7 @@ m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
 m_tar(tar), m_taiv(taiv) {
 
 	m_mem->addWatcher(tactl, this);
-	m_mem->addWatcher(taiv, this, true);
+	m_mem->addWatcher(taiv, this, Memory::Read);
 
 	m_intManager->addWatcher(m_variant->getTIMERA0_VECTOR(), this);
 	m_intManager->addWatcher(m_variant->getTIMERA1_VECTOR(), this);
@@ -69,19 +69,23 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	ccr.ccia = cciaName;
 	ccr.ccib = ccibName;
 	ccr.capturePending = false;
+	ccr.ccrRead = true;
 	m_ccr.push_back(ccr);
 
 	// We don't have to store PinMultiplexers here, because we won't write
 	// any data there.
 	m_pinManager->addPinHandler(cciaName, this);
 	m_pinManager->addPinHandler(ccibName, this);
+
+	// Setup memory watchers so we can generate Capture overflow (COV)
+	m_mem->addWatcher(taccr, this, Memory::Read);
 }
 
 void Timer::checkCCRInterrupts(uint16_t tar) {
 	// If timer changes its value to CCR0, fire CCR0 interrupt if
 	// enabled.
 	bool ccr0_interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
-	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
 	if (ccr0_interrupt_enabled && tar == ccr0) {
 		m_mem->setBit(m_ccr[0].tacctl, 1, true);
 		m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
@@ -89,7 +93,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 
 	// Set CCIFG if TAR == CCR and CCIE is enabled
 	for (int i = 1; i < m_ccr.size(); ++i) {
-		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr);
+		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr, false);
 		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
 		if (interrupt_enabled && ccr == tar) {
 			m_mem->setBit(m_ccr[i].tacctl, 1, true);
@@ -107,6 +111,7 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 				m_mem->setBigEndian(ccr.taccr, tar);
 				m_mem->setBit(m_ccr[i].tacctl, 1, true);
 				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				ccr.ccrRead = false;
 			}
 			ccr.capturePending = false;
 		}
@@ -115,14 +120,14 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 
 void Timer::changeTAR(uint8_t mode) {
 	uint16_t ccr0;
-	uint16_t tar = m_mem->getBigEndian(m_tar);
+	uint16_t tar = m_mem->getBigEndian(m_tar, false);
 	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
 
 	switch (mode) {
 		case TIMER_STOPPED:
 			break;
 		case TIMER_UP:
-			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
 
 			// CCR0 is 0, so timer is stopped
 			if (ccr0 == 0) {
@@ -169,7 +174,7 @@ void Timer::changeTAR(uint8_t mode) {
 			checkCCRInterrupts(tar);
 			break;
 		case TIMER_UPDOWN:
-			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr);
+			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
 
 			// CCR0 is 0, so timer is stopped
 			if (ccr0 == 0) {
@@ -230,7 +235,7 @@ void Timer::reset() {
 
 
 void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
-	uint16_t val = memory->getBigEndian(address);
+	uint16_t val = memory->getBigEndian(address, false);
 
 	if (address == m_tactl) {
 		// TACLR
@@ -285,21 +290,26 @@ void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 }
 
 void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {
-	// Check what interrupts we have queued and set 'value' to the one with highest
-	// priority. TAIV will remain 0.
-	for (int i = 1; i < m_ccr.size(); ++i) {
-		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
-		if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
-			value = 2 * i;
-			m_mem->setBit(m_ccr[i].tacctl, 1, false);
-			return;
+	if (address == m_taiv) {
+		// Check what interrupts we have queued and set 'value' to the one
+		// with highest priority. TAIV will remain 0.
+		for (int i = 1; i < m_ccr.size(); ++i) {
+			bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
+			if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
+				value = 2 * i;
+				m_mem->setBit(m_ccr[i].tacctl, 1, false);
+				return;
+			}
+		}
+
+		bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
+		if (taifg_interrupt_enabled && m_mem->isBitSet(m_tactl, 1)) {
+			m_mem->setBit(m_tactl, 1, false);
+			value = 10;
 		}
 	}
-
-	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
-	if (taifg_interrupt_enabled && m_mem->isBitSet(m_tactl, 1)) {
-		m_mem->setBit(m_tactl, 1, false);
-		value = 10;
+	else {
+		
 	}
 }
 
@@ -310,7 +320,7 @@ void Timer::handlePinInput(const std::string &name, double value) {
 	}
 
 	CCR &ccr = m_ccr[it->second];
-	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl);
+	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl, false);
 
 	// Running in compare mode, so return
 	if ((tacctl & (1 << 8)) == 0) {
@@ -356,8 +366,9 @@ void Timer::handlePinInput(const std::string &name, double value) {
 					// Interrupts enabled and we are in async mode, so fire
 					// the interrupt.
 					m_mem->setBit(ccr.tacctl, 1, true);
-					m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar));
+					m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
 					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					ccr.ccrRead = false;
 				}
 			}
 		default:
