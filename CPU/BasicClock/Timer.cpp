@@ -108,10 +108,16 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 		if (ccr.capturePending) {
 			if (m_mem->isBitSet(ccr.tacctl, 16)) {
 				// interrupts enabled
-				m_mem->setBigEndian(ccr.taccr, tar);
-				m_mem->setBit(m_ccr[i].tacctl, 1, true);
-				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
-				ccr.ccrRead = false;
+				if (ccr.ccrRead) {
+					m_mem->setBigEndian(ccr.taccr, tar);
+					m_mem->setBit(m_ccr[i].tacctl, 1, true);
+					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					ccr.ccrRead = false;
+				}
+				else {
+					// Set COV, because CCR has not been read yet
+					m_mem->setBit(ccr.tacctl, 2, true);	
+				}
 			}
 			ccr.capturePending = false;
 		}
@@ -309,7 +315,15 @@ void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) 
 		}
 	}
 	else {
-		
+		// CCR is read, so we have to set ccr.ccrRead flag to not generate
+		// COV later.
+		for (int i = 0; i < m_ccr.size(); ++i) {
+			CCR &ccr = m_ccr[i];
+			if (ccr.taccr == address) {
+				ccr.ccrRead = true;
+				break;
+			}
+		}
 	}
 }
 
@@ -356,7 +370,6 @@ void Timer::handlePinInput(const std::string &name, double value) {
 		case 1:
 			// Capture on rising edge
 			if (old_value == 0 && value == 1) {
-
 				if (tacctl & (1 << 11)) {
 					// SCS is 1, so we are in sync mode, therefore just set
 					// the capturePending flag.
@@ -365,10 +378,17 @@ void Timer::handlePinInput(const std::string &name, double value) {
 				else if (tacctl & 16) {
 					// Interrupts enabled and we are in async mode, so fire
 					// the interrupt.
-					m_mem->setBit(ccr.tacctl, 1, true);
-					m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
-					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
-					ccr.ccrRead = false;
+					if (ccr.ccrRead) {
+						m_mem->setBit(ccr.tacctl, 1, true);
+						m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
+						m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+						ccr.ccrRead = false;
+					}
+					else {
+						// Set COV, because previous capture has not been
+						// read yet.
+						m_mem->setBit(ccr.tacctl, 2, true);
+					}
 				}
 			}
 		default:
