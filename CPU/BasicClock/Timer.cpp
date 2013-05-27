@@ -103,7 +103,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 }
 
 void Timer::finishPendingCaptures(uint16_t tar) {
-	for (int i = 1; i < m_ccr.size(); ++i) {
+	for (int i = 0; i < m_ccr.size(); ++i) {
 		CCR &ccr = m_ccr[i];
 		if (ccr.capturePending) {
 			if (m_mem->isBitSet(ccr.tacctl, 16)) {
@@ -111,7 +111,12 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 				if (ccr.ccrRead) {
 					m_mem->setBigEndian(ccr.taccr, tar);
 					m_mem->setBit(m_ccr[i].tacctl, 1, true);
-					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					if (i == 0) {
+						m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+					}
+					else {
+						m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					}
 					ccr.ccrRead = false;
 				}
 				else {
@@ -369,6 +374,7 @@ void Timer::handlePinInput(const std::string &name, double value) {
 			return;
 		case 1:
 			// Capture on rising edge
+			
 			if (old_value == 0 && value == 1) {
 				if (tacctl & (1 << 11)) {
 					// SCS is 1, so we are in sync mode, therefore just set

@@ -51,6 +51,8 @@ class InterruptManager {
 
 		bool hasQueuedInterrupts();
 
+		void clearQueuedInterrupts();
+
 		void addWatcher(int vector, InterruptWatcher *watcher);
 
 	private:

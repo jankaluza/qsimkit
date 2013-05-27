@@ -100,6 +100,10 @@ bool InterruptManager::hasQueuedInterrupts() {
 	return !m_interrupts.empty();
 }
 
+void InterruptManager::clearQueuedInterrupts() {
+	m_interrupts.clear();
+}
+
 void InterruptManager::addWatcher(int vector, InterruptWatcher *watcher) {
 	m_watchers[vector].push_back(watcher);
 }

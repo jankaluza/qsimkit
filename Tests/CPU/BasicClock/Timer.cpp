@@ -12,6 +12,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 #include "CPU/Pins/PinManager.h"
+#include "CPU/Pins/PinMultiplexer.h"
 
 using namespace MCU;
 
@@ -31,6 +32,8 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(upMode);
 	CPPUNIT_TEST(continuousMode);
 	CPPUNIT_TEST(upDownMode);
+	CPPUNIT_TEST(captureRisingEdge);
+	CPPUNIT_TEST(captureRisingEdgeAsync);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -50,6 +53,22 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			intManager = new InterruptManager(r, m);
 			factory = new DummyTimerFactory();
 			pinManager = new PinManager(m, intManager, v);
+
+			PinMultiplexer *mpx = pinManager->addPin(P1, 0);
+
+			{
+				PinMultiplexer::Condition c;
+				c["sel"] = 0;
+				mpx->addMultiplexing(c, "GP");
+			}
+
+			{
+				PinMultiplexer::Condition c;
+				c["dir"] = 0;
+				c["sel"] = 1;
+				mpx->addMultiplexing(c, "TA0.CCI0A");
+			}
+			
 			bc = new BasicClock(m, v, intManager, pinManager, factory);
 		}
 
@@ -226,6 +245,122 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			// We have read TAIV, so CCIFG 1 is reset
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1)); // CCIFG 1
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0IV(), 4)); // TAIV
+		}
+
+		void captureRisingEdge() {
+			// Start timer in continuous mode
+			m->setBigEndian(v->getTA0CTL(), 32);
+			// Rising edge, SCS, CCIA0, Capture mode, Interrupt
+			m->setBigEndian(v->getTA0CCTL0(), 0x4910);
+			// Set P1.0 to be handled by Timer
+			m->setBitWatcher(v->getP1SEL(), 1, true);
+
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			// Change from 0 to 0 should not trigger interrupt
+			pinManager->handlePinInput(0, 0.0);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			pinManager->handlePinInput(0, 1.0);
+			// We should not have interrupt until we ->tick(), because we are
+			// in SCS mode
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			// Until tick, TA0CCR0 should be unchanged
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0CCR0(), false));
+
+			intManager->clearQueuedInterrupts();
+
+			// Another tick should not reraise the interrupt
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Change from 1 to 1 should not raise the interrupt
+			pinManager->handlePinInput(0, 1.0);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Change from 1 to 0 should not raise the interrupt
+			pinManager->handlePinInput(0, 0.0);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// We have not really read TA0CCR0 yet, so another capture should
+			// set COV bit
+			pinManager->handlePinInput(0, 1.0);
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0CCR0(), false));
+
+			// Rest COV
+			m->setBit(v->getTA0CCTL0(), 2, false);
+
+			// Read the TA0CCR0 and check that interrupt is not raised
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 2, m->getBigEndian(v->getTA0CCR0()));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Next capture should raise an interrupt
+			pinManager->handlePinInput(0, 0.0);
+			pinManager->handlePinInput(0, 1.0);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 8, m->getBigEndian(v->getTA0CCR0(), false));
+		}
+
+		void captureRisingEdgeAsync() {
+			m->setBigEndian(v->getTA0CCR0(), 1000);
+			// Rising edge, CCIA0, Capture mode, Interrupt
+			m->setBigEndian(v->getTA0CCTL0(), 0x4110);
+			// Set P1.0 to be handled by Timer
+			m->setBitWatcher(v->getP1SEL(), 1, true);
+
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			// Change from 0 to 0 should not trigger interrupt
+			pinManager->handlePinInput(0, 0.0);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			pinManager->handlePinInput(0, 1.0);
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
+
+			intManager->clearQueuedInterrupts();
+
+			// Change from 1 to 1 should not raise the interrupt
+			pinManager->handlePinInput(0, 1.0);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Change from 1 to 0 should not raise the interrupt
+			pinManager->handlePinInput(0, 0.0);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// We have not really read TA0CCR0 yet, so another capture should
+			// set COV bit
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
+			pinManager->handlePinInput(0, 1.0);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
+
+			// Rest COV
+			m->setBit(v->getTA0CCTL0(), 2, false);
+			
+
+			// Read the TA0CCR0 and check that interrupt is not raised
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0()));
+			m->setBigEndian(v->getTA0CCR0(), 1000);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Next capture should raise an interrupt
+			pinManager->handlePinInput(0, 0.0);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			pinManager->handlePinInput(0, 1.0);
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
 		}
 
 };
