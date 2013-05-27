@@ -52,7 +52,7 @@ void GPPinHandler::handleMemoryChanged(Memory *memory, uint16_t address) {
 		return;
 	}
 
-	bool value = m_mem->isBitSet(address, m_id);
+	bool value = m_mem->isBitSet(m_out, m_id);
 	if (m_oldValue != value) {
 		m_mpx->generateOutput(this, value ? 1.0 : 0.0);
 		m_oldValue = value;

@@ -68,10 +68,6 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		double getStep();
 
 	private:
-		void checkCCRInterrupts(uint16_t tar);
-		void finishPendingCaptures(uint16_t tar);
-		void changeTAR(uint8_t mode);
-
 		typedef struct {
 			uint16_t tacctl;
 			uint16_t taccr;
@@ -81,6 +77,11 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 			bool capturePending;
 			bool ccrRead;
 		} CCR;
+
+		void checkCCRInterrupts(uint16_t tar);
+		void doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl);
+		void finishPendingCaptures(uint16_t tar);
+		void changeTAR(uint8_t mode);
 
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;

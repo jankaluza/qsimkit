@@ -282,7 +282,7 @@ class BlinkingLedTest : public CPPUNIT_NS :: TestFixture {
 				CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(15)->getBigEndian());
 // 			f020:	0f 93       	tst	r15
 				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-				CPPUNIT_ASSERT_EQUAL(true, r->get(1)->isBitSet(SR_Z));
+				CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
 // 			f022:	04 24       	jz	$+10     	;abs 0xf02c
 				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf02c, r->get(0)->getBigEndian());

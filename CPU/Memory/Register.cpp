@@ -63,16 +63,19 @@ void Register::setByte(uint8_t value) {
 }
 
 bool Register::isBitSet(uint16_t bit) {
-	return m_value & bit;
+	return getBigEndian() & bit;
 }
 
 bool Register::setBit(uint16_t bit, bool value) {
+	uint16_t v = getBigEndian();
 	if (value) {
-		m_value = m_value | bit;
+		v = v | bit;
 	}
 	else {
-		m_value = m_value & (~bit);
+		v = v & (~bit);
 	}
+
+	setBigEndian(v);
 }
 
 void Register::addWatcher(RegisterWatcher *watcher) {

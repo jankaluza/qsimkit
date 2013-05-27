@@ -332,6 +332,34 @@ void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) 
 	}
 }
 
+void Timer::doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl) {
+	if (tacctl & (1 << 11)) {
+		// SCS is 1, so we are in sync mode, therefore just set
+		// the capturePending flag.
+		ccr.capturePending = true;
+	}
+	else if (tacctl & 16) {
+		// Interrupts enabled and we are in async mode, so fire
+		// the interrupt.
+		if (ccr.ccrRead) {
+			m_mem->setBit(ccr.tacctl, 1, true);
+			m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
+			if (ccrIndex == 0) {
+				m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+			}
+			else {
+				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			}
+			ccr.ccrRead = false;
+		}
+		else {
+			// Set COV, because previous capture has not been
+			// read yet.
+			m_mem->setBit(ccr.tacctl, 2, true);
+		}
+	}
+}
+
 void Timer::handlePinInput(const std::string &name, double value) {
 	std::map<std::string, int>::iterator it = m_cciNames.find(name);
 	if (it == m_cciNames.end()) {
@@ -374,34 +402,25 @@ void Timer::handlePinInput(const std::string &name, double value) {
 			return;
 		case 1:
 			// Capture on rising edge
-			
 			if (old_value == 0 && value == 1) {
-				if (tacctl & (1 << 11)) {
-					// SCS is 1, so we are in sync mode, therefore just set
-					// the capturePending flag.
-					ccr.capturePending = true;
-				}
-				else if (tacctl & 16) {
-					// Interrupts enabled and we are in async mode, so fire
-					// the interrupt.
-					if (ccr.ccrRead) {
-						m_mem->setBit(ccr.tacctl, 1, true);
-						m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
-						m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
-						ccr.ccrRead = false;
-					}
-					else {
-						// Set COV, because previous capture has not been
-						// read yet.
-						m_mem->setBit(ccr.tacctl, 2, true);
-					}
-				}
+				doCapture(ccr, it->second, tacctl);
 			}
+			break;
+		case 2:
+			// Capture on failing edge
+			if (old_value == 1 && value == 0.0) {
+				doCapture(ccr, it->second, tacctl);
+			}
+			break;
+		case 3:
+			// Capture on failing and rising edge
+			if (old_value != (value == 0.0)) {
+				doCapture(ccr, it->second, tacctl);
+			}
+			break;
 		default:
 			break;
 	}
-
-	
 }
 
 void Timer::handlePinActivated(const std::string &name) {

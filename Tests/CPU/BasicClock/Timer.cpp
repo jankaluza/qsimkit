@@ -348,7 +348,6 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 
 			// Rest COV
 			m->setBit(v->getTA0CCTL0(), 2, false);
-			
 
 			// Read the TA0CCR0 and check that interrupt is not raised
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0()));
