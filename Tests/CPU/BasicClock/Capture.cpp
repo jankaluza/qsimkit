@@ -292,7 +292,9 @@ class CaptureTest : public CPPUNIT_NS :: TestFixture {
 			// No queued interrupt yet
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
+		for (int x = 0; x < 16; ++x) {
 			// Generate rising edge
+			pinManager->handlePinInput(0, 0.0);
 			pinManager->handlePinInput(0, 1.0);
 			for (int t = 0; t < 10; ++t) { bc->getTimerA()->tick(); }
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
@@ -318,50 +320,95 @@ class CaptureTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL(m->getBigEndian(0x0200), r->get(14)->getBigEndian());
 		// f872:	0d 4e       	mov	r14,	r13	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, r->get(14)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (11 + x*10), r->get(14)->getBigEndian());
 		// f874:	1d 82 02 02 	sub	&0x0202,r13	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, r->get(13)->getBigEndian());
+			// cap_diff is 10 everytime except of first cap
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (x == 0 ? 11 : 10), r->get(13)->getBigEndian());
 		// f878:	82 4d 04 02 	mov	r13,	&0x0204	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, m->getBigEndian(0x0204));
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (x == 0 ? 11 : 10), m->getBigEndian(0x0204));
 		// f87c:	5c 42 06 02 	mov.b	&0x0206,r12	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(12)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) x, (uint16_t) r->get(12)->getByte());
 		// f880:	4f 4c       	mov.b	r12,	r15	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) x, (uint16_t) r->get(15)->getByte());
 		// f882:	0f 5f       	rla	r15		
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (x*2), (uint16_t) r->get(15)->getByte());
 		// f884:	8f 4d 0a 02 	mov	r13,	522(r15);0x020a(r15)
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, m->getBigEndian(r->get(15)->getBigEndian() + 522));
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (x == 0 ? 11 : 10), m->getBigEndian(r->get(15)->getBigEndian() + 522));
 		// f888:	8f 4e 2a 02 	mov	r14,	554(r15);0x022a(r15)
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, m->getBigEndian(r->get(15)->getBigEndian() + 554));
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (11 + x*10), m->getBigEndian(r->get(15)->getBigEndian() + 554));
 		// f88c:	4f 4c       	mov.b	r12,	r15	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) x, (uint16_t) r->get(15)->getByte());
 		// f88e:	5f 53       	inc.b	r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint8_t) 1, r->get(15)->getByte());
+			CPPUNIT_ASSERT_EQUAL((uint8_t) (x + 1), r->get(15)->getByte());
 		// f890:	c2 4f 06 02 	mov.b	r15,	&0x0206	
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint8_t) 1, m->getByte(0x0206));
+			CPPUNIT_ASSERT_EQUAL((uint8_t) (x + 1), m->getByte(0x0206));
 		// f894:	7f 90 10 00 	cmp.b	#16,	r15	;#0x0010
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
-		// f898:	02 20       	jnz	$+6      	;abs 0xf89e
-			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf89e, r->get(0)->getBigEndian());
+			if (x == 15) {
+				CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
+			// f898:	02 20       	jnz	$+6      	;abs 0xf89e
+				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf89a, r->get(0)->getBigEndian());
+			// f89a:	c2 43 06 02 	mov.b	#0,	&0x0206	;r3 As==00
+				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+				CPPUNIT_ASSERT_EQUAL((uint8_t) 0, m->getByte(0x0206));
+			}
+			else {
+				CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+			// f898:	02 20       	jnz	$+6      	;abs 0xf89e
+				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf89e, r->get(0)->getBigEndian());
+			}
 		// f89e:	82 4e 02 02 	mov	r14,	&0x0202
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 11, m->getBigEndian(0x0202));
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (11 + x*10), m->getBigEndian(0x0202));
 		// f8a2:	5f 42 08 02 	mov.b	&0x0208,r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint8_t) 0, r->get(15)->getByte());
-			
+			CPPUNIT_ASSERT_EQUAL((uint8_t) x, r->get(15)->getByte());
+		// f8a6:	5f 53       	inc.b	r15
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL((uint8_t) (x + 1), r->get(15)->getByte());
+		// f8a8:	c2 4f 08 02 	mov.b	r15,	&0x0208
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL((uint8_t) (x + 1), m->getByte(0x0208));
+		// f8ac:	7f 90 20 00 	cmp.b	#32,	r15	;#0x0020
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+		// f8b0:	02 20       	jnz	$+6      	;abs 0xf8b6
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf8b6, r->get(0)->getBigEndian());
+		// f8b6:	3c 41       	pop	r12
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+		// f8b8:	3d 41       	pop	r13
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+		// f8ba:	3e 41       	pop	r14
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+		// f8bc:	3f 41       	pop	r15
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+		// f8be:	00 13       	reti
+			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf856, r->get(0)->getBigEndian());
+			intManager->handleInstruction(i);
+		}
+
+		CPPUNIT_ASSERT_EQUAL((uint16_t) 11, m->getBigEndian(0x20a));
+		for (int x = 1; x < 16; ++x) {
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 10, m->getBigEndian(0x20a + 2*x));
+		}
+		for (int x = 0; x < 16; ++x) {
+			CPPUNIT_ASSERT_EQUAL((uint16_t) (11 + (x*10)), m->getBigEndian(0x20a + 32 + 2*x));
+		}
+
 	}
 
 };

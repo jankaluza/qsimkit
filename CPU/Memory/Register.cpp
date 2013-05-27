@@ -30,10 +30,7 @@ Register::~Register() {
 }
 
 uint16_t Register::get() {
-	return m_value;
-}
-
-uint16_t Register::getBigEndian() {
+// 	return m_value;
 	uint16_t w;
 	uint8_t *ptr = (uint8_t *) &w;
 	uint8_t *ptr2 = (uint8_t *) &m_value;
@@ -42,15 +39,25 @@ uint16_t Register::getBigEndian() {
 	return w;
 }
 
-void Register::set(uint16_t value) {
-	m_value = value;
+uint16_t Register::getBigEndian() {
+	return m_value;
+// 	uint16_t w;
+// 	uint8_t *ptr = (uint8_t *) &w;
+// 	uint8_t *ptr2 = (uint8_t *) &m_value;
+// 	*ptr++ = *(ptr2 + 1);
+// 	*ptr++ = *ptr2;
+// 	return w;
 }
 
-void Register::setBigEndian(uint16_t value) {
+void Register::set(uint16_t value) {
 	uint8_t *ptr = (uint8_t *) &m_value;
 	uint8_t *ptr2 = (uint8_t *) &value;
 	*ptr++ = *(ptr2 + 1);
 	*ptr++ = *ptr2;
+}
+
+void Register::setBigEndian(uint16_t value) {
+	m_value = value;
 }
 
 uint8_t Register::getByte() {

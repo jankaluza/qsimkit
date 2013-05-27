@@ -23,13 +23,13 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 
 		void setget() {
 			Register r(0, "R0", 55, "desc");
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 55, r.get());
-			r.set(0xff00);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xff00, r.get());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 55, r.getBigEndian());
+			r.setBigEndian(0xff00);
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xff00, r.getBigEndian());
 
-			r.setBigEndian(0xfffc); // -4
-			CPPUNIT_ASSERT_EQUAL((int16_t) -4, (int16_t) r.getBigEndian());
-			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) ((uint32_t) r.getBigEndian() + 4));
+			r.set(0xfffc); // -4
+			CPPUNIT_ASSERT_EQUAL((int16_t) -4, (int16_t) r.get());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) ((uint32_t) r.get() + 4));
 		}
 
 		void setByte() {
@@ -37,7 +37,7 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) 3, (int) r.getByte());
 			r.setByte(0x04);
 			CPPUNIT_ASSERT_EQUAL((int) 4, (int) r.getByte());
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0204, r.get());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0204, r.getBigEndian());
 		}
 
 		void setBit() {
