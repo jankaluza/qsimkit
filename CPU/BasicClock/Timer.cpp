@@ -384,6 +384,10 @@ void Timer::handlePinInput(const std::string &name, double value) {
 
 	CCR &ccr = m_ccr[it->second];
 	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl, false);
+	bool old_value = tacctl & 8;
+
+	// Set CCI bit
+	m_mem->setBit(ccr.tacctl, 8, value == 1);
 
 	// Running in compare mode, so return
 	if ((tacctl & (1 << 8)) == 0) {
@@ -407,9 +411,6 @@ void Timer::handlePinInput(const std::string &name, double value) {
 		default:
 			break;
 	}
-
-	bool old_value = tacctl & 8;
-	m_mem->setBit(ccr.tacctl, 8, value == 1);
 
 	// Check capture mode
 	switch((tacctl >> 14) & 3) {
