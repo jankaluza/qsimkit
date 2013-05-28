@@ -48,6 +48,7 @@ class DummyPinWatcher : public PinWatcher {
 class PinMultiplexerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(PinMultiplexerTest);
 	CPPUNIT_TEST(switchHandlers);
+	CPPUNIT_TEST(generateOutput);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -121,6 +122,14 @@ class PinMultiplexerTest : public CPPUNIT_NS :: TestFixture{
 
 			m->setBitWatcher(v->getP1SEL(), 1, false);
 			CPPUNIT_ASSERT_EQUAL(false, cci0a->active);
+		}
+
+		void generateOutput() {
+			mpx->generateOutput(cci0a, 1.0);
+			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->value);
+			m->setBitWatcher(v->getP1SEL(), 1, true);
+			m->setBitWatcher(v->getP1DIR(), 1, true);
+			CPPUNIT_ASSERT_EQUAL(1.0, watcher->value);
 		}
 
 };

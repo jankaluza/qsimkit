@@ -77,8 +77,10 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	m_pinManager->addPinHandler(cciaName, this);
 	m_pinManager->addPinHandler(ccibName, this);
 
-	// Setup memory watchers so we can generate Capture overflow (COV)
+	// Setup memory watcher for ccr so we can generate Capture overflow (COV)
 	m_mem->addWatcher(taccr, this, Memory::Read);
+	// Setup memory watcher for cctl so we can change output according to OUT
+	m_mem->addWatcher(taccr, this, Memory::Write);
 }
 
 void Timer::checkCCRInterrupts(uint16_t tar) {
@@ -244,6 +246,11 @@ void Timer::reset() {
 	m_source = m_aclk;
 }
 
+void Timer::generateOutput(CCR &ccr, double value) {
+	for (std::vector<PinMultiplexer *>::iterator it = ccr.outputMpxs.begin(); it != ccr.outputMpxs.end(); ++it) {
+		(*it)->generateOutput(this, value);
+	}
+}
 
 void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 	uint16_t val = memory->getBigEndian(address, false);
@@ -251,7 +258,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 	if (address == m_tactl) {
 		// TACLR
 		if (val & 4) {
-			memory->setBit(address, 4, false);
+			memory->setBit(m_tactl, 4, false);
 			memory->setBigEndian(m_tar, 0);
 			m_up = true;
 			m_divider = 1;
@@ -273,6 +280,15 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			case 2: m_source = m_smclk; break;
 			case 3: break;
 			default: break;
+		}
+	}
+	else {
+		for (int i = 0; i < m_ccr.size(); ++i) {
+			CCR &ccr = m_ccr[i];
+			if (ccr.tacctl == address) {
+				generateOutput(ccr, val & 4);
+				break;
+			}
 		}
 	}
 }

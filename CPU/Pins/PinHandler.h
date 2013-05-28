@@ -33,6 +33,10 @@ class PinHandler {
 		virtual void handlePinActivated(const std::string &name) = 0;
 
 		virtual void handlePinDeactivated(const std::string &name) = 0;
+
+	private:
+		double currentOutputValue;
+		friend class PinMultiplexer;
 };
 
 }

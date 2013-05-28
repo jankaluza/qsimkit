@@ -53,7 +53,7 @@ class Memory {
 		uint8_t getByte(uint16_t address);
 		void setByte(uint16_t address, uint8_t value);
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode = ReadWrite);
+		void addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode = Write);
 		void callWatcher(uint16_t address);
 		void callReadWatcher(uint16_t address, uint16_t &value);
 		void callReadWatcher(uint16_t address, uint8_t &value);

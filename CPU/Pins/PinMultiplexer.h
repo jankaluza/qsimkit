@@ -65,6 +65,7 @@ class PinMultiplexer : public MemoryWatcher {
 		uint16_t m_sel;
 		uint8_t m_index;
 		double m_value;
+		bool m_valueIsInput;
 		
 		std::vector<Condition> m_conds;
 		std::vector<std::string> m_outputs;

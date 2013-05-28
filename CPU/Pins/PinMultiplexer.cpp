@@ -30,7 +30,7 @@ namespace MCU {
 PinMultiplexer::PinMultiplexer(PinManager *manager, int id, Memory *mem, Variant *variant,
 							   uint16_t dir, uint16_t sel, uint8_t index) :
 m_manager(manager), m_id(id), m_mem(mem), m_variant(variant), m_dir(dir),
-m_sel(sel), m_index(1 << index), m_value(0) {
+m_sel(sel), m_index(1 << index), m_value(0), m_valueIsInput(false) {
 	m_mem->addWatcher(m_dir, this);
 	m_mem->addWatcher(m_sel, this);
 }
@@ -55,6 +55,7 @@ bool PinMultiplexer::hasMultiplexing(const std::string &outputName) {
 
 void PinMultiplexer::addPinHandler(const std::string &name, PinHandler *handler) {
 	m_handlers[name] = handler;
+	handler->currentOutputValue = 0;
 
 	// By adding this handler, multiplexing can change
 	handleMemoryChanged(m_mem, 0);
@@ -66,15 +67,20 @@ bool PinMultiplexer::handleInput(double value) {
 	}
 
 	m_value = value;
+	m_valueIsInput = true;
 }
 
 void PinMultiplexer::generateOutput(PinHandler *handler, double value) {
+	handler->currentOutputValue = value;
+
 	// This is not active handler, it can't generate output
 	if (handler != m_handler) {
 		return;
 	}
 
 	m_manager->generateOutput(m_id, value);
+	m_value = value;
+	m_valueIsInput = false;
 }
 
 void PinMultiplexer::reset() {
@@ -110,6 +116,9 @@ void PinMultiplexer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			if (m_handler) {
 				m_handler->handlePinActivated(m_handlerName);
 				m_handler->handlePinInput(m_handlerName, m_value);
+				if (!m_valueIsInput && m_value != m_handler->currentOutputValue) {
+					generateOutput(m_handler, m_handler->currentOutputValue);
+				}
 			}
 			break;
 		}

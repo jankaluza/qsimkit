@@ -82,6 +82,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		void doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl);
 		void finishPendingCaptures(uint16_t tar);
 		void changeTAR(uint8_t mode);
+		void generateOutput(CCR &ccr, double value);
 
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
