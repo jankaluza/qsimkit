@@ -83,23 +83,107 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	m_mem->addWatcher(taccr, this, Memory::Write);
 }
 
+void Timer::doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt) {
+	// generate output bit according to OUTMODx
+	switch((tacctl >> 5) & 7) {
+		case 0:
+			// Mode = Output
+			break;
+		case 1:
+			// Mode = Set
+			if (ccr0_interrupt) {
+				break;
+			}
+			m_mem->setBitWatcher(ccr.tacctl, 4, true);
+			break;
+		case 2:
+			// Mode = Toggle/Reset
+			if (ccr0_interrupt) {
+				m_mem->setBitWatcher(ccr.tacctl, 4, false);
+			}
+			else {
+				m_mem->setBitWatcher(ccr.tacctl, 4, !(tacctl & 4));
+			}
+			break;
+		case 3:
+			// Mode = Set/Reset
+			if (ccr0_interrupt) {
+				m_mem->setBitWatcher(ccr.tacctl, 4, false);
+			}
+			else {
+				m_mem->setBitWatcher(ccr.tacctl, 4, true);
+			}
+			break;
+		case 4:
+			// Mode = Toggle
+			if (ccr0_interrupt) {
+				break;
+			}
+			m_mem->setBitWatcher(ccr.tacctl, 4, !(tacctl & 4));
+			break;
+		case 5:
+			// Mode = Reset
+			if (ccr0_interrupt) {
+				break;
+			}
+			m_mem->setBitWatcher(ccr.tacctl, 4, false);
+			break;
+		case 6:
+			// Mode = Toggle/Set
+			if (ccr0_interrupt) {
+				m_mem->setBitWatcher(ccr.tacctl, 4, true);
+			}
+			else {
+				m_mem->setBitWatcher(ccr.tacctl, 4, !(tacctl & 4));
+			}
+			break;
+		case 7:
+			// Mode = Reset/Set
+			if (ccr0_interrupt) {
+				m_mem->setBitWatcher(ccr.tacctl, 4, true);
+			}
+			else {
+				m_mem->setBitWatcher(ccr.tacctl, 4, false);
+			}
+			break;
+	}
+}
+
 void Timer::checkCCRInterrupts(uint16_t tar) {
 	// If timer changes its value to CCR0, fire CCR0 interrupt if
 	// enabled.
-	bool ccr0_interrupt_enabled = m_mem->isBitSet(m_ccr[0].tacctl, 16);
+	uint16_t tacctl = m_mem->getBigEndian(m_ccr[0].tacctl);
+	bool ccr0_interrupt_enabled = tacctl & 16;
+	bool ccr0_interrupt = false;
 	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
 	if (ccr0_interrupt_enabled && tar == ccr0) {
+		// "Interrupt flag CCIFG is set"
 		m_mem->setBit(m_ccr[0].tacctl, 1, true);
 		m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+		// "Internal signal EQUx=1 and EQUx affects current output"
+		doOutput(m_ccr[0], tacctl, false);
+		// CCI is latched to SCCI
+		m_mem->setBit(m_ccr[0].tacctl, 1 << 10, tacctl & 8);
+		ccr0_interrupt = true;
 	}
 
 	// Set CCIFG if TAR == CCR and CCIE is enabled
 	for (int i = 1; i < m_ccr.size(); ++i) {
+		tacctl = m_mem->getBigEndian(m_ccr[i].tacctl);
 		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr, false);
-		bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
+		bool interrupt_enabled = tacctl & 16;
 		if (interrupt_enabled && ccr == tar) {
+			// "Interrupt flag CCIFG is set"
 			m_mem->setBit(m_ccr[i].tacctl, 1, true);
 			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			// "Internal signal EQUx=1 and EQUx affects current output"
+			doOutput(m_ccr[i], tacctl, false);
+			// CCI is latched to SCCI
+			m_mem->setBit(m_ccr[i].tacctl, 1 << 10, tacctl & 8);
+		}
+
+		if (ccr0_interrupt) {
+			doOutput(m_ccr[i], tacctl, true);
 		}
 	}
 }
