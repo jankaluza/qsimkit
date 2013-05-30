@@ -214,15 +214,11 @@ bool Memory::isBitSet(uint16_t address, uint16_t bit) {
 }
 
 void Memory::setBit(uint16_t address, uint16_t bit, bool value) {
-	if (bit > (1 << 8)) {
-		address++;
-		bit = bit >> 8;
-	}
 	if (value) {
-		m_memory[address] = m_memory[address] | bit;
+		*((uint16_t *) &m_memory[address]) |=  bit;
 	}
 	else {
-		m_memory[address] = m_memory[address] & (~bit);
+		*((uint16_t *) &m_memory[address]) &= (~bit);
 	}
 }
 
