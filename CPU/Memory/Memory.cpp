@@ -210,10 +210,14 @@ void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode) {
 }
 
 bool Memory::isBitSet(uint16_t address, uint16_t bit) {
-	return m_memory[address] & bit;
+	return *((uint16_t *) &m_memory[address]) & bit;
 }
 
 void Memory::setBit(uint16_t address, uint16_t bit, bool value) {
+	if (bit > (1 << 8)) {
+		address++;
+		bit = bit >> 8;
+	}
 	if (value) {
 		m_memory[address] = m_memory[address] | bit;
 	}

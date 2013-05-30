@@ -80,7 +80,7 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	// Setup memory watcher for ccr so we can generate Capture overflow (COV)
 	m_mem->addWatcher(taccr, this, Memory::Read);
 	// Setup memory watcher for cctl so we can change output according to OUT
-	m_mem->addWatcher(taccr, this, Memory::Write);
+	m_mem->addWatcher(tacctl, this, Memory::Write);
 }
 
 void Timer::doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt) {
@@ -156,10 +156,12 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 	bool ccr0_interrupt_enabled = tacctl & 16;
 	bool ccr0_interrupt = false;
 	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
-	if (ccr0_interrupt_enabled && tar == ccr0) {
-		// "Interrupt flag CCIFG is set"
-		m_mem->setBit(m_ccr[0].tacctl, 1, true);
-		m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+	if (tar == ccr0) {
+		if (ccr0_interrupt_enabled) {
+			// "Interrupt flag CCIFG is set"
+			m_mem->setBit(m_ccr[0].tacctl, 1, true);
+			m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+		}
 		// "Internal signal EQUx=1 and EQUx affects current output"
 		doOutput(m_ccr[0], tacctl, false);
 		// CCI is latched to SCCI
@@ -172,10 +174,12 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 		tacctl = m_mem->getBigEndian(m_ccr[i].tacctl);
 		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr, false);
 		bool interrupt_enabled = tacctl & 16;
-		if (interrupt_enabled && ccr == tar) {
-			// "Interrupt flag CCIFG is set"
-			m_mem->setBit(m_ccr[i].tacctl, 1, true);
-			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+		if (ccr == tar) {
+			if (interrupt_enabled) {
+				// "Interrupt flag CCIFG is set"
+				m_mem->setBit(m_ccr[i].tacctl, 1, true);
+				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			}
 			// "Internal signal EQUx=1 and EQUx affects current output"
 			doOutput(m_ccr[i], tacctl, false);
 			// CCI is latched to SCCI
@@ -370,7 +374,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 		for (int i = 0; i < m_ccr.size(); ++i) {
 			CCR &ccr = m_ccr[i];
 			if (ccr.tacctl == address) {
-				generateOutput(ccr, val & 4);
+				generateOutput(ccr, (val & 4) == 4);
 				break;
 			}
 		}

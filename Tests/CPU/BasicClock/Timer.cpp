@@ -26,6 +26,19 @@ class DummyTimerFactory : public TimerFactory {
 		}
 };
 
+class DummyPinWatcher : public PinWatcher {
+	public:
+		DummyPinWatcher() : id(-1), value(-1) {}
+
+		void handlePinChanged(int i, double v) {
+			id = i;
+			value = v;
+		}
+
+		int id;
+		double value;
+};
+
 class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(TimerTest);
 	// TODO: Add tests for changing CCR0 in upMode and UpDownMode!
@@ -34,6 +47,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(upDownMode);
 	CPPUNIT_TEST(captureRisingEdge);
 	CPPUNIT_TEST(captureRisingEdgeAsync);
+	CPPUNIT_TEST(compareSetReset);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -43,6 +57,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 	BasicClock *bc;
 	TimerFactory *factory;
 	PinManager *pinManager;
+	DummyPinWatcher *watcher;
 
 	public:
 		void setUp (void) {
@@ -68,8 +83,32 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 				c["sel"] = 1;
 				mpx->addMultiplexing(c, "TA0.CCI0A");
 			}
+
+			mpx = pinManager->addPin(P1, 1);
+
+			{
+				PinMultiplexer::Condition c;
+				c["sel"] = 0;
+				mpx->addMultiplexing(c, "GP");
+			}
+
+			{
+				PinMultiplexer::Condition c;
+				c["dir"] = 0;
+				c["sel"] = 1;
+				mpx->addMultiplexing(c, "TA0.CCI1A");
+			}
+
+			{
+				PinMultiplexer::Condition c;
+				c["dir"] = 1;
+				c["sel"] = 1;
+				mpx->addMultiplexing(c, "TA0.1");
+			}
 			
 			bc = new BasicClock(m, v, intManager, pinManager, factory);
+			watcher = new DummyPinWatcher();
+			pinManager->setWatcher(watcher);
 		}
 
 		void tearDown (void) {
@@ -79,6 +118,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			delete bc;
 			delete factory;
 			delete pinManager;
+			delete watcher;
 		}
 
 		void upMode() {
@@ -360,6 +400,51 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			pinManager->handlePinInput(0, 1.0);
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
+		}
+
+		void compareSetReset() {
+			// set UP mode and CCR0 to 4
+			m->setBigEndian(v->getTA0CTL(), 16);
+			m->setBigEndian(v->getTA0CCR0(), 4);
+			// set CCR1 to 2, and Set/Reset mode, CCI1A input and interrupts
+			m->setBigEndian(v->getTA0CCR1(), 2);
+			m->setBigEndian(v->getTA0CCTL1(), 112);
+			// Set P1.1 to be handled by Timer
+			m->setBitWatcher(v->getP1SEL(), 2, true);
+
+			// intput should be handled by tiemr and CCI bit should be set,
+			// but it should not be sampled yet, so SCCI should be 0
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 8));
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
+			pinManager->handlePinInput(1, 1.0);
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 8));
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
+
+			// First tick, TAR == 1, no interrupt yet
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Second tick, TAR == 2 == CCR1, CCR1 interrupt raised, SCCI latched,
+			// Set output generated
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 4));
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 4));
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
+			CPPUNIT_ASSERT_EQUAL(1, watcher->id);
+			CPPUNIT_ASSERT_EQUAL(1.0, watcher->value);
+			intManager->clearQueuedInterrupts();
+
+			// TAR == 3, no interrupt yet
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// TAR == 4 == CCR0, CCR0 interrupts disabled, Reset output generated
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(1, watcher->id);
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->value);
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 4));
 		}
 
 };
