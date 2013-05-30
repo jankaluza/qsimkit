@@ -94,6 +94,10 @@ class Variant {
 		virtual unsigned int getTA1IV() = 0;
 		virtual unsigned int getTIMERA0_VECTOR() = 0;
 		virtual unsigned int getTIMERA1_VECTOR() = 0;
+		virtual unsigned int getTIMER0_A0_VECTOR() = 0;
+		virtual unsigned int getTIMER0_A1_VECTOR() = 0;
+		virtual unsigned int getTIMER1_A0_VECTOR() = 0;
+		virtual unsigned int getTIMER1_A1_VECTOR() = 0;
 		virtual double getSRSEL() = 0;
 		virtual double getSDCO() = 0;
 		virtual double getDCOZERO() = 0;

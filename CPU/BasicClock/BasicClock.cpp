@@ -39,6 +39,8 @@ BasicClock::BasicClock(Memory *mem, Variant *variant,
 m_mem(mem), m_variant(variant), m_intManager(intManager), m_factory(factory),
 m_pinManager(pinManager) {
 
+	uint16_t intvec0;
+	uint16_t intvec1;
 	m_vlo = new VLO();
 	m_lfxt1 = new LFXT1(m_mem, m_variant);
 	m_aclk = new ACLK(m_mem, m_variant, m_vlo, m_lfxt1);
@@ -46,11 +48,62 @@ m_pinManager(pinManager) {
 	m_smclk = new SMCLK(m_mem, m_variant, m_dco);
 	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
 
-	m_timerA = m_factory->createTimer(m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+	// add TA0
+	intvec0 = m_variant->getTIMERA0_VECTOR();
+	if (intvec0 == 0) {
+		intvec0 = m_variant->getTIMER0_A0_VECTOR();
+	}
+
+	intvec1 = m_variant->getTIMERA1_VECTOR();
+	if (intvec1 == 0) {
+		intvec1 = m_variant->getTIMER0_A1_VECTOR();
+	}
+
+	m_timerA0 = m_factory->createTimer(m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 									  m_variant->getTA0CTL(), m_variant->getTA0R(),
-									  m_variant->getTA0IV());
-	m_timerA->addCCR("TA0.0", "TA0.CCI0A", "TA0.CCI0B", m_variant->getTA0CCTL0(), m_variant->getTA0CCR0());
-	m_timerA->addCCR("TA0.1", "TA0.CCI1A", "TA0.CCI1B", m_variant->getTA0CCTL1(), m_variant->getTA0CCR1());
+									  m_variant->getTA0IV(), intvec0, intvec1);
+	if (m_variant->getTA0CCTL0() != 0) {
+		m_timerA0->addCCR("TA0.0", "TA0.CCI0A", "TA0.CCI0B", m_variant->getTA0CCTL0(), m_variant->getTA0CCR0());
+	}
+	if (m_variant->getTA0CCTL1() != 0) {
+		m_timerA0->addCCR("TA0.1", "TA0.CCI1A", "TA0.CCI1B", m_variant->getTA0CCTL1(), m_variant->getTA0CCR1());
+	}
+	if (m_variant->getTA0CCTL2() != 0) {
+		m_timerA0->addCCR("TA0.2", "TA0.CCI2A", "TA0.CCI2B", m_variant->getTA0CCTL2(), m_variant->getTA0CCR2());
+	}
+	if (m_variant->getTA0CCTL3() != 0) {
+		m_timerA0->addCCR("TA0.3", "TA0.CCI3A", "TA0.CCI3B", m_variant->getTA0CCTL3(), m_variant->getTA0CCR3());
+	}
+	if (m_variant->getTA0CCTL4() != 0) {
+		m_timerA0->addCCR("TA0.4", "TA0.CCI4A", "TA0.CCI4B", m_variant->getTA0CCTL4(), m_variant->getTA0CCR4());
+	}
+
+	// add TA1
+	intvec0 = m_variant->getTIMER1_A0_VECTOR();
+	intvec1 = m_variant->getTIMER1_A1_VECTOR();
+	if (intvec0 != 0 && intvec1 != 0) {
+		m_timerA1 = m_factory->createTimer(m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+										m_variant->getTA1CTL(), m_variant->getTA1R(),
+										m_variant->getTA1IV(), intvec0, intvec1);
+		if (m_variant->getTA0CCTL0() != 0) {
+			m_timerA1->addCCR("TA1.0", "TA1.CCI0A", "TA1.CCI0B", m_variant->getTA1CCTL0(), m_variant->getTA1CCR0());
+		}
+		if (m_variant->getTA0CCTL1() != 0) {
+			m_timerA1->addCCR("TA1.1", "TA1.CCI1A", "TA1.CCI1B", m_variant->getTA1CCTL1(), m_variant->getTA1CCR1());
+		}
+		if (m_variant->getTA0CCTL2() != 0) {
+			m_timerA1->addCCR("TA1.2", "TA1.CCI2A", "TA1.CCI2B", m_variant->getTA1CCTL2(), m_variant->getTA1CCR2());
+		}
+		if (m_variant->getTA0CCTL3() != 0) {
+			m_timerA1->addCCR("TA1.3", "TA1.CCI3A", "TA1.CCI3B", m_variant->getTA1CCTL3(), m_variant->getTA1CCR3());
+		}
+		if (m_variant->getTA0CCTL4() != 0) {
+			m_timerA1->addCCR("TA1.4", "TA1.CCI4A", "TA1.CCI4B", m_variant->getTA1CCTL4(), m_variant->getTA1CCR4());
+		}
+	}
+	else {
+		m_timerA1 = 0;
+	}
 }
 
 BasicClock::~BasicClock() {
@@ -60,7 +113,7 @@ BasicClock::~BasicClock() {
 	delete m_smclk;
 	delete m_dco;
 	delete m_mclk;
-	delete m_timerA;
+	delete m_timerA0;
 }
 
 void BasicClock::reset() {

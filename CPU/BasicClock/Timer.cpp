@@ -37,16 +37,16 @@ namespace MCU {
 
 Timer::Timer(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
-			 uint16_t taiv) :
+			 uint16_t taiv, uint16_t intvect0, uint16_t intvect1) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
-m_tar(tar), m_taiv(taiv) {
+m_tar(tar), m_taiv(taiv), m_intvect0(intvect0), m_intvect1(intvect1) {
 
 	m_mem->addWatcher(tactl, this);
 	m_mem->addWatcher(taiv, this, Memory::Read);
 
-	m_intManager->addWatcher(m_variant->getTIMERA0_VECTOR(), this);
-	m_intManager->addWatcher(m_variant->getTIMERA1_VECTOR(), this);
+	m_intManager->addWatcher(m_intvect0, this);
+	m_intManager->addWatcher(m_intvect1, this);
 
 	reset();
 }
@@ -160,7 +160,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 		if (ccr0_interrupt_enabled) {
 			// "Interrupt flag CCIFG is set"
 			m_mem->setBit(m_ccr[0].tacctl, 1, true);
-			m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+			m_intManager->queueInterrupt(m_intvect0);
 		}
 		// "Internal signal EQUx=1 and EQUx affects current output"
 		doOutput(m_ccr[0], tacctl, false);
@@ -178,7 +178,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 			if (interrupt_enabled) {
 				// "Interrupt flag CCIFG is set"
 				m_mem->setBit(m_ccr[i].tacctl, 1, true);
-				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				m_intManager->queueInterrupt(m_intvect1);
 			}
 			// "Internal signal EQUx=1 and EQUx affects current output"
 			doOutput(m_ccr[i], tacctl, false);
@@ -202,10 +202,10 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 					m_mem->setBigEndian(ccr.taccr, tar);
 					m_mem->setBit(m_ccr[i].tacctl, 1, true);
 					if (i == 0) {
-						m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+						m_intManager->queueInterrupt(m_intvect0);
 					}
 					else {
-						m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+						m_intManager->queueInterrupt(m_intvect1);
 					}
 					ccr.ccrRead = false;
 				}
@@ -240,7 +240,7 @@ void Timer::changeTAR(uint8_t mode) {
 				m_mem->setBigEndian(m_tar, 0);
 				if (taifg_interrupt_enabled) {
 					m_mem->setBit(m_tactl, 1, true);
-					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					m_intManager->queueInterrupt(m_intvect1);
 				}
 				tar = 0;
 			}
@@ -260,7 +260,7 @@ void Timer::changeTAR(uint8_t mode) {
 				m_mem->setBigEndian(m_tar, 0);
 				if (taifg_interrupt_enabled) {
 					m_mem->setBit(m_tactl, 1, true);
-					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					m_intManager->queueInterrupt(m_intvect1);
 				}
 				tar = 0;
 			}
@@ -287,7 +287,7 @@ void Timer::changeTAR(uint8_t mode) {
 				m_mem->setBigEndian(m_tar, 0);
 				if (taifg_interrupt_enabled) {
 					m_mem->setBit(m_tactl, 1, true);
-					m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+					m_intManager->queueInterrupt(m_intvect1);
 				}
 				tar = 0;
 				m_up = true;
@@ -382,7 +382,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 }
 
 void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
-	if (vector == m_variant->getTIMERA0_VECTOR()) {
+	if (vector == m_intvect0) {
 		// We have to reset CCR0 CCIFG after interrupt routine
 		m_mem->setBit(m_ccr[0].tacctl, 1, false);
 	}
@@ -392,14 +392,14 @@ void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 		for (int i = 1; i < m_ccr.size(); ++i) {
 			bool interrupt_enabled = m_mem->isBitSet(m_ccr[i].tacctl, 16);
 			if (m_mem->isBitSet(m_ccr[i].tacctl, 1)) {
-				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				m_intManager->queueInterrupt(m_intvect1);
 				return;
 			}
 		}
 
 		bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
 		if (taifg_interrupt_enabled && m_mem->isBitSet(m_tactl, 1)) {
-			m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+			m_intManager->queueInterrupt(m_intvect1);
 		}
 	}
 }
@@ -449,10 +449,10 @@ void Timer::doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl) {
 			m_mem->setBit(ccr.tacctl, 1, true);
 			m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
 			if (ccrIndex == 0) {
-				m_intManager->queueInterrupt(m_variant->getTIMERA0_VECTOR());
+				m_intManager->queueInterrupt(m_intvect0);
 			}
 			else {
-				m_intManager->queueInterrupt(m_variant->getTIMERA1_VECTOR());
+				m_intManager->queueInterrupt(m_intvect1);
 			}
 			ccr.ccrRead = false;
 		}

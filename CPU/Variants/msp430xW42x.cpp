@@ -2470,6 +2470,42 @@ class Variant_msp430xW42x : public Variant {
 		}
 
 
+		unsigned int getTIMER0_A0_VECTOR() {
+#ifdef TIMER0_A0_VECTOR
+			return TIMER0_A0_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMER0_A1_VECTOR() {
+#ifdef TIMER0_A1_VECTOR
+			return TIMER0_A1_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMER1_A0_VECTOR() {
+#ifdef TIMER1_A0_VECTOR
+			return TIMER1_A0_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMER1_A1_VECTOR() {
+#ifdef TIMER1_A1_VECTOR
+			return TIMER1_A1_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;

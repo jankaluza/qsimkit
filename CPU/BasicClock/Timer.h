@@ -43,7 +43,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 	public:
 		Timer(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			  ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
-			  uint16_t taiv);
+			  uint16_t taiv, uint16_t intvect0, uint16_t intvect1);
 		virtual ~Timer();
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
@@ -99,6 +99,8 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		uint16_t m_taiv;
 		std::vector<CCR> m_ccr;
 		std::map<std::string, int> m_cciNames;
+		uint16_t m_intvect0;
+		uint16_t m_intvect1;
 };
 
 }

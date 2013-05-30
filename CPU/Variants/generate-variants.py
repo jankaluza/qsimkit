@@ -31,6 +31,7 @@ defines += ["TA1CCTL0_", "TA1CCTL1_", "TA1CCTL2_", "TA1CCTL3_", "TA1CCTL4_"]
 defines += ["TA0IV_", "TA1IV_"]
 
 defines += ["TIMERA0_VECTOR", "TIMERA1_VECTOR"]
+defines += ["TIMER0_A0_VECTOR", "TIMER0_A1_VECTOR", "TIMER1_A0_VECTOR", "TIMER1_A1_VECTOR"]
 
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]

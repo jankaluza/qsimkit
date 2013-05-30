@@ -56,7 +56,11 @@ class BasicClock {
 		}
 
 		Timer *getTimerA() {
-			return m_timerA;
+			return m_timerA0;
+		}
+
+		Timer *getTimerA1() {
+			return m_timerA1;
 		}
 
 	private:
@@ -68,7 +72,8 @@ class BasicClock {
 		ACLK *m_aclk;
 		SMCLK *m_smclk;
 		LFXT1 *m_lfxt1;
-		Timer *m_timerA;
+		Timer *m_timerA0;
+		Timer *m_timerA1;
 		InterruptManager *m_intManager;
 		TimerFactory *m_factory;
 		PinManager *m_pinManager;
