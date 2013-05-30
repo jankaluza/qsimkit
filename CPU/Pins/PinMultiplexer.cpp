@@ -78,7 +78,12 @@ void PinMultiplexer::generateOutput(PinHandler *handler, double value) {
 		return;
 	}
 
-	m_manager->generateOutput(m_id, value);
+	// Generate output only if it's different value then the one we
+	// have generated last time
+	if (m_valueIsInput || (!m_valueIsInput && m_value != value)) {
+		m_manager->generateOutput(m_id, value);
+	}
+
 	m_value = value;
 	m_valueIsInput = false;
 }
