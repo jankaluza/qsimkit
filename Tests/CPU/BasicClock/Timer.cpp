@@ -47,6 +47,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(upDownMode);
 	CPPUNIT_TEST(captureRisingEdge);
 	CPPUNIT_TEST(captureRisingEdgeAsync);
+	CPPUNIT_TEST(captureGNDVCC);
 	CPPUNIT_TEST(compareSetReset);
 	CPPUNIT_TEST_SUITE_END();
 
@@ -445,6 +446,21 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(1, watcher->id);
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->value);
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 4));
+		}
+
+		void captureGNDVCC() {
+			// Start timer in continuous mode
+			m->setBigEndian(v->getTA0CTL(), 32);
+			// Rising edge, SCS, GND, Capture mode, Interrupt
+			m->setBigEndian(v->getTA0CCTL0(), 0x6910);
+			// Set P1.0 to be handled by Timer
+			m->setBitWatcher(v->getP1SEL(), 1, true);
+
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			// Change SCCI to VCC - rising edge
+			m->setBigEndian(v->getTA0CCTL0(), 0x7910);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 		}
 
 };

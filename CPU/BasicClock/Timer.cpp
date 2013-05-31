@@ -411,11 +411,11 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						break;
 					case 2:
 						// GND
-						handlePinInput("GND", 0.0);
+						handlePinInput(ccr.ccia, 0.0);
 						break;
 					case 3:
 						// VCC
-						handlePinInput("VCC", 1.0);
+						handlePinInput(ccr.ccia, 1.0);
 						break;
 				}
 
