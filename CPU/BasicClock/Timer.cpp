@@ -70,12 +70,13 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	ccr.ccib = ccibName;
 	ccr.capturePending = false;
 	ccr.ccrRead = true;
-	m_ccr.push_back(ccr);
 
-	// We don't have to store PinMultiplexers here, because we won't write
-	// any data there.
-	m_pinManager->addPinHandler(cciaName, this);
-	m_pinManager->addPinHandler(ccibName, this);
+	mpxs = m_pinManager->addPinHandler(cciaName, this);
+	ccr.cciaMpx = mpxs.empty() ? 0 : mpxs[0];
+	mpxs = m_pinManager->addPinHandler(ccibName, this);
+	ccr.ccibMpx = mpxs.empty() ? 0 : mpxs[0];
+
+	m_ccr.push_back(ccr);
 
 	// Setup memory watcher for ccr so we can generate Capture overflow (COV)
 	m_mem->addWatcher(taccr, this, Memory::Read);
@@ -375,6 +376,41 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			CCR &ccr = m_ccr[i];
 			if (ccr.tacctl == address) {
 				generateOutput(ccr, (val & 4) == 4);
+
+				bool isInput = false;
+				double value;
+				// Check input select
+				switch((val >> 12) & 3) {
+					case 0:
+						// CCIA
+						if (!ccr.cciaMpx) {
+							break;
+						}
+						value = ccr.cciaMpx->getValue(isInput);
+						if (isInput) {
+							handlePinInput(ccr.ccia, value);
+						}
+						break;
+					case 1:
+						// CCIAB
+						if (!ccr.ccibMpx) {
+							break;
+						}
+						value = ccr.ccibMpx->getValue(isInput);
+						if (isInput) {
+							handlePinInput(ccr.ccib, value);
+						}
+						break;
+					case 2:
+						// GND
+						handlePinInput("GND", 0.0);
+						break;
+					case 3:
+						// VCC
+						handlePinInput("VCC", 1.0);
+						break;
+				}
+
 				break;
 			}
 		}

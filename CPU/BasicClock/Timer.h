@@ -73,7 +73,9 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 			uint16_t taccr;
 			std::vector<PinMultiplexer *> outputMpxs;
 			std::string ccia;
+			PinMultiplexer *cciaMpx;
 			std::string ccib;
+			PinMultiplexer *ccibMpx;
 			bool capturePending;
 			bool ccrRead;
 		} CCR;

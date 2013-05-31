@@ -56,6 +56,8 @@ class PinMultiplexer : public MemoryWatcher {
 
 		void handleMemoryChanged(Memory *memory, uint16_t address);
 
+		double getValue(bool &isInput);
+
 	private:
 		PinManager *m_manager;
 		int m_id;

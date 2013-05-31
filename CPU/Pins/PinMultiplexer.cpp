@@ -91,6 +91,11 @@ void PinMultiplexer::generateOutput(PinHandler *handler, double value) {
 void PinMultiplexer::reset() {
 }
 
+double PinMultiplexer::getValue(bool &isInput) {
+	isInput = m_valueIsInput;
+	return m_value;
+}
+
 void PinMultiplexer::handleMemoryChanged(Memory *memory, uint16_t address) {
 	for (int i = 0; i < m_conds.size(); ++i) {
 		const Condition &c = m_conds[i];
