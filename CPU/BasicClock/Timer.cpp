@@ -70,6 +70,7 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	ccr.ccib = ccibName;
 	ccr.capturePending = false;
 	ccr.ccrRead = true;
+	ccr.ccis = 0;
 
 	mpxs = m_pinManager->addPinHandler(cciaName, this);
 	ccr.cciaMpx = mpxs.empty() ? 0 : mpxs[0];
@@ -377,10 +378,17 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			if (ccr.tacctl == address) {
 				generateOutput(ccr, (val & 4) == 4);
 
+				// Check if CCIS really changed
+				uint8_t ccis = (val >> 12) & 3;
+				if (ccr.ccis == ccis) {
+					break;
+				}
+				ccr.ccis = ccis;
+
 				bool isInput = false;
 				double value;
 				// Check input select
-				switch((val >> 12) & 3) {
+				switch(ccis) {
 					case 0:
 						// CCIA
 						if (!ccr.cciaMpx) {
@@ -392,7 +400,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						}
 						break;
 					case 1:
-						// CCIAB
+						// CCIB
 						if (!ccr.ccibMpx) {
 							break;
 						}
