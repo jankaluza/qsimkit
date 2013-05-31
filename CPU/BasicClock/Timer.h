@@ -87,6 +87,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		void changeTAR(uint8_t mode);
 		void generateOutput(CCR &ccr, double value);
 		void doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt);
+		void handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, double value);
 
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;

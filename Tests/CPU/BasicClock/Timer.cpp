@@ -48,6 +48,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST(captureRisingEdge);
 	CPPUNIT_TEST(captureRisingEdgeAsync);
 	CPPUNIT_TEST(captureGNDVCC);
+	CPPUNIT_TEST(captureGNDCCIA);
 	CPPUNIT_TEST(compareSetReset);
 	CPPUNIT_TEST_SUITE_END();
 
@@ -463,6 +464,9 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 		}
 
+		void captureGNDCCIA() {
+			// TODO
+		}
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (TimerTest);

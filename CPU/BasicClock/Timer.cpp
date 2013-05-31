@@ -396,7 +396,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						}
 						value = ccr.cciaMpx->getValue(isInput);
 						if (isInput) {
-							handlePinInput(ccr.ccia, value);
+							handlePinInput(ccr, i, ccr.ccia, value);
 						}
 						break;
 					case 1:
@@ -406,16 +406,16 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						}
 						value = ccr.ccibMpx->getValue(isInput);
 						if (isInput) {
-							handlePinInput(ccr.ccib, value);
+							handlePinInput(ccr, i, ccr.ccib, value);
 						}
 						break;
 					case 2:
 						// GND
-						handlePinInput(ccr.ccia, 0.0);
+						handlePinInput(ccr, i, "GND", 0.0);
 						break;
 					case 3:
 						// VCC
-						handlePinInput(ccr.ccia, 1.0);
+						handlePinInput(ccr, i, "VCC", 1.0);
 						break;
 				}
 
@@ -508,13 +508,7 @@ void Timer::doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl) {
 	}
 }
 
-void Timer::handlePinInput(const std::string &name, double value) {
-	std::map<std::string, int>::iterator it = m_cciNames.find(name);
-	if (it == m_cciNames.end()) {
-		return;
-	}
-
-	CCR &ccr = m_ccr[it->second];
+void Timer::handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, double value) {
 	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl, false);
 	bool old_value = tacctl & 8;
 
@@ -540,7 +534,15 @@ void Timer::handlePinInput(const std::string &name, double value) {
 				return;
 			}
 			break;
-		default:
+		case 2:
+			if (name != "GND") {
+				return;
+			}
+			break;
+		case 3:
+			if (name != "VCC") {
+				return;
+			}
 			break;
 	}
 
@@ -552,24 +554,34 @@ void Timer::handlePinInput(const std::string &name, double value) {
 		case 1:
 			// Capture on rising edge
 			if (old_value == 0 && value == 1) {
-				doCapture(ccr, it->second, tacctl);
+				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;
 		case 2:
 			// Capture on failing edge
 			if (old_value == 1 && value == 0.0) {
-				doCapture(ccr, it->second, tacctl);
+				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;
 		case 3:
 			// Capture on failing and rising edge
 			if (old_value != (value == 0.0)) {
-				doCapture(ccr, it->second, tacctl);
+				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;
 		default:
 			break;
 	}
+}
+
+void Timer::handlePinInput(const std::string &name, double value) {
+	std::map<std::string, int>::iterator it = m_cciNames.find(name);
+	if (it == m_cciNames.end()) {
+		return;
+	}
+
+	CCR &ccr = m_ccr[it->second];
+	handlePinInput(ccr, it->second, name, value);
 }
 
 void Timer::handlePinActivated(const std::string &name) {
