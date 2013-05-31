@@ -58,8 +58,7 @@ QDialog(parent) {
 
 MSP430 *ProjectConfiguration::getMSP430() {
 	Variant *v = getVariant(MSP430Variants->currentItem()->text().toStdString().c_str());
-	MSP430 *cpu = new MSP430(v);
-	cpu->loadPackage("Packages/msp430x241x.xml");
+	MSP430 *cpu = new MSP430(v, QString("Packages/") + MSP430Variants->currentItem()->text() + ".xml");
 	return cpu;
 }
 

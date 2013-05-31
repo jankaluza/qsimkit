@@ -87,7 +87,9 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 			break;
 	}
 
-	m_multiplexers.push_back(mpx);
+	if (mpx) {
+		m_multiplexers.push_back(mpx);
+	}
 	return mpx;
 }
 

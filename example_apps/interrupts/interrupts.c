@@ -62,7 +62,7 @@ void blink(unsigned int led, unsigned int times)
 void delay(void)
 {
 	volatile unsigned int n;
-	for (n = 0; n < 60000; n++);
+	for (n = 0; n < 5000; n++);
 }
 
 interrupt(PORT1_VECTOR) button_press (void) {
@@ -75,8 +75,8 @@ interrupt(PORT1_VECTOR) button_press (void) {
 	i ^= 1;			// For switching i between 1 and 0
 
 	if (i == 0){
-		DCO3(10,3);
+		DCO3(10,3); // 66.8ms per one blink period
 	} else {
-		DCO3(6,3);
+		DCO3(6,3); // 534.2 ms per one blink period
 	}
 }

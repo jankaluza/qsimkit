@@ -54,7 +54,7 @@ class PinAddr {
 class MSP430 : public Peripheral, public MCU::PinWatcher
 {
 	public:
-		MSP430(Variant *variant);
+		MSP430(Variant *variant, const QString &package = "Packages/msp430x241x.xml");
 
 		Variant *getVariant() { return m_variant; }
 
@@ -116,8 +116,6 @@ class MSP430 : public Peripheral, public MCU::PinWatcher
 		const QByteArray &getELF() {
 			return m_elf;
 		}
-
-		void loadPackage(const QString &file);
 
 	private:
 		void setPinType(const QString &name, MCU::PinType &type, int &subtype);

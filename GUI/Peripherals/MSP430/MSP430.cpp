@@ -45,7 +45,7 @@
 #include <QDebug>
 #include <QDomDocument>
 
-MSP430::MSP430(Variant *variant) :
+MSP430::MSP430(Variant *variant, const QString &package) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
 m_instruction(new MCU::Instruction), m_variant(variant),
@@ -60,19 +60,12 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
 	m_pinManager = new MCU::PinManager(m_mem, m_intManager, m_variant);
 	m_pinManager->setWatcher(this);
-	Package::loadPackage(this, m_pinManager, "Packages/msp430x241x.xml", m_pins, m_sides);
+	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
 
-	
 	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
-}
-
-void MSP430::loadPackage(const QString &file) {
-	std::cout << "LOAD PACKAGE " << this << "\n";
-	m_pinManager->reset();
-	Package::loadPackage(this, m_pinManager, file, m_pins, m_sides);
 }
 
 void MSP430::reset() {
