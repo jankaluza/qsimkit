@@ -80,8 +80,8 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 
 	m_ccr.push_back(ccr);
 
-	// Setup memory watcher for ccr so we can generate Capture overflow (COV)
-	m_mem->addWatcher(taccr, this, Memory::Read);
+	// Setup memory watcher for ccr so we can generate Capture overflow (COV).
+	m_mem->addWatcher(taccr, this, Memory::ReadWrite);
 	// Setup memory watcher for cctl so we can change output according to OUT
 	m_mem->addWatcher(tacctl, this, Memory::Write);
 }
@@ -158,7 +158,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 	uint16_t tacctl = m_mem->getBigEndian(m_ccr[0].tacctl);
 	bool ccr0_interrupt_enabled = tacctl & 16;
 	bool ccr0_interrupt = false;
-	uint16_t ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
+	uint16_t ccr0 = m_ccr[0].tbcl;
 	if (tar == ccr0) {
 		if (ccr0_interrupt_enabled) {
 			// "Interrupt flag CCIFG is set"
@@ -177,7 +177,7 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 	// Set CCIFG if TAR == CCR and CCIE is enabled
 	for (int i = 1; i < m_ccr.size(); ++i) {
 		tacctl = m_mem->getBigEndian(m_ccr[i].tacctl);
-		uint16_t ccr = m_mem->getBigEndian(m_ccr[i].taccr, false);
+		uint16_t ccr = m_ccr[i].tbcl;
 		bool interrupt_enabled = tacctl & 16;
 		if (ccr == tar) {
 			if (interrupt_enabled) {
@@ -206,7 +206,7 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 			if (m_mem->isBitSet(ccr.tacctl, 16)) {
 				// interrupts enabled
 				if (ccr.ccrRead) {
-					m_mem->setBigEndian(ccr.taccr, tar);
+					m_mem->setBigEndian(ccr.taccr, tar, false);
 					m_mem->setBit(m_ccr[i].tacctl, 1, true);
 					if (i == 0) {
 						m_intManager->queueInterrupt(m_intvect0);
@@ -235,7 +235,7 @@ void Timer::changeTAR(uint8_t mode) {
 		case TIMER_STOPPED:
 			break;
 		case TIMER_UP:
-			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
+			ccr0 = m_ccr[0].tbcl;
 
 			// CCR0 is 0, so timer is stopped
 			if (ccr0 == 0) {
@@ -282,7 +282,7 @@ void Timer::changeTAR(uint8_t mode) {
 			checkCCRInterrupts(tar);
 			break;
 		case TIMER_UPDOWN:
-			ccr0 = m_mem->getBigEndian(m_ccr[0].taccr, false);
+			ccr0 = m_ccr[0].tbcl;
 
 			// CCR0 is 0, so timer is stopped
 			if (ccr0 == 0) {
@@ -437,6 +437,12 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 
 				break;
 			}
+			else if (ccr.taccr == address) {
+				if (m_type == TimerA) {
+					ccr.tbcl = val;
+				}
+				break;
+			}
 		}
 	}
 }
@@ -507,7 +513,7 @@ void Timer::doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl) {
 		// the interrupt.
 		if (ccr.ccrRead) {
 			m_mem->setBit(ccr.tacctl, 1, true);
-			m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false));
+			m_mem->setBigEndian(ccr.taccr, m_mem->getBigEndian(m_tar, false), false);
 			if (ccrIndex == 0) {
 				m_intManager->queueInterrupt(m_intvect0);
 			}

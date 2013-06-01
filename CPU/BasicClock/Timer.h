@@ -81,6 +81,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 			bool capturePending;
 			bool ccrRead;
 			uint8_t ccis;
+			uint16_t tbcl;
 		} CCR;
 
 		void checkCCRInterrupts(uint16_t tar);
