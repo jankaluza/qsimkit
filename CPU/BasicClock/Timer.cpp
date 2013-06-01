@@ -35,7 +35,7 @@
 
 namespace MCU {
 
-Timer::Timer(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
+Timer::Timer(Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,
 			 uint16_t taiv, uint16_t intvect0, uint16_t intvect1) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),

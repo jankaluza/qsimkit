@@ -18,11 +18,11 @@ using namespace MCU;
 
 class DummyTimerFactory : public TimerFactory {
 	public:
-		Timer *createTimer(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
+		Timer *createTimer(Timer::Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem,
 						   Variant *variant, ACLK *aclk,
 						   SMCLK *smclk, uint16_t tactl, uint16_t tar,
 						   uint16_t taiv, uint16_t intvec0, uint16_t intvec1) {
-			return new Timer(pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1);
+			return new Timer(type, pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1);
 		}
 };
 
@@ -465,7 +465,24 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 		}
 
 		void captureGNDCCIA() {
-			// TODO
+			// Start timer in continuous mode
+			m->setBigEndian(v->getTA0CTL(), 32);
+			// Rising edge, SCS, GND, Capture mode, Interrupt
+			m->setBigEndian(v->getTA0CCTL0(), 0x6910);
+			// Set P1.0 to be handled by Timer
+			m->setBitWatcher(v->getP1SEL(), 1, true);
+			// Set P1.0 to 1
+			pinManager->handlePinInput(0, 1.0);
+
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			// No interrupt yet, because Timer input is still GND
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// Change input to CCIA, interrupt should happen
+			m->setBigEndian(v->getTA0CCTL0(), 0x4910);
+			bc->getTimerA()->tick();
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 		}
 };
 

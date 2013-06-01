@@ -42,7 +42,7 @@ class AdevsTimerFactory : public MCU::TimerFactory {
 		AdevsTimerFactory();
 		virtual ~AdevsTimerFactory() {}
 
-		MCU::Timer *createTimer(MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem,
+		MCU::Timer *createTimer(MCU::Timer::Type type, MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem,
 								Variant *variant, MCU::ACLK *aclk,
 								MCU::SMCLK *smclk, uint16_t tactl, uint16_t tar,
 								uint16_t taiv, uint16_t intvec0, uint16_t intvec1);

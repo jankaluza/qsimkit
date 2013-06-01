@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include "CPU/BasicClock/Timer.h"
 
 class Variant;
 
@@ -38,7 +39,7 @@ class PinManager;
 class TimerFactory {
 	public:
 		virtual ~TimerFactory() {}
-		virtual Timer *createTimer(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
+		virtual Timer *createTimer(Timer::Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem,
 								   Variant *variant, ACLK *aclk,
 								   SMCLK *smclk, uint16_t tactl, uint16_t tar,
 								   uint16_t taiv, uint16_t intvec0, uint16_t intvec1) = 0;

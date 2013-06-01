@@ -24,11 +24,11 @@ using namespace MCU;
 
 class DummyTimerFactory : public TimerFactory {
 	public:
-		Timer *createTimer(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
+		Timer *createTimer(Timer::Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem,
 						   Variant *variant, ACLK *aclk,
 						   SMCLK *smclk, uint16_t tactl, uint16_t tar,
 						   uint16_t taiv, uint16_t intvec0, uint16_t intvec1) {
-			return new Timer(pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1);
+			return new Timer(type, pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1);
 		}
 };
 

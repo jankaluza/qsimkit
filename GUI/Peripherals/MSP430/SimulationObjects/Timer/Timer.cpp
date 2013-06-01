@@ -20,10 +20,10 @@
 #include "Timer.h"
 #include <QDebug>
 
-Timer::Timer(MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem,
+Timer::Timer(Timer::Type &type, MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem,
 			 Variant *variant, MCU::ACLK *aclk, MCU::SMCLK *smclk,
 			 uint16_t tactl, uint16_t tar, uint16_t taiv, uint16_t intvec0, uint16_t intvec1) :
-			 MCU::Timer(pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1) {
+			 MCU::Timer(type, pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1) {
 	
 }
 
