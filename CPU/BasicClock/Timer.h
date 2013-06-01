@@ -107,6 +107,8 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		std::map<std::string, int> m_cciNames;
 		uint16_t m_intvect0;
 		uint16_t m_intvect1;
+		Type m_type;
+		uint16_t m_counterMax;
 };
 
 }

@@ -40,7 +40,8 @@ Timer::Timer(Type type, PinManager *pinManager, InterruptManager *intManager, Me
 			 uint16_t taiv, uint16_t intvect0, uint16_t intvect1) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
-m_tar(tar), m_taiv(taiv), m_intvect0(intvect0), m_intvect1(intvect1) {
+m_tar(tar), m_taiv(taiv), m_intvect0(intvect0), m_intvect1(intvect1),
+m_type(type), m_counterMax(0xffff) {
 
 	m_mem->addWatcher(tactl, this);
 	m_mem->addWatcher(taiv, this, Memory::Read);
@@ -166,8 +167,10 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 		}
 		// "Internal signal EQUx=1 and EQUx affects current output"
 		doOutput(m_ccr[0], tacctl, false);
-		// CCI is latched to SCCI
-		m_mem->setBit(m_ccr[0].tacctl, 1 << 10, tacctl & 8);
+		if (m_type == TimerA) {
+			// CCI is latched to SCCI
+			m_mem->setBit(m_ccr[0].tacctl, 1 << 10, tacctl & 8);
+		}
 		ccr0_interrupt = true;
 	}
 
@@ -184,8 +187,10 @@ void Timer::checkCCRInterrupts(uint16_t tar) {
 			}
 			// "Internal signal EQUx=1 and EQUx affects current output"
 			doOutput(m_ccr[i], tacctl, false);
-			// CCI is latched to SCCI
-			m_mem->setBit(m_ccr[i].tacctl, 1 << 10, tacctl & 8);
+			if (m_type == TimerA) {
+				// CCI is latched to SCCI
+				m_mem->setBit(m_ccr[i].tacctl, 1 << 10, tacctl & 8);
+			}
 		}
 
 		if (ccr0_interrupt) {
@@ -257,7 +262,7 @@ void Timer::changeTAR(uint8_t mode) {
 			checkCCRInterrupts(tar);
 			break;
 		case TIMER_CONTINUOUS:
-			if (tar == 0xffff) {
+			if (tar == m_counterMax) {
 				// Timer overflows, fire TAIFG interrupt if it's enabled
 				m_mem->setBigEndian(m_tar, 0);
 				if (taifg_interrupt_enabled) {
@@ -370,6 +375,17 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			case 2: m_source = m_smclk; break;
 			case 3: break;
 			default: break;
+		}
+
+		if (m_type == TimerB) {
+			// Choose source
+			switch((val >> 11) & 3) {
+				case 0: m_counterMax = 0xffff; break;
+				case 1: m_counterMax = 0x0fff; break;
+				case 2: m_counterMax = 0x03ff; break;
+				case 3: m_counterMax = 0x00ff; break;
+				default: break;
+			}
 		}
 	}
 	else {
