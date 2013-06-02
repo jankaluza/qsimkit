@@ -69,7 +69,14 @@
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionTracked_pins"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuView"/>
   </widget>
   <action name="actionLoad_A43">
    <property name="text">
@@ -119,6 +126,11 @@
   <action name="actionLoad_ELF">
    <property name="text">
     <string>Load ELF</string>
+   </property>
+  </action>
+  <action name="actionTracked_pins">
+   <property name="text">
+    <string>Tracked pins</string>
    </property>
   </action>
  </widget>

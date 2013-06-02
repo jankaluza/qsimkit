@@ -18,7 +18,7 @@
  **/
 
 #include "SimulationObject.h"
-#include "History/PinHistory.h"
+#include "Tracking/PinHistory.h"
 
 #include <QDebug>
 
