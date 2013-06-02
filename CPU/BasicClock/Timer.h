@@ -91,6 +91,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		void generateOutput(CCR &ccr, double value);
 		void doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt);
 		void handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, double value);
+		void latchTBCL(uint16_t tar, bool direction_changed);
 
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;

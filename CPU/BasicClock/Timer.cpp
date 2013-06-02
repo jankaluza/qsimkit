@@ -226,10 +226,37 @@ void Timer::finishPendingCaptures(uint16_t tar) {
 	}
 }
 
+void Timer::latchTBCL(uint16_t tar, bool direction_changed) {
+	for (int i = 0; i < m_ccr.size(); ++i) {
+		CCR &ccr = m_ccr[i];
+		uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl, false);
+		switch((tacctl >> 9) & 3) {
+			case 0:
+				break;
+			case 1:
+				if (tar == 0) {
+					ccr.tbcl = m_mem->getBigEndian(ccr.taccr, false);
+				}
+				break;
+			case 2:
+				if (tar == 0 || direction_changed) {
+					ccr.tbcl = m_mem->getBigEndian(ccr.taccr, false);
+				}
+				break;
+			case 3:
+				if (tar == ccr.tbcl) {
+					ccr.tbcl = m_mem->getBigEndian(ccr.taccr, false);
+				}
+				break;
+		}
+	}
+}
+
 void Timer::changeTAR(uint8_t mode) {
 	uint16_t ccr0;
 	uint16_t tar = m_mem->getBigEndian(m_tar, false);
 	bool taifg_interrupt_enabled = m_mem->isBitSet(m_tactl, 2);
+	bool direction_changed = false;
 
 	switch (mode) {
 		case TIMER_STOPPED:
@@ -260,6 +287,10 @@ void Timer::changeTAR(uint8_t mode) {
 
 			// Generate CCRx interrupts
 			checkCCRInterrupts(tar);
+
+			if (m_type == TimerB) {
+				latchTBCL(tar, false);
+			}
 			break;
 		case TIMER_CONTINUOUS:
 			if (tar == m_counterMax) {
@@ -280,6 +311,10 @@ void Timer::changeTAR(uint8_t mode) {
 
 			// Generate CCRx interrupts
 			checkCCRInterrupts(tar);
+
+			if (m_type == TimerB) {
+				latchTBCL(tar, false);
+			}
 			break;
 		case TIMER_UPDOWN:
 			ccr0 = m_ccr[0].tbcl;
@@ -298,6 +333,7 @@ void Timer::changeTAR(uint8_t mode) {
 				}
 				tar = 0;
 				m_up = true;
+				direction_changed = true;
 			}
 			else {
 				if (m_up) {
@@ -312,12 +348,16 @@ void Timer::changeTAR(uint8_t mode) {
 
 				if (tar == ccr0) {
 					m_up = false;
+					direction_changed = true;
 				}
 				m_mem->setBigEndian(m_tar, tar);
 			}
 
 			finishPendingCaptures(tar);
 
+			if (m_type == TimerB) {
+				latchTBCL(tar, direction_changed);
+			}
 			break;
 		default:
 			break;
@@ -440,6 +480,18 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 			else if (ccr.taccr == address) {
 				if (m_type == TimerA) {
 					ccr.tbcl = val;
+				}
+				else {
+					uint16_t tacctl = memory->getBigEndian(ccr.tacctl, false);
+					switch((tacctl >> 9) & 3) {
+						case 0:
+							// TBCTL loads on write
+							ccr.tbcl = val;
+							break;
+						default:
+							// Otherwise it gets refreshed in changeTar()
+							break;
+					}
 				}
 				break;
 			}
