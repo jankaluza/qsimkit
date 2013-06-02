@@ -147,6 +147,8 @@ BasicClock::~BasicClock() {
 	delete m_dco;
 	delete m_mclk;
 	delete m_timerA0;
+	delete m_timerA1;
+	delete m_timerB;
 }
 
 void BasicClock::reset() {
