@@ -63,6 +63,10 @@ class BasicClock {
 			return m_timerA1;
 		}
 
+		Timer *getTimerB() {
+			m_timerB;
+		}
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
@@ -74,6 +78,7 @@ class BasicClock {
 		LFXT1 *m_lfxt1;
 		Timer *m_timerA0;
 		Timer *m_timerA1;
+		Timer *m_timerB;
 		InterruptManager *m_intManager;
 		TimerFactory *m_factory;
 		PinManager *m_pinManager;

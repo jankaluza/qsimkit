@@ -33,6 +33,14 @@ defines += ["TA0IV_", "TA1IV_"]
 defines += ["TIMERA0_VECTOR", "TIMERA1_VECTOR"]
 defines += ["TIMER0_A0_VECTOR", "TIMER0_A1_VECTOR", "TIMER1_A0_VECTOR", "TIMER1_A1_VECTOR"]
 
+# Timer B
+defines += ["TBR_", "TBCTL_"]
+defines += ["TBCCR0_", "TBCCR1_", "TBCCR2_", "TBCCR3_", "TBCCR4_", "TBCCR5_", "TBCCR6_"]
+defines += ["TBCCTL0_", "TBCCTL1_", "TBCCTL2_", "TBCCTL3_", "TBCCTL4_", "TBCCTL5_", "TBCCTL6_"]
+defines += ["TBIV_"]
+
+defines += ["TIMERB0_VECTOR", "TIMERB1_VECTOR"]
+
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
 

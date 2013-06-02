@@ -104,6 +104,39 @@ m_pinManager(pinManager) {
 	else {
 		m_timerA1 = 0;
 	}
+
+	// add TB
+	intvec0 = m_variant->getTIMERB0_VECTOR();
+	intvec1 = m_variant->getTIMERB1_VECTOR();
+	if (intvec0 != 0 && intvec1 != 0) {
+		m_timerB = m_factory->createTimer(Timer::TimerB, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+										m_variant->getTBCTL(), m_variant->getTBR(),
+										m_variant->getTBIV(), intvec0, intvec1);
+		if (m_variant->getTBCCTL0() != 0) {
+			m_timerB->addCCR("TB0.0", "TB0.CCI0A", "TB0.CCI0B", m_variant->getTBCCTL0(), m_variant->getTBCCR0());
+		}
+		if (m_variant->getTBCCTL1() != 0) {
+			m_timerB->addCCR("TB0.1", "TB0.CCI1A", "TB0.CCI1B", m_variant->getTBCCTL1(), m_variant->getTBCCR1());
+		}
+		if (m_variant->getTBCCTL2() != 0) {
+			m_timerB->addCCR("TB0.2", "TB0.CCI2A", "TB0.CCI2B", m_variant->getTBCCTL2(), m_variant->getTBCCR2());
+		}
+		if (m_variant->getTBCCTL3() != 0) {
+			m_timerB->addCCR("TB0.3", "TB0.CCI3A", "TB0.CCI3B", m_variant->getTBCCTL3(), m_variant->getTBCCR3());
+		}
+		if (m_variant->getTBCCTL4() != 0) {
+			m_timerB->addCCR("TB0.4", "TB0.CCI4A", "TB0.CCI4B", m_variant->getTBCCTL4(), m_variant->getTBCCR4());
+		}
+		if (m_variant->getTBCCTL5() != 0) {
+			m_timerB->addCCR("TB0.5", "TB0.CCI5A", "TB0.CCI5B", m_variant->getTBCCTL5(), m_variant->getTBCCR5());
+		}
+		if (m_variant->getTBCCTL6() != 0) {
+			m_timerB->addCCR("TB0.6", "TB0.CCI6A", "TB0.CCI6B", m_variant->getTBCCTL6(), m_variant->getTBCCR6());
+		}
+	}
+	else {
+		m_timerB = 0;
+	}
 }
 
 BasicClock::~BasicClock() {

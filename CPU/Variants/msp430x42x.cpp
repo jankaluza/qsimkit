@@ -2572,6 +2572,177 @@ class Variant_msp430x42x : public Variant {
 		}
 
 
+		unsigned int getTBR() {
+#ifdef TBR_
+			return TBR_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCTL() {
+#ifdef TBCTL_
+			return TBCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR0() {
+#ifdef TBCCR0_
+			return TBCCR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR1() {
+#ifdef TBCCR1_
+			return TBCCR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR2() {
+#ifdef TBCCR2_
+			return TBCCR2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR3() {
+#ifdef TBCCR3_
+			return TBCCR3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR4() {
+#ifdef TBCCR4_
+			return TBCCR4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR5() {
+#ifdef TBCCR5_
+			return TBCCR5_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCR6() {
+#ifdef TBCCR6_
+			return TBCCR6_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL0() {
+#ifdef TBCCTL0_
+			return TBCCTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL1() {
+#ifdef TBCCTL1_
+			return TBCCTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL2() {
+#ifdef TBCCTL2_
+			return TBCCTL2_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL3() {
+#ifdef TBCCTL3_
+			return TBCCTL3_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL4() {
+#ifdef TBCCTL4_
+			return TBCCTL4_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL5() {
+#ifdef TBCCTL5_
+			return TBCCTL5_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBCCTL6() {
+#ifdef TBCCTL6_
+			return TBCCTL6_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTBIV() {
+#ifdef TBIV_
+			return TBIV_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMERB0_VECTOR() {
+#ifdef TIMERB0_VECTOR
+			return TIMERB0_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getTIMERB1_VECTOR() {
+#ifdef TIMERB1_VECTOR
+			return TIMERB1_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;
