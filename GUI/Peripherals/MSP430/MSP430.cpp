@@ -246,4 +246,11 @@ void MSP430::paint(QWidget *screen) {
 			even = not even;
 		}
 	}
+
+	if (m_code.empty()) {
+		QPen pen(Qt::black, 1, Qt::SolidLine);
+		qp.setPen(pen);
+		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
+					"No code loaded. Load the code using\n\"File->Load ELF\" menu option.");
+	}
 }

@@ -121,6 +121,12 @@ void Screen::paintEvent(QPaintEvent *e) {
 		p.drawLine(0, i, 1500, i);
 	}
 
+	if (m_objects.empty()) {
+		p.setPen(QPen(QColor(0, 0, 0), 1, Qt::SolidLine));
+		p.drawText(0, 0, width(), height(), Qt::AlignCenter,
+				   "There is no project loaded yet.\nCreate new project or open the existing one.");
+	}
+
 	p.end();
 
 	for (int i = 0; i < m_objects.size(); ++i) {
@@ -214,7 +220,7 @@ void Screen::load(QDomDocument &doc) {
 		ScreenObject *obj = 0;
 		if (type == "MSP430") {
 			QString variant = object.firstChildElement("variant").text();
-			obj = new MSP430(getVariant(variant.toStdString().c_str()));
+			obj = new MSP430(getVariant(variant.toStdString().c_str()), QString("Packages/") + variant + ".xml");
 		}
 		else if (type == "ConnectionNode") {
 			obj = new ConnectionNode();

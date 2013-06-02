@@ -27,6 +27,7 @@
 
 #include "RegistersItem.h"
 #include "TimerAItem.h"
+#include "TimerBItem.h"
 
 #include <QWidget>
 #include <QTime>
@@ -50,6 +51,9 @@ MSP430PeripheralItem::MSP430PeripheralItem(MSP430 *cpu) {
 
 	m_timerAItem = new TimerAItem(m_cpu);
 	addChild(m_timerAItem);
+
+	m_timerBItem = new TimerBItem(m_cpu);
+	addChild(m_timerBItem);
 }
 
 MSP430PeripheralItem::~MSP430PeripheralItem() {
@@ -59,4 +63,5 @@ MSP430PeripheralItem::~MSP430PeripheralItem() {
 void MSP430PeripheralItem::refresh() {
 	m_registersItem->refresh();
 	m_timerAItem->refresh();
+	m_timerBItem->refresh();
 }

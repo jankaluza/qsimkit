@@ -93,6 +93,8 @@ m_dig(0), m_sim(0) {
 
 	connect(screen, SIGNAL(onPeripheralAdded(QObject *)), m_peripheralsWidget, SLOT(addPeripheral(QObject *)));
 	connect(screen, SIGNAL(onPeripheralRemoved(QObject *)), m_peripheralsWidget, SLOT(removePeripheral(QObject *)));
+
+	setDockWidgetsEnabled(false);
 }
 
 void QSimKit::setVariant(const QString &variant) {
@@ -112,10 +114,20 @@ void QSimKit::refreshDockWidgets() {
 	statusbar->showMessage(QString::number(m_sim->nextEventTime()));
 }
 
+void QSimKit::setDockWidgetsEnabled(bool enabled) {
+	for (int i = 0; i < m_dockWidgets.size(); ++i) {
+		m_dockWidgets[i]->setEnabled(enabled);
+	}
+
+	toolbar->setEnabled(enabled);
+}
+
 void QSimKit::setDockWidgetsCPU(MSP430 *cpu) {
 	for (int i = 0; i < m_dockWidgets.size(); ++i) {
 		m_dockWidgets[i]->setCPU(cpu);
 	}
+
+	setDockWidgetsEnabled(true);
 }
 
 void QSimKit::singleStep() {

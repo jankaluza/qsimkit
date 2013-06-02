@@ -77,6 +77,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 
 	private:
 		void refreshDockWidgets();
+		void setDockWidgetsEnabled(bool enabled);
 		void setDockWidgetsCPU(MSP430 *cpu);
 
 	private:
