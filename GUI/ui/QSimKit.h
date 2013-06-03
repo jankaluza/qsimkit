@@ -36,6 +36,7 @@ class Disassembler;
 class BreakpointManager;
 class DockWidget;
 class Peripherals;
+class TrackedPins;
 
 class QSimKit : public QMainWindow, public Ui::QSimKit
 {
@@ -77,11 +78,13 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void pauseSimulation(bool pause);
 		void resetSimulation();
 
+		void showTrackedPins();
+
 	signals:
 		void onSimulationStarted(bool wasPaused);
 		void onSimulationPaused();
 		void onSimulationStopped();
-		void onSimulationStep();
+		void onSimulationStep(double t);
 
 	private:
 		void refreshDockWidgets();
@@ -100,5 +103,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		BreakpointManager *m_breakpointManager;
 		QList<DockWidget *> m_dockWidgets;
 		Peripherals *m_peripheralsWidget;
+		TrackedPins *m_trackedPins;
 };
 

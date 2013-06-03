@@ -36,6 +36,8 @@
 
 #include "Breakpoints/BreakpointManager.h"
 
+#include "Tracking/TrackedPins.h"
+
 #include <QWidget>
 #include <QTime>
 #include <QMainWindow>
@@ -65,6 +67,7 @@ m_dig(0), m_sim(0) {
 	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
 	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
 	connect(actionProject_options, SIGNAL(triggered()), this, SLOT(projectOptions()) );
+	connect(actionTracked_pins, SIGNAL(triggered()), this, SLOT(showTrackedPins()) );
 
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -95,6 +98,9 @@ m_dig(0), m_sim(0) {
 	connect(screen, SIGNAL(onPeripheralAdded(QObject *)), m_peripheralsWidget, SLOT(addPeripheral(QObject *)));
 	connect(screen, SIGNAL(onPeripheralRemoved(QObject *)), m_peripheralsWidget, SLOT(removePeripheral(QObject *)));
 
+	m_trackedPins = new TrackedPins(this, this);
+	QMainWindow::addDockWidget(Qt::BottomDockWidgetArea, m_trackedPins);
+
 	setDockWidgetsEnabled(false);
 }
 
@@ -104,6 +110,10 @@ Screen *QSimKit::getScreen() {
 
 void QSimKit::setVariant(const QString &variant) {
 	m_variant = getVariant(variant.toStdString().c_str());
+}
+
+void QSimKit::showTrackedPins() {
+	m_trackedPins->show();
 }
 
 void QSimKit::addDockWidget(DockWidget *widget, Qt::DockWidgetArea area) {
@@ -148,7 +158,7 @@ void QSimKit::singleStep() {
 	while (t == m_sim->nextEventTime());
 	refreshDockWidgets();
 
-	onSimulationStep();
+	onSimulationStep(m_sim->nextEventTime());
 }
 
 void QSimKit::simulationStep() {
