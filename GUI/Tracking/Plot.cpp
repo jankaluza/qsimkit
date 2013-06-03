@@ -29,14 +29,15 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_maxY(3.3) {
+Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_maxY(3.3), m_pinHistory(0),
+	m_fromX(-1), m_toX(-1)  {
 	setMouseTracking(true);
 
 	// Test:
-	m_pinHistory = new PinHistory();
-	m_pinHistory->addEvent(0.5, 1.0);
-	m_pinHistory->addEvent(0.6, 1.5);
-	m_pinHistory->addEvent(0.65, 0.3);
+// 	m_pinHistory = new PinHistory();
+// 	m_pinHistory->addEvent(0.5, 1.0);
+// 	m_pinHistory->addEvent(0.6, 1.5);
+// 	m_pinHistory->addEvent(0.65, 0.3);
 }
 
 void Plot::setMaximumX(double x) {
@@ -71,6 +72,13 @@ void Plot::paintEvent(QPaintEvent *e) {
 	double x = (double(m_pos.x() - 25) / (width() - 35)) * m_maxX;
 	double y = m_maxY - (double(m_pos.y() - 10) / (height() - 30)) * m_maxY;
 
+	if (m_fromX != -1 && m_toX != -1) {
+		p.fillRect(m_fromX, 10, m_toX - m_fromX, height() - 30, palette().highlight());
+	}
+	else if (m_fromX != -1 && m_toX == -1) {
+		p.fillRect(m_fromX, 10, m_pos.x() - m_fromX, height() - 30, palette().highlight());
+	}
+
 	p.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine));
 	if (m_pinHistory) {
 		double toX = 0;
@@ -98,6 +106,9 @@ void Plot::paintEvent(QPaintEvent *e) {
 			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
 				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
 				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
+				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT);
+				}
 				p.drawText(m_pos.x() - 100, height() - 20, 200, 20, Qt::AlignCenter, label);
 			}
 
@@ -136,9 +147,48 @@ void Plot::paintEvent(QPaintEvent *e) {
 void Plot::mouseReleaseEvent(QMouseEvent *event) {
 }
 
+int Plot::correctX(int x, double &t) {
+	t = -1;
+	if (!m_pinHistory) {
+		return x;
+	}
+
+	QLinkedList<PinEvent>::iterator it = m_pinHistory->getEvents().begin();
+	for (; it != m_pinHistory->getEvents().end(); ++it) {
+		if ((*it).t > m_maxX) {
+			break;
+		}
+		double toX = ((*it).t / m_maxX) * (width() - 35) + 25;
+		double toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);		
+		if (x > toX - 5 && x < toX + 5) {
+			t = (*it).t;
+			return toX;
+		}
+	}
+
+	return x;
+}
 
 void Plot::mousePressEvent(QMouseEvent *event) {
+	if (event->button() == Qt::RightButton) {
+		m_fromX = -1;
+		m_toX = -1;
+		repaint();
+		return;
+	}
 
+	if (m_fromX == -1 && m_toX == -1) {
+		m_fromX = correctX(event->pos().x(), m_fromT);
+		m_toX = -1;
+	}
+	else if (m_toX == -1) {
+		m_toX = correctX(event->pos().x(), m_toT);
+	}
+	else {
+		m_fromX = correctX(event->pos().x(), m_fromT);
+		m_toX = -1;
+	}
+	repaint();
 }
 
 void Plot::mouseMoveEvent(QMouseEvent *event) {

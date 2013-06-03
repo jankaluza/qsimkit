@@ -51,7 +51,7 @@
 #include <QDomDocument>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
-m_dig(0), m_sim(0) {
+m_dig(0), m_sim(0), m_logicalSteps(0) {
 	setupUi(this);
 
 	m_peripherals = new PeripheralManager();
@@ -172,7 +172,12 @@ void QSimKit::simulationStep() {
 			return;
 		}
 	}
-	statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", 2500 instructions per " + QString::number(perf.elapsed()) + " ms");
+	m_logicalSteps++;
+	if (m_logicalSteps == 4) {
+		m_logicalSteps = 0;
+		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", 2500 instructions per " + QString::number(perf.elapsed()) + " ms");
+		onSimulationStep(m_sim->nextEventTime());
+	}
 }
 
 void QSimKit::resetSimulation() {
@@ -203,7 +208,7 @@ void QSimKit::startSimulation() {
 }
 
 void QSimKit::stopSimulation() {
-	resetSimulation();
+	m_timer->stop();
 	m_pauseAction->setEnabled(false);
 	onSimulationStopped();
 }

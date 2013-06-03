@@ -74,6 +74,10 @@ class Screen : public QWidget
 			m_peripherals = peripherals;
 		}
 
+		std::map<ScreenObject *, SimulationObjectWrapper *> &getWrappers() {
+			return wrappers;
+		}
+
 	signals:
 		void onPeripheralAdded(QObject *peripheral);
 		void onPeripheralRemoved(QObject *peripheral);

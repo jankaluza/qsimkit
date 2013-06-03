@@ -44,10 +44,17 @@ class Plot : public QWidget
 		void mouseReleaseEvent(QMouseEvent *event);
 
 	private:
+		int correctX(int x, double &t);
+
+	private:
 		double m_maxX;
 		double m_maxY;
 		QPoint m_pos;
 		PinHistory *m_pinHistory;
+		int m_fromX;
+		int m_toX;
+		double m_fromT;
+		double m_toT;
 
 };
 

@@ -35,6 +35,7 @@ class TrackedPins : public QDockWidget, public Ui::TrackedPins
 		TrackedPins(QSimKit *simkit, QWidget *parent = 0);
 
 	private slots:
+		void handleSimulationStarted(bool wasPaused);
 		void handleSimulationStep(double t);
 
 	private:

@@ -20,6 +20,9 @@
 #include "TrackedPins.h"
 
 #include "ui/QSimKit.h"
+#include "ui/Screen.h"
+#include "ui/ScreenObject.h"
+#include "Peripherals/SimulationObject.h"
 
 #include <QWidget>
 #include <QTime>
@@ -38,6 +41,20 @@ QDockWidget(parent), m_simkit(simkit) {
 	setMinimumHeight(100);
 
 	connect(m_simkit, SIGNAL(onSimulationStep(double)), this, SLOT(handleSimulationStep(double)));
+	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
+}
+
+void TrackedPins::handleSimulationStarted(bool wasPaused) {
+	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
+	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
+		QList<PinHistory *> &history = (*it).second->getPinHistory();
+		for (int i = 0; i < history.size(); ++i) {
+			if (history[i]) {
+				plot->showPinHistory(history[i]);
+			}
+		}
+	}
+	plot->repaint();
 }
 
 void TrackedPins::handleSimulationStep(double t) {

@@ -104,5 +104,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		QList<DockWidget *> m_dockWidgets;
 		Peripherals *m_peripheralsWidget;
 		TrackedPins *m_trackedPins;
+		int m_logicalSteps;
 };
 

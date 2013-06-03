@@ -91,6 +91,10 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 			m_sim->addModel(this);
 		}
 
+		QList<PinHistory *> &getPinHistory() {
+			return m_history;
+		}
+
 	private:
 		void addChangeToHistory(int pin, double value);
 
