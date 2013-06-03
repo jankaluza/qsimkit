@@ -71,6 +71,7 @@ m_dig(0), m_sim(0) {
 
 	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
 	action->setCheckable(true);
+	action->setEnabled(false);
 	connect(action, SIGNAL(triggered(bool)), this, SLOT(pauseSimulation(bool)));
 	m_pauseAction = action;
 
@@ -95,6 +96,10 @@ m_dig(0), m_sim(0) {
 	connect(screen, SIGNAL(onPeripheralRemoved(QObject *)), m_peripheralsWidget, SLOT(removePeripheral(QObject *)));
 
 	setDockWidgetsEnabled(false);
+}
+
+Screen *QSimKit::getScreen() {
+	return screen;
 }
 
 void QSimKit::setVariant(const QString &variant) {
@@ -142,6 +147,8 @@ void QSimKit::singleStep() {
 	}
 	while (t == m_sim->nextEventTime());
 	refreshDockWidgets();
+
+	onSimulationStep();
 }
 
 void QSimKit::simulationStep() {
@@ -175,21 +182,27 @@ void QSimKit::resetSimulation() {
 void QSimKit::startSimulation() {
 	if (m_pauseAction->isChecked()) {
 		m_pauseAction->setChecked(false);
+		onSimulationStarted(true);
 	}
 	else {
 		resetSimulation();
+		onSimulationStarted(false);
 	}
+	m_pauseAction->setEnabled(true);
 	m_timer->start(50);
 }
 
 void QSimKit::stopSimulation() {
 	resetSimulation();
+	m_pauseAction->setEnabled(false);
+	onSimulationStopped();
 }
 
 void QSimKit::pauseSimulation(bool checked) {
 	if (checked) {
 		m_timer->stop();
 		refreshDockWidgets();
+		onSimulationPaused();
 	}
 	else {
 		m_timer->start(50);

@@ -49,15 +49,17 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		bool loadELFFile(const QString &file);
 		bool loadProject(const QString &file);
 
+		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
+
 		BreakpointManager *getBreakpointManager() {
 			return m_breakpointManager;
 		}
 
-		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
-
 		Peripherals *getPeripheralsWidget() {
 			return m_peripheralsWidget;
 		}
+
+		Screen *getScreen();
 
 	public slots:
 		void loadA43();
@@ -74,6 +76,12 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void stopSimulation();
 		void pauseSimulation(bool pause);
 		void resetSimulation();
+
+	signals:
+		void onSimulationStarted(bool wasPaused);
+		void onSimulationPaused();
+		void onSimulationStopped();
+		void onSimulationStep();
 
 	private:
 		void refreshDockWidgets();
