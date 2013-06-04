@@ -21,8 +21,6 @@
 
 #include "ProjectConfiguration.h"
 
-#include "CPU/Variants/Variant.h"
-#include "CPU/Variants/VariantManager.h"
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
 #include "Peripherals/MSP430/MSP430.h"
@@ -50,7 +48,7 @@
 #include <QDebug>
 #include <QDomDocument>
 
-QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
+QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
 m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
 	setupUi(this);
 
@@ -106,10 +104,6 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
 
 Screen *QSimKit::getScreen() {
 	return screen;
-}
-
-void QSimKit::setVariant(const QString &variant) {
-	m_variant = getVariant(variant.toStdString().c_str());
 }
 
 void QSimKit::showTrackedPins() {

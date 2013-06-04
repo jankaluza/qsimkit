@@ -26,6 +26,7 @@
 #include "CPU/Instructions/InstructionDecoder.h"
 #include "CPU/Instructions/InstructionManager.h"
 #include "CPU/Variants/Variant.h"
+#include "CPU/Variants/VariantManager.h"
 #include "CPU/Pins/PinManager.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/BasicClock/BasicClock.h"
@@ -45,11 +46,14 @@
 #include <QDebug>
 #include <QDomDocument>
 
-MSP430::MSP430(Variant *variant, const QString &package) :
+MSP430::MSP430(const QString &variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
-m_instruction(new MCU::Instruction), m_variant(variant),
+m_instruction(new MCU::Instruction), m_variant(0),
 m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
+
+	m_variant = ::getVariant(variant.toStdString().c_str());
+	QString package = QString("Packages/") + variant + ".xml";
 
 	m_type = "MSP430";
 
@@ -81,6 +85,19 @@ void MSP430::reset() {
 		loadA43(m_code);
 	}
 	
+}
+
+QString MSP430::getVariant() {
+	return m_variant->getName();
+}
+
+QStringList MSP430::getVariants() {
+	QStringList ret;
+	std::vector<_msp430_variant *> variants = ::getVariants();
+	for (std::vector<_msp430_variant *>::iterator it = variants.begin(); it != variants.end(); it++) {
+		ret << QString((*it)->name);
+	}
+	return ret;
 }
 
 void MSP430::handlePinChanged(int id, double value) {

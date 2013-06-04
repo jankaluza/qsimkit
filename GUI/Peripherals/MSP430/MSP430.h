@@ -21,6 +21,7 @@
 
 #include <QWidget>
 #include <QString>
+#include <QStringList>
 #include <QChar>
 #include <QRect>
 #include <map>
@@ -54,9 +55,12 @@ class PinAddr {
 class MSP430 : public Peripheral, public MCU::PinWatcher
 {
 	public:
-		MSP430(Variant *variant, const QString &package = "Packages/msp430x241x.xml");
+		MSP430(const QString &variant = "msp430x241x");
 
-		Variant *getVariant() { return m_variant; }
+		QString getVariant();
+		Variant *getVariantPtr() { return m_variant; }
+
+		QStringList getVariants();
 
 		bool loadA43(const std::string &data);
 

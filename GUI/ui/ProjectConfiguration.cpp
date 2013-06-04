@@ -19,9 +19,6 @@
 
 #include "ProjectConfiguration.h"
 
-#include "CPU/Variants/Variant.h"
-#include "CPU/Variants/VariantManager.h"
-
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
 
@@ -39,12 +36,13 @@
 ProjectConfiguration::ProjectConfiguration(QWidget *parent, MSP430 *cpu) :
 QDialog(parent) {
 	setupUi(this);
-
-	std::vector<_msp430_variant *> variants = getVariants();
-	for (std::vector<_msp430_variant *>::iterator it = variants.begin(); it != variants.end(); it++) {
-		MSP430Variants->addItem((*it)->name);
-		if (cpu && QString((*it)->name) == QString(cpu->getVariant()->getName())) {
-			MSP430Variants->setCurrentRow(MSP430Variants->count() - 1);
+	if (cpu) {
+		QStringList variants = cpu->getVariants();
+		for (int i = 0; i < variants.size(); ++i) {
+			MSP430Variants->addItem(variants[i]);
+			if (variants[i] == cpu->getVariant()) {
+				MSP430Variants->setCurrentRow(MSP430Variants->count() - 1);
+			}
 		}
 	}
 
@@ -57,8 +55,7 @@ QDialog(parent) {
 }
 
 MSP430 *ProjectConfiguration::getMSP430() {
-	Variant *v = getVariant(MSP430Variants->currentItem()->text().toStdString().c_str());
-	MSP430 *cpu = new MSP430(v, QString("Packages/") + MSP430Variants->currentItem()->text() + ".xml");
+	MSP430 *cpu = new MSP430(MSP430Variants->currentItem()->text());
 	return cpu;
 }
 

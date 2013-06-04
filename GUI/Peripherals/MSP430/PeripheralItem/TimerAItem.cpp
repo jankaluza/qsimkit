@@ -44,7 +44,7 @@ TimerAItem::TimerAItem(MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType)
 	setExpanded(true);
 
 	QTreeWidgetItem *item;
-	Variant *v = m_cpu->getVariant();
+	Variant *v = m_cpu->getVariantPtr();
 
 #define ADD_ITEM(METHOD, NAME) if (METHOD != 0) { \
 	item = new QTreeWidgetItem(this); \

@@ -29,7 +29,6 @@
 #include "Peripherals/Peripheral.h"
 #include "adevs.h"
 
-class Variant;
 class CPU;
 class PeripheralManager;
 class Disassembler;
@@ -45,7 +44,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 	public:
 		QSimKit(QWidget *parent = 0);
 
-		void setVariant(const QString &variant);
 		bool loadA43File(const QString &file);
 		bool loadELFFile(const QString &file);
 		bool loadProject(const QString &file);
@@ -92,7 +90,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void setDockWidgetsCPU(MSP430 *cpu);
 
 	private:
-		Variant *m_variant;
 		adevs::Digraph<double> *m_dig;
 		adevs::Simulator<SimulationEvent> *m_sim;
 		QTimer *m_timer;

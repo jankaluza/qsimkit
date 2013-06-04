@@ -19,8 +19,6 @@
 
 #include "Screen.h"
 
-#include "CPU/Variants/Variant.h"
-#include "CPU/Variants/VariantManager.h"
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
 #include "Peripherals/MSP430/MSP430.h"
@@ -220,7 +218,7 @@ void Screen::load(QDomDocument &doc) {
 		ScreenObject *obj = 0;
 		if (type == "MSP430") {
 			QString variant = object.firstChildElement("variant").text();
-			obj = new MSP430(getVariant(variant.toStdString().c_str()), QString("Packages/") + variant + ".xml");
+			obj = new MSP430(variant);
 		}
 		else if (type == "ConnectionNode") {
 			obj = new ConnectionNode();
