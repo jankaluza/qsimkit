@@ -25,13 +25,11 @@
 #include <QChar>
 #include <QRect>
 #include <map>
-#include "Peripherals/Peripheral.h"
+#include "MCU/MCU.h"
 #include "CPU/Pins/PinManager.h"
 
 namespace MSP430 {
 
-class Memory;
-class RegisterSet;
 class InstructionDecoder;
 class Instruction;
 class InterruptManager;
@@ -40,6 +38,8 @@ class BasicClock;
 
 class Timer;
 class AdevsTimerFactory;
+class Memory;
+class RegisterSet;
 
 class Variant;
 
@@ -52,7 +52,7 @@ class PinAddr {
 		uint8_t bit;
 };
 
-class MCU_MSP430 : public Peripheral, public MSP430::PinWatcher
+class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 {
 	public:
 		MCU_MSP430(const QString &variant = "msp430x241x");
@@ -101,11 +101,11 @@ class MCU_MSP430 : public Peripheral, public MSP430::PinWatcher
 		virtual void save(QTextStream &stream);
 		virtual void load(QDomElement &object);
 
-		MSP430::RegisterSet *getRegisterSet() {
+		RegisterSet *getRegisterSet() {
 			return m_reg;
 		}
 
-		MSP430::Memory *getMemory() {
+		Memory *getMemory() {
 			return m_mem;
 		}
 
@@ -132,8 +132,8 @@ class MCU_MSP430 : public Peripheral, public MSP430::PinWatcher
 		double m_time;
 		double m_instructionCycles;
 
-		MSP430::Memory *m_mem;
-		MSP430::RegisterSet *m_reg;
+		Memory *m_mem;
+		RegisterSet *m_reg;
 		MSP430::InstructionDecoder *m_decoder;
 		MSP430::Instruction *m_instruction;
 		Variant *m_variant;

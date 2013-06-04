@@ -31,9 +31,9 @@ class Memory {
 		virtual uint16_t get(uint16_t address) = 0;
 		virtual uint16_t getBigEndian(uint16_t address) = 0;
 		virtual void set(uint16_t address, uint16_t value) = 0;
-		virtual setBigEndian(uint16_t address, uint16_t value) = 0;
+		virtual void setBigEndian(uint16_t address, uint16_t value) = 0;
 
 		virtual uint8_t getByte(uint16_t address) = 0;
-		virtual setByte(uint16_t address, uint8_t value) = 0;
+		virtual void setByte(uint16_t address, uint8_t value) = 0;
 };
 

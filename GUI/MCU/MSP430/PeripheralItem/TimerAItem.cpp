@@ -21,9 +21,10 @@
 
 #include "ui/QSimKit.h"
 #include "MCU/MSP430/MSP430.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
+#include "MCU/Memory.h"
 #include "Peripherals/Peripheral.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
 #include "CPU/Variants/Variant.h"
 
 #include <QWidget>
