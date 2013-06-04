@@ -29,9 +29,9 @@
 #include "Peripherals/PeripheralManager.h"
 
 #include "DockWidgets/Disassembler/Disassembler.h"
-#include "DockWidgets/Registers/Registers.h"
-#include "DockWidgets/Stack/Stack.h"
-#include "DockWidgets/MemoryTracker/MemoryTracker.h"
+// #include "DockWidgets/Registers/Registers.h"
+// #include "DockWidgets/Stack/Stack.h"
+// #include "DockWidgets/MemoryTracker/MemoryTracker.h"
 #include "DockWidgets/Peripherals/Peripherals.h"
 
 #include "Breakpoints/BreakpointManager.h"
