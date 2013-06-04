@@ -18,11 +18,11 @@
  **/
 
 #include "BreakpointManager.h"
-#include "CPU/Memory/Register.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/Register.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/MCU.h"
 
-BreakpointManager::BreakpointManager() : m_cpu(0), m_break(0) {
+BreakpointManager::BreakpointManager() : m_mcu(0), m_break(0) {
 
 }
 
@@ -30,7 +30,7 @@ BreakpointManager::~BreakpointManager() {
 
 }
 
-bool BreakpointManager::handleRegisterChanged(MCU::Register *reg, int id, uint16_t value) {
+bool BreakpointManager::handleRegisterChanged(Register *reg, int id, uint16_t value) {
 	if (m_break) {
 		return true;
 	}
@@ -48,16 +48,16 @@ bool BreakpointManager::handleRegisterChanged(MCU::Register *reg, int id, uint16
 	return true;
 }
 
-void BreakpointManager::setCPU(MSP430 *cpu) {
-	m_cpu = cpu;
+void BreakpointManager::setMCU(MCU *mcu) {
+	m_mcu = mcu;
 
-	for (int i = 0; i < m_cpu->getRegisterSet()->size(); ++i) {
+	for (int i = 0; i < m_mcu->getRegisterSet()->size(); ++i) {
 		m_breaks.append(QList<uint16_t>());
 	}
 }
 
 void BreakpointManager::addRegisterBreak(int reg, uint16_t value) {
-	m_cpu->getRegisterSet()->get(reg)->addWatcher(this);
+	m_mcu->getRegisterSet()->get(reg)->addWatcher(this);
 	m_breaks[reg].append(value);
 	qSort(m_breaks[reg]);
 }
@@ -65,7 +65,7 @@ void BreakpointManager::addRegisterBreak(int reg, uint16_t value) {
 void BreakpointManager::removeRegisterBreak(int reg, uint16_t value) {
 	m_breaks[reg].removeAll(value);
 	if (m_breaks[reg].empty()) {
-		m_cpu->getRegisterSet()->get(reg)->removeWatcher(this);
+		m_mcu->getRegisterSet()->get(reg)->removeWatcher(this);
 	}
 }
 
@@ -81,7 +81,7 @@ bool BreakpointManager::shouldBreak() {
 // 	}
 // 
 // 	QList<uint16_t>::iterator it;
-// 	it = qBinaryFind(m_breaks.begin(), m_breaks.end(), m_cpu->getRegisterSet()->get(0)->getBigEndian());
+// 	it = qBinaryFind(m_breaks.begin(), m_breaks.end(), m_mcu->getRegisterSet()->get(0)->getBigEndian());
 // 	if (it != m_breaks.end()) {
 // 		return true;
 // 	}

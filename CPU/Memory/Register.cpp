@@ -20,7 +20,7 @@
 #include "CPU/Memory/Register.h"
 #include <algorithm>
 
-namespace MCU {
+namespace MSP430 {
 
 Register::Register(int id, const std::string &name, uint16_t value, const std::string &desc) :
 	m_id(id), m_value(value), m_name(name), m_desc(desc) { }

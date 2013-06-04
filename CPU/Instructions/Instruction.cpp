@@ -21,7 +21,7 @@
 #include "CPU/Instructions/InstructionArgument.h"
 #include "CPU/Memory/Register.h"
 
-namespace MCU {
+namespace MSP430 {
 
 Instruction::Instruction () : m_src(0), m_dst(0) {
 

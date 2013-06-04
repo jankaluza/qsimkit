@@ -27,7 +27,7 @@
 #include "LFXT1.h"
 #include "VLO.h"
 
-namespace MCU {
+namespace MSP430 {
 
 MCLK::MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_vlo(vlo),

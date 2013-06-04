@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-namespace MCU {
+namespace MSP430 {
 
 class PinHandler {
 	public:

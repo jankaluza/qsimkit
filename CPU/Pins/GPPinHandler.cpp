@@ -24,7 +24,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
-namespace MCU {
+namespace MSP430 {
 	
 GPPinHandler::GPPinHandler(Memory *mem, PinMultiplexer *mpx, InterruptManager *intManager,
 						   uint16_t dir, uint16_t in, uint16_t out,

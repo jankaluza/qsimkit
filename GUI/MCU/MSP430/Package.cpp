@@ -34,7 +34,7 @@
 
 namespace Package {
 
-void setPinType(const QString &n, MCU::PinType &type, int &subtype) {
+void setPinType(const QString &n, MSP430::PinType &type, int &subtype) {
 #define SET_GP_PIN(PREFIX, T) { \
 		if (n.startsWith(PREFIX)) { \
 			type = T;\
@@ -42,17 +42,17 @@ void setPinType(const QString &n, MCU::PinType &type, int &subtype) {
 		} \
 	}
 
-	SET_GP_PIN("P1.", MCU::P1)
-	SET_GP_PIN("P2.", MCU::P2)
-	SET_GP_PIN("P3.", MCU::P3)
-	SET_GP_PIN("P4.", MCU::P4)
-	SET_GP_PIN("P5.", MCU::P5)
-	SET_GP_PIN("P6.", MCU::P6)
-	SET_GP_PIN("P7.", MCU::P7)
-	SET_GP_PIN("P8.", MCU::P8)
+	SET_GP_PIN("P1.", MSP430::P1)
+	SET_GP_PIN("P2.", MSP430::P2)
+	SET_GP_PIN("P3.", MSP430::P3)
+	SET_GP_PIN("P4.", MSP430::P4)
+	SET_GP_PIN("P5.", MSP430::P5)
+	SET_GP_PIN("P6.", MSP430::P6)
+	SET_GP_PIN("P7.", MSP430::P7)
+	SET_GP_PIN("P8.", MSP430::P8)
 }
 
-bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides) {
+bool loadPackage(MCU_MSP430 *cpu, MSP430::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides) {
 	pins.clear();
 	int pin_size = 10;
 	int width = 48;
@@ -120,7 +120,7 @@ bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, 
 			int id = pin.toElement().attribute("id").toInt() - 1;
 			sides[id] = side;
 			QString n;
-			MCU::PinType type = MCU::UNKNOWN;
+			MSP430::PinType type = MSP430::UNKNOWN;
 			int subtype = -1;
 
 			for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
@@ -130,10 +130,10 @@ bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, 
 			}
 
 			pins.push_back(Pin(QRect(x, y, pin_size, pin_size), n, 0));
-			MCU::PinMultiplexer *mpx = pinManager->addPin(type, subtype);
+			MSP430::PinMultiplexer *mpx = pinManager->addPin(type, subtype);
 			if (mpx) {
 				for(QDomNode name = pin.firstChild(); !name.isNull(); name = name.nextSibling()) {
-					MCU::PinMultiplexer::Condition c;
+					MSP430::PinMultiplexer::Condition c;
 					if (name.toElement().hasAttribute("sel")) {
 						c["sel"] = name.toElement().attribute("sel").toInt();
 					}

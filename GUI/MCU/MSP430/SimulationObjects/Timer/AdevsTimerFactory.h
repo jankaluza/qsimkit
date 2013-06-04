@@ -27,7 +27,7 @@
 
 class Variant;
 
-namespace MCU {
+namespace MSP430 {
 
 class ACLK;
 class SMCLK;
@@ -37,13 +37,13 @@ class PinManager;
 
 }
 
-class AdevsTimerFactory : public MCU::TimerFactory {
+class AdevsTimerFactory : public MSP430::TimerFactory {
 	public:
 		AdevsTimerFactory();
 		virtual ~AdevsTimerFactory() {}
 
-		MCU::Timer *createTimer(MCU::Timer::Type type, MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem,
-								Variant *variant, MCU::ACLK *aclk,
-								MCU::SMCLK *smclk, uint16_t tactl, uint16_t tar,
+		MSP430::Timer *createTimer(MSP430::Timer::Type type, MSP430::PinManager *pinManager, MSP430::InterruptManager *intManager, MSP430::Memory *mem,
+								Variant *variant, MSP430::ACLK *aclk,
+								MSP430::SMCLK *smclk, uint16_t tactl, uint16_t tar,
 								uint16_t taiv, uint16_t intvec0, uint16_t intvec1);
 };

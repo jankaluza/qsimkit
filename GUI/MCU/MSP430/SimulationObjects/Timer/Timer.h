@@ -29,10 +29,10 @@
 #include "Peripherals/SimulationObject.h"
 #include "CPU/BasicClock/Timer.h"
 
-class Timer : public SimulationObject, public MCU::Timer {
+class Timer : public SimulationObject, public MSP430::Timer {
 	public:
-		Timer(Timer::Type &type, MCU::PinManager *pinManager, MCU::InterruptManager *intManager, MCU::Memory *mem, Variant *variant,
-			  MCU::ACLK *aclk, MCU::SMCLK *smclk, uint16_t tactl, uint16_t tar,
+		Timer(Timer::Type &type, MSP430::PinManager *pinManager, MSP430::InterruptManager *intManager, MSP430::Memory *mem, Variant *variant,
+			  MSP430::ACLK *aclk, MSP430::SMCLK *smclk, uint16_t tactl, uint16_t tar,
 			  uint16_t taiv, uint16_t intvec0, uint16_t intvec1);
 		~Timer();
 

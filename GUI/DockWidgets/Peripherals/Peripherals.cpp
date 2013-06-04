@@ -21,10 +21,10 @@
 #include "PeripheralItem.h"
 
 #include "ui/QSimKit.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/MCU.h"
 #include "Peripherals/Peripheral.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
 
 #include <QWidget>
 #include <QTime>
@@ -38,7 +38,7 @@
 #include <QDebug>
 
 Peripherals::Peripherals(QSimKit *simkit) :
-DockWidget(simkit), m_cpu(0), m_simkit(simkit) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit) {
 	setupUi(this);
 }
 
@@ -105,8 +105,8 @@ void Peripherals::removePeripheral(QObject *peripheral) {
 	removePeripheralItem(item);
 }
 
-void Peripherals::setCPU(MSP430 *cpu) {
-	m_cpu = cpu;
+void Peripherals::setMCU(MCU *mcu) {
+	m_mcu = mcu;
 
 	
 }

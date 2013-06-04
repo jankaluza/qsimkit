@@ -23,7 +23,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace MCU {
+namespace MSP430 {
 
 MemoryArgument::MemoryArgument(Memory *mem, uint16_t address) :
 	m_mem(mem), m_address(address) { }

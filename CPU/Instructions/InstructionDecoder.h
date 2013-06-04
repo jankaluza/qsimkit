@@ -25,7 +25,7 @@
 
 #include "CPU/Instructions/InstructionManager.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class RegisterSet;
 class Memory;

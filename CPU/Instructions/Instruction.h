@@ -25,7 +25,7 @@
 
 #include "CPU/Instructions/InstructionDecoder.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class InstructionArgument;
 

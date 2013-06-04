@@ -20,7 +20,7 @@
 #include "MSP430PeripheralItem.h"
 
 #include "ui/QSimKit.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/MSP430/MSP430.h"
 #include "Peripherals/Peripheral.h"
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
@@ -40,7 +40,7 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-MSP430PeripheralItem::MSP430PeripheralItem(MSP430 *cpu) {
+MSP430PeripheralItem::MSP430PeripheralItem(MCU_MSP430 *cpu) {
 	m_cpu = cpu;
 	setText(0, "MSP430");
 	setFirstColumnSpanned(true);

@@ -33,7 +33,7 @@
 #define TIMER_CONTINUOUS 2
 #define TIMER_UPDOWN 3
 
-namespace MCU {
+namespace MSP430 {
 
 Timer::Timer(Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			 ACLK *aclk, SMCLK *smclk, uint16_t tactl, uint16_t tar,

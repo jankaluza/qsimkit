@@ -20,7 +20,7 @@
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
 
-namespace MCU {
+namespace MSP430 {
 
 RegisterSet::RegisterSet() {
 

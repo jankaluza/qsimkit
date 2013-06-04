@@ -28,7 +28,7 @@
 
 #include "ui_Disassembler.h"
 
-class MSP430;
+class MCU;
 class QSimKit;
 
 class Disassembler : public DockWidget, public Ui::Disassembler
@@ -38,7 +38,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 	public:
 		Disassembler(QSimKit *simkit);
 
-		void setCPU(MSP430 *cpu);
+		void setMCU(MCU *mcu);
 
 		void reloadCode();
 
@@ -58,7 +58,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void addSourceLine(const QString &line);
 
 	private:
-		MSP430 *m_cpu;
+		MCU *m_mcu;
 		QSimKit *m_simkit;
 		QTreeWidgetItem *m_currentItem;
 		QList<QTreeWidgetItem *> m_breakpoints;

@@ -28,7 +28,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace MCU {
+namespace MSP430 {
 
 CPU::CPU() : m_cycles(0), m_instructionCycles(0),
 	m_mem(new Memory(512000)), m_reg(new RegisterSet()),

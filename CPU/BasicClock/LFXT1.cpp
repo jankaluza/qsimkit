@@ -23,7 +23,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
-namespace MCU {
+namespace MSP430 {
 
 LFXT1::LFXT1(Memory *mem, Variant *variant) :
 m_mem(mem), m_variant(variant), m_freq(12000), m_step(1.0/12000) {

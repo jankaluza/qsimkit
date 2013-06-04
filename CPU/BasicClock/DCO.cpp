@@ -24,7 +24,7 @@
 #include <iostream>
 #include <math.h>
 
-namespace MCU {
+namespace MSP430 {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }

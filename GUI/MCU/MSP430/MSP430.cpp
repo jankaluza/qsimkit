@@ -46,40 +46,40 @@
 #include <QDebug>
 #include <QDomDocument>
 
-MSP430::MSP430(const QString &variant) :
+MCU_MSP430::MCU_MSP430(const QString &variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
-m_instruction(new MCU::Instruction), m_variant(0),
+m_instruction(new MSP430::Instruction), m_variant(0),
 m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 
 	m_variant = ::getVariant(variant.toStdString().c_str());
 	QString package = QString("Packages/") + variant + ".xml";
 
-	m_type = "MSP430";
+	m_type = "MCU_MSP430";
 
-	m_mem = new MCU::Memory(512000);
-	m_reg = new MCU::RegisterSet();
+	m_mem = new MSP430::Memory(512000);
+	m_reg = new MSP430::RegisterSet();
 	m_reg->addDefaultRegisters();
 
-	m_intManager = new MCU::InterruptManager(m_reg, m_mem);
-	m_pinManager = new MCU::PinManager(m_mem, m_intManager, m_variant);
+	m_intManager = new MSP430::InterruptManager(m_reg, m_mem);
+	m_pinManager = new MSP430::PinManager(m_mem, m_intManager, m_variant);
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
 
-	m_basicClock = new MCU::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
+	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
 }
 
-void MSP430::reset() {
+void MCU_MSP430::reset() {
 	delete m_decoder;
 
 	// TODO; m_mem->reset(); m_reg->reset(); m_intManager->reset();
 
 	m_basicClock->reset();
 
-	m_decoder = new MCU::InstructionDecoder(m_reg, m_mem);
+	m_decoder = new MSP430::InstructionDecoder(m_reg, m_mem);
 
 	if (!m_code.empty()) {
 		loadA43(m_code);
@@ -87,11 +87,11 @@ void MSP430::reset() {
 	
 }
 
-QString MSP430::getVariant() {
+QString MCU_MSP430::getVariant() {
 	return m_variant->getName();
 }
 
-QStringList MSP430::getVariants() {
+QStringList MCU_MSP430::getVariants() {
 	QStringList ret;
 	std::vector<_msp430_variant *> variants = ::getVariants();
 	for (std::vector<_msp430_variant *>::iterator it = variants.begin(); it != variants.end(); it++) {
@@ -100,23 +100,23 @@ QStringList MSP430::getVariants() {
 	return ret;
 }
 
-void MSP430::handlePinChanged(int id, double value) {
+void MCU_MSP430::handlePinChanged(int id, double value) {
 	m_pins[id].value = value;
 	m_output.insert(SimulationEvent(id, value));
 	onUpdated();
 }
 
 
-bool MSP430::loadA43(const std::string &data) {
+bool MCU_MSP430::loadA43(const std::string &data) {
 	m_code = data;
 	return m_mem->loadA43(data, m_reg);
 }
 
-void MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
+void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
 	objects.push_back(dynamic_cast<Timer *>(m_basicClock->getTimerA()));
 }
 
-void MSP430::externalEvent(double t, const SimulationEventList &events) {
+void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {
 	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
 		if (!m_pinManager->handlePinInput((*it).port, (*it).value)) {
 			qDebug() << "WARN: input on output PIN";
@@ -126,14 +126,14 @@ void MSP430::externalEvent(double t, const SimulationEventList &events) {
 	}
 }
 
-void MSP430::output(SimulationEventList &output) {
+void MCU_MSP430::output(SimulationEventList &output) {
 	if (!m_output.empty()) {
 		output = m_output;
 		m_output.clear();
 	}
 }
 
-void MSP430::internalTransition() {
+void MCU_MSP430::internalTransition() {
 	if (!m_ignoreNextStep) {
 		if (m_intManager->runQueuedInterrupts()) {
 			m_instructionCycles = 5;
@@ -158,21 +158,21 @@ void MSP430::internalTransition() {
 	}
 }
 
-double MSP430::timeAdvance() {
+double MCU_MSP430::timeAdvance() {
 	if (!m_output.empty()) {
-// 		qDebug() << "MSP430 ta=" << 0;
+// 		qDebug() << "MCU_MSP430 ta=" << 0;
 		m_ignoreNextStep = true;
 		return 0;
 	}
-// 	qDebug() << "MSP430 ta=" << m_instructionCycles;
+// 	qDebug() << "MCU_MSP430 ta=" << m_instructionCycles;
 	return m_instructionCycles;
 }
 
-void MSP430::executeOption(int option) {
+void MCU_MSP430::executeOption(int option) {
 	
 }
 
-void MSP430::save(QTextStream &stream) {
+void MCU_MSP430::save(QTextStream &stream) {
 	ScreenObject::save(stream);
 	stream << "<code>";
 	stream << QString::fromStdString(m_code);
@@ -185,12 +185,12 @@ void MSP430::save(QTextStream &stream) {
 	stream << "</elf>";
 }
 
-void MSP430::load(QDomElement &object) {
+void MCU_MSP430::load(QDomElement &object) {
 	loadA43(object.firstChildElement("code").text().toStdString());
 	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 
-void MSP430::setPinType(const QString &n, MCU::PinType &type, int &subtype) {
+void MCU_MSP430::setPinType(const QString &n, MSP430::PinType &type, int &subtype) {
 #define SET_GP_PIN(PREFIX, T) { \
 		if (n.startsWith(PREFIX)) { \
 			type = T;\
@@ -198,18 +198,18 @@ void MSP430::setPinType(const QString &n, MCU::PinType &type, int &subtype) {
 		} \
 	}
 
-	SET_GP_PIN("P1.", MCU::P1)
-	SET_GP_PIN("P2.", MCU::P2)
-	SET_GP_PIN("P3.", MCU::P3)
-	SET_GP_PIN("P4.", MCU::P4)
-	SET_GP_PIN("P5.", MCU::P5)
-	SET_GP_PIN("P6.", MCU::P6)
-	SET_GP_PIN("P7.", MCU::P7)
-	SET_GP_PIN("P8.", MCU::P8)
+	SET_GP_PIN("P1.", MSP430::P1)
+	SET_GP_PIN("P2.", MSP430::P2)
+	SET_GP_PIN("P3.", MSP430::P3)
+	SET_GP_PIN("P4.", MSP430::P4)
+	SET_GP_PIN("P5.", MSP430::P5)
+	SET_GP_PIN("P6.", MSP430::P6)
+	SET_GP_PIN("P7.", MSP430::P7)
+	SET_GP_PIN("P8.", MSP430::P8)
 }
 
 
-void MSP430::paint(QWidget *screen) {
+void MCU_MSP430::paint(QWidget *screen) {
 	QPainter qp(screen);
 	int pin_size = 10;
 	QPen pen(Qt::black, 2, Qt::SolidLine);

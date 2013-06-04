@@ -20,7 +20,7 @@
 
 #include <algorithm>
 
-using namespace MCU;
+using namespace MSP430;
 
 class DummyTimerFactory : public TimerFactory {
 	public:

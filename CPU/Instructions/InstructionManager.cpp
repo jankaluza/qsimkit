@@ -28,7 +28,7 @@
 
 #define TYPE_OFFSET 20
 
-namespace MCU {
+namespace MSP430 {
 
 static std::vector<_msp430_instruction *> *instructions;
 

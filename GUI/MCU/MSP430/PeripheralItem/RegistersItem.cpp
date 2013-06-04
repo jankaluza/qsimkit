@@ -20,7 +20,7 @@
 #include "RegistersItem.h"
 
 #include "ui/QSimKit.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/MSP430/MSP430.h"
 #include "Peripherals/Peripheral.h"
 #include "CPU/Memory/RegisterSet.h"
 #include "CPU/Memory/Register.h"
@@ -36,7 +36,7 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-RegistersItem::RegistersItem(MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType) {
+RegistersItem::RegistersItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType) {
 	m_cpu = cpu;
 	setText(0, "Registers");
 	setFirstColumnSpanned(true);

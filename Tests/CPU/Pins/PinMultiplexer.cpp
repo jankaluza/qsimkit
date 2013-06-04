@@ -10,7 +10,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 
-using namespace MCU;
+using namespace MSP430;
 
 class DummyPinHandler : public PinHandler {
 	public:

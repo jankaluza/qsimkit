@@ -20,9 +20,9 @@
 #include "Disassembler.h"
 
 #include "ui/QSimKit.h"
-#include "Peripherals/MSP430/MSP430.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
+#include "MCU/MCU.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
 
 #include "Breakpoints/BreakpointManager.h"
 
@@ -38,7 +38,7 @@
 #include <QDebug>
 
 Disassembler::Disassembler(QSimKit *simkit) :
-DockWidget(simkit), m_cpu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -185,15 +185,15 @@ void Disassembler::reloadCode() {
 	view->clear();
 	m_currentItem = 0;
 
-	if (!m_cpu) {
+	if (!m_mcu) {
 		return;
 	}
 
 	bool elf = true;
-	QByteArray code = m_cpu->getELF();
+	QByteArray code = m_mcu->getELF();
 	if (code.isEmpty()) {
 		elf = false;
-		code = QString::fromStdString(m_cpu->getCode()).toAscii();
+		code = m_mcu->getA43().toAscii();
 	}
 
 	QFile file("test.dump");
@@ -247,7 +247,7 @@ QString Disassembler::ELFToA43(const QByteArray &elf) {
 }
 
 void Disassembler::refresh() {
-	QString addr = QString("%1").arg(m_cpu->getRegisterSet()->get(0)->getBigEndian(), 0, 16);
+	QString addr = QString("%1").arg(m_mcu->getRegisterSet()->get(0)->getBigEndian(), 0, 16);
 	QList<QTreeWidgetItem *> item = view->findItems(addr, Qt::MatchExactly);
 	if (item.empty()) {
 		return;
@@ -262,8 +262,8 @@ void Disassembler::refresh() {
 	view->scrollToItem(m_currentItem);
 }
 
-void Disassembler::setCPU(MSP430 *cpu) {
-	m_cpu = cpu;
+void Disassembler::setMCU(MCU *mcu) {
+	m_mcu = mcu;
 	reloadCode();
 	refresh();
 }

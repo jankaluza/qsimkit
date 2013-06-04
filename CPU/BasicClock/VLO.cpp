@@ -23,7 +23,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
-namespace MCU {
+namespace MSP430 {
 
 VLO::VLO() : m_freq(12000), m_step(1.0/12000) {
 }

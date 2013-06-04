@@ -27,7 +27,7 @@
 
 #include "ui_Peripherals.h"
 
-class MSP430;
+class MCU;
 class QSimKit;
 class PeripheralItem;
 
@@ -38,7 +38,7 @@ class Peripherals : public DockWidget, public Ui::Peripherals
 	public:
 		Peripherals(QSimKit *simkit);
 
-		void setCPU(MSP430 *cpu);
+		void setMCU(MCU *mcu);
 
 		void refresh();
 
@@ -52,7 +52,7 @@ class Peripherals : public DockWidget, public Ui::Peripherals
 		void removePeripheral(QObject *peripheral);
 
 	private:
-		MSP430 *m_cpu;
+		MCU *m_mcu;
 		QSimKit *m_simkit;
 };
 

@@ -27,13 +27,13 @@
 #include "Peripherals/Peripheral.h"
 #include "CPU/Pins/PinManager.h"
 
-class MSP430;
+class MCU_MSP430;
 
 namespace Package {
 
-	bool loadPackage(MSP430 *cpu, MCU::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides);
+	bool loadPackage(MCU_MSP430 *cpu, MSP430::PinManager *pinManager, const QString &file, PinList &pins, std::map<int, QChar> &sides);
 
-	void setPinType(const QString &name, MCU::PinType &type, int &subtype);
+	void setPinType(const QString &name, MSP430::PinType &type, int &subtype);
 
 }
 

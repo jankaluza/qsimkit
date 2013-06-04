@@ -27,17 +27,17 @@
 
 #include "DockWidgets/Peripherals/PeripheralItem.h"
 
-class MSP430;
+class MCU_MSP430;
 
 class RegistersItem : public QTreeWidgetItem
 {
 	public:
-		RegistersItem(MSP430 *cpu);
+		RegistersItem(MCU_MSP430 *cpu);
 		~RegistersItem();
 
 		void refresh();
 
 	private:
-		MSP430 *m_cpu;
+		MCU_MSP430 *m_cpu;
 };
 

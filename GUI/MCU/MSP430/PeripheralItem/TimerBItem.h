@@ -22,17 +22,17 @@
 #include <QString>
 #include <QTreeWidgetItem>
 
-class MSP430;
+class MCU_MSP430;
 
 class TimerBItem : public QTreeWidgetItem
 {
 	public:
-		TimerBItem(MSP430 *cpu);
+		TimerBItem(MCU_MSP430 *cpu);
 		~TimerBItem();
 
 		void refresh();
 
 	private:
-		MSP430 *m_cpu;
+		MCU_MSP430 *m_cpu;
 };
 

@@ -32,7 +32,7 @@
 #include "TimerFactory.h"
 #include "Timer.h"
 
-namespace MCU {
+namespace MSP430 {
 
 BasicClock::BasicClock(Memory *mem, Variant *variant,
 					   InterruptManager *intManager, PinManager *pinManager, TimerFactory *factory) :

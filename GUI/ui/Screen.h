@@ -30,7 +30,7 @@
 
 class Package;
 class ScreenObject;
-class MSP430;
+class MCU;
 class ConnectionManager;
 class PeripheralManager;
 class SimulationObjectWrapper;
@@ -42,8 +42,8 @@ class Screen : public QWidget
 	public:
 		Screen(QWidget *parent = 0);
 
-		void setCPU(MSP430 *cpu);
-		MSP430 *getCPU();
+		void setMCU(MCU *cpu);
+		MCU *getMCU();
 
 		void addObject(ScreenObject *obj);
 

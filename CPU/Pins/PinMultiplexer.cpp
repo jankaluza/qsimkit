@@ -25,7 +25,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace MCU {
+namespace MSP430 {
 
 PinMultiplexer::PinMultiplexer(PinManager *manager, int id, Memory *mem, Variant *variant,
 							   uint16_t dir, uint16_t sel, uint8_t index) :

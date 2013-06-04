@@ -31,7 +31,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace MCU {
+namespace MSP430 {
 
 // [1111110000000000]2
 #define INSTRUCTION1_MASK 64512

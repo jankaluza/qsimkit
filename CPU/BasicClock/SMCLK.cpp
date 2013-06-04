@@ -25,7 +25,7 @@
 
 #include "DCO.h"
 
-namespace MCU {
+namespace MSP430 {
 
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_divider(1) {

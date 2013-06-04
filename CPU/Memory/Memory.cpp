@@ -24,7 +24,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace MCU {
+namespace MSP430 {
 
 static unsigned int hexToInt(const std::string &str) {
 	unsigned int x;

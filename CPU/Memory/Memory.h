@@ -24,7 +24,7 @@
 #include <vector>
 #include <map>
 
-namespace MCU {
+namespace MSP430 {
 
 class RegisterSet;
 class Memory;

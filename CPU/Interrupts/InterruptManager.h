@@ -24,7 +24,7 @@
 #include <vector>
 #include "CPU/Memory/Memory.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class Memory;
 class RegisterSet;

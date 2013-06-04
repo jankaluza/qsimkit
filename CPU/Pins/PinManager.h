@@ -26,7 +26,7 @@
 
 class Variant;
 
-namespace MCU {
+namespace MSP430 {
 
 class Memory;
 class InterruptManager;

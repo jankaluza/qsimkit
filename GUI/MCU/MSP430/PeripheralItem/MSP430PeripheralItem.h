@@ -27,7 +27,7 @@
 
 #include "DockWidgets/Peripherals/PeripheralItem.h"
 
-class MSP430;
+class MCU_MSP430;
 class RegistersItem;
 class TimerAItem;
 class TimerBItem;
@@ -35,13 +35,13 @@ class TimerBItem;
 class MSP430PeripheralItem : public PeripheralItem
 {
 	public:
-		MSP430PeripheralItem(MSP430 *cpu);
+		MSP430PeripheralItem(MCU_MSP430 *cpu);
 		~MSP430PeripheralItem();
 
 		void refresh();
 
 	private:
-		MSP430 *m_cpu;
+		MCU_MSP430 *m_cpu;
 		RegistersItem *m_registersItem;
 		TimerAItem *m_timerAItem;
 		TimerBItem *m_timerBItem;

@@ -25,16 +25,16 @@
 
 #include "ui_ProjectConfiguration.h"
 
-#include "Peripherals/MSP430/MSP430.h"
+class MCU;
 
 class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
 {
 	Q_OBJECT
 
 	public:
-		ProjectConfiguration(QWidget *parent = 0, MSP430 *cpu = 0);
+		ProjectConfiguration(QWidget *parent = 0, MCU *mpu = 0);
 
-		MSP430 *getMSP430();
+		MCU *getMCU();
 
 
 	private slots:

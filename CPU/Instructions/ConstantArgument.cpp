@@ -19,7 +19,7 @@
 
 #include "CPU/Instructions/ConstantArgument.h"
 
-namespace MCU {
+namespace MSP430 {
 
 ConstantArgument::ConstantArgument(uint16_t value) :
 	m_value(value) { }

@@ -27,7 +27,7 @@
 
 #include <QDockWidget>
 
-class MSP430;
+class MCU;
 
 class DockWidget : public QDockWidget {
 
@@ -36,7 +36,7 @@ class DockWidget : public QDockWidget {
 	public:
 		DockWidget(QMainWindow *parent) : QDockWidget(parent) {}
 
-		virtual void setCPU(MSP430 *cpu) = 0;
+		virtual void setMCU(MCU *cpu) = 0;
 
 		virtual void refresh() = 0;
 

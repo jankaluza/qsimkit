@@ -21,7 +21,7 @@
 #include "CPU/Memory/Register.h"
 #include "CPU/Memory/Memory.h"
 
-namespace MCU {
+namespace MSP430 {
 
 IndexedArgument::IndexedArgument(Memory *mem, Register *reg, uint16_t offset) :
 	m_reg(reg), m_offset(offset), m_mem(mem) { }

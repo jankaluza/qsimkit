@@ -7,7 +7,7 @@
 #include "CPU/Instructions/InstructionDecoder.h"
 #include "CPU/Instructions/Instruction.h"
 
-using namespace MCU;
+using namespace MSP430;
 
 class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(InstructionDecoderTest);

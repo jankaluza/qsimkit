@@ -25,7 +25,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include <iostream>
 
-namespace MCU {
+namespace MSP430 {
 
 PinManager::PinManager(Memory *mem, InterruptManager *intManager, Variant *variant) :
 m_mem(mem), m_intManager(intManager), m_variant(variant) {

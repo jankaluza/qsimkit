@@ -26,7 +26,7 @@
 #include <iostream>
 #include <algorithm>
 
-namespace MCU {
+namespace MSP430 {
 
 InterruptManager::InterruptManager(RegisterSet *reg, Memory *mem) : m_reg(reg), m_mem(mem) {
 

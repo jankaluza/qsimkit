@@ -24,7 +24,7 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class Memory;
 

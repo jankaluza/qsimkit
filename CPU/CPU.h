@@ -25,7 +25,7 @@
 
 #include "adevs.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class Event {
 	public:

@@ -29,7 +29,7 @@
 #include "Peripherals/Peripheral.h"
 #include "adevs.h"
 
-class CPU;
+class MCU;
 class PeripheralManager;
 class Disassembler;
 class BreakpointManager;
@@ -87,7 +87,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 	private:
 		void refreshDockWidgets();
 		void setDockWidgetsEnabled(bool enabled);
-		void setDockWidgetsCPU(MSP430 *cpu);
+		void setDockWidgetsMCU(MCU *cpu);
 
 	private:
 		adevs::Digraph<double> *m_dig;

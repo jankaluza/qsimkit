@@ -10,7 +10,7 @@
 
 #include <algorithm>
 
-using namespace MCU;
+using namespace MSP430;
 
 #if 0
 

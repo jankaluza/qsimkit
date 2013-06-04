@@ -25,7 +25,7 @@
 #include "CPU/Memory/Memory.h"
 #include "PinHandler.h"
 
-namespace MCU {
+namespace MSP430 {
 
 class PinMultiplexer;
 class InterruptManager;

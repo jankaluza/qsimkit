@@ -14,7 +14,7 @@
 #include "CPU/Pins/PinManager.h"
 #include "CPU/Pins/PinMultiplexer.h"
 
-using namespace MCU;
+using namespace MSP430;
 
 class DummyTimerFactory : public TimerFactory {
 	public:

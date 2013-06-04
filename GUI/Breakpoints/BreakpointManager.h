@@ -21,16 +21,16 @@
 
 #include <stdint.h>
 #include <QList>
-#include "CPU/Memory/Register.h"
+#include "MCU/Register.h"
 
-class MSP430;
+class MCU;
 
-class BreakpointManager : public MCU::RegisterWatcher {
+class BreakpointManager : public RegisterWatcher {
 	public:
 		BreakpointManager();
 		~BreakpointManager();
 
-		void setCPU(MSP430 *cpu);
+		void setMCU(MCU *cpu);
 
 		void addRegisterBreak(int reg, uint16_t value);
 		void removeRegisterBreak(int reg, uint16_t value);
@@ -41,10 +41,10 @@ class BreakpointManager : public MCU::RegisterWatcher {
 			m_break = true;
 		}
 
-		bool handleRegisterChanged(MCU::Register *reg, int id, uint16_t value);
+		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
 
 	private:
-		MSP430 *m_cpu;
+		MCU *m_mcu;
 		QList<QList<uint16_t> > m_breaks;
 		bool m_break;
 

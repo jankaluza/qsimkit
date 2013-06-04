@@ -19,7 +19,7 @@
 
 #pragma once
 
-namespace MCU {
+namespace MSP430 {
 
 class _msp430_instruction;
 class RegisterSet;

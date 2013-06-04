@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <string>
 
-namespace MCU {
+namespace MSP430 {
 
 class InstructionArgument {
 	public:

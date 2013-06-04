@@ -27,7 +27,7 @@
 #include <sstream>
 #include <map>
 
-namespace MCU {
+namespace MSP430 {
 
 static int execJNZ(RegisterSet *reg, Memory *mem, Instruction *i) {
 	if (!reg->get(2)->isBitSet(SR_Z)) {

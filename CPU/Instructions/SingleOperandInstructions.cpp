@@ -28,7 +28,7 @@
 #include <sstream>
 #include <map>
 
-namespace MCU {
+namespace MSP430 {
 
 static int execPUSH(RegisterSet *reg, Memory *mem, Instruction *i) {
 	// Decrease SP, Store current PC, change PC

@@ -21,6 +21,7 @@
 
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
+#include "MCU/MCU.h"
 
 #include <QWidget>
 #include <QTime>
@@ -33,14 +34,14 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-ProjectConfiguration::ProjectConfiguration(QWidget *parent, MSP430 *cpu) :
+ProjectConfiguration::ProjectConfiguration(QWidget *parent, MCU *mcu) :
 QDialog(parent) {
 	setupUi(this);
-	if (cpu) {
-		QStringList variants = cpu->getVariants();
+	if (mcu) {
+		QStringList variants = mcu->getVariants();
 		for (int i = 0; i < variants.size(); ++i) {
 			MSP430Variants->addItem(variants[i]);
-			if (variants[i] == cpu->getVariant()) {
+			if (variants[i] == mcu->getVariant()) {
 				MSP430Variants->setCurrentRow(MSP430Variants->count() - 1);
 			}
 		}
@@ -48,20 +49,22 @@ QDialog(parent) {
 
 	connect(MSP430Variants, SIGNAL(currentItemChanged(QListWidgetItem *, QListWidgetItem *)), this, SLOT(handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *)));
 
-	if (cpu) {
+	if (mcu) {
 		MSP430Variants->setEnabled(false);
 		handleCurrentItemChanged(0, 0);
 	}
 }
 
-MSP430 *ProjectConfiguration::getMSP430() {
-	MSP430 *cpu = new MSP430(MSP430Variants->currentItem()->text());
-	return cpu;
+MCU *ProjectConfiguration::getMCU() {
+// 	MCU *mcu = new MCU(MSP430Variants->currentItem()->text());
+	// TODO
+	MCU *mcu = 0;
+	return mcu;
 }
 
 
 void ProjectConfiguration::handleCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *) {
-	preview->setObject(getMSP430());
+	preview->setObject(getMCU());
 }
 
 

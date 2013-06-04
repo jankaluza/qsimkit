@@ -21,9 +21,7 @@
 
 #include "ProjectConfiguration.h"
 
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/MCU.h"
 #include "Peripherals/PeripheralManager.h"
 
 #include "DockWidgets/Disassembler/Disassembler.h"
@@ -131,9 +129,9 @@ void QSimKit::setDockWidgetsEnabled(bool enabled) {
 	toolbar->setEnabled(enabled);
 }
 
-void QSimKit::setDockWidgetsCPU(MSP430 *cpu) {
+void QSimKit::setDockWidgetsMCU(MCU *mcu) {
 	for (int i = 0; i < m_dockWidgets.size(); ++i) {
-		m_dockWidgets[i]->setCPU(cpu);
+		m_dockWidgets[i]->setMCU(mcu);
 	}
 
 	setDockWidgetsEnabled(true);
@@ -231,10 +229,10 @@ void QSimKit::newProject() {
 	if (dialog.exec() == QDialog::Accepted) {
 		m_filename = "";
 		screen->clear();
-		screen->setCPU(dialog.getMSP430());
-		setDockWidgetsCPU(screen->getCPU());
+		screen->setMCU(dialog.getMCU());
+		setDockWidgetsMCU(screen->getMCU());
 
-		m_breakpointManager->setCPU(screen->getCPU());
+		m_breakpointManager->setMCU(screen->getMCU());
 	}
 }
 
@@ -275,8 +273,8 @@ bool QSimKit::loadProject(const QString &file) {
 
 	screen->load(document);
 	m_filename = file;
-	setDockWidgetsCPU(screen->getCPU());
-	m_breakpointManager->setCPU(screen->getCPU());
+	setDockWidgetsMCU(screen->getMCU());
+	m_breakpointManager->setMCU(screen->getMCU());
 
 	return true;
 }
@@ -291,9 +289,9 @@ void QSimKit::loadProject() {
 }
 
 bool QSimKit::loadA43File(const QString &f) {
-	if (!screen->getCPU()) {
+	if (!screen->getMCU()) {
 		newProject();
-		if (!screen->getCPU()) {
+		if (!screen->getMCU()) {
 			return false;
 		}
 	}
@@ -302,7 +300,7 @@ bool QSimKit::loadA43File(const QString &f) {
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return false;
 
-	bool ret = screen->getCPU()->loadA43(file.readAll().data());
+	bool ret = screen->getMCU()->loadA43(file.readAll().data());
 	m_disassembler->reloadCode();
 	return ret;
 }
@@ -317,9 +315,9 @@ void QSimKit::loadA43() {
 }
 
 bool QSimKit::loadELFFile(const QString &f) {
-	if (!screen->getCPU()) {
+	if (!screen->getMCU()) {
 		newProject();
-		if (!screen->getCPU()) {
+		if (!screen->getMCU()) {
 			return false;
 		}
 	}
@@ -331,10 +329,10 @@ bool QSimKit::loadELFFile(const QString &f) {
 	QByteArray elf = file.readAll();
 	QString a43 = m_disassembler->ELFToA43(elf);
 
-	screen->getCPU()->setELF(elf);
+	screen->getMCU()->loadELF(elf);
 
 	qDebug() << a43;
-	bool ret = screen->getCPU()->loadA43(a43.toAscii().data());
+	bool ret = screen->getMCU()->loadA43(a43.toAscii().data());
 	m_disassembler->reloadCode();
 	return ret;
 }
@@ -351,7 +349,7 @@ void QSimKit::loadELF() {
 }
 
 void QSimKit::projectOptions() {
-	ProjectConfiguration dialog(this, screen->getCPU());
+	ProjectConfiguration dialog(this, screen->getMCU());
 	if (dialog.exec() == QDialog::Accepted) {
 
 	}

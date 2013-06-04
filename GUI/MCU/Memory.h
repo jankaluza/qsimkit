@@ -19,38 +19,21 @@
 
 #pragma once
 
-#include "Clock.h"
-
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "CPU/Memory/Memory.h"
+#include <map>
 
-class Variant;
-
-namespace MSP430 {
-
-/// Digitally-Controlled Osctillator
-class DCO : public Clock, public MemoryWatcher {
+class Memory {
 	public:
-		DCO(Memory *mem, Variant *variant);
-		virtual ~DCO();
+		Memory() {};
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		virtual uint16_t get(uint16_t address) = 0;
+		virtual uint16_t getBigEndian(uint16_t address) = 0;
+		virtual void set(uint16_t address, uint16_t value) = 0;
+		virtual setBigEndian(uint16_t address, uint16_t value) = 0;
 
-		virtual void reset();
-
-		virtual unsigned long getFrequency() {
-			return m_freq;
-		}
-
-		double getStep();
-
-	private:
-		Memory *m_mem;
-		Variant *m_variant;
-		unsigned long m_freq;
-		double m_step;
+		virtual uint8_t getByte(uint16_t address) = 0;
+		virtual setByte(uint16_t address, uint8_t value) = 0;
 };
 
-}

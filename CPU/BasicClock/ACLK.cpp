@@ -26,7 +26,7 @@
 #include "VLO.h"
 #include "LFXT1.h"
 
-namespace MCU {
+namespace MSP430 {
 
 ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1) :
 m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo),

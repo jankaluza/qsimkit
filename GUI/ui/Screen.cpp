@@ -21,7 +21,7 @@
 
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
-#include "Peripherals/MSP430/MSP430.h"
+#include "MCU/MCU.h"
 // #include "Peripherals/LED/LED.h"
 #include "ConnectionNode.h"
 #include "ScreenObject.h"
@@ -83,27 +83,27 @@ void Screen::setSimulator(adevs::Simulator<SimulationEvent> *sim) {
 	}
 }
 
-void Screen::setCPU(MSP430 *cpu) {
+void Screen::setMCU(MCU *mcu) {
 	if (m_objects.empty()) {
-		m_objects.append(cpu);
+		m_objects.append(mcu);
 	}
 	else {
 		onPeripheralRemoved(m_objects[0]);
 		disconnect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
 		m_objects[0]->deleteLater();
-		m_objects[0] = cpu;
+		m_objects[0] = mcu;
 	}
 
 	onPeripheralAdded(m_objects[0]);
 	connect(m_objects[0], SIGNAL(onUpdated()), this, SLOT(update()));
 }
 
-MSP430 *Screen::getCPU() {
+MCU *Screen::getMCU() {
 	if (m_objects.empty()) {
 		return 0;
 	}
 
-	return static_cast<MSP430 *>(m_objects[0]);
+	return static_cast<MCU *>(m_objects[0]);
 }
 
 void Screen::paintEvent(QPaintEvent *e) {
@@ -217,8 +217,9 @@ void Screen::load(QDomDocument &doc) {
 
 		ScreenObject *obj = 0;
 		if (type == "MSP430") {
-			QString variant = object.firstChildElement("variant").text();
-			obj = new MSP430(variant);
+			// TODO
+// 			QString variant = object.firstChildElement("variant").text();
+// 			obj = new MSP430(variant);
 		}
 		else if (type == "ConnectionNode") {
 			obj = new ConnectionNode();
@@ -237,7 +238,7 @@ void Screen::load(QDomDocument &doc) {
 
 		obj->load(object);
 		if (m_objects.empty()) {
-			setCPU(dynamic_cast<MSP430 *>(obj));
+			setMCU(dynamic_cast<MCU *>(obj));
 		}
 		else {
 			m_objects.append(obj);

@@ -28,7 +28,7 @@
 
 class Variant;
 
-namespace MCU {
+namespace MSP430 {
 
 class LFXT1 : public Clock, public MemoryWatcher {
 	public:

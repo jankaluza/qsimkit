@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,38 +19,39 @@
 
 #pragma once
 
-#include "Clock.h"
+#include <QWidget>
+#include <QString>
+#include <QStringList>
+#include <QChar>
+#include <QRect>
+#include <map>
 
-#include <stdint.h>
-#include <string>
-#include <vector>
-#include "CPU/Memory/Memory.h"
+#include "ui/ScreenObject.h"
+#include "Peripherals/Peripheral.h"
+#include "Peripherals/SimulationObject.h"
 
-class Variant;
+class Memory;
+class RegisterSet;
 
-namespace MSP430 {
-
-/// Digitally-Controlled Osctillator
-class DCO : public Clock, public MemoryWatcher {
+class MCU : public Peripheral {
 	public:
-		DCO(Memory *mem, Variant *variant);
-		virtual ~DCO();
+		MCU() {}
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		virtual QString getVariant() = 0;
 
-		virtual void reset();
+		virtual QStringList getVariants() = 0;
 
-		virtual unsigned long getFrequency() {
-			return m_freq;
-		}
+		virtual bool loadA43(const QString &data) = 0;
 
-		double getStep();
+		virtual const QString &getA43() = 0;
 
-	private:
-		Memory *m_mem;
-		Variant *m_variant;
-		unsigned long m_freq;
-		double m_step;
+		virtual RegisterSet *getRegisterSet() = 0;
+
+		virtual Memory *getMemory() = 0;
+
+		virtual void loadELF(const QByteArray &elf) = 0;
+
+		virtual const QByteArray &getELF() = 0;
+
 };
 
-}

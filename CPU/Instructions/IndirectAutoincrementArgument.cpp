@@ -24,7 +24,7 @@
 #include <iostream>
 #include <sstream>
 
-namespace MCU {
+namespace MSP430 {
 
 IndirectAutoincrementArgument::IndirectAutoincrementArgument(Memory *mem, Register *reg, bool bw) :
 	m_reg(reg), m_bw(bw), m_mem(mem) { }

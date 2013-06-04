@@ -25,7 +25,7 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
-namespace MCU {
+namespace MSP430 {
 
 /// Status register bits
 #define SR_V 256

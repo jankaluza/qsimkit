@@ -27,7 +27,7 @@
 #include <sstream>
 #include <map>
 
-namespace MCU {
+namespace MSP430 {
 
 static int execMOV(RegisterSet *reg, Memory *mem, Instruction *i) {
 	if (i->bw) {
