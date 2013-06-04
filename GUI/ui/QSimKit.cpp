@@ -175,7 +175,7 @@ void QSimKit::simulationStep() {
 	m_logicalSteps++;
 	if (m_logicalSteps == 2) {
 		m_logicalSteps = 0;
-		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(m_instPerCycle) + " instructions per " + QString::number(perf.elapsed()) + " ms");
+		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(m_instPerCycle * 20) + " simulation events per second");
 		onSimulationStep(m_sim->nextEventTime());
 	}
 
