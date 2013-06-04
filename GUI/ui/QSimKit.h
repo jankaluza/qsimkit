@@ -105,5 +105,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		Peripherals *m_peripheralsWidget;
 		TrackedPins *m_trackedPins;
 		int m_logicalSteps;
+		int m_instPerCycle;
 };
 

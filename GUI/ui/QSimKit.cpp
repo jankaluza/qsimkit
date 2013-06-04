@@ -51,7 +51,7 @@
 #include <QDomDocument>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent), m_variant(0),
-m_dig(0), m_sim(0), m_logicalSteps(0) {
+m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
 	setupUi(this);
 
 	m_peripherals = new PeripheralManager();
@@ -164,7 +164,7 @@ void QSimKit::singleStep() {
 void QSimKit::simulationStep() {
 	QTime perf;
 	perf.start();
-	for (int i = 0; i < 2500; ++i) {
+	for (int i = 0; i < m_instPerCycle; ++i) {
 		m_sim->execNextEvent();
 		if (m_breakpointManager->shouldBreak()) {
 			m_pauseAction->setChecked(true);
@@ -173,10 +173,18 @@ void QSimKit::simulationStep() {
 		}
 	}
 	m_logicalSteps++;
-	if (m_logicalSteps == 4) {
+	if (m_logicalSteps == 2) {
 		m_logicalSteps = 0;
-		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", 2500 instructions per " + QString::number(perf.elapsed()) + " ms");
+		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(m_instPerCycle) + " instructions per " + QString::number(perf.elapsed()) + " ms");
 		onSimulationStep(m_sim->nextEventTime());
+	}
+
+	
+	// Keep 60% CPU usage. This method is called every 50ms, so we should spend
+	// 30ms here. If we are spending less or more, change the instPerCycle
+	// value.
+	if (perf.elapsed() < 28 || perf.elapsed() > 32) {
+		m_instPerCycle = m_instPerCycle * (30.0 / perf.elapsed());
 	}
 }
 
