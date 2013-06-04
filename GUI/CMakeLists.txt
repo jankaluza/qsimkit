@@ -5,9 +5,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 FILE(GLOB SRC ui/*.cpp Peripherals/*.cpp Script/*.cpp)
-FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Peripherals/MSP430/*.cpp Breakpoints/*.cpp Tracking/*.cpp)
+FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp MCU/*.cpp Breakpoints/*.cpp Tracking/*.cpp)
 FILE(GLOB HEADERS ui/*.h Peripherals/*.h Script/*.h)
-FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Peripherals/MSP430/*.h Breakpoints/*.h Tracking/*.h)
+FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h MCU/*.h Breakpoints/*.h Tracking/*.h)
 FILE(GLOB FORMS ui/*.ui)
 FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui)
 
