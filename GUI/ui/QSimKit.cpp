@@ -21,6 +21,7 @@
 
 #include "ProjectConfiguration.h"
 
+#include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
 #include "Peripherals/PeripheralManager.h"
 
@@ -50,10 +51,13 @@ QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
 m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
 	setupUi(this);
 
+	m_mcuManager = new MCUManager();
+	m_mcuManager->loadMCUs();
 	m_peripherals = new PeripheralManager();
 	m_peripherals->loadPeripherals();
 
 	screen->setPeripheralManager(m_peripherals);
+	screen->setMCUManager(m_mcuManager);
 
 	m_breakpointManager = new BreakpointManager();
 
@@ -225,7 +229,7 @@ void QSimKit::pauseSimulation(bool checked) {
 }
 
 void QSimKit::newProject() {
-	ProjectConfiguration dialog(this);
+	ProjectConfiguration dialog(this, m_mcuManager);
 	if (dialog.exec() == QDialog::Accepted) {
 		m_filename = "";
 		screen->clear();
@@ -349,7 +353,7 @@ void QSimKit::loadELF() {
 }
 
 void QSimKit::projectOptions() {
-	ProjectConfiguration dialog(this, screen->getMCU());
+	ProjectConfiguration dialog(this, m_mcuManager, screen->getMCU());
 	if (dialog.exec() == QDialog::Accepted) {
 
 	}

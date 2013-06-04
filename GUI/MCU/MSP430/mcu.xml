@@ -1,0 +1,9 @@
+<mcu type='binary'>
+   <name>MSP430</name>
+   <comment>MSP430</comment>
+   <author>Jan Kaluza</author>
+   <email>hanzz.k@gmail.com</email>
+   <version>0.1</version>
+   <license>GNU/GPL</license>
+   <library>libmsp430</library>
+</mcu>

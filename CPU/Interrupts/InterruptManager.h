@@ -24,6 +24,8 @@
 #include <vector>
 #include "CPU/Memory/Memory.h"
 
+class Variant;
+
 namespace MSP430 {
 
 class Memory;
@@ -38,7 +40,7 @@ class InterruptWatcher {
 
 class InterruptManager {
 	public:
-		InterruptManager(RegisterSet *reg, Memory *mem);
+		InterruptManager(RegisterSet *reg, Memory *mem, Variant *variant);
 		virtual ~InterruptManager();
 
 		void queueInterrupt(int vector);
@@ -58,6 +60,7 @@ class InterruptManager {
 	private:
 		RegisterSet *m_reg;
 		Memory *m_mem;
+		Variant *m_variant;
 		std::vector<int> m_interrupts;
 		std::vector<int> m_runningInterrupts;
 		std::map<int, std::vector<InterruptWatcher *> > m_watchers;

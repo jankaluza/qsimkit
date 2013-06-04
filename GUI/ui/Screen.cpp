@@ -21,8 +21,8 @@
 
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
+#include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
-// #include "Peripherals/LED/LED.h"
 #include "ConnectionNode.h"
 #include "ScreenObject.h"
 #include "ConnectionManager.h"
@@ -49,6 +49,7 @@
 Screen::Screen(QWidget *parent) : QWidget(parent) {
 	m_moving = 0;
 	m_peripherals = 0;
+	m_mcuManager = 0;
 	m_conns = new ConnectionManager(this);
 	setMouseTracking(true);
 }
@@ -198,7 +199,7 @@ void Screen::clear() {
 void Screen::save(QTextStream &stream) {
 	stream << "<objects>\n";
 	for (int i = 0; i < m_objects.size(); ++i) {
-		stream << "<object id='" << i << "' type='" << m_objects[i]->type() << "'>\n";
+		stream << "<object id='" << i << "' type='" << m_objects[i]->type() << "' interface='" + m_objects[i]->interface() + "' name='" + m_objects[i]->name() + "'>\n";
 		m_objects[i]->save(stream);
 		stream << "</object>\n";
 	}
@@ -216,10 +217,9 @@ void Screen::load(QDomDocument &doc) {
 		QString type = object.attribute("type");
 
 		ScreenObject *obj = 0;
-		if (type == "MSP430") {
-			// TODO
-// 			QString variant = object.firstChildElement("variant").text();
-// 			obj = new MSP430(variant);
+		if (object.attribute("interface") == "mcu") {
+			QString variant = object.firstChildElement("variant").text();
+			obj = m_mcuManager->getMCU(type).create(variant);
 		}
 		else if (type == "ConnectionNode") {
 			obj = new ConnectionNode();

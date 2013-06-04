@@ -2290,6 +2290,7 @@
 #define DCOZERO 0.1
 #define SRSEL 1.39
 #define SDCO 1.08
+#define INTVECT 0xffc0
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 
@@ -3319,6 +3320,15 @@ class Variant_msp430x241x : public Variant {
 		unsigned int getTIMERB1_VECTOR() {
 #ifdef TIMERB1_VECTOR
 			return TIMERB1_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getINTVECT() {
+#ifdef INTVECT
+			return INTVECT;
 #else
 			return 0;
 #endif

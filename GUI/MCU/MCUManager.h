@@ -19,30 +19,58 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
+#include <QChar>
+#include <QRect>
+#include <QMap>
+#include <QDir>
 
-#include "ui_ProjectConfiguration.h"
-
-class MCU;
+class MCUInterface;
 class MCUManager;
+class MCU;
 
-class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
-{
+class MCUInfo {
+	public:
+		MCUInfo() : m_mcu(0) {}
+		virtual ~MCUInfo() {}
+
+		MCU *create(const QString &variant);
+
+		const QString &getName() const { return m_name; }
+		const QString &getLibrary() const { return m_library; }
+
+	private:
+		MCUInterface *m_mcu;
+		QString m_name;
+		QString m_library;
+
+	friend class MCUManager;
+};
+
+typedef QMap<QString, MCUInfo> MCUList;
+
+class MCUManager : public QObject {
 	Q_OBJECT
 
 	public:
-		ProjectConfiguration(QWidget *parent = 0, MCUManager *manager = 0, MCU *mcu = 0);
+		MCUManager();
+		~MCUManager();
 
-		MCU *getMCU();
+		void loadMCUs();
+		MCUInterface *loadBinaryMCU(QString dir);
 
+		MCUInfo &getMCU(const QString &name) {
+			return m_mcu[name];
+		}
 
-	private slots:
-		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);
+		const MCUList &getMCUs() {
+			return m_mcu;
+		}
 
 	private:
-		MCUManager *m_manager;
+		bool loadXML(QString xml);
 
+		MCUList m_mcu;
 };
 

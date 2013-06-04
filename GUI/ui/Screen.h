@@ -30,6 +30,7 @@
 
 class Package;
 class ScreenObject;
+class MCUManager;
 class MCU;
 class ConnectionManager;
 class PeripheralManager;
@@ -74,6 +75,10 @@ class Screen : public QWidget
 			m_peripherals = peripherals;
 		}
 
+		void setMCUManager(MCUManager *mcuManager) {
+			m_mcuManager = mcuManager;
+		}
+
 		std::map<ScreenObject *, SimulationObjectWrapper *> &getWrappers() {
 			return wrappers;
 		}
@@ -101,6 +106,7 @@ class Screen : public QWidget
 		int m_movingY;		
 		ConnectionManager *m_conns;
 		PeripheralManager *m_peripherals;
+		MCUManager *m_mcuManager;
 		std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
 		std::map<ScreenObject *, QList<int> > m_trackedPins;
 };

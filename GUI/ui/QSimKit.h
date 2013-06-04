@@ -31,6 +31,7 @@
 
 class MCU;
 class PeripheralManager;
+class MCUManager;
 class Disassembler;
 class BreakpointManager;
 class DockWidget;
@@ -100,6 +101,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		BreakpointManager *m_breakpointManager;
 		QList<DockWidget *> m_dockWidgets;
 		Peripherals *m_peripheralsWidget;
+		MCUManager *m_mcuManager;
 		TrackedPins *m_trackedPins;
 		int m_logicalSteps;
 		int m_instPerCycle;

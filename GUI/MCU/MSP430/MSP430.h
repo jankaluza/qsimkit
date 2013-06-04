@@ -26,6 +26,7 @@
 #include <QRect>
 #include <map>
 #include "MCU/MCU.h"
+#include "MCU/MCUInterface.h"
 #include "CPU/Pins/PinManager.h"
 
 namespace MSP430 {
@@ -62,7 +63,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 
 		QStringList getVariants();
 
-		bool loadA43(const std::string &data);
+		bool loadA43(const QString &data);
 
 		void getInternalSimulationObjects(std::vector<SimulationObject *> &objects);
 
@@ -107,11 +108,11 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 			return m_mem;
 		}
 
-		const std::string &getCode() {
+		const QString &getA43() {
 			return m_code;
 		}
 
-		void setELF(const QByteArray &elf) {
+		void loadELF(const QByteArray &elf) {
 			m_elf = elf;
 		}
 
@@ -139,12 +140,20 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 		MSP430::InterruptManager *m_intManager;
 		MSP430::BasicClock *m_basicClock;
 		AdevsTimerFactory *m_timerFactory;
-		std::string m_code;
+		QString m_code;
 		SimulationEventList m_output;
 		QStringList m_options;
 		bool m_ignoreNextStep;
 		QByteArray m_elf;
 		PeripheralItem *m_peripheralItem;
 		
+};
+
+class MSP430Interface : public QObject, MCUInterface {
+	Q_OBJECT
+	Q_INTERFACES(MCUInterface)
+
+	public:
+		MCU *create(const QString &variant);
 };
 

@@ -7,7 +7,7 @@
  * More at: http://mspgcc.sourceforge.net/manual/
  */
 
-#include <msp430x241x.h>
+#include <msp430x16x.h>
 #include <signal.h>
 
 #define REDLED		BIT0

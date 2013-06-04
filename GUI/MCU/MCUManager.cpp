@@ -17,36 +17,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "PeripheralManager.h"
-#include "PeripheralInterface.h"
-#include "PythonPeripheralInterface.h"
-#include "Peripheral.h"
+#include "MCUManager.h"
+#include "MCUInterface.h"
+#include "MCU.h"
 #include "Script/ScriptEngine.h"
 #include <QPluginLoader>
 #include <QApplication>
 #include <QDebug>
 #include <QDomDocument>
 
-Peripheral *PeripheralInfo::create() {
-	Peripheral *p = m_peripheral->create();
+MCU *MCUInfo::create(const QString &variant) {
+	MCU *p = m_mcu->create(variant);
 	p->m_type = m_library;
-	p->m_interface = "peripheral";
+	p->m_interface = "mcu";
 	return p;
 }
 
-PeripheralManager::PeripheralManager() {
-	m_scriptEngine = new ScriptEngine();
+MCUManager::MCUManager() {
 }
 
-PeripheralManager::~PeripheralManager() {
-	delete m_scriptEngine;
+MCUManager::~MCUManager() {
 }
 
-bool PeripheralManager::loadXML(QString file) {
+bool MCUManager::loadXML(QString file) {
 	int errorLine, errorColumn;
 	QString errorMsg;
 
-	QFile modelFile(file + "/peripheral.xml");
+	QFile modelFile(file + "/mcu.xml");
 	QDomDocument document;
 	if (!document.setContent(&modelFile, &errorMsg, &errorLine, &errorColumn))
 	{
@@ -60,14 +57,14 @@ bool PeripheralManager::loadXML(QString file) {
 	}
 
 	QDomElement peripheral = document.firstChild().toElement();
-	if (peripheral.nodeName() != "peripheral") {
+	if (peripheral.nodeName() != "mcu") {
 		return false;
 	}
 
 	QString type = peripheral.attribute("type");
 
 	QString library;
-	PeripheralInfo info;
+	MCUInfo info;
 
 	for(QDomNode node = peripheral.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		QDomElement element = node.toElement();
@@ -76,10 +73,7 @@ bool PeripheralManager::loadXML(QString file) {
 			library = element.text();
 			info.m_library = library;
 			if (type == "binary") {
-				info.m_peripheral = loadBinaryPeripheral(file + "/" + element.text());
-			}
-			else {
-				info.m_peripheral = loadPythonPeripheral(file + "/" + element.text(), element.text());
+				info.m_mcu = loadBinaryMCU(file + "/" + element.text());
 			}
 		}
 		else if (element.nodeName() == "name") {
@@ -87,44 +81,34 @@ bool PeripheralManager::loadXML(QString file) {
 		}
 	}
 
-	if (info.m_peripheral) {
-		qDebug() << "adding peripheral" << library;
-		m_peripherals[library] = info;
+	if (info.m_mcu) {
+		qDebug() << "adding MCU" << library;
+		m_mcu[library] = info;
 	}
 }
 
-PeripheralInterface *PeripheralManager::loadBinaryPeripheral(QString f) {
-	QStringList extensions = QStringList() << ".dll" << ".so";
+MCUInterface *MCUManager::loadBinaryMCU(QString f) {
+	QStringList extensions = QStringList() << ".so" << ".dll";
 
 	foreach(const QString& ext, extensions) {
 		QPluginLoader pluginLoader(f + ext);
 		QObject *plugin = pluginLoader.instance();
 		if (plugin) {
-			PeripheralInterface *p = qobject_cast<PeripheralInterface *>(plugin);
+			MCUInterface *p = qobject_cast<MCUInterface *>(plugin);
 			if (p) {
 				qDebug() << "Loaded peripheral:" << (f + ext);
 				return p;
 			}
+		}
+		else {
+			qDebug() << "Error loading" << (f + ext) << pluginLoader.errorString();
 		}
 	}
 
 	return 0;
 }
 
-PeripheralInterface *PeripheralManager::loadPythonPeripheral(QString f, QString name) {
-	Script *script = 0;
-	QString moduleName = QString("Plugin") + name;
-
-	if((script = m_scriptEngine->load(f + ".py", moduleName)) == 0) {
-		return 0;
-	}
-
-	qDebug() << "Loaded peripheral:" << (f + ".py");
-	PythonPeripheralInterface *p = new PythonPeripheralInterface(script);
-	return p;
-}
-
-void PeripheralManager::loadPeripherals() {
+void MCUManager::loadMCUs() {
 	QDir pluginsDir(QApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
 	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
@@ -136,7 +120,7 @@ void PeripheralManager::loadPeripherals() {
 		pluginsDir.cdUp();
 	}
 #endif
-	pluginsDir.cd("Peripherals");
+	pluginsDir.cd("MCU");
 	foreach (QString fileName, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
 		loadXML(pluginsDir.absoluteFilePath(fileName));
 	}

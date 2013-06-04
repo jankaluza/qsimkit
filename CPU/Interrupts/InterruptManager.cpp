@@ -28,7 +28,8 @@
 
 namespace MSP430 {
 
-InterruptManager::InterruptManager(RegisterSet *reg, Memory *mem) : m_reg(reg), m_mem(mem) {
+InterruptManager::InterruptManager(RegisterSet *reg, Memory *mem, Variant *variant)
+: m_reg(reg), m_mem(mem), m_variant(variant) {
 
 }
 
@@ -57,7 +58,6 @@ void InterruptManager::handleInstruction(Instruction *instruction) {
 }
 
 void InterruptManager::runInterrupt(int vector) {
-// 	std::cerr << "running interrupt vector " << vector << "\n";
 	uint16_t v;
 	Register *sp = m_reg->getp(1);
 
@@ -79,7 +79,7 @@ void InterruptManager::runInterrupt(int vector) {
 	m_reg->get(2)->callWatchers();
 
 	// Load content of interrupt vector to PC
-	m_reg->get(0)->setBigEndian(m_mem->getBigEndian(0xffc0 + vector));
+	m_reg->get(0)->setBigEndian(m_mem->getBigEndian(m_variant->getINTVECT() + vector));
 
 	m_runningInterrupts.push_back(vector);
 }

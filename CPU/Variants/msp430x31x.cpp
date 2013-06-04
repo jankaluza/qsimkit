@@ -2101,6 +2101,15 @@ class Variant_msp430x31x : public Variant {
 		}
 
 
+		unsigned int getINTVECT() {
+#ifdef INTVECT
+			return INTVECT;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;

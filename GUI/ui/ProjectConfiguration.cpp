@@ -21,6 +21,7 @@
 
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
+#include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
 
 #include <QWidget>
@@ -34,16 +35,29 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-ProjectConfiguration::ProjectConfiguration(QWidget *parent, MCU *mcu) :
-QDialog(parent) {
+ProjectConfiguration::ProjectConfiguration(QWidget *parent, MCUManager *manager, MCU *mcu) :
+QDialog(parent), m_manager(manager) {
 	setupUi(this);
-	if (mcu) {
-		QStringList variants = mcu->getVariants();
+
+	MCU *currentMCU = mcu;
+
+	foreach (const MCUInfo &m, m_manager->getMCUs()) {
+		family->addItem(m.getName(), m.getLibrary());
+		if (!currentMCU) {
+			currentMCU = m_manager->getMCU(m.getLibrary()).create("");
+		}
+	}
+
+	if (currentMCU) {
+		QStringList variants = currentMCU->getVariants();
 		for (int i = 0; i < variants.size(); ++i) {
 			MSP430Variants->addItem(variants[i]);
-			if (variants[i] == mcu->getVariant()) {
+			if (variants[i] == currentMCU->getVariant()) {
 				MSP430Variants->setCurrentRow(MSP430Variants->count() - 1);
 			}
+		}
+		if (currentMCU != mcu) {
+			delete currentMCU;
 		}
 	}
 
@@ -56,15 +70,18 @@ QDialog(parent) {
 }
 
 MCU *ProjectConfiguration::getMCU() {
-// 	MCU *mcu = new MCU(MSP430Variants->currentItem()->text());
-	// TODO
-	MCU *mcu = 0;
-	return mcu;
+	if (MSP430Variants->currentItem() == 0) {
+		return 0;
+	}
+	return m_manager->getMCU(family->itemData(family->currentIndex()).toString()).create(MSP430Variants->currentItem()->text());
 }
 
 
 void ProjectConfiguration::handleCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *) {
-	preview->setObject(getMCU());
+	MCU *mcu = getMCU();
+	if (mcu) {
+		preview->setObject(mcu);
+	}
 }
 
 

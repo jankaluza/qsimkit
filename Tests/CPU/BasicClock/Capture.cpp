@@ -167,7 +167,7 @@ class CaptureTest : public CPPUNIT_NS :: TestFixture {
 			d = new InstructionDecoder(r, m);
 			i = new Instruction;
 			v = getVariant("msp430x241x");
-			intManager = new InterruptManager(r, m);
+			intManager = new InterruptManager(r, m, v);
 			factory = new DummyTimerFactory();
 			pinManager = new PinManager(m, intManager, v);
 

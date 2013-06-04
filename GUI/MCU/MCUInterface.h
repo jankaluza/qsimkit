@@ -19,30 +19,21 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
-
-#include "ui_ProjectConfiguration.h"
+#include <QChar>
+#include <QRect>
+#include <map>
 
 class MCU;
-class MCUManager;
 
-class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
-{
-	Q_OBJECT
-
+class MCUInterface {
 	public:
-		ProjectConfiguration(QWidget *parent = 0, MCUManager *manager = 0, MCU *mcu = 0);
+		virtual ~MCUInterface() {}
 
-		MCU *getMCU();
-
-
-	private slots:
-		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);
-
-	private:
-		MCUManager *m_manager;
-
+		virtual MCU *create(const QString &variant) = 0;
 };
 
+
+Q_DECLARE_INTERFACE(MCUInterface,
+                     "com.trolltech.QSimKit.MCUInterface/1.0");

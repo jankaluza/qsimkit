@@ -150,7 +150,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			i = new Instruction;
 
 			v = getVariant("msp430x241x");
-			intManager = new InterruptManager(r, m);
+			intManager = new InterruptManager(r, m, v);
 			factory = new DummyTimerFactory();
 			pinManager = new PinManager(m, intManager, v);
 			bc = new BasicClock(m, v, intManager, pinManager, factory);

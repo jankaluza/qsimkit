@@ -45,6 +45,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QDomDocument>
+#include <QtCore/qplugin.h>
 
 MCU_MSP430::MCU_MSP430(const QString &variant) :
 m_time(0), m_instructionCycles(0),
@@ -53,15 +54,19 @@ m_instruction(new MSP430::Instruction), m_variant(0),
 m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 
 	m_variant = ::getVariant(variant.toStdString().c_str());
+	if (!m_variant) {
+		return;
+	}
+
 	QString package = QString("Packages/") + variant + ".xml";
 
-	m_type = "MCU_MSP430";
+	m_name = "MSP430";
 
 	m_mem = new MSP430::Memory(512000);
 	m_reg = new MSP430::RegisterSet();
 	m_reg->addDefaultRegisters();
 
-	m_intManager = new MSP430::InterruptManager(m_reg, m_mem);
+	m_intManager = new MSP430::InterruptManager(m_reg, m_mem, m_variant);
 	m_pinManager = new MSP430::PinManager(m_mem, m_intManager, m_variant);
 	m_pinManager->setWatcher(this);
 	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
@@ -81,7 +86,7 @@ void MCU_MSP430::reset() {
 
 	m_decoder = new MSP430::InstructionDecoder(m_reg, m_mem);
 
-	if (!m_code.empty()) {
+	if (!m_code.isEmpty()) {
 		loadA43(m_code);
 	}
 	
@@ -92,6 +97,10 @@ RegisterSet *MCU_MSP430::getRegisterSet() {
 }
 
 QString MCU_MSP430::getVariant() {
+	if (!m_variant) {
+		return "";
+	}
+
 	return m_variant->getName();
 }
 
@@ -111,9 +120,9 @@ void MCU_MSP430::handlePinChanged(int id, double value) {
 }
 
 
-bool MCU_MSP430::loadA43(const std::string &data) {
+bool MCU_MSP430::loadA43(const QString &data) {
 	m_code = data;
-	return m_mem->loadA43(data, m_reg);
+	return m_mem->loadA43(data.toStdString(), m_reg);
 }
 
 void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
@@ -179,7 +188,7 @@ void MCU_MSP430::executeOption(int option) {
 void MCU_MSP430::save(QTextStream &stream) {
 	ScreenObject::save(stream);
 	stream << "<code>";
-	stream << QString::fromStdString(m_code);
+	stream << m_code;
 	stream << "</code>\n";
 	stream << "<variant>";
 	stream << QString(m_variant->getName());
@@ -190,8 +199,8 @@ void MCU_MSP430::save(QTextStream &stream) {
 }
 
 void MCU_MSP430::load(QDomElement &object) {
-	loadA43(object.firstChildElement("code").text().toStdString());
-	setELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
+	loadA43(object.firstChildElement("code").text());
+	loadELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
 
 void MCU_MSP430::setPinType(const QString &n, MSP430::PinType &type, int &subtype) {
@@ -268,10 +277,16 @@ void MCU_MSP430::paint(QWidget *screen) {
 		}
 	}
 
-	if (m_code.empty()) {
+	if (m_code.isEmpty()) {
 		QPen pen(Qt::black, 1, Qt::SolidLine);
 		qp.setPen(pen);
 		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
 					"No code loaded. Load the code using\n\"File->Load ELF\" menu option.");
 	}
 }
+
+MCU *MSP430Interface::create(const QString &variant) {
+	return new MCU_MSP430(variant);
+}
+
+Q_EXPORT_PLUGIN2(msp430mcu, MSP430Interface);

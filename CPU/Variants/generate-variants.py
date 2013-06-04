@@ -41,6 +41,8 @@ defines += ["TBIV_"]
 
 defines += ["TIMERB0_VECTOR", "TIMERB1_VECTOR"]
 
+defines += ["INTVECT"]
+
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
 

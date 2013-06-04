@@ -87,16 +87,14 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 			break;
 	}
 
-	if (mpx) {
-		m_multiplexers.push_back(mpx);
-	}
+	m_multiplexers.push_back(mpx);
 	return mpx;
 }
 
 std::vector<PinMultiplexer *> PinManager::addPinHandler(const std::string &name, PinHandler *handler) {
 	std::vector<PinMultiplexer *> multiplexers;
 	for (std::vector<PinMultiplexer *>::iterator it = m_multiplexers.begin(); it != m_multiplexers.end(); ++it) {
-		if ((*it)->hasMultiplexing(name)) {
+		if ((*it) && (*it)->hasMultiplexing(name)) {
 			(*it)->addPinHandler(name, handler);
 			multiplexers.push_back(*it);
 		}
@@ -106,7 +104,8 @@ std::vector<PinMultiplexer *> PinManager::addPinHandler(const std::string &name,
 }
 
 bool PinManager::handlePinInput(int id, double value) {
-	m_multiplexers[id]->handleInput(value);
+	if (m_multiplexers[id])
+		m_multiplexers[id]->handleInput(value);
 	return true;
 }
 

@@ -24,26 +24,6 @@
      </property>
     </widget>
    </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Frequency:</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <widget class="QSpinBox" name="frequency">
-     <property name="suffix">
-      <string> kHz</string>
-     </property>
-     <property name="maximum">
-      <number>16000</number>
-     </property>
-     <property name="value">
-      <number>4000</number>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1" colspan="2">
     <widget class="ScreenObjectPreview" name="preview" native="true">
      <property name="sizePolicy">
@@ -69,6 +49,16 @@
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>MCU Family:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="2">
+    <widget class="QComboBox" name="family"/>
    </item>
   </layout>
  </widget>

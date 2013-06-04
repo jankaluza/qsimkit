@@ -52,12 +52,14 @@ class ScreenObject : public QObject
 		int width() { return m_width; }
 		int height() { return m_height; }
 		const QString &type() { return m_type; }
+		const QString &interface() { return m_interface; }
+		const QString &name() { return m_name; }
 
 		void setX(int x);
 		void setY(int y);
 		void setWidth(int width) { m_width = width; }
 		void setHeight(int height) { m_height = height; }
-		void setType(const QString &type) { m_type = type; }
+		void setName(const QString &name) { m_name = name; }
 
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
@@ -88,7 +90,13 @@ class ScreenObject : public QObject
 		int m_width;
 		int m_height;
 		int m_id;
+		QString m_name;
 		QString m_type;
+		QString m_interface;
+	
+		friend class Screen;
+		friend class MCUInfo;
+		friend class PeripheralInfo;
 
 };
 

@@ -67,7 +67,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			r = new RegisterSet;
 			r->addDefaultRegisters();
 			v = getVariant("msp430x241x");
-			intManager = new InterruptManager(r, m);
+			intManager = new InterruptManager(r, m, v);
 			factory = new DummyTimerFactory();
 			pinManager = new PinManager(m, intManager, v);
 
