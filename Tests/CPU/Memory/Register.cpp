@@ -3,7 +3,7 @@
 
 #include "CPU/Memory/Register.h"
 
-using namespace MSP430;
+namespace MSP430 {
 
 class RegisterTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(RegisterTest);
@@ -52,3 +52,5 @@ class RegisterTest : public CPPUNIT_NS :: TestFixture{
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (RegisterTest);
+
+}

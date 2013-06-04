@@ -19,7 +19,7 @@
 
 #include <algorithm>
 
-using namespace MSP430;
+namespace MSP430 {
 
 class DummyTimerFactory : public TimerFactory {
 	public:
@@ -187,7 +187,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 
 		// f800:       31 40 80 02     mov     #640,   r1      ;#0x0280
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0280, r->get(1)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0280, r->getp(1)->getBigEndian());
 		// f804:       15 42 20 01     mov     &0x0120,r5
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 		// f808:       75 f3           and.b   #-1,    r5      ;r3 As==11
@@ -197,43 +197,43 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 
 		// f80e:       3f 40 00 00     mov     #0,     r15     ;#0x0000
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, r->getp(15)->getBigEndian());
 		// f812:       0f 93           tst     r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(true, r->getp(2)->isBitSet(SR_Z));
 		// f814:       07 24           jz      $+16            ;abs 0xf824
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf824, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf824, r->getp(0)->getBigEndian());
 		// f824:       3f 40 02 00     mov     #2,     r15     ;#0x0002
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((int16_t) 2, (int16_t) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 2, (int16_t) r->getp(15)->getBigEndian());
 		// f828:       0f 93           tst     r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+			CPPUNIT_ASSERT_EQUAL(false, r->getp(2)->isBitSet(SR_Z));
 		// f82a:       06 24           jz      $+14            ;abs 0xf838
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf82c, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf82c, r->getp(0)->getBigEndian());
 
 		// f82c:       82 45 20 01     mov     r5,     &0x0120
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 		// f830:       1f 83           dec     r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((int16_t) 1, (int16_t) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 1, (int16_t) r->getp(15)->getBigEndian());
 		// f832:       cf 43 00 02     mov.b   #0,     512(r15);r3 As==00, 0x0200(r15)
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 		// f836:       fa 23           jnz     $-10            ;abs 0xf82c
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf82c, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf82c, r->getp(0)->getBigEndian());
 		// f82c:       82 45 20 01     mov     r5,     &0x0120
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 		// f830:       1f 83           dec     r15
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int16_t) 0, (int16_t) r->getp(15)->getBigEndian());
 		// f832:       cf 43 00 02     mov.b   #0,     512(r15);r3 As==00, 0x0200(r15)
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 		// f836:       fa 23           jnz     $-10            ;abs 0xf82c
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf838, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf838, r->getp(0)->getBigEndian());
 
 		/// MAIN
 		// f838:       b2 40 80 5a     mov     #23168, &0x0120 ;#0x5a80
@@ -277,7 +277,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 		/// LOOP
 		// f864:       ff 3f           jmp     $+0             ;abs 0xf864
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf864, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf864, r->getp(0)->getBigEndian());
 
 		/// Do timer interrupt
 			// tick to 999
@@ -294,7 +294,7 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(0x162, 1));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());
-			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf870, r->get(0)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf870, r->getp(0)->getBigEndian());
 
 		/// Timer interrupt handler
 		// f870:       92 53 00 02     inc     &0x0200
@@ -303,16 +303,16 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 		// f874:       b2 90 7d 00     cmp     #125,   &0x0200 ;#0x007d
 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 			if (y != 124) {
-				CPPUNIT_ASSERT_EQUAL(false, r->get(2)->isBitSet(SR_Z));
+				CPPUNIT_ASSERT_EQUAL(false, r->getp(2)->isBitSet(SR_Z));
 			// f87a:       05 20           jnz     $+12            ;abs 0xf886
 				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf886, r->get(0)->getBigEndian());
+				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf886, r->getp(0)->getBigEndian());
 			}
 			else {
-				CPPUNIT_ASSERT_EQUAL(true, r->get(2)->isBitSet(SR_Z));
+				CPPUNIT_ASSERT_EQUAL(true, r->getp(2)->isBitSet(SR_Z));
 			// f87a:       05 20           jnz     $+12            ;abs 0xf886
 				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf87c, r->get(0)->getBigEndian());
+				CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf87c, r->getp(0)->getBigEndian());
 			// f87c:       f2 e0 40 00     xor.b   #64,    &0x0021 ;#0x0040
 				d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 				CPPUNIT_ASSERT_EQUAL((uint16_t) 0x0000, (uint16_t) m->getByte(0x0021));
@@ -333,10 +333,10 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(0x0170));
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 // 			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());
-// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf86c, r->get(0)->getBigEndian());
+// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf86c, r->getp(0)->getBigEndian());
 // 		// f86c:       30 40 88 f8     br      #0xf888
 // 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
-// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf888, r->get(0)->getBigEndian());
+// 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0xf888, r->getp(0)->getBigEndian());
 // 		// f888:       00 13           reti
 // 			d->decodeCurrentInstruction(i); executeInstruction(r, m, i);
 // 			intManager->handleInstruction(i);
@@ -348,3 +348,5 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (BlinkingLedTimerTest);
+
+}

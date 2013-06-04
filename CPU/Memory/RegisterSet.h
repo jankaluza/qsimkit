@@ -23,11 +23,13 @@
 #include <string>
 #include <vector>
 
+#include "../../GUI/MCU/RegisterSet.h"
+
 namespace MSP430 {
 
 class Register;
 
-class RegisterSet {
+class RegisterSet : public ::RegisterSet {
 	public:
 		RegisterSet();
 		virtual ~RegisterSet();
@@ -39,8 +41,10 @@ class RegisterSet {
 			return m_registers.size();
 		}
 
-		Register *get(unsigned int reg);
-		Register *operator[](unsigned int reg);
+		::Register *get(unsigned int reg);
+		::Register *operator[](unsigned int reg);
+
+		Register *getp(unsigned int reg);
 
 	private:
 		std::vector<Register *> m_registers;

@@ -56,11 +56,15 @@ void RegisterSet::addDefaultRegisters() {
 	addRegister("R15", 0);
 }
 
-Register *RegisterSet::operator[](unsigned int reg) {
+::Register *RegisterSet::operator[](unsigned int reg) {
 	return m_registers[reg];
 }
 
-Register *RegisterSet::get(unsigned int reg) {
+::Register *RegisterSet::get(unsigned int reg) {
+	return m_registers[reg];
+}
+
+Register *RegisterSet::getp(unsigned int reg) {
 	return m_registers[reg];
 }
 

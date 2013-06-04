@@ -87,6 +87,10 @@ void MCU_MSP430::reset() {
 	
 }
 
+RegisterSet *MCU_MSP430::getRegisterSet() {
+	return m_reg;
+}
+
 QString MCU_MSP430::getVariant() {
 	return m_variant->getName();
 }

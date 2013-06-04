@@ -44,5 +44,6 @@ class Register {
 
 		virtual void addWatcher(RegisterWatcher *watcher) = 0;
 		virtual void removeWatcher(RegisterWatcher *watcher) = 0;
+		virtual void callWatchers() = 0;
 };
 

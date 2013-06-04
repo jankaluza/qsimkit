@@ -7,7 +7,7 @@
 #include "CPU/Instructions/InstructionDecoder.h"
 #include "CPU/Instructions/Instruction.h"
 
-using namespace MSP430;
+namespace MSP430 {
 
 class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(InstructionDecoderTest);
@@ -54,7 +54,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(11)->set(55);
+			r->getp(11)->set(55);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -75,8 +75,8 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(1)->set(51);
-			r->get(15)->set(55);
+			r->getp(1)->set(51);
+			r->getp(15)->set(55);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -97,7 +97,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(11)->set(55);
+			r->getp(11)->set(55);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -118,7 +118,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(1)->set(55);
+			r->getp(1)->set(55);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -140,8 +140,8 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(1)->set(55);
-			r->get(11)->set(65);
+			r->getp(1)->set(55);
+			r->getp(11)->set(65);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -195,10 +195,10 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":00000001FF\r\n";
 
 			m->setBigEndian(0x0120, 55);
-			r->get(15)->setBigEndian(0x0120);
+			r->getp(15)->setBigEndian(0x0120);
 
 			m->setBigEndian(0x0130, 50);
-			r->get(1)->setBigEndian(0x0130);
+			r->getp(1)->setBigEndian(0x0130);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -208,7 +208,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) 4, (int) i->opcode);
 			CPPUNIT_ASSERT(i->getSrc());
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getSrc()->getBigEndian());
-			CPPUNIT_ASSERT_EQUAL((int) 0x0122, (int) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int) 0x0122, (int) r->getp(15)->getBigEndian());
 			CPPUNIT_ASSERT(i->getDst());
 			CPPUNIT_ASSERT_EQUAL((int) 50, (int) i->getDst()->getBigEndian());
 		}
@@ -221,7 +221,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":00000001FF\r\n";
 
 			m->setBigEndian(0x0120, 55);
-			r->get(15)->setBigEndian(0x0120);
+			r->getp(15)->setBigEndian(0x0120);
 
 			m->setBigEndian(0x0021, 50);
 
@@ -233,7 +233,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL((int) 4, (int) i->opcode);
 			CPPUNIT_ASSERT(i->getSrc());
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getSrc()->getBigEndian());
-			CPPUNIT_ASSERT_EQUAL((int) 0x0120, (int) r->get(15)->getBigEndian());
+			CPPUNIT_ASSERT_EQUAL((int) 0x0120, (int) r->getp(15)->getBigEndian());
 			CPPUNIT_ASSERT(i->getDst());
 			CPPUNIT_ASSERT_EQUAL((int) 50, (int) i->getDst()->getBigEndian());
 		}
@@ -310,7 +310,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 				":040000030000F00009\r\n"
 				":00000001FF\r\n";
 
-			r->get(15)->set(55);
+			r->getp(15)->set(55);
 
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
@@ -327,3 +327,5 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (InstructionDecoderTest);
+
+}

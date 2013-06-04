@@ -42,12 +42,12 @@ static int execMOV(RegisterSet *reg, Memory *mem, Instruction *i) {
 }
 
 #define SET_ADD_OVERFLOW(REG, R, D, S, B) \
-	REG->get(2)->setBit(SR_V, (!(R & B) && (S & B) && (D & B)) ||\
+	REG->getp(2)->setBit(SR_V, (!(R & B) && (S & B) && (D & B)) ||\
 	((R & B) && !(S & B) && !(D & B)));
 
-#define SET_N(REG, R, B) REG->get(2)->setBit(SR_N, R & B);
-#define SET_Z(REG, R, B) REG->get(2)->setBit(SR_Z, (R & B) == 0);
-#define SET_C(REG, R, B) REG->get(2)->setBit(SR_C, R < 0 || R > B);
+#define SET_N(REG, R, B) REG->getp(2)->setBit(SR_N, R & B);
+#define SET_Z(REG, R, B) REG->getp(2)->setBit(SR_Z, (R & B) == 0);
+#define SET_C(REG, R, B) REG->getp(2)->setBit(SR_C, R < 0 || R > B);
 
 static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 	if (i->bw) {
@@ -55,7 +55,7 @@ static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 		d = (int32_t) i->getDst()->getByte();
 		s = (int32_t) i->getSrc()->getByte();
 		
-		c = carry ? reg->get(2)->isBitSet(SR_C) : 0;
+		c = carry ? reg->getp(2)->isBitSet(SR_C) : 0;
 		r = d + s + c;
 		i->getDst()->setByte(r);
 		i->getDst()->callWatchers();
@@ -64,13 +64,13 @@ static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
 		SET_C(reg, r, 0xff);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r, c;
 		d = (int32_t) i->getDst()->getBigEndian();
 		s = (int32_t) i->getSrc()->getBigEndian();
-		c = carry ? reg->get(2)->isBitSet(SR_C) : 0;
+		c = carry ? reg->getp(2)->isBitSet(SR_C) : 0;
 		r = d + s + c;
 		i->getDst()->setBigEndian(r);
 		i->getDst()->callWatchers();
@@ -79,7 +79,7 @@ static int add(RegisterSet *reg, Memory *mem, Instruction *i, bool carry) {
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
 		SET_C(reg, r, 0xffff);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->callWatchers();
 	}
 	return 0;	
 }
@@ -93,17 +93,17 @@ static int execADDC(RegisterSet *reg, Memory *mem, Instruction *i) {
 }
 
 #define SET_SUB_OVERFLOW(REG, R, D, S, B) \
-	REG->get(2)->setBit(SR_V, !(R & B) && !(S & B) && (D & B) ||\
+	REG->getp(2)->setBit(SR_V, !(R & B) && !(S & B) && (D & B) ||\
 	((R & B) && (S & B) && !(D & B)));
 
-#define SET_SUB_C(REG, R, B) REG->get(2)->setBit(SR_C, !(R < 0 || R > B));
+#define SET_SUB_C(REG, R, B) REG->getp(2)->setBit(SR_C, !(R < 0 || R > B));
 
 static int sub(RegisterSet *reg, Memory *mem, Instruction *i, bool store, bool carry) {
 	if (i->bw) {
 		int32_t d, s, r, c;
 		d = (int32_t) i->getDst()->getByte();
 		s = (int32_t) i->getSrc()->getByte();
-		c = carry ? reg->get(2)->isBitSet(SR_C) : 1;
+		c = carry ? reg->getp(2)->isBitSet(SR_C) : 1;
 		r = d + ((~s) & 0xff) + c;
 		if (store) {
 			i->getDst()->setByte(r);
@@ -114,13 +114,13 @@ static int sub(RegisterSet *reg, Memory *mem, Instruction *i, bool store, bool c
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
 		SET_C(reg, r, 0xff);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r, c;
 		d = (int32_t) i->getDst()->getBigEndian();
 		s = (int32_t) i->getSrc()->getBigEndian();
-		c = carry ? reg->get(2)->isBitSet(SR_C) : 1;
+		c = carry ? reg->getp(2)->isBitSet(SR_C) : 1;
 		r = d + ((~s) & 0xffff) + c;
 		if (store) {
 			i->getDst()->setBigEndian(r);
@@ -132,7 +132,7 @@ static int sub(RegisterSet *reg, Memory *mem, Instruction *i, bool store, bool c
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
 		SET_C(reg, r, 0xffff);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->callWatchers();
 	}
 	return 0;
 }
@@ -159,8 +159,8 @@ static int execBIT(RegisterSet *reg, Memory *mem, Instruction *i) {
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
 		SET_C(reg, r, 0xff);
-		reg->get(2)->setBit(SR_V, 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, 0);
+		reg->getp(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r;
@@ -171,8 +171,8 @@ static int execBIT(RegisterSet *reg, Memory *mem, Instruction *i) {
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
 		SET_C(reg, r, 0xffff);
-		reg->get(2)->setBit(SR_V, 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, 0);
+		reg->getp(2)->callWatchers();
 	}
 	return 0;
 }
@@ -228,9 +228,9 @@ static int execXOR(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
-		reg->get(2)->setBit(SR_V, d < 0 && s < 0);
-		reg->get(2)->setBit(SR_C, r != 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, d < 0 && s < 0);
+		reg->getp(2)->setBit(SR_C, r != 0);
+		reg->getp(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r;
@@ -242,9 +242,9 @@ static int execXOR(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
-		reg->get(2)->setBit(SR_V, d < 0 && s < 0);
-		reg->get(2)->setBit(SR_C, r != 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, d < 0 && s < 0);
+		reg->getp(2)->setBit(SR_C, r != 0);
+		reg->getp(2)->callWatchers();
 	}
 	return 0;
 }
@@ -260,9 +260,9 @@ static int execAND(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 		SET_N(reg, r, 0x80);
 		SET_Z(reg, r, 0xff);
-		reg->get(2)->setBit(SR_V, 0);
-		reg->get(2)->setBit(SR_C, r != 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, 0);
+		reg->getp(2)->setBit(SR_C, r != 0);
+		reg->getp(2)->callWatchers();
 	}
 	else {
 		int32_t d, s, r;
@@ -274,9 +274,9 @@ static int execAND(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 		SET_N(reg, r, 0x8000);
 		SET_Z(reg, r, 0xffff);
-		reg->get(2)->setBit(SR_V, 0);
-		reg->get(2)->setBit(SR_C, r != 0);
-		reg->get(2)->callWatchers();
+		reg->getp(2)->setBit(SR_V, 0);
+		reg->getp(2)->setBit(SR_C, r != 0);
+		reg->getp(2)->callWatchers();
 	}
 	return 0;
 }

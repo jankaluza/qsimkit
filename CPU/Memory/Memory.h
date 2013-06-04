@@ -24,6 +24,8 @@
 #include <vector>
 #include <map>
 
+#include "../../GUI/MCU/Memory.h"
+
 namespace MSP430 {
 
 class RegisterSet;
@@ -37,7 +39,7 @@ class MemoryWatcher {
 		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint8_t &value) {}
 };
 
-class Memory {
+class Memory : public ::Memory {
 	public:
 		typedef enum { Read, Write, ReadWrite } Mode;
 		Memory(unsigned int size);

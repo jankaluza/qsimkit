@@ -59,7 +59,7 @@ void InterruptManager::handleInstruction(Instruction *instruction) {
 void InterruptManager::runInterrupt(int vector) {
 // 	std::cerr << "running interrupt vector " << vector << "\n";
 	uint16_t v;
-	Register *sp = m_reg->get(1);
+	Register *sp = m_reg->getp(1);
 
 	// Push PC on stack
 	v = sp->getBigEndian() - 2;

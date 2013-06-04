@@ -30,6 +30,8 @@
 
 namespace MSP430 {
 
+class Memory;
+class RegisterSet;
 class InstructionDecoder;
 class Instruction;
 class InterruptManager;
@@ -38,8 +40,6 @@ class BasicClock;
 
 class Timer;
 class AdevsTimerFactory;
-class Memory;
-class RegisterSet;
 
 class Variant;
 
@@ -101,9 +101,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 		virtual void save(QTextStream &stream);
 		virtual void load(QDomElement &object);
 
-		RegisterSet *getRegisterSet() {
-			return m_reg;
-		}
+		RegisterSet *getRegisterSet();
 
 		Memory *getMemory() {
 			return m_mem;
@@ -132,8 +130,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 		double m_time;
 		double m_instructionCycles;
 
-		Memory *m_mem;
-		RegisterSet *m_reg;
+		MSP430::Memory *m_mem;
+		MSP430::RegisterSet *m_reg;
 		MSP430::InstructionDecoder *m_decoder;
 		MSP430::Instruction *m_instruction;
 		Variant *m_variant;

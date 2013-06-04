@@ -25,6 +25,8 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
+#include "../../GUI/MCU/Register.h"
+
 namespace MSP430 {
 
 /// Status register bits
@@ -40,12 +42,12 @@ namespace MSP430 {
 
 class Register;
 
-class RegisterWatcher {
-	public:
-		virtual bool handleRegisterChanged(Register *reg, int id, uint16_t value) = 0;
-};
+// class RegisterWatcher {
+// 	public:
+// 		virtual bool handleRegisterChanged(Register *reg, int id, uint16_t value) = 0;
+// };
 
-class Register : public InstructionArgument {
+class Register : public InstructionArgument, public ::Register {
 	public:
 		Register(int id, const std::string &name, uint16_t value, const std::string &desc = "");
 		virtual ~Register();

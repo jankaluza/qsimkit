@@ -30,56 +30,56 @@
 namespace MSP430 {
 
 static int execJNZ(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (!reg->get(2)->isBitSet(SR_Z)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (!reg->getp(2)->isBitSet(SR_Z)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJZ(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (reg->get(2)->isBitSet(SR_Z)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (reg->getp(2)->isBitSet(SR_Z)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJNC(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (!reg->get(2)->isBitSet(SR_C)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (!reg->getp(2)->isBitSet(SR_C)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJC(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (reg->get(2)->isBitSet(SR_C)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (reg->getp(2)->isBitSet(SR_C)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJN(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (reg->get(2)->isBitSet(SR_N)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (reg->getp(2)->isBitSet(SR_N)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJGE(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (!(reg->get(2)->isBitSet(SR_N) ^ reg->get(2)->isBitSet(SR_V))) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (!(reg->getp(2)->isBitSet(SR_N) ^ reg->getp(2)->isBitSet(SR_V))) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJL(RegisterSet *reg, Memory *mem, Instruction *i) {
-	if (reg->get(2)->isBitSet(SR_N) ^ reg->get(2)->isBitSet(SR_V)) {
-		reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	if (reg->getp(2)->isBitSet(SR_N) ^ reg->getp(2)->isBitSet(SR_V)) {
+		reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	}
 	return 0;
 }
 
 static int execJMP(RegisterSet *reg, Memory *mem, Instruction *i) {
-	reg->get(0)->setBigEndian(reg->get(0)->getBigEndian() + i->offset);
+	reg->getp(0)->setBigEndian(reg->getp(0)->getBigEndian() + i->offset);
 	return 0;
 }
 

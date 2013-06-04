@@ -68,7 +68,7 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 		switch (as) {
 			// Normal access
 			case 0:
-				arg = m_reg->get(2);
+				arg = m_reg->getp(2);
 				break;
 			// Absolute mode
 			case 1:
@@ -121,12 +121,12 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 		switch (as) {
 			// Register direct
 			case 0:
-				arg = m_reg->get(source_reg);
+				arg = m_reg->getp(source_reg);
 				break;
 			// Indexed mode
 			case 1:
 				arg = m_srcIndexedArg;
-				m_srcIndexedArg->reinitialize(m_reg->get(source_reg), m_mem->getBigEndian(pc));
+				m_srcIndexedArg->reinitialize(m_reg->getp(source_reg), m_mem->getBigEndian(pc));
 				pc += 2;
 				cycles += 2; // fetch + read
 				break;
@@ -134,7 +134,7 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 			case 2:
 				// simulate Indirect with indexed with offset 0
 				arg = m_srcIndexedArg;
-				m_srcIndexedArg->reinitialize(m_reg->get(source_reg), 0);
+				m_srcIndexedArg->reinitialize(m_reg->getp(source_reg), 0);
 				cycles += 1; // target mem read
 				break;
 			case 3:
@@ -148,7 +148,7 @@ InstructionArgument *InstructionDecoder::getSourceArg(int &cycles, uint16_t &pc,
 				else {
 					// Indirect autoincrement
 					arg = m_srcIndirectAutoArg;
-					m_srcIndirectAutoArg->reinitialize(m_reg->get(source_reg), bw);
+					m_srcIndirectAutoArg->reinitialize(m_reg->getp(source_reg), bw);
 					cycles += 1; // read
 				}
 				break;
@@ -164,7 +164,7 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 	InstructionArgument *arg = 0;
 
 	if (ad == 0) {
-		arg = m_reg->get(dest_reg);
+		arg = m_reg->getp(dest_reg);
 		if (dest_reg == 0) {
 			cycles += 1; // Modifying PC needs 1 more cycle
 		}
@@ -180,7 +180,7 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 		else {
 			// Indexed
 			arg = m_dstIndexedArg;
-			m_dstIndexedArg->reinitialize(m_reg->get(dest_reg), m_mem->getBigEndian(pc));
+			m_dstIndexedArg->reinitialize(m_reg->getp(dest_reg), m_mem->getBigEndian(pc));
 			pc += 2;
 			cycles += 3; // fetch, read from memory, write back
 		}
@@ -190,7 +190,7 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 }
 
 int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
-	Register *pc_reg = m_reg->get(0);
+	Register *pc_reg = m_reg->getp(0);
 	uint16_t pc = pc_reg->getBigEndian();
 
 	uint16_t data = m_mem->getBigEndian(pc);

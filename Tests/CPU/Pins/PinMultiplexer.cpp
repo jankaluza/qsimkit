@@ -10,7 +10,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 
-using namespace MSP430;
+namespace MSP430 {
 
 class DummyPinHandler : public PinHandler {
 	public:
@@ -135,3 +135,5 @@ class PinMultiplexerTest : public CPPUNIT_NS :: TestFixture{
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (PinMultiplexerTest);
+
+}

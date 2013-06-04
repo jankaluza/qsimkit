@@ -14,7 +14,7 @@
 #include "CPU/Pins/PinManager.h"
 #include "CPU/Pins/PinMultiplexer.h"
 
-using namespace MSP430;
+namespace MSP430 {
 
 class DummyTimerFactory : public TimerFactory {
 	public:
@@ -487,3 +487,5 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION (TimerTest);
+
+}
