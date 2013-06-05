@@ -120,6 +120,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 			return m_elf;
 		}
 
+		DisassembledCode getDisassembledCode();
+
 	private:
 		void setPinType(const QString &name, MSP430::PinType &type, int &subtype);
 

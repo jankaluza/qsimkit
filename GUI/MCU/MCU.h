@@ -35,22 +35,23 @@ class Memory;
 class RegisterSet;
 
 class DisassembledLine {
-	typedef enum {Instruction, Code, Section} Type;
+	public:
+		typedef enum {Instruction, Code, Section} Type;
 
-	DisassembledLine(uint16_t addr, Type type = Instruction, const QString &data = "") :
-		m_addr(addr), m_type(type), m_data(data) {}
+		DisassembledLine(uint16_t addr, Type type = Instruction, const QString &data = "") :
+			m_addr(addr), m_type(type), m_data(data) {}
 
-	uint16_t getAddr() {
-		return m_addr;
-	}
+		uint16_t getAddr() const {
+			return m_addr;
+		}
 
-	const Type &getType() {
-		return m_type;
-	}
+		const Type &getType() const {
+			return m_type;
+		}
 
-	const QString &getData() {
-		return m_data;
-	}
+		const QString &getData() const {
+			return m_data;
+		}
 
 	private:
 		uint16_t m_addr;
@@ -70,17 +71,12 @@ class MCU : public Peripheral {
 
 		virtual QStringList getVariants() = 0;
 
-		virtual bool loadA43(const QString &data) = 0;
-
-		virtual const QString &getA43() = 0;
-
 		virtual RegisterSet *getRegisterSet() = 0;
 
 		virtual Memory *getMemory() = 0;
 
-		virtual void loadELF(const QByteArray &elf) = 0;
+		virtual DisassembledCode getDisassembledCode() = 0;
 
-		virtual const QByteArray &getELF() = 0;
 
 	signals:
 		void onCodeLoaded();

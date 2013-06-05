@@ -19,48 +19,14 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QByteArray>
 #include <QString>
-#include <QTimer>
-#include <DockWidgets/DockWidget.h>
-#include <QTreeWidgetItem>
-#include <QList>
-#include <stdint.h>
 
-#include "ui_Disassembler.h"
+#include "MCU/MCU.h"
 
-class MCU;
-class QSimKit;
+namespace CodeUtil {
 
-class Disassembler : public DockWidget, public Ui::Disassembler
-{
-	Q_OBJECT
+	DisassembledCode disassemble(const QByteArray &elf, const QString &a43);
 
-	public:
-		Disassembler(QSimKit *simkit);
-
-		void setMCU(MCU *mcu);
-
-		void refresh();
-
-		void showSourceCode(bool show);
-
-	public slots:
-		void handleContextMenu(const QPoint &point);
-		void reloadCode();
-
-	private:
-		void addBreakpoint();
-		void removeBreakpoint();
-		void addSourceLine(const QString &line);
-		void addInstructionLine(uint16_t addr, const QString &line);
-		void addSectionLine(uint16_t addr, const QString &line);
-
-	private:
-		MCU *m_mcu;
-		QSimKit *m_simkit;
-		QTreeWidgetItem *m_currentItem;
-		QList<QTreeWidgetItem *> m_breakpoints;
-		bool m_showSource;
-};
+}
 

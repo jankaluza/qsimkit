@@ -33,6 +33,7 @@
 #include "CPU/BasicClock/MCLK.h"
 
 #include "Package.h"
+#include "CodeUtil.h"
 #include "SimulationObjects/Timer/AdevsTimerFactory.h"
 #include "SimulationObjects/Timer/Timer.h"
 #include "PeripheralItem/MSP430PeripheralItem.h"
@@ -283,6 +284,10 @@ void MCU_MSP430::paint(QWidget *screen) {
 		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
 					"No code loaded. Load the code using\n\"File->Load ELF\" menu option.");
 	}
+}
+
+DisassembledCode MCU_MSP430::getDisassembledCode() {
+	return CodeUtil::disassemble(m_elf, m_code);
 }
 
 MCU *MSP430Interface::create(const QString &variant) {

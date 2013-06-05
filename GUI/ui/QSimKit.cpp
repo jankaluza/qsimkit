@@ -61,8 +61,6 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
 
 	m_breakpointManager = new BreakpointManager();
 
-	connect(actionLoad_A43, SIGNAL(triggered()), this, SLOT(loadA43()) );
-	connect(actionLoad_ELF, SIGNAL(triggered()), this, SLOT(loadELF()) );
 	connect(actionNew_project, SIGNAL(triggered()), this, SLOT(newProject()) );
 	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
 	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
@@ -290,66 +288,6 @@ void QSimKit::loadProject() {
 	}
 
 	loadProject(filename);
-}
-
-bool QSimKit::loadA43File(const QString &f) {
-	if (!screen->getMCU()) {
-		newProject();
-		if (!screen->getMCU()) {
-			return false;
-		}
-	}
-
-	QFile file(f);
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-		return false;
-
-	bool ret = screen->getMCU()->loadA43(file.readAll().data());
-	m_disassembler->reloadCode();
-	return ret;
-}
-
-void QSimKit::loadA43() {
-	QString filename = QFileDialog::getOpenFileName(this);
-	if (filename.isEmpty()) {
-		return;
-	}
-
-	loadA43File(filename);
-}
-
-bool QSimKit::loadELFFile(const QString &f) {
-	if (!screen->getMCU()) {
-		newProject();
-		if (!screen->getMCU()) {
-			return false;
-		}
-	}
-
-	QFile file(f);
-	if (!file.open(QIODevice::ReadOnly))
-		return false;
-
-	QByteArray elf = file.readAll();
-	QString a43 = m_disassembler->ELFToA43(elf);
-
-	screen->getMCU()->loadELF(elf);
-
-	qDebug() << a43;
-	bool ret = screen->getMCU()->loadA43(a43.toAscii().data());
-	m_disassembler->reloadCode();
-	return ret;
-}
-
-void QSimKit::loadELF() {
-	QString filename = QFileDialog::getOpenFileName(this);
-	if (filename.isEmpty()) {
-		return;
-	}
-
-	if (!loadELFFile(filename)) {
-		qDebug() << "Error while loading ELF file";
-	}
 }
 
 void QSimKit::projectOptions() {

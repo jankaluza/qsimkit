@@ -45,8 +45,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 	public:
 		QSimKit(QWidget *parent = 0);
 
-		bool loadA43File(const QString &file);
-		bool loadELFFile(const QString &file);
 		bool loadProject(const QString &file);
 
 		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
@@ -62,8 +60,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		Screen *getScreen();
 
 	public slots:
-		void loadA43();
-		void loadELF();
 		void newProject();
 		void saveProject();
 		void loadProject();

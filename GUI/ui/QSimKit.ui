@@ -63,8 +63,6 @@
     <addaction name="actionLoad_project"/>
     <addaction name="actionSave_project"/>
     <addaction name="separator"/>
-    <addaction name="actionLoad_A43"/>
-    <addaction name="actionLoad_ELF"/>
     <addaction name="actionProject_options"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>

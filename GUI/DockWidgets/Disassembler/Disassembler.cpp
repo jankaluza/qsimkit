@@ -122,63 +122,23 @@ void Disassembler::addSourceLine(const QString &line) {
 	item->setFont(1, f);
 }
 
-void Disassembler::parseCode(const QString &code) {
-	QStringList lines = code.split("\n", QString::SkipEmptyParts);
-	for (int i = 0; i < lines.size(); ++i) {
-		QString &line = lines[i];
-		if (line[0] == ' ') {
-			if (line.startsWith("   ") && line[8] == ':') {
-				QString l = line.simplified();
+void Disassembler::addInstructionLine(uint16_t addr, const QString &line) {
+	QTreeWidgetItem *item = new QTreeWidgetItem(view);
+	item->setText(0, QString("%1").arg(addr));
+	item->setText(1, "  " + line);
+	item->setBackground(0, view->palette().window());
+}
 
-				QString addr = l.left(l.indexOf(':'));
-				int x;
-				int c = 0;
-				for (x = l.indexOf(':') + 1; x < l.size(); ++x) {
-					if (!l[x].isNumber() && !l[x].isSpace() || (l[x].isSpace() && c > 2)) {
-						if (l[x] >= 'a' && l[x] <= 'f') {
-							c++;
-							continue;
-						}
-						if (!l[x - 1].isSpace() && !l[x - 1].isNumber()) {
-							x -= c;
-						}
-						break;
-					}
-					c = 0;
-				}
-				QString inst = l.mid(x);
-
-				if (inst.isEmpty()) {
-					continue;
-				}
-
-				QTreeWidgetItem *item = new QTreeWidgetItem(view);
-				item->setText(0, addr);
-				item->setText(1, "  " + inst);
-				item->setBackground(0, view->palette().window());
-			}
-			else {
-				addSourceLine(line);
-			}
-		}
-		else if (line[0] == '0') {
-			QTreeWidgetItem *item = new QTreeWidgetItem(view);
-			QString addr = line.left(8).right(4);
-			item->setText(0, addr);
-			item->setText(1, line.mid(9));
-			QFont f = item->font(1);
-			f.setBold(true);
-			item->setFont(0, f);
-			item->setFont(1, f);
-			item->setBackground(0, view->palette().window());
-			item->setBackground(1, view->palette().window());
-		}
-		else if (i > 2) {
-			addSourceLine(line);
-		}
-	}
-
-	view->resizeColumnToContents(0);
+void Disassembler::addSectionLine(uint16_t addr, const QString &line) {
+	QTreeWidgetItem *item = new QTreeWidgetItem(view);
+	item->setText(0, QString("%1").arg(addr));
+	item->setText(1, line);
+	QFont f = item->font(1);
+	f.setBold(true);
+	item->setFont(0, f);
+	item->setFont(1, f);
+	item->setBackground(0, view->palette().window());
+	item->setBackground(1, view->palette().window());
 }
 
 void Disassembler::reloadCode() {
@@ -189,61 +149,22 @@ void Disassembler::reloadCode() {
 		return;
 	}
 
-	bool elf = true;
-	QByteArray code = m_mcu->getELF();
-	if (code.isEmpty()) {
-		elf = false;
-		code = m_mcu->getA43().toAscii();
+	DisassembledCode code = m_mcu->getDisassembledCode();
+	foreach(const DisassembledLine &l, code) {
+		switch(l.getType()) {
+			case DisassembledLine::Code:
+				addSourceLine(l.getData());
+				break;
+			case DisassembledLine::Instruction:
+				addInstructionLine(l.getAddr(), l.getData());
+				break;
+			case DisassembledLine::Section:
+				addSectionLine(l.getAddr(), l.getData());
+				break;
+		}
 	}
 
-	QFile file("test.dump");
-	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
-		return;
-
-	file.write(code);
-	file.close();
-
-	QProcess objdump;
-	if (elf) {
-		objdump.start("msp430-objdump", QStringList() << "-dS" << "test.dump");
-	}
-	else {
-		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp:43" << "test.dump");
-	}
-	
-	if (!objdump.waitForStarted()) {
-		return;
-	}
-
-	if (!objdump.waitForFinished())
-		return;
-
-	QString result = QString(objdump.readAll());
-	parseCode(result);
-}
-
-QString Disassembler::ELFToA43(const QByteArray &elf) {
-	QFile file("test.dump");
-	if (!file.open(QFile::WriteOnly | QFile::Truncate))
-		return "";
-
-	file.write(elf);
-	file.close();
-
-	QProcess objdump;
-	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << "test.dump" << "test.a43");
-	if (!objdump.waitForStarted()) {
-		return "";
-	}
-
-	if (!objdump.waitForFinished())
-		return "";
-
-	QFile file2("test.a43");
-	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text))
-		return "";
-
-	return file2.readAll();
+	view->resizeColumnToContents(0);
 }
 
 void Disassembler::refresh() {
@@ -264,6 +185,7 @@ void Disassembler::refresh() {
 
 void Disassembler::setMCU(MCU *mcu) {
 	m_mcu = mcu;
+	connect(m_mcu, SIGNAL(onCodeLoaded()), this, SLOT(reloadCode()) );
 	reloadCode();
 	refresh();
 }
