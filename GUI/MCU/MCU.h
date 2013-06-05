@@ -40,6 +40,10 @@ class DisassembledLine {
 	DisassembledLine(uint16_t addr, Type type = Instruction, const QString &data = "") :
 		m_addr(addr), m_type(type), m_data(data) {}
 
+	uint16_t getAddr() {
+		return m_addr;
+	}
+
 	const Type &getType() {
 		return m_type;
 	}
