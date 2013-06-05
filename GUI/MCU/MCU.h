@@ -24,7 +24,7 @@
 #include <QStringList>
 #include <QChar>
 #include <QRect>
-#include <QMap>
+#include <QList>
 #include <stdint.h>
 
 #include "ui/ScreenObject.h"
@@ -37,8 +37,8 @@ class RegisterSet;
 class DisassembledLine {
 	typedef enum {Instruction, Code, Section} Type;
 
-	DisassembledLine(Type type = Instruction, const QString &data = "") :
-		m_type(type), m_data(data) {}
+	DisassembledLine(uint16_t addr, Type type = Instruction, const QString &data = "") :
+		m_addr(addr), m_type(type), m_data(data) {}
 
 	const Type &getType() {
 		return m_type;
@@ -49,11 +49,12 @@ class DisassembledLine {
 	}
 
 	private:
+		uint16_t m_addr;
 		Type m_type;
 		QString m_data;
 };
 
-typedef QMap<uint16_t, DisassembledLine> DisassembledCode;
+typedef QList<DisassembledLine> DisassembledCode;
 
 class MCU : public Peripheral {
 	Q_OBJECT
