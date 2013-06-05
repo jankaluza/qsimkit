@@ -24,7 +24,8 @@
 #include <QStringList>
 #include <QChar>
 #include <QRect>
-#include <map>
+#include <QMap>
+#include <stdint.h>
 
 #include "ui/ScreenObject.h"
 #include "Peripherals/Peripheral.h"
@@ -33,7 +34,30 @@
 class Memory;
 class RegisterSet;
 
+class DisassembledLine {
+	typedef enum {Instruction, Code, Section} Type;
+
+	DisassembledLine(Type type = Instruction, const QString &data = "") :
+		m_type(type), m_data(data) {}
+
+	const Type &getType() {
+		return m_type;
+	}
+
+	const QString &getData() {
+		return m_data;
+	}
+
+	private:
+		Type m_type;
+		QString m_data;
+};
+
+typedef QMap<uint16_t, DisassembledLine> DisassembledCode;
+
 class MCU : public Peripheral {
+	Q_OBJECT
+
 	public:
 		MCU() {}
 
@@ -52,6 +76,9 @@ class MCU : public Peripheral {
 		virtual void loadELF(const QByteArray &elf) = 0;
 
 		virtual const QByteArray &getELF() = 0;
+
+	signals:
+		void onCodeLoaded();
 
 };
 
