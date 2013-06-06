@@ -81,6 +81,7 @@ void InterruptManager::runInterrupt(int vector) {
 
 	// Load content of interrupt vector to PC
 	m_reg->get(0)->setBigEndian(m_mem->getBigEndian(m_variant->getINTVECT() + vector));
+	m_reg->getp(0)->callWatchers();
 
 	m_runningInterrupts.push_back(vector);
 }
