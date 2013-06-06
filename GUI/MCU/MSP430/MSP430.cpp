@@ -295,14 +295,17 @@ void MCU_MSP430::loadA43Option() {
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return;
 
+	m_elf.clear();
 	loadA43(file.readAll().data());
 }
 
 void MCU_MSP430::loadELF(const QByteArray &elf) {
 	m_elf = elf;
 
-	QString a43 = CodeUtil::ELFToA43(elf);
-	loadA43(a43);
+	if (!m_elf.isEmpty()) {
+		QString a43 = CodeUtil::ELFToA43(elf);
+		loadA43(a43);
+	}
 }
 
 void MCU_MSP430::loadELFOption() {

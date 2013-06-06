@@ -21,7 +21,7 @@
 #define RED_LED BIT0
 
 #define ONE_SECOND	150	/*  125 = SMCLK/8/1000 */
-#define COMPARE_VAL	10000	/* 1000 = SMCLK/8/125  */
+#define COMPARE_VAL	1260	/* 1000 = SMCLK/8/125  */
 
 volatile unsigned int count = 0;
 
@@ -62,7 +62,9 @@ main(void)
 
 	__enable_interrupt();
 
+	int lol = 1;
 	while(1) {
+		lol++;
 		/*  all work is done in the ISR */
 	}
 

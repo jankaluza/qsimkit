@@ -11,7 +11,7 @@
 #include <signal.h>
 
 #define REDLED		BIT0
-#define GREENLED	BIT6
+#define GREENLED	BIT2
 #define BUTTON		BIT3
 #define DCOCTL_MASK 	0xe0	//0b11100000
 #define BCSCTL1_MASK	0x0f	//0b00001111
@@ -31,7 +31,7 @@ int main (void)
 	WDTCTL = WDTPW + WDTHOLD;
 	
 	P1OUT = 0;                  
-	P1DIR = GREENLED;
+	P1DIR = GREENLED | BIT0;
 
 	P1IES |= BUTTON;	// high -> low is selected with IES.x = 1
 
@@ -45,7 +45,7 @@ int main (void)
 	DCO3(6,3);
 
 	for (;;){
-		blink(GREENLED, 5);
+		blink(GREENLED | BIT0, 5);
 	}
 }
 

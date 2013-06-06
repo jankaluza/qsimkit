@@ -82,7 +82,6 @@ TimerAItem::TimerAItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	ADD_ITEM(v->getTA1CCTL4(), "TA1CCTL4");
 	ADD_ITEM(v->getTA1CCR4(), "TA1CCR4");
 	ADD_ITEM(v->getTA1IV(), "TA1IV");
-
 }
 
 TimerAItem::~TimerAItem() {
