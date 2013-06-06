@@ -17,30 +17,45 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "PlotHeader.h"
 
-#include <QDockWidget>
+#include <QWidget>
+#include <QPainter>
+#include <QAction>
+#include <QMenu>
+#include <QToolTip>
 #include <QString>
-#include <QTimer>
+#include <QMouseEvent>
+#include <QDebug>
 
-#include "ui_TrackedPins.h"
+PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
+	m_layout = new QHBoxLayout(this);
+	m_layout->setContentsMargins(0, 0, 0, 0);
+	setLayout(m_layout);
 
-class QSimKit;
-class PinHistory;
+	m_label = new QLabel(" Tracked pins:");
 
-class TrackedPins : public QDockWidget, public Ui::TrackedPins
-{
-	Q_OBJECT
+	m_layout->addWidget(m_label);
+	m_layout->addStretch();
+}
 
-	public:
-		TrackedPins(QSimKit *simkit, QWidget *parent = 0);
+PlotHeader::~PlotHeader() {
 
-	private slots:
-		void handleSimulationStarted(bool wasPaused);
-		void handleSimulationStep(double t);
+}
 
-	private:
-		QSimKit *m_simkit;
-		QList<PinHistory *> m_history;
-};
+void PlotHeader::clear() {
+	while (!m_pins.isEmpty()) {
+		m_layout->removeWidget(m_pins[0]);
+		delete m_pins[0];
+		m_pins.removeFirst();
+	}
+}
 
+void PlotHeader::addPin(const QString &label) {
+	QToolButton *button = new QToolButton(this);
+	button->setText(label);
+	button->setCheckable(true);
+	
+	m_layout->insertWidget(m_layout->count() - 1, button);
+	m_pins.append(button);
+}

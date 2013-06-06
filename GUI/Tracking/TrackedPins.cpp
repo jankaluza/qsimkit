@@ -42,18 +42,25 @@ QDockWidget(parent), m_simkit(simkit) {
 
 	connect(m_simkit, SIGNAL(onSimulationStep(double)), this, SLOT(handleSimulationStep(double)));
 	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
+
+	setTitleBarWidget(plotHeader);
 }
 
 void TrackedPins::handleSimulationStarted(bool wasPaused) {
+	m_history.clear();
+	plotHeader->clear();
+
 	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
 	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
 		QList<PinHistory *> &history = (*it).second->getPinHistory();
 		for (int i = 0; i < history.size(); ++i) {
 			if (history[i]) {
-				plot->showPinHistory(history[i]);
+				m_history.append(history[i]);
+				plotHeader->addPin((*it).first->getPins()[i].name);
 			}
 		}
 	}
+
 	plot->repaint();
 }
 

@@ -19,28 +19,32 @@
 
 #pragma once
 
-#include <QDockWidget>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
+#include <QList>
+#include <QToolButton>
+#include <QHBoxLayout>
+#include <QLabel>
 
-#include "ui_TrackedPins.h"
-
-class QSimKit;
-class PinHistory;
-
-class TrackedPins : public QDockWidget, public Ui::TrackedPins
+class PlotHeader : public QWidget
 {
 	Q_OBJECT
 
 	public:
-		TrackedPins(QSimKit *simkit, QWidget *parent = 0);
+		PlotHeader(QWidget *parent = 0);
+		~PlotHeader();
 
-	private slots:
-		void handleSimulationStarted(bool wasPaused);
-		void handleSimulationStep(double t);
+		void addPin(const QString &label);
+
+		void clear();
+
+	signals:
+		void onPinChanged(int pin, bool enabled);
 
 	private:
-		QSimKit *m_simkit;
-		QList<PinHistory *> m_history;
+		QList<QToolButton *> m_pins;
+		QHBoxLayout *m_layout;
+		QLabel *m_label;
+
 };
 
