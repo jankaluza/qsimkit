@@ -19,12 +19,118 @@
 
 #include "CodeUtil.h"
 
+#include <QFile>
+#include <QProcess>
+
 namespace CodeUtil {
+	
+static void parseCode(DisassembledCode &dc, QString &code) {
+	QStringList lines = code.split("\n", QString::SkipEmptyParts);
+	for (int i = 0; i < lines.size(); ++i) {
+		QString &line = lines[i];
+		if (line[0] == ' ') {
+			if (line.startsWith("   ") && line[8] == ':') {
+				QString l = line.simplified();
+
+				QString addr = l.left(l.indexOf(':'));
+				int x;
+				int c = 0;
+				for (x = l.indexOf(':') + 1; x < l.size(); ++x) {
+					if (!l[x].isNumber() && !l[x].isSpace() || (l[x].isSpace() && c > 2)) {
+						if (l[x] >= 'a' && l[x] <= 'f') {
+							c++;
+							continue;
+						}
+						if (!l[x - 1].isSpace() && !l[x - 1].isNumber()) {
+							x -= c;
+						}
+						break;
+					}
+					c = 0;
+				}
+				QString inst = l.mid(x);
+
+				if (inst.isEmpty()) {
+					continue;
+				}
+
+				dc.append(DisassembledLine(addr.toInt(0, 16), DisassembledLine::Instruction, inst));
+			}
+			else {
+				dc.append(DisassembledLine(0, DisassembledLine::Code, line));
+			}
+		}
+		else if (line[0] == '0') {
+			QString addr = line.left(8).right(4);
+			dc.append(DisassembledLine(addr.toInt(0, 16), DisassembledLine::Section, line.mid(9)));
+		}
+		else if (i > 2) {
+			
+			dc.append(DisassembledLine(0, DisassembledLine::Code, line));
+		}
+	}
+}
 
 DisassembledCode disassemble(const QByteArray &elf, const QString &a43) {
-	DisassembledCode code;
+	DisassembledCode dc;
 
-	return code;
+	bool hasELF = true;
+	QByteArray code = elf;
+	if (code.isEmpty()) {
+		hasELF = false;
+		code = a43.toAscii();
+	}
+
+	QFile file("test.dump");
+	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
+		return dc;
+
+	file.write(code);
+	file.close();
+
+	QProcess objdump;
+	if (hasELF) {
+		objdump.start("msp430-objdump", QStringList() << "-dS" << "test.dump");
+	}
+	else {
+		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp:43" << "test.dump");
+	}
+	
+	if (!objdump.waitForStarted()) {
+		return dc;
+	}
+
+	if (!objdump.waitForFinished())
+		return dc;
+
+	QString result = QString(objdump.readAll());
+	parseCode(dc, result);
+
+	return dc;
+}
+
+QString ELFToA43(const QByteArray &elf) {
+	QFile file("test.dump");
+	if (!file.open(QFile::WriteOnly | QFile::Truncate))
+		return "";
+
+	file.write(elf);
+	file.close();
+
+	QProcess objdump;
+	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << "test.dump" << "test.a43");
+	if (!objdump.waitForStarted()) {
+		return "";
+ 	}
+ 
+	if (!objdump.waitForFinished())
+		return "";
+
+	QFile file2("test.a43");
+	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text))
+		return "";
+
+	return file2.readAll();
 }
 
 }

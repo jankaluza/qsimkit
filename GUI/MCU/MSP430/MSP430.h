@@ -87,9 +87,6 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 			return m_pins;
 		}
 
-		void refreshPins();
-
-		void refreshGP(const QString &prefix, uint16_t dir, uint16_t out);
 
 		void handlePinChanged(int id, double value);
 
@@ -108,22 +105,13 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 			return m_mem;
 		}
 
-		const QString &getA43() {
-			return m_code;
-		}
-
-		void loadELF(const QByteArray &elf) {
-			m_elf = elf;
-		}
-
-		const QByteArray &getELF() {
-			return m_elf;
-		}
+		void loadELF(const QByteArray &elf);
 
 		DisassembledCode getDisassembledCode();
 
 	private:
-		void setPinType(const QString &name, MSP430::PinType &type, int &subtype);
+		void loadELFOption();
+		void loadA43Option();
 
 	private:
 		std::map<int, QChar> m_sides;

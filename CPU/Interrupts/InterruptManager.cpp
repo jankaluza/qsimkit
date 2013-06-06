@@ -58,6 +58,7 @@ void InterruptManager::handleInstruction(Instruction *instruction) {
 }
 
 void InterruptManager::runInterrupt(int vector) {
+// 	std::cout << "Running interrupt " << vector << " base=" << m_variant->getINTVECT() << "\n";
 	uint16_t v;
 	Register *sp = m_reg->getp(1);
 

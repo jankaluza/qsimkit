@@ -124,14 +124,14 @@ void Disassembler::addSourceLine(const QString &line) {
 
 void Disassembler::addInstructionLine(uint16_t addr, const QString &line) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
-	item->setText(0, QString("%1").arg(addr));
+	item->setText(0, QString::number(addr, 16));
 	item->setText(1, "  " + line);
 	item->setBackground(0, view->palette().window());
 }
 
 void Disassembler::addSectionLine(uint16_t addr, const QString &line) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
-	item->setText(0, QString("%1").arg(addr));
+	item->setText(0, QString::number(addr, 16));
 	item->setText(1, line);
 	QFont f = item->font(1);
 	f.setBold(true);

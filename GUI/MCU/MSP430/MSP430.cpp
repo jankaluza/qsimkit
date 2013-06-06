@@ -46,6 +46,7 @@
 #include <QPainter>
 #include <QDebug>
 #include <QDomDocument>
+#include <QFileDialog>
 #include <QtCore/qplugin.h>
 
 MCU_MSP430::MCU_MSP430(const QString &variant) :
@@ -76,6 +77,9 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
+
+	m_options << "Load ELF";
+	m_options << "Load A43 (IHEX)";
 }
 
 void MCU_MSP430::reset() {
@@ -120,11 +124,6 @@ void MCU_MSP430::handlePinChanged(int id, double value) {
 	onUpdated();
 }
 
-
-bool MCU_MSP430::loadA43(const QString &data) {
-	m_code = data;
-	return m_mem->loadA43(data.toStdString(), m_reg);
-}
 
 void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
 	objects.push_back(dynamic_cast<Timer *>(m_basicClock->getTimerA()));
@@ -183,7 +182,16 @@ double MCU_MSP430::timeAdvance() {
 }
 
 void MCU_MSP430::executeOption(int option) {
-	
+	switch (option) {
+		case 0:
+			loadELFOption();
+			break;
+		case 1:
+			loadA43Option();
+			break;
+		default:
+			break;
+	}
 }
 
 void MCU_MSP430::save(QTextStream &stream) {
@@ -203,25 +211,6 @@ void MCU_MSP430::load(QDomElement &object) {
 	loadA43(object.firstChildElement("code").text());
 	loadELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
-
-void MCU_MSP430::setPinType(const QString &n, MSP430::PinType &type, int &subtype) {
-#define SET_GP_PIN(PREFIX, T) { \
-		if (n.startsWith(PREFIX)) { \
-			type = T;\
-			subtype = n.right(1).toInt();\
-		} \
-	}
-
-	SET_GP_PIN("P1.", MSP430::P1)
-	SET_GP_PIN("P2.", MSP430::P2)
-	SET_GP_PIN("P3.", MSP430::P3)
-	SET_GP_PIN("P4.", MSP430::P4)
-	SET_GP_PIN("P5.", MSP430::P5)
-	SET_GP_PIN("P6.", MSP430::P6)
-	SET_GP_PIN("P7.", MSP430::P7)
-	SET_GP_PIN("P8.", MSP430::P8)
-}
-
 
 void MCU_MSP430::paint(QWidget *screen) {
 	QPainter qp(screen);
@@ -282,8 +271,51 @@ void MCU_MSP430::paint(QWidget *screen) {
 		QPen pen(Qt::black, 1, Qt::SolidLine);
 		qp.setPen(pen);
 		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
-					"No code loaded. Load the code using\n\"File->Load ELF\" menu option.");
+					"No code loaded. Load the code by right click on this MCU and selection \"Load ELF\".");
 	}
+}
+
+bool MCU_MSP430::loadA43(const QString &data) {
+	m_code = data;
+
+	bool ret =  m_mem->loadA43(data.toStdString(), m_reg);
+	if (ret) {
+		onCodeLoaded();
+	}
+	return ret;
+}
+
+void MCU_MSP430::loadA43Option() {
+	QString filename = QFileDialog::getOpenFileName();
+	if (filename.isEmpty()) {
+		return;
+	}
+
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+		return;
+
+	loadA43(file.readAll().data());
+}
+
+void MCU_MSP430::loadELF(const QByteArray &elf) {
+	m_elf = elf;
+
+	QString a43 = CodeUtil::ELFToA43(elf);
+	loadA43(a43);
+}
+
+void MCU_MSP430::loadELFOption() {
+	QString filename = QFileDialog::getOpenFileName();
+	if (filename.isEmpty()) {
+		return;
+	}
+
+	QFile file(filename);
+	if (!file.open(QIODevice::ReadOnly))
+		return;
+
+	loadELF(file.readAll());
 }
 
 DisassembledCode MCU_MSP430::getDisassembledCode() {
