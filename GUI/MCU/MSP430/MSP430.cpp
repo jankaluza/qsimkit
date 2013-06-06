@@ -92,9 +92,8 @@ void MCU_MSP430::reset() {
 	m_decoder = new MSP430::InstructionDecoder(m_reg, m_mem);
 
 	if (!m_code.isEmpty()) {
-		loadA43(m_code);
+		m_mem->loadA43(m_code.toStdString(), m_reg);
 	}
-	
 }
 
 RegisterSet *MCU_MSP430::getRegisterSet() {
