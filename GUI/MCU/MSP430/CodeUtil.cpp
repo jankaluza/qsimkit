@@ -93,7 +93,7 @@ DisassembledCode disassemble(const QByteArray &elf, const QString &a43) {
 		objdump.start("msp430-objdump", QStringList() << "-dS" << "test.dump");
 	}
 	else {
-		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp:43" << "test.dump");
+		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << "test.dump");
 	}
 	
 	if (!objdump.waitForStarted()) {
