@@ -64,10 +64,13 @@ class Memory : public ::Memory {
 		void setBit(uint16_t address, uint16_t bit, bool value);
 		void setBitWatcher(uint16_t address, uint16_t bit, bool value);
 
+		void reset();
+
 	private:
 		std::vector<uint8_t> m_memory;
 		std::vector<std::vector<MemoryWatcher *> > m_watchers;
 		std::vector<std::vector<MemoryWatcher *> > m_readWatchers;
+		unsigned int m_size;
 };
 
 }

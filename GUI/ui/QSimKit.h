@@ -101,5 +101,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		TrackedPins *m_trackedPins;
 		int m_logicalSteps;
 		int m_instPerCycle;
+		bool m_stopped;
 };
 

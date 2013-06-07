@@ -42,13 +42,30 @@ QDockWidget(parent), m_simkit(simkit) {
 
 	connect(m_simkit, SIGNAL(onSimulationStep(double)), this, SLOT(handleSimulationStep(double)));
 	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
+	connect(plotHeader, SIGNAL(onPinChanged(int, bool)), this, SLOT(handlePinChanged(int, bool)));
+	connect(m_simkit->getScreen(), SIGNAL(onPinTracked(QObject *, int)), this, SLOT(handlePinTracked(QObject *, int)));
 
 	setTitleBarWidget(plotHeader);
+}
+
+void TrackedPins::handlePinTracked(QObject *obj, int pin) {
+// 	ScreenObject *object = static_cast<ScreenObject *>(obj);
+// 	plotHeader->addPin(object->getPins()[pin].name);
+}
+
+void TrackedPins::handlePinChanged(int id, bool checked) {
+	if (m_history.size() <= id) {
+		return;
+	}
+
+	plot->showPinHistory(m_history[id]);
+	plot->repaint();
 }
 
 void TrackedPins::handleSimulationStarted(bool wasPaused) {
 	m_history.clear();
 	plotHeader->clear();
+	plot->showPinHistory(0);
 
 	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
 	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {

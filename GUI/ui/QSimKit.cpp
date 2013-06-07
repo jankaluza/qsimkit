@@ -48,7 +48,7 @@
 #include <QDomDocument>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
-m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500) {
+m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	setupUi(this);
 
 	m_mcuManager = new MCUManager();
@@ -140,8 +140,10 @@ void QSimKit::setDockWidgetsMCU(MCU *mcu) {
 }
 
 void QSimKit::singleStep() {
-	if (!m_dig) {
+	if (!m_dig || m_stopped) {
 		resetSimulation();
+		onSimulationStarted(false);
+		m_stopped = false;
 	}
 
 	double t = m_sim->nextEventTime();
@@ -205,6 +207,7 @@ void QSimKit::startSimulation() {
 		resetSimulation();
 		onSimulationStarted(false);
 	}
+	m_stopped = false;
 	m_pauseAction->setEnabled(true);
 	m_timer->start(50);
 }
@@ -213,6 +216,7 @@ void QSimKit::stopSimulation() {
 	m_timer->stop();
 	m_pauseAction->setEnabled(false);
 	onSimulationStopped();
+	m_stopped = true;
 }
 
 void QSimKit::pauseSimulation(bool checked) {

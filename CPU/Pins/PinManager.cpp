@@ -114,7 +114,11 @@ void PinManager::generateOutput(int id, double value) {
 }
 
 void PinManager::reset() {
-	m_multiplexers.clear();
+	for (std::vector<PinMultiplexer *>::iterator it = m_multiplexers.begin(); it != m_multiplexers.end(); ++it) {
+		if ((*it)) {
+			(*it)->reset();
+		}
+	}
 }
 
 }

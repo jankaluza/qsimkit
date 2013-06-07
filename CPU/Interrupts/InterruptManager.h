@@ -57,6 +57,8 @@ class InterruptManager {
 
 		void addWatcher(int vector, InterruptWatcher *watcher);
 
+		void reset();
+
 	private:
 		RegisterSet *m_reg;
 		Memory *m_mem;

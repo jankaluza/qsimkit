@@ -51,11 +51,33 @@ void PlotHeader::clear() {
 	}
 }
 
+void PlotHeader::handleButtonToggled(bool checked) {
+	if (!checked) {
+		return;
+	}
+
+	QToolButton *button = dynamic_cast<QToolButton *>(sender());
+
+	for (int i = 0; i < m_pins.size(); ++i) {
+		if (m_pins[i] == button) {
+			onPinChanged(i, true);
+		}
+		else {
+			m_pins[i]->setChecked(false);
+		}
+	}
+}
+
 void PlotHeader::addPin(const QString &label) {
 	QToolButton *button = new QToolButton(this);
 	button->setText(label);
 	button->setCheckable(true);
+	connect(button, SIGNAL(toggled(bool)), this, SLOT(handleButtonToggled(bool)));
 	
 	m_layout->insertWidget(m_layout->count() - 1, button);
 	m_pins.append(button);
+
+	if (m_pins.size() == 1) {
+		button->setChecked(true);
+	}
 }

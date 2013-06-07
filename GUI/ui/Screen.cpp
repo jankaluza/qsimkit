@@ -303,9 +303,11 @@ void Screen::showPinMenu(ScreenObject *object, int pin, const QPoint &pos) {
 	if (action) {
 		if (action->isChecked()) {
 			m_trackedPins[object].append(pin);
+			onPinTracked(object, pin);
 		}
 		else {
 			m_trackedPins[object].removeAll(pin);
+			onPinUntracked(object, pin);
 		}
 	}
 

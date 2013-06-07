@@ -34,18 +34,25 @@ static unsigned int hexToInt(const std::string &str) {
 	return x;
 }
 
-Memory::Memory(unsigned int size) {
-	m_memory.resize(size);
-	m_watchers.resize(size);
-	m_readWatchers.resize(size);
+Memory::Memory(unsigned int size) : m_size(size) {
+	m_watchers.resize(m_size);
+	m_readWatchers.resize(m_size);
 
-	for (int i = 0; i < size; ++i) {
-		m_memory[i] = 0;
-	}
+	reset();
 }
 
 Memory::~Memory() {
 }
+
+void Memory::reset() {
+	m_memory.clear();
+	m_memory.resize(m_size);
+
+	for (int i = 0; i < m_size; ++i) {
+		m_memory[i] = 0;
+	}
+}
+
 
 #define LOAD_DIGIT \
 		if (++it == data.end()) { return false; } \

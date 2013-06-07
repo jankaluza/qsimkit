@@ -110,4 +110,9 @@ void InterruptManager::addWatcher(int vector, InterruptWatcher *watcher) {
 	m_watchers[vector].push_back(watcher);
 }
 
+void InterruptManager::reset() {
+	m_interrupts.clear();
+	m_runningInterrupts.clear();
+}
+
 }

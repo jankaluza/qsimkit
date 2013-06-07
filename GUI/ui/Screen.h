@@ -86,6 +86,8 @@ class Screen : public QWidget
 	signals:
 		void onPeripheralAdded(QObject *peripheral);
 		void onPeripheralRemoved(QObject *peripheral);
+		void onPinTracked(QObject *peripheral, int pin);
+		void onPinUntracked(QObject *peripheral, int pin);
 
 	protected:
 		void paintEvent(QPaintEvent *e);

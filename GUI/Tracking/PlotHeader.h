@@ -38,6 +38,9 @@ class PlotHeader : public QWidget
 
 		void clear();
 
+	public slots:
+		void handleButtonToggled(bool checked);
+
 	signals:
 		void onPinChanged(int pin, bool enabled);
 

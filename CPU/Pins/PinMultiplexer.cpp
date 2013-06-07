@@ -89,6 +89,8 @@ void PinMultiplexer::generateOutput(PinHandler *handler, double value) {
 }
 
 void PinMultiplexer::reset() {
+	m_value = 0;
+	m_valueIsInput = false;
 }
 
 double PinMultiplexer::getValue(bool &isInput) {

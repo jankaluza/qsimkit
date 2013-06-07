@@ -85,8 +85,10 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 void MCU_MSP430::reset() {
 	delete m_decoder;
 
-	// TODO; m_mem->reset(); m_reg->reset(); m_intManager->reset();
-
+	m_mem->reset();
+	//m_reg->reset(); TODO
+	m_intManager->reset();
+	m_pinManager->reset();
 	m_basicClock->reset();
 
 	m_decoder = new MSP430::InstructionDecoder(m_reg, m_mem);
@@ -270,7 +272,7 @@ void MCU_MSP430::paint(QWidget *screen) {
 		QPen pen(Qt::black, 1, Qt::SolidLine);
 		qp.setPen(pen);
 		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
-					"No code loaded. Load the code by right click on this MCU and selection \"Load ELF\".");
+					"No code loaded. Load the code by right clicking on this MCU and selecting \"Load ELF\".");
 	}
 }
 
