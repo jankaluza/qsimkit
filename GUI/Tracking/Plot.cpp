@@ -100,7 +100,7 @@ void Plot::paintEvent(QPaintEvent *e) {
 			if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
 				p.drawRect(toX - 4, toY - 4, 8, 8);
 				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-				p.drawText(toX - 100, height() - 20, 200, 20, Qt::AlignCenter, label);
+				p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
 				draw = true;
 			}
 			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
@@ -109,7 +109,7 @@ void Plot::paintEvent(QPaintEvent *e) {
 				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
 					label += ", delta t=" + QString::number(m_toT - m_fromT);
 				}
-				p.drawText(m_pos.x() - 100, height() - 20, 200, 20, Qt::AlignCenter, label);
+				p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
 			}
 
 			previousV = (*it).v;
@@ -121,7 +121,7 @@ void Plot::paintEvent(QPaintEvent *e) {
 			it--;
 			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
 			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
-			p.drawText(m_pos.x() - 100, height() - 20, 200, 20, Qt::AlignCenter, label);
+			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
 		}
 		p.drawLine(fromX, fromY, width() - 20, fromY);
 	}

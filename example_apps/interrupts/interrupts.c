@@ -42,7 +42,7 @@ int main (void)
 
 	eint();			// Enable Interrupts
 
-	DCO3(6,3);
+	DCO3(10,3); // 1.86MHz
 
 	for (;;){
 		blink(GREENLED | BIT0, 5);
@@ -51,11 +51,8 @@ int main (void)
 
 void blink(unsigned int led, unsigned int times)
 {
-	for (; times > 0; times--){
-		P1OUT |= led;
-		delay();
-		P1OUT &= ~led;
-		delay();
+	while (1) {
+		P1OUT ^= led;
 	}
 }
 
@@ -75,8 +72,8 @@ interrupt(PORT1_VECTOR) button_press (void) {
 	i ^= 1;			// For switching i between 1 and 0
 
 	if (i == 0){
-		DCO3(10,3); // 66.8ms per one blink period
+		DCO3(10,3); // 534.2 ms per one blink period 0.224Mhz
 	} else {
-		DCO3(6,3); // 534.2 ms per one blink period
+		DCO3(6,3); // 66.8ms per one blink period
 	}
 }

@@ -1,5 +1,5 @@
 CC=msp430-gcc
-CFLAGS=-Os -Wall -g -mmcu=msp430x1612
+CFLAGS=-Os -Wall -g -mmcu=msp430x168
 
 OBJS=interrupts.c
 
