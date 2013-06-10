@@ -31,6 +31,7 @@
 #include "MCLK.h"
 #include "TimerFactory.h"
 #include "Timer.h"
+#include "ClockPinHandler.h"
 
 namespace MSP430 {
 
@@ -48,6 +49,10 @@ m_pinManager(pinManager) {
 	m_aclk = new ACLK(m_mem, m_variant, m_vlo, m_lfxt1);
 	m_smclk = new SMCLK(m_mem, m_variant, m_dco);
 	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
+
+	m_aclkHandler = new ClockPinHandler(m_pinManager, m_aclk, "ACLK");
+	m_smclkHandler = new ClockPinHandler(m_pinManager, m_smclk, "SMCLK");
+	m_mclkHandler = new ClockPinHandler(m_pinManager, m_mclk, "MCLK");
 
 	// add TA0
 	intvec0 = m_variant->getTIMERA0_VECTOR();
@@ -150,6 +155,9 @@ BasicClock::~BasicClock() {
 	delete m_timerA0;
 	delete m_timerA1;
 	delete m_timerB;
+	delete m_smclkHandler;
+	delete m_aclkHandler;
+	delete m_mclkHandler;
 }
 
 void BasicClock::reset() {

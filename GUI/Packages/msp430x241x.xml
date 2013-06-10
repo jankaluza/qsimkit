@@ -16,7 +16,7 @@
 		<pin id="13"><name sel="0">P1.1</name><name dir="0" sel="1">TA0.CCI0A</name></pin>
 		<pin id="14"><name sel="0">P1.2</name><name>TA1</name></pin>
 		<pin id="15"><name sel="0">P1.3</name><name>TA2</name></pin>
-		<pin id="16"><name sel="0">P1.4</name><name>SMCLK</name></pin>
+		<pin id="16"><name sel="0">P1.4</name><name dir="1" sel="1">SMCLK</name></pin>
 		<pin id="17"><name sel="0">P1.5</name><name>TA0</name></pin>
 		<pin id="18"><name sel="0">P1.6</name><name>TA1</name></pin>
 		<pin id="19"><name sel="0">P1.7</name><name>TA2</name></pin>

@@ -57,7 +57,8 @@ main(void)
 	CCTL0 = CCIE;
 	TACTL |= MC_1;
 
-	P1DIR |= GRN_LED;
+	P1DIR |= GRN_LED | BIT4;
+//	P1SEL |= BIT4;
 	P1OUT |= GRN_LED;
 
 	__enable_interrupt();

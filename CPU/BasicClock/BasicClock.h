@@ -41,6 +41,7 @@ class LFXT1;
 class Timer;
 class TimerFactory;
 class PinManager;
+class ClockPinHandler;
 
 /// Implements and includes all modules from Basic Clock Module.
 class BasicClock {
@@ -94,6 +95,9 @@ class BasicClock {
 		InterruptManager *m_intManager;
 		TimerFactory *m_factory;
 		PinManager *m_pinManager;
+		ClockPinHandler *m_smclkHandler;
+		ClockPinHandler *m_mclkHandler;
+		ClockPinHandler *m_aclkHandler;
 };
 
 }
