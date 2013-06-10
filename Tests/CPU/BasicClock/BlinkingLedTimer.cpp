@@ -282,7 +282,9 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 		/// Do timer interrupt
 			// tick to 999
 			for (int x = 0; x < 999; ++x) {
-				bc->getTimerA()->tick();
+				for (int divider = 0; divider < 8; ++divider) {
+					bc->getTimerA()->tick();
+				}
 				CPPUNIT_ASSERT_EQUAL((uint16_t) (x + 1), m->getBigEndian(0x0170));
 			}
 
@@ -290,7 +292,9 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
 			// one more tick and we have interrupt about tar == taccr0
-			bc->getTimerA()->tick();
+			for (int divider = 0; divider < 8; ++divider) {
+				bc->getTimerA()->tick();
+			}
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(0x162, 1));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());
@@ -329,7 +333,9 @@ class BlinkingLedTimerTest : public CPPUNIT_NS :: TestFixture {
 
 			// one more tick and we overlow, no TAIV interrupt, because
 			// TAIFG interrupts are disabled
-			bc->getTimerA()->tick();
+			for (int divider = 0; divider < 8; ++divider) {
+				bc->getTimerA()->tick();
+			}
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(0x0170));
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 // 			CPPUNIT_ASSERT_EQUAL(true, intManager->runQueuedInterrupts());

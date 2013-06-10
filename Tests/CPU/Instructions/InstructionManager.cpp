@@ -279,9 +279,8 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			m->loadA43(data, r);
 			int cycles = d->decodeCurrentInstruction(i);
 			r->getp(2)->setBit(SR_Z, 0);
-			uint16_t pc = r->getp(0)->getBigEndian();
+			uint16_t pc = i->pc;
 			executeInstruction(r, m, i);
-
 			CPPUNIT_ASSERT_EQUAL(pc, r->getp(0)->getBigEndian());
 
 			r->getp(2)->setBit(SR_Z, 1);
@@ -305,7 +304,7 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 			m->loadA43(data, r);
 			r->getp(2)->setBit(SR_C, 1);
 			d->decodeCurrentInstruction(i);
-			uint16_t pc = r->getp(0)->getBigEndian();
+			uint16_t pc = i->pc;
 			executeInstruction(r, m, i);
 
 			CPPUNIT_ASSERT_EQUAL(pc, r->getp(0)->getBigEndian());
@@ -329,7 +328,7 @@ class InstructionManagerTest : public CPPUNIT_NS :: TestFixture {
 
 			m->loadA43(data, r);
 			int cycles = d->decodeCurrentInstruction(i);
-			uint16_t pc = r->getp(0)->getBigEndian();
+			uint16_t pc = i->pc;
 
 			r->getp(1)->setBigEndian(0x0300); // SP
 			cycles += executeInstruction(r, m, i);

@@ -154,6 +154,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT(i->getDst());
 			CPPUNIT_ASSERT_EQUAL((int) 55, (int) i->getDst()->get());
 
+			r->getp(0)->setBigEndian(i->pc);
 			inc = d->decodeCurrentInstruction(i);
 
 			CPPUNIT_ASSERT_EQUAL(1, inc);
@@ -280,7 +281,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
 
-			CPPUNIT_ASSERT_EQUAL(2, inc);
+			CPPUNIT_ASSERT_EQUAL(5, inc);
 			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
 			CPPUNIT_ASSERT_EQUAL((int) 5, (int) i->opcode);
 			CPPUNIT_ASSERT(i->getDst());
@@ -297,7 +298,7 @@ class InstructionDecoderTest : public CPPUNIT_NS :: TestFixture{
 			m->loadA43(data, r);
 			int inc = d->decodeCurrentInstruction(i);
 
-			CPPUNIT_ASSERT_EQUAL(1, inc);
+			CPPUNIT_ASSERT_EQUAL(5, inc);
 			CPPUNIT_ASSERT_EQUAL((int) Instruction1, (int) i->type);
 			CPPUNIT_ASSERT_EQUAL((int) 6, (int) i->opcode);
 // 			CPPUNIT_ASSERT(!i->getDst());

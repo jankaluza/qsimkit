@@ -208,6 +208,13 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 		InstructionArgument *dst = getSourceArg(cycles, pc, bw, ad, dest_reg);
 		instruction->setDst(dst);
 
+		switch (instruction->opcode) {
+			case 4: cycles += 3; break;
+			case 5: cycles += 3; break;
+			case 6: cycles += 4; break;
+			default: break;
+		}
+
 		instruction->bw = bw;
 	}
 	else if ((data & 0xe000) == 0x2000) {
@@ -244,7 +251,7 @@ int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 		instruction->bw = bw;
 	}
 
-	pc_reg->setBigEndian(pc);
+	instruction->pc = pc;
 
 	return cycles;
 }

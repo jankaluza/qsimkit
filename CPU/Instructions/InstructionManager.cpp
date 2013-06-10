@@ -51,6 +51,7 @@ int executeInstruction(RegisterSet *reg, Memory *mem, Instruction *i) {
 		return -1;
 	}
 	
+	reg->get(0)->setBigEndian(i->pc);
 	int cycles = instruction->callback(reg, mem, i);
 	reg->get(0)->callWatchers();
 	return cycles;

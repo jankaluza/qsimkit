@@ -43,7 +43,7 @@ static int execPUSH(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 	reg->get(1)->callWatchers();
 	
-	return 3;
+	return 0;
 }
 
 static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
@@ -54,7 +54,7 @@ static int execCALL(RegisterSet *reg, Memory *mem, Instruction *i) {
 	reg->get(1)->setBigEndian(sp);
 	reg->get(1)->callWatchers();
 	reg->get(0)->setBigEndian(i->getDst()->getBigEndian());
-	return 3;
+	return 0;
 }
 
 static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
@@ -71,7 +71,7 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 
 	reg->get(1)->setBigEndian(sp);
 	reg->get(1)->callWatchers();
-	return 4;
+	return 0;
 }
 
 MSP430_INSTRUCTION("push", Instruction1, 4, &execPUSH);
