@@ -38,7 +38,7 @@ class TrackedPins : public QDockWidget, public Ui::TrackedPins
 	private slots:
 		void handleSimulationStarted(bool wasPaused);
 		void handleSimulationStep(double t);
-		void handlePinChanged(int id, bool check);
+		void handlePinChanged(int color, int id);
 		void handlePinTracked(QObject *obj, int pin);
 
 	private:

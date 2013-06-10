@@ -34,50 +34,44 @@ PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
 	setLayout(m_layout);
 
 	m_label = new QLabel(" Tracked pins:");
-
 	m_layout->addWidget(m_label);
+
+	m_redPin = new QComboBox();
+	m_redPin->setMinimumWidth(130);
+	m_redPin->addItem("None");
+	m_layout->addWidget(m_redPin);
+
+	m_greenPin = new QComboBox();
+	m_greenPin->addItem("None");
+	m_greenPin->setMinimumWidth(130);
+	m_layout->addWidget(m_greenPin);
+
 	m_layout->addStretch();
+
+	connect(m_redPin, SIGNAL(currentIndexChanged(int)), this, SLOT(handleRedIndexChanged(int)));
+	connect(m_greenPin, SIGNAL(currentIndexChanged(int)), this, SLOT(handleGreenIndexChanged(int)));
 }
 
 PlotHeader::~PlotHeader() {
 
 }
 
-void PlotHeader::clear() {
-	while (!m_pins.isEmpty()) {
-		m_layout->removeWidget(m_pins[0]);
-		delete m_pins[0];
-		m_pins.removeFirst();
-	}
+void PlotHeader::handleRedIndexChanged(int id) {
+	onPinChanged(0, id - 1);
 }
 
-void PlotHeader::handleButtonToggled(bool checked) {
-	if (!checked) {
-		return;
-	}
+void PlotHeader::handleGreenIndexChanged(int id) {
+	onPinChanged(1, id - 1);
+}
 
-	QToolButton *button = dynamic_cast<QToolButton *>(sender());
-
-	for (int i = 0; i < m_pins.size(); ++i) {
-		if (m_pins[i] == button) {
-			onPinChanged(i, true);
-		}
-		else {
-			m_pins[i]->setChecked(false);
-		}
-	}
+void PlotHeader::clear() {
+	m_redPin->clear();
+	m_greenPin->clear();
+	m_redPin->addItem("None");
+	m_greenPin->addItem("None");
 }
 
 void PlotHeader::addPin(const QString &label) {
-	QToolButton *button = new QToolButton(this);
-	button->setText(label);
-	button->setCheckable(true);
-	connect(button, SIGNAL(toggled(bool)), this, SLOT(handleButtonToggled(bool)));
-	
-	m_layout->insertWidget(m_layout->count() - 1, button);
-	m_pins.append(button);
-
-	if (m_pins.size() == 1) {
-		button->setChecked(true);
-	}
+	m_redPin->addItem(label);
+	m_greenPin->addItem(label);
 }

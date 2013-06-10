@@ -22,7 +22,7 @@
 #include <QWidget>
 #include <QString>
 #include <QList>
-#include <QToolButton>
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
 
@@ -39,15 +39,17 @@ class PlotHeader : public QWidget
 		void clear();
 
 	public slots:
-		void handleButtonToggled(bool checked);
+		void handleRedIndexChanged(int);
+		void handleGreenIndexChanged(int);
 
 	signals:
-		void onPinChanged(int pin, bool enabled);
+		void onPinChanged(int color, int pin);
 
 	private:
-		QList<QToolButton *> m_pins;
 		QHBoxLayout *m_layout;
 		QLabel *m_label;
+		QComboBox *m_redPin;
+		QComboBox *m_greenPin;
 
 };
 

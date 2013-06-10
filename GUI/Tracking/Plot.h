@@ -35,7 +35,9 @@ class Plot : public QWidget
 		void setMaximumX(double x);
 		void setMaximumY(double y);
 
-		void showPinHistory(PinHistory *pinHistory);
+		void showPinHistory0(PinHistory *pinHistory);
+		void showPinHistory1(PinHistory *pinHistory);
+		void clear();
 
 	protected:
 		void paintEvent(QPaintEvent *e);
@@ -50,7 +52,8 @@ class Plot : public QWidget
 		double m_maxX;
 		double m_maxY;
 		QPoint m_pos;
-		PinHistory *m_pinHistory;
+		PinHistory *m_pinHistory0;
+		PinHistory *m_pinHistory1;
 		int m_fromX;
 		int m_toX;
 		double m_fromT;

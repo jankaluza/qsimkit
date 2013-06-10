@@ -29,8 +29,8 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_maxY(3.3), m_pinHistory(0),
-	m_fromX(-1), m_toX(-1)  {
+Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_maxY(3.3), m_pinHistory0(0),
+	m_pinHistory1(0), m_fromX(-1), m_toX(-1)  {
 	setMouseTracking(true);
 
 	// Test:
@@ -50,8 +50,18 @@ void Plot::setMaximumY(double y) {
 	repaint();
 }
 
-void Plot::showPinHistory(PinHistory *pinHistory) {
-	m_pinHistory = pinHistory;
+void Plot::clear() {
+	m_pinHistory0 = 0;
+	m_pinHistory1 = 0;
+}
+
+void Plot::showPinHistory0(PinHistory *pinHistory) {
+	m_pinHistory0 = pinHistory;
+	repaint();
+}
+
+void Plot::showPinHistory1(PinHistory *pinHistory) {
+	m_pinHistory1 = pinHistory;
 	repaint();
 }
 
@@ -79,16 +89,63 @@ void Plot::paintEvent(QPaintEvent *e) {
 		p.fillRect(m_fromX, 10, m_pos.x() - m_fromX, height() - 30, palette().highlight());
 	}
 
-	p.setPen(QPen(QColor(255, 0, 0), 2, Qt::SolidLine));
-	if (m_pinHistory) {
+	p.setPen(QPen(QColor(255, 0, 0, 0x80), 2, Qt::SolidLine));
+	if (m_pinHistory0) {
 		double toX = 0;
 		double toY = 0;
 		double fromX = 25;
 		double fromY = height() - 20;
 		bool draw = false;
 		double previousV = 0;
-		QLinkedList<PinEvent>::iterator it = m_pinHistory->getEvents().begin();
-		for (; it != m_pinHistory->getEvents().end(); ++it) {
+		QLinkedList<PinEvent>::iterator it = m_pinHistory0->getEvents().begin();
+		for (; it != m_pinHistory0->getEvents().end(); ++it) {
+			if ((*it).t > m_maxX) {
+				break;
+			}
+			toX = ((*it).t / m_maxX) * (width() - 35) + 25;
+			toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
+			p.drawLine(fromX, fromY, toX, fromY);
+			p.drawLine(toX, fromY, toX, toY);
+			
+			if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
+				p.drawRect(toX - 4, toY - 4, 8, 8);
+				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
+				p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+				draw = true;
+			}
+			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
+				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
+				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
+				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT);
+				}
+				p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+			}
+
+			previousV = (*it).v;
+			fromX = toX;
+			fromY = toY;
+		}
+
+		if (!draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
+			it--;
+			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
+			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
+			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+		}
+		p.drawLine(fromX, fromY, width() - 20, fromY);
+	}
+
+	p.setPen(QPen(QColor(0, 255, 0, 0x80), 2, Qt::SolidLine));
+	if (m_pinHistory1) {
+		double toX = 0;
+		double toY = 0;
+		double fromX = 25;
+		double fromY = height() - 20;
+		bool draw = false;
+		double previousV = 0;
+		QLinkedList<PinEvent>::iterator it = m_pinHistory1->getEvents().begin();
+		for (; it != m_pinHistory1->getEvents().end(); ++it) {
 			if ((*it).t > m_maxX) {
 				break;
 			}
@@ -149,12 +206,12 @@ void Plot::mouseReleaseEvent(QMouseEvent *event) {
 
 int Plot::correctX(int x, double &t) {
 	t = -1;
-	if (!m_pinHistory) {
+	if (!m_pinHistory0) {
 		return x;
 	}
 
-	QLinkedList<PinEvent>::iterator it = m_pinHistory->getEvents().begin();
-	for (; it != m_pinHistory->getEvents().end(); ++it) {
+	QLinkedList<PinEvent>::iterator it = m_pinHistory0->getEvents().begin();
+	for (; it != m_pinHistory0->getEvents().end(); ++it) {
 		if ((*it).t > m_maxX) {
 			break;
 		}
