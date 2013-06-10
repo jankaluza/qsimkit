@@ -23,6 +23,8 @@
 
 #include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
 #include "Peripherals/PeripheralManager.h"
 
 #include "DockWidgets/Disassembler/Disassembler.h"
@@ -146,12 +148,17 @@ void QSimKit::singleStep() {
 		m_stopped = false;
 	}
 
-	double t = m_sim->nextEventTime();
-
+	uint16_t pc = screen->getMCU()->getRegisterSet()->get(0)->getBigEndian();
 	do {
-		m_sim->execNextEvent();
+		double t = m_sim->nextEventTime();
+
+		do {
+			m_sim->execNextEvent();
+		}
+		while (t == m_sim->nextEventTime());
 	}
-	while (t == m_sim->nextEventTime());
+	while(pc == screen->getMCU()->getRegisterSet()->get(0)->getBigEndian());
+
 	refreshDockWidgets();
 
 	onSimulationStep(m_sim->nextEventTime());
