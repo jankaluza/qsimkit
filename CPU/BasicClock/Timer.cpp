@@ -41,7 +41,7 @@ Timer::Timer(Type type, PinManager *pinManager, InterruptManager *intManager, Me
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk), m_up(true), m_tactl(tactl),
 m_tar(tar), m_taiv(taiv), m_intvect0(intvect0), m_intvect1(intvect1),
-m_type(type), m_counterMax(0xffff) {
+m_type(type), m_counterMax(0xffff), m_counter(0) {
 
 	m_mem->addWatcher(tactl, this);
 	m_mem->addWatcher(taiv, this, Memory::Read);
@@ -365,20 +365,19 @@ void Timer::changeTAR(uint8_t mode) {
 }
 
 void Timer::tick() {
-	uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
-	changeTAR(mode);
-}
-
-unsigned long Timer::getFrequency() {
-	return m_source->getFrequency() / m_divider;
-}
-
-double Timer::getStep() {
-	return m_source->getStep() * m_divider;
+	if (++m_counter >= m_divider) {
+		m_counter = 0;
+		uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
+		changeTAR(mode);
+	}
 }
 
 void Timer::reset() {
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
 	m_source = m_aclk;
+	m_source->addHandler(this);
 }
 
 void Timer::generateOutput(CCR &ccr, double value) {
@@ -411,8 +410,20 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 		// Choose source
 		switch((val >> 8) & 3) {
 			case 0: break;
-			case 1: m_source = m_aclk; break;
-			case 2: m_source = m_smclk; break;
+			case 1:
+				if (m_source) {
+					m_source->removeHandler(this);
+				}
+				m_source = m_aclk;
+				m_source->addHandler(this);
+				break;
+			case 2:
+				if (m_source) {
+					m_source->removeHandler(this);
+				}
+				m_source = m_smclk;
+				m_source->addHandler(this);
+				break;
 			case 3: break;
 			default: break;
 		}

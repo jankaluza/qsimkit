@@ -17,28 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "AdevsTimerFactory.h"
-#include "CPU/Variants/Variant.h"
-#include "CPU/Memory/Memory.h"
-#include "CPU/Interrupts/InterruptManager.h"
-#include "CPU/Pins/PinManager.h"
-#include "DCO.h"
-#include "LFXT1.h"
-#include "VLO.h"
-#include <iostream>
+#pragma once
 
-#include "CPU/BasicClock/ACLK.h"
+#include <QWidget>
+#include <QString>
+#include <QChar>
+#include <QRect>
+#include <QList>
+#include <map>
 
-AdevsTimerFactory::AdevsTimerFactory() {}
+#include "Peripherals/SimulationObject.h"
+#include "CPU/BasicClock/LFXT1.h"
 
-MSP430::DCO *AdevsTimerFactory::createDCO(MSP430::Memory *mem, Variant *variant) {
-	return new DCO(mem, variant);
-}
+class LFXT1 : public SimulationObject, public MSP430::LFXT1 {
+	public:
+		LFXT1(MSP430::Memory *mem, Variant *variant);
+		~LFXT1();
 
-MSP430::VLO *AdevsTimerFactory::createVLO() {
-	return new VLO();
-}
+		void internalTransition();
 
-MSP430::LFXT1 *AdevsTimerFactory::createLFXT1(MSP430::Memory *mem, Variant *variant) {
-	return new LFXT1(mem, variant);
-}
+		void externalEvent(double t, const SimulationEventList &);
+
+		void output(SimulationEventList &output);
+
+		double timeAdvance();
+};

@@ -17,30 +17,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "VLO.h"
+#include <QDebug>
 
-#include <QWidget>
-#include <QString>
-#include <QChar>
-#include <QRect>
-#include <QList>
-#include <map>
+VLO::VLO() {
+	
+}
 
-#include "Peripherals/SimulationObject.h"
-#include "CPU/BasicClock/Timer.h"
+VLO::~VLO() {
 
-class Timer : public SimulationObject, public MSP430::Timer {
-	public:
-		Timer(Timer::Type &type, MSP430::PinManager *pinManager, MSP430::InterruptManager *intManager, MSP430::Memory *mem, Variant *variant,
-			  MSP430::ACLK *aclk, MSP430::SMCLK *smclk, uint16_t tactl, uint16_t tar,
-			  uint16_t taiv, uint16_t intvec0, uint16_t intvec1);
-		~Timer();
+}
 
-		void internalTransition();
+void VLO::internalTransition() {
+	tick();
+}
 
-		void externalEvent(double t, const SimulationEventList &);
+void VLO::externalEvent(double t, const SimulationEventList &) {
 
-		void output(SimulationEventList &output);
+}
 
-		double timeAdvance();
-};
+void VLO::output(SimulationEventList &output) {
+
+}
+
+double VLO::timeAdvance() {
+	return getStep();
+}

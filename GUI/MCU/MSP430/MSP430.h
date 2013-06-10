@@ -28,6 +28,7 @@
 #include "MCU/MCU.h"
 #include "MCU/MCUInterface.h"
 #include "CPU/Pins/PinManager.h"
+#include "CPU/BasicClock/Clock.h"
 
 namespace MSP430 {
 
@@ -53,7 +54,7 @@ class PinAddr {
 		uint8_t bit;
 };
 
-class MCU_MSP430 : public MCU, public MSP430::PinWatcher
+class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHandler
 {
 	public:
 		MCU_MSP430(const QString &variant = "msp430x241x");
@@ -74,6 +75,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 		void output(SimulationEventList &output);
 
 		double timeAdvance();
+
+		void tick();
 
 		void reset();
 
@@ -136,7 +139,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher
 		bool m_ignoreNextStep;
 		QByteArray m_elf;
 		PeripheralItem *m_peripheralItem;
-		
+		int8_t m_counter;
+		bool m_syncing;
 };
 
 class MSP430Interface : public QObject, MCUInterface {

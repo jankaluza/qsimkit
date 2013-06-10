@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Clock.h"
+#include "Oscillator.h"
 #include "CPU/Memory/Memory.h"
 
 #include <stdint.h>
@@ -30,7 +30,7 @@ class Variant;
 
 namespace MSP430 {
 
-class LFXT1 : public Clock, public MemoryWatcher {
+class LFXT1 : public Oscillator, public MemoryWatcher {
 	public:
 		LFXT1(Memory *mem, Variant *variant);
 		virtual ~LFXT1();

@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Clock.h"
+#include "Oscillator.h"
 
 #include <stdint.h>
 #include <string>
@@ -31,7 +31,7 @@ class Variant;
 namespace MSP430 {
 
 /// Digitally-Controlled Osctillator
-class DCO : public Clock, public MemoryWatcher {
+class DCO : public Oscillator, public MemoryWatcher {
 	public:
 		DCO(Memory *mem, Variant *variant);
 		virtual ~DCO();

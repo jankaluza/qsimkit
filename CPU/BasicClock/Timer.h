@@ -39,7 +39,7 @@ class InterruptManager;
 class PinManager;
 class PinMultiplexer;
 
-class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, public PinHandler {
+class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler {
 	public:
 		typedef enum { TimerA, TimerB } Type;
 
@@ -64,10 +64,6 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		void tick();
 
 		void reset();
-
-		unsigned long getFrequency();
-
-		double getStep();
 
 	private:
 		typedef struct {
@@ -111,6 +107,7 @@ class Timer : public Clock, public MemoryWatcher, public InterruptWatcher, publi
 		uint16_t m_intvect1;
 		Type m_type;
 		uint16_t m_counterMax;
+		uint8_t m_counter;
 };
 
 }

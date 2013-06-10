@@ -20,6 +20,7 @@
 #pragma once
 
 #include "Clock.h"
+#include "Oscillator.h"
 
 #include <stdint.h>
 #include <string>
@@ -33,9 +34,9 @@ namespace MSP430 {
 class DCO;
 class VLO;
 class LFXT1;
-class Clock;
+class Oscillator;
 
-class MCLK : public Clock, public MemoryWatcher {
+class MCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 	public:
 		MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1);
 		virtual ~MCLK();
@@ -44,18 +45,19 @@ class MCLK : public Clock, public MemoryWatcher {
 
 		void reset();
 
-		unsigned long getFrequency();
+		void tick();
 
 		double getStep();
 
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
-		Clock *m_source;
+		Oscillator *m_source;
 		DCO *m_dco;
 		VLO *m_vlo;
 		LFXT1 *m_lfxt1;
 		uint8_t m_divider;
+		uint8_t m_counter;
 };
 
 }

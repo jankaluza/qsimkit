@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "Clock.h"
+#include "Oscillator.h"
 
 #include <stdint.h>
 #include <string>
@@ -29,7 +29,7 @@ class Variant;
 
 namespace MSP430 {
 
-class VLO : public Clock {
+class VLO : public Oscillator {
 	public:
 		VLO();
 		virtual ~VLO();

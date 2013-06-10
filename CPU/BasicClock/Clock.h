@@ -25,14 +25,24 @@
 
 namespace MSP430 {
 
+class ClockHandler {
+	public:
+		virtual void tick() = 0;
+};
+
 class Clock {
 	public:
+		Clock();
+		virtual ~Clock();
+
+		void addHandler(ClockHandler *handler);
+		void removeHandler(ClockHandler *handler);
+		void callHandlers();
 
 		virtual void reset() = 0;
 
-		virtual unsigned long getFrequency() = 0;
-
-		virtual double getStep() = 0;
+	private:
+		std::vector<ClockHandler *> m_handlers;
 };
 
 }

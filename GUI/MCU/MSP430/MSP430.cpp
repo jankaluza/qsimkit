@@ -35,7 +35,9 @@
 #include "Package.h"
 #include "CodeUtil.h"
 #include "SimulationObjects/Timer/AdevsTimerFactory.h"
-#include "SimulationObjects/Timer/Timer.h"
+#include "SimulationObjects/Timer/DCO.h"
+#include "SimulationObjects/Timer/VLO.h"
+#include "SimulationObjects/Timer/LFXT1.h"
 #include "PeripheralItem/MSP430PeripheralItem.h"
 
 #include <QWidget>
@@ -53,7 +55,8 @@ MCU_MSP430::MCU_MSP430(const QString &variant) :
 m_time(0), m_instructionCycles(0),
 m_mem(0), m_reg(0), m_decoder(0), m_pinManager(0), m_intManager(0),
 m_instruction(new MSP430::Instruction), m_variant(0),
-m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
+m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false), m_counter(-1),
+m_syncing(0) {
 
 	m_variant = ::getVariant(variant.toStdString().c_str());
 	if (!m_variant) {
@@ -74,6 +77,7 @@ m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false) {
 	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
 
 	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
+	m_basicClock->getMCLK()->addHandler(this);
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
@@ -121,13 +125,19 @@ QStringList MCU_MSP430::getVariants() {
 
 void MCU_MSP430::handlePinChanged(int id, double value) {
 	m_pins[id].value = value;
+	bool reschedule = m_output.empty();
 	m_output.insert(SimulationEvent(id, value));
+	if (reschedule) {
+		m_wrapper->reschedule();
+	}
 	onUpdated();
 }
 
 
 void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
-	objects.push_back(dynamic_cast<Timer *>(m_basicClock->getTimerA()));
+	objects.push_back(dynamic_cast<DCO *>(m_basicClock->getDCO()));
+	objects.push_back(dynamic_cast<VLO *>(m_basicClock->getVLO()));
+	objects.push_back(dynamic_cast<LFXT1 *>(m_basicClock->getLFXT1()));
 }
 
 void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {
@@ -147,8 +157,9 @@ void MCU_MSP430::output(SimulationEventList &output) {
 	}
 }
 
-void MCU_MSP430::internalTransition() {
-	if (!m_ignoreNextStep) {
+void MCU_MSP430::tick() {
+	if (++m_counter == m_instructionCycles) {
+		m_counter = 0;
 		if (m_intManager->runQueuedInterrupts()) {
 			m_instructionCycles = 5;
 		}
@@ -164,12 +175,11 @@ void MCU_MSP430::internalTransition() {
 			m_intManager->handleInstruction(m_instruction);
 			m_instructionCycles += cycles;
 		}
+	}
+}
 
-		m_instructionCycles *= m_basicClock->getMCLK()->getStep();
-	}
-	else {
-		m_ignoreNextStep = false;
-	}
+void MCU_MSP430::internalTransition() {
+	return;
 }
 
 double MCU_MSP430::timeAdvance() {
@@ -179,7 +189,7 @@ double MCU_MSP430::timeAdvance() {
 		return 0;
 	}
 // 	qDebug() << "MCU_MSP430 ta=" << m_instructionCycles;
-	return m_instructionCycles;
+	return 365;
 }
 
 void MCU_MSP430::executeOption(int option) {

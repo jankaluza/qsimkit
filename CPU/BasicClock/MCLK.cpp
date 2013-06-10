@@ -31,7 +31,7 @@ namespace MSP430 {
 
 MCLK::MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_vlo(vlo),
-m_lfxt1(lfxt1), m_divider(1) {
+m_lfxt1(lfxt1), m_divider(1), m_counter(0) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
@@ -47,23 +47,28 @@ MCLK::~MCLK() {
 
 }
 
-unsigned long MCLK::getFrequency() {
-	return m_source->getFrequency() / m_divider;
-}
-
-double MCLK::getStep() {
-	return m_source->getStep() * m_divider;
+void MCLK::tick() {
+	if (++m_counter >= m_divider) {
+		m_counter = 0;
+		callHandlers();
+	}
 }
 
 void MCLK::reset() {
 	handleMemoryChanged(m_mem, m_variant->getBCSCTL1());
 }
 
+double MCLK::getStep() {
+	return m_source->getStep();
+}
 
 void MCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 	// Set divider and source
 	uint16_t ctl2 = m_mem->getBigEndian(m_variant->getBCSCTL2());
 
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
 	// Choose source - SELMx
 	switch ((ctl2 >> 6) & 3) {
 		case 0: case 1: m_source = m_dco; break;
@@ -79,6 +84,7 @@ void MCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 		default:
 			break;
 	}
+	m_source->addHandler(this);
 
 	// Choose divider - DIVMx
 	switch((ctl2 >> 4) & 3) {

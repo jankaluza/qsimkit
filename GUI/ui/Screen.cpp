@@ -63,6 +63,7 @@ void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
 			
 			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(p, m_trackedPins[m_objects[i]]);
 			dig->add(wrapper);
+			p->setWrapper(wrapper);
 
 			wrappers[m_objects[i]] = wrapper;
 

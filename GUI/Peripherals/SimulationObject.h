@@ -43,6 +43,8 @@ typedef adevs::PortValue<double> SimulationEvent;
 
 typedef adevs::Bag<SimulationEvent> SimulationEventList;
 
+class SimulationObjectWrapper;
+
 class SimulationObject {
 	public:
 		SimulationObject() {}
@@ -57,6 +59,13 @@ class SimulationObject {
 		virtual double timeAdvance() = 0;
 
 		virtual void getInternalSimulationObjects(std::vector<SimulationObject *> &) {}
+
+		void setWrapper(SimulationObjectWrapper *wrapper) {
+			m_wrapper = wrapper;
+		}
+
+	protected:
+		SimulationObjectWrapper *m_wrapper;
 };
 
 class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
@@ -89,6 +98,10 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 
 		void reschedule() {
 			m_sim->addModel(this);
+		}
+
+		double getTime() {
+			return m_sim->nextEventTime();
 		}
 
 		QList<PinHistory *> &getPinHistory() {

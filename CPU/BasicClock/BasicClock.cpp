@@ -41,10 +41,11 @@ m_pinManager(pinManager) {
 
 	uint16_t intvec0;
 	uint16_t intvec1;
-	m_vlo = new VLO();
-	m_lfxt1 = new LFXT1(m_mem, m_variant);
+	m_vlo = m_factory->createVLO();
+	m_lfxt1 = m_factory->createLFXT1(m_mem, m_variant);
+	m_dco = m_factory->createDCO(m_mem, m_variant);
+
 	m_aclk = new ACLK(m_mem, m_variant, m_vlo, m_lfxt1);
-	m_dco = new DCO(m_mem, m_variant);
 	m_smclk = new SMCLK(m_mem, m_variant, m_dco);
 	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
 
@@ -59,7 +60,7 @@ m_pinManager(pinManager) {
 		intvec1 = m_variant->getTIMER0_A1_VECTOR();
 	}
 
-	m_timerA0 = m_factory->createTimer(Timer::TimerA, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+	m_timerA0 = new Timer(Timer::TimerA, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 									  m_variant->getTA0CTL(), m_variant->getTA0R(),
 									  m_variant->getTA0IV(), intvec0, intvec1);
 	if (m_variant->getTA0CCTL0() != 0) {
@@ -82,7 +83,7 @@ m_pinManager(pinManager) {
 	intvec0 = m_variant->getTIMER1_A0_VECTOR();
 	intvec1 = m_variant->getTIMER1_A1_VECTOR();
 	if (intvec0 != 0 && intvec1 != 0) {
-		m_timerA1 = m_factory->createTimer(Timer::TimerA, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+		m_timerA1 = new Timer(Timer::TimerA, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 										m_variant->getTA1CTL(), m_variant->getTA1R(),
 										m_variant->getTA1IV(), intvec0, intvec1);
 		if (m_variant->getTA0CCTL0() != 0) {
@@ -109,7 +110,7 @@ m_pinManager(pinManager) {
 	intvec0 = m_variant->getTIMERB0_VECTOR();
 	intvec1 = m_variant->getTIMERB1_VECTOR();
 	if (intvec0 != 0 && intvec1 != 0) {
-		m_timerB = m_factory->createTimer(Timer::TimerB, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
+		m_timerB = new Timer(Timer::TimerB, m_pinManager, m_intManager, m_mem, m_variant, m_aclk, m_smclk,
 										m_variant->getTBCTL(), m_variant->getTBR(),
 										m_variant->getTBIV(), intvec0, intvec1);
 		if (m_variant->getTBCCTL0() != 0) {

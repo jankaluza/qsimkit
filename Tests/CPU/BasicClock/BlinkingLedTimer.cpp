@@ -13,6 +13,9 @@
 #include "CPU/BasicClock/BasicClock.h"
 #include "CPU/BasicClock/ACLK.h"
 #include "CPU/BasicClock/SMCLK.h"
+#include "CPU/BasicClock/VLO.h"
+#include "CPU/BasicClock/DCO.h"
+#include "CPU/BasicClock/LFXT1.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 #include "CPU/Pins/PinManager.h"
@@ -23,12 +26,9 @@ namespace MSP430 {
 
 class DummyTimerFactory : public TimerFactory {
 	public:
-		Timer *createTimer(Timer::Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem,
-						   Variant *variant, ACLK *aclk,
-						   SMCLK *smclk, uint16_t tactl, uint16_t tar,
-						   uint16_t taiv, uint16_t intvec0, uint16_t intvec1) {
-			return new Timer(type, pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1);
-		}
+		DCO *createDCO(Memory *mem, Variant *variant) { return new DCO(mem, variant); }
+		LFXT1 *createLFXT1(Memory *mem, Variant *variant) { return new LFXT1(mem, variant); }
+		VLO *createVLO() { return new VLO(); }
 };
 
 #if 0

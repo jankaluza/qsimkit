@@ -17,28 +17,34 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "AdevsTimerFactory.h"
-#include "CPU/Variants/Variant.h"
-#include "CPU/Memory/Memory.h"
-#include "CPU/Interrupts/InterruptManager.h"
-#include "CPU/Pins/PinManager.h"
-#include "DCO.h"
-#include "LFXT1.h"
-#include "VLO.h"
+#include "Clock.h"
 #include <iostream>
+#include <algorithm>
 
-#include "CPU/BasicClock/ACLK.h"
-
-AdevsTimerFactory::AdevsTimerFactory() {}
-
-MSP430::DCO *AdevsTimerFactory::createDCO(MSP430::Memory *mem, Variant *variant) {
-	return new DCO(mem, variant);
+namespace MSP430 {
+	
+Clock::Clock() {
 }
 
-MSP430::VLO *AdevsTimerFactory::createVLO() {
-	return new VLO();
+Clock::~Clock() {
+	
 }
 
-MSP430::LFXT1 *AdevsTimerFactory::createLFXT1(MSP430::Memory *mem, Variant *variant) {
-	return new LFXT1(mem, variant);
+void Clock::addHandler(ClockHandler *handler) {
+	m_handlers.push_back(handler);
+}
+
+void Clock::removeHandler(ClockHandler *handler) {
+	std::vector<ClockHandler *>::iterator it = std::find(m_handlers.begin(), m_handlers.end(), handler);
+	if (it != m_handlers.end()) {
+		m_handlers.erase(it);
+	}
+}
+
+void Clock::callHandlers() {
+	for (std::vector<ClockHandler *>::const_iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
+		(*it)->tick();
+	}
+}
+
 }

@@ -17,32 +17,28 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "Timer.h"
-#include <QDebug>
+#pragma once
 
-Timer::Timer(Timer::Type &type, MSP430::PinManager *pinManager, MSP430::InterruptManager *intManager, MSP430::Memory *mem,
-			 Variant *variant, MSP430::ACLK *aclk, MSP430::SMCLK *smclk,
-			 uint16_t tactl, uint16_t tar, uint16_t taiv, uint16_t intvec0, uint16_t intvec1) :
-			 MSP430::Timer(type, pinManager, intManager, mem, variant, aclk, smclk, tactl, tar, taiv, intvec0, intvec1) {
-	
-}
+#include <QWidget>
+#include <QString>
+#include <QChar>
+#include <QRect>
+#include <QList>
+#include <map>
 
-Timer::~Timer() {
+#include "Peripherals/SimulationObject.h"
+#include "CPU/BasicClock/DCO.h"
 
-}
+class DCO : public SimulationObject, public MSP430::DCO {
+	public:
+		DCO(MSP430::Memory *mem, Variant *variant);
+		~DCO();
 
-void Timer::internalTransition() {
-	tick();
-}
+		void internalTransition();
 
-void Timer::externalEvent(double t, const SimulationEventList &) {
+		void externalEvent(double t, const SimulationEventList &);
 
-}
+		void output(SimulationEventList &output);
 
-void Timer::output(SimulationEventList &output) {
-
-}
-
-double Timer::timeAdvance() {
-	return getStep();
-}
+		double timeAdvance();
+};

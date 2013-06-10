@@ -51,6 +51,18 @@ class BasicClock {
 
 		void reset();
 
+		DCO *getDCO() {
+			return m_dco;
+		}
+
+		VLO *getVLO() {
+			return m_vlo;
+		}
+
+		LFXT1 *getLFXT1() {
+			return m_lfxt1;
+		}
+
 		MCLK *getMCLK() {
 			return m_mclk;
 		}

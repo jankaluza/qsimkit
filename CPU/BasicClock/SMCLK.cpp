@@ -28,7 +28,8 @@
 namespace MSP430 {
 
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco) :
-m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_divider(1) {
+m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_divider(1),
+m_counter(0) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -40,17 +41,20 @@ SMCLK::~SMCLK() {
 
 }
 
-unsigned long SMCLK::getFrequency() {
-	return m_source->getFrequency() / m_divider;
-}
-
-double SMCLK::getStep() {
-	return m_source->getStep() * m_divider;
+void SMCLK::tick() {
+	if (++m_counter >= m_divider) {
+		m_counter = 0;
+		callHandlers();
+	}
 }
 
 void SMCLK::reset() {
 	handleMemoryChanged(m_mem, m_variant->getBCSCTL2());
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
 	m_source = m_dco;
+	m_source->addHandler(this);
 }
 
 

@@ -30,7 +30,7 @@ namespace MSP430 {
 
 ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1) :
 m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo),
-m_lfxt1(lfxt1), m_divider(1) {
+m_lfxt1(lfxt1), m_divider(1), m_counter(0) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
@@ -45,18 +45,21 @@ ACLK::~ACLK() {
 
 }
 
-unsigned long ACLK::getFrequency() {
-	return m_source->getFrequency() / m_divider;
-}
-
-double ACLK::getStep() {
-	return m_source->getStep() * m_divider;
+void ACLK::tick() {
+	if (++m_counter >= m_divider) {
+		m_counter = 0;
+		callHandlers();
+	}
 }
 
 void ACLK::reset() {
 	handleMemoryChanged(m_mem, m_variant->getBCSCTL1());
 	handleMemoryChanged(m_mem, m_variant->getBCSCTL3());
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
 	m_source = m_vlo;
+	m_source->addHandler(this);
 }
 
 
@@ -73,6 +76,10 @@ void ACLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 		}
 	}
 	else if (address == m_variant->getBCSCTL3()) {
+		if (m_source) {
+			m_source->removeHandler(this);
+		}
+
 		// Choose between VLO and LFXT1
 		if (m_lfxt1->isChosen()) {
 			m_source = m_lfxt1;
@@ -80,6 +87,7 @@ void ACLK::handleMemoryChanged(Memory *memory, uint16_t address) {
 		else {
 			m_source = m_vlo;
 		}
+		m_source->addHandler(this);
 	}
 }
 

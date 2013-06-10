@@ -17,28 +17,29 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "AdevsTimerFactory.h"
-#include "CPU/Variants/Variant.h"
-#include "CPU/Memory/Memory.h"
-#include "CPU/Interrupts/InterruptManager.h"
-#include "CPU/Pins/PinManager.h"
-#include "DCO.h"
 #include "LFXT1.h"
-#include "VLO.h"
-#include <iostream>
+#include <QDebug>
 
-#include "CPU/BasicClock/ACLK.h"
-
-AdevsTimerFactory::AdevsTimerFactory() {}
-
-MSP430::DCO *AdevsTimerFactory::createDCO(MSP430::Memory *mem, Variant *variant) {
-	return new DCO(mem, variant);
+LFXT1::LFXT1(MSP430::Memory *mem, Variant *variant) : MSP430::LFXT1(mem, variant) {
+	
 }
 
-MSP430::VLO *AdevsTimerFactory::createVLO() {
-	return new VLO();
+LFXT1::~LFXT1() {
+
 }
 
-MSP430::LFXT1 *AdevsTimerFactory::createLFXT1(MSP430::Memory *mem, Variant *variant) {
-	return new LFXT1(mem, variant);
+void LFXT1::internalTransition() {
+	tick();
+}
+
+void LFXT1::externalEvent(double t, const SimulationEventList &) {
+
+}
+
+void LFXT1::output(SimulationEventList &output) {
+
+}
+
+double LFXT1::timeAdvance() {
+	return getStep();
 }

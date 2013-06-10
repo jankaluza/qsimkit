@@ -22,27 +22,23 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
-#include "CPU/BasicClock/Timer.h"
+#include "CPU/BasicClock/Oscillator.h"
 
 class Variant;
 
 namespace MSP430 {
 
-class ACLK;
-class SMCLK;
-class Clock;
-class InterruptManager;
-class Timer;
 class Memory;
-class PinManager;
+class DCO;
+class VLO;
+class LFXT1;
 
 class TimerFactory {
 	public:
 		virtual ~TimerFactory() {}
-		virtual Timer *createTimer(Timer::Type type, PinManager *pinManager, InterruptManager *intManager, Memory *mem,
-								   Variant *variant, ACLK *aclk,
-								   SMCLK *smclk, uint16_t tactl, uint16_t tar,
-								   uint16_t taiv, uint16_t intvec0, uint16_t intvec1) = 0;
+		virtual DCO *createDCO(Memory *mem, Variant *variant) = 0;
+		virtual VLO *createVLO() = 0;
+		virtual LFXT1 *createLFXT1(Memory *mem, Variant *variant) = 0;
 };
 
 }
