@@ -161,9 +161,9 @@ void MCU_MSP430::output(SimulationEventList &output) {
 }
 
 void MCU_MSP430::tick() {
-	std::cout << "tick\n";
+// 	std::cout << "tick\n";
 	if (++m_counter == m_instructionCycles) {
-		std::cout << "executed\n";
+// 		std::cout << "executed\n";
 		int cycles = executeInstruction(m_reg, m_mem, m_instruction);
 		if (cycles == -1) {
 			qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;
@@ -175,7 +175,8 @@ void MCU_MSP430::tick() {
 
 		m_counter = 0;
 		if (m_intManager->runQueuedInterrupts()) {
-			m_instructionCycles = 5;
+			m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
+			m_instructionCycles += 5;
 		}
 		else {
 			m_instructionCycles = m_decoder->decodeCurrentInstruction(m_instruction);
