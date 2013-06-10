@@ -31,17 +31,28 @@ class PinManager;
 class PinMultiplexer;
 class Clock;
 
+/// Outputs Clock's signal to output pin.
 class ClockPinHandler : public PinHandler, public ClockHandler {
 	public:
+		/// Creates new ClockPinHandler.
+		/// \param pinManager PinManager to which output pin of this handler is
+		/// connected to.
+		/// \param clock Clock connected to output pin.
+		/// \param name Name of the output to be used to register PinMultiplexer.
 		ClockPinHandler(PinManager *pinManager, Clock *clock, const std::string &name);
 		virtual ~ClockPinHandler();
 
+		/// Called by Clock on every tick. Generates output signal on pin.
 		void tick();
 
+		/// Called by PinMultiplexer in case of input signal. Any input is
+		/// ignored.
 		void handlePinInput(const std::string &name, double value);
 
+		/// Called by PinMultiplexer when this PinHandler becomes active.
 		void handlePinActivated(const std::string &name);
 
+		/// Called by PinMultiplexer when this PinHandler becomes inactive.
 		void handlePinDeactivated(const std::string &name);
 
 	private:

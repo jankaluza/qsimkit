@@ -29,6 +29,7 @@ ClockPinHandler::ClockPinHandler(PinManager *pinManager, Clock *clock,
 								 const std::string &name) : m_mpx(0),
 								 m_clock(clock) {
 
+	// Register PinMultiplexer
 	std::vector<PinMultiplexer *> mpxs;
 	mpxs = pinManager->addPinHandler(name, this);
 	m_mpx = mpxs.empty() ? 0 : mpxs[0];
@@ -39,6 +40,7 @@ ClockPinHandler::~ClockPinHandler() {
 }
 
 void ClockPinHandler::tick() {
+	// Generate signal on output
 	m_mpx->generateOutput(this, 1.0);
 	m_mpx->generateOutput(this, 0.0);
 }
