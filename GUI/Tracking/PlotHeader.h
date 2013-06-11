@@ -50,6 +50,7 @@ class PlotHeader : public QWidget
 		QLabel *m_label;
 		QComboBox *m_redPin;
 		QComboBox *m_greenPin;
+		int m_index;
 
 };
 

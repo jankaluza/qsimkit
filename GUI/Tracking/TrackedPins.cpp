@@ -49,8 +49,8 @@ QDockWidget(parent), m_simkit(simkit) {
 }
 
 void TrackedPins::handlePinTracked(QObject *obj, int pin) {
-// 	ScreenObject *object = static_cast<ScreenObject *>(obj);
-// 	plotHeader->addPin(object->getPins()[pin].name);
+	ScreenObject *object = static_cast<ScreenObject *>(obj);
+	plotHeader->addPin(object->getPins()[pin].name);
 }
 
 void TrackedPins::handlePinChanged(int color, int id) {

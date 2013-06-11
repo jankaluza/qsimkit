@@ -65,7 +65,7 @@ void Plot::showPinHistory1(PinHistory *pinHistory) {
 	repaint();
 }
 
-void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y) {
+void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x) {
 	double toX = 0;
 	double toY = 0;
 	double fromX = 25;
@@ -90,7 +90,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y) {
 		if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
 			p.drawRect(toX - 4, toY - 4, 8, 8);
 			QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-			p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+			p.drawText(text_x, height() - 20, 300, 20, Qt::AlignCenter, label);
 			draw = true;
 		}
 		else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
@@ -99,7 +99,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y) {
 			if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
 				label += ", delta t=" + QString::number(m_toT - m_fromT);
 			}
-			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+			p.drawText(text_x, height() - 20, 300, 20, Qt::AlignCenter, label);
 		}
 
 		previousV = (*it).v;
@@ -112,7 +112,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y) {
 		it--;
 		p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
 		QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
-		p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+		p.drawText(text_x, height() - 20, 300, 20, Qt::AlignCenter, label);
 	}
 
 	// Last line is only horizontal and ends up in the infinity
@@ -145,12 +145,12 @@ void Plot::paintEvent(QPaintEvent *e) {
 
 	if (m_pinHistory0) {
 		p.setPen(QPen(QColor(255, 0, 0, 0x80), 2, Qt::SolidLine));
-		paintPin(p, m_pinHistory0, x, y);
+		paintPin(p, m_pinHistory0, x, y, 30);
 	}
 
 	p.setPen(QPen(QColor(50, 255, 50, 0x80), 2, Qt::SolidLine));
 	if (m_pinHistory1) {
-		paintPin(p, m_pinHistory1, x, y);
+		paintPin(p, m_pinHistory1, x, y, 230);
 	}
 
 	p.end();

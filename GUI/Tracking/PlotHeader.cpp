@@ -29,6 +29,7 @@
 #include <QDebug>
 
 PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
+	m_index = 0;
 	m_layout = new QHBoxLayout(this);
 	m_layout->setContentsMargins(0, 0, 0, 0);
 	setLayout(m_layout);
@@ -39,11 +40,13 @@ PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
 	m_redPin = new QComboBox();
 	m_redPin->setMinimumWidth(130);
 	m_redPin->addItem("None");
+	m_redPin->setItemData(0, -1);
 	m_layout->addWidget(m_redPin);
 
 	m_greenPin = new QComboBox();
 	m_greenPin->addItem("None");
 	m_greenPin->setMinimumWidth(130);
+	m_greenPin->setItemData(0, -1);
 	m_layout->addWidget(m_greenPin);
 
 	m_layout->addStretch();
@@ -57,21 +60,42 @@ PlotHeader::~PlotHeader() {
 }
 
 void PlotHeader::handleRedIndexChanged(int id) {
-	onPinChanged(0, id - 1);
+	onPinChanged(0, m_redPin->itemData(id).toInt());
 }
 
 void PlotHeader::handleGreenIndexChanged(int id) {
-	onPinChanged(1, id - 1);
+	onPinChanged(1, m_greenPin->itemData(id).toInt());
 }
 
 void PlotHeader::clear() {
-	m_redPin->clear();
-	m_greenPin->clear();
-	m_redPin->addItem("None");
-	m_greenPin->addItem("None");
+	m_index = 0;
+// 	m_redPin->clear();
+// 	m_greenPin->clear();
+// 	m_redPin->addItem("None");
+// 	m_greenPin->addItem("None");
 }
 
 void PlotHeader::addPin(const QString &label) {
+	int id = m_redPin->findText(label);
+	if (id != -1) {
+		m_redPin->setItemData(id, m_index);
+		m_greenPin->setItemData(id, m_index);
+		handleRedIndexChanged(id);
+		handleGreenIndexChanged(id);
+		m_index++;
+		return;
+	}
+
 	m_redPin->addItem(label);
 	m_greenPin->addItem(label);
+	m_redPin->setItemData(m_redPin->count() - 1, m_index);
+	m_greenPin->setItemData(m_greenPin->count() - 1, m_index);
+	m_index++;
+
+	if (m_redPin->currentIndex() == 0) {
+		m_redPin->setCurrentIndex(m_redPin->count() - 1);
+	}
+	else if (m_greenPin->currentIndex() == 0) {
+		m_greenPin->setCurrentIndex(m_greenPin->count() - 1);
+	}
 }
