@@ -80,8 +80,8 @@ void PlotHeader::addPin(const QString &label) {
 	if (id != -1) {
 		m_redPin->setItemData(id, m_index);
 		m_greenPin->setItemData(id, m_index);
-		handleRedIndexChanged(id);
-		handleGreenIndexChanged(id);
+		handleRedIndexChanged(m_redPin->currentIndex());
+		handleGreenIndexChanged(m_greenPin->currentIndex());
 		m_index++;
 		return;
 	}
