@@ -51,6 +51,7 @@ class Plot : public QWidget
 
 	private:
 		double m_maxX;
+		double m_minX;
 		double m_maxY;
 		QPoint m_pos;
 		PinHistory *m_pinHistory0;

@@ -23,6 +23,7 @@
 #include <QString>
 #include <QList>
 #include <QTimer>
+#include <QLineEdit>
 
 #include "ui_QSimKit.h"
 
@@ -85,6 +86,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void refreshDockWidgets();
 		void setDockWidgetsEnabled(bool enabled);
 		void setDockWidgetsMCU(MCU *cpu);
+		void populateToolBar();
 
 	private:
 		adevs::Digraph<double> *m_dig;
@@ -102,5 +104,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		int m_logicalSteps;
 		int m_instPerCycle;
 		bool m_stopped;
+		QLineEdit *m_runUntil;
 };
 

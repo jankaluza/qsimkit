@@ -69,20 +69,7 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	connect(actionProject_options, SIGNAL(triggered()), this, SLOT(projectOptions()) );
 	connect(actionTracked_pins, SIGNAL(triggered()), this, SLOT(showTrackedPins()) );
 
-	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
-	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
-
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
-	action->setCheckable(true);
-	action->setEnabled(false);
-	connect(action, SIGNAL(triggered(bool)), this, SLOT(pauseSimulation(bool)));
-	m_pauseAction = action;
-
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-stop.png"), tr("Sto&p simulation"));
-	connect(action, SIGNAL(triggered()), this, SLOT(stopSimulation()));
-
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
-	connect(action, SIGNAL(triggered()), this, SLOT(singleStep()));
+	populateToolBar();
 
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(simulationStep()));
@@ -102,6 +89,34 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	QMainWindow::addDockWidget(Qt::BottomDockWidgetArea, m_trackedPins);
 
 	setDockWidgetsEnabled(false);
+}
+
+void QSimKit::populateToolBar() {
+	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
+	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
+
+	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
+	action->setCheckable(true);
+	action->setEnabled(false);
+	connect(action, SIGNAL(triggered(bool)), this, SLOT(pauseSimulation(bool)));
+	m_pauseAction = action;
+
+	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-stop.png"), tr("Sto&p simulation"));
+	connect(action, SIGNAL(triggered()), this, SLOT(stopSimulation()));
+
+	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
+	connect(action, SIGNAL(triggered()), this, SLOT(singleStep()));
+
+	toolbar->addSeparator();
+
+	toolbar->addWidget(new QLabel("Run until:"));
+
+	m_runUntil = new QLineEdit();
+	m_runUntil->setMaximumWidth(100);
+	m_runUntil->setValidator(new QDoubleValidator());
+	m_runUntil->setText("1.0");
+	connect(m_runUntil, SIGNAL(returnPressed()), this, SLOT(startSimulation()));
+	toolbar->addWidget(m_runUntil);
 }
 
 Screen *QSimKit::getScreen() {
@@ -167,11 +182,20 @@ void QSimKit::singleStep() {
 void QSimKit::simulationStep() {
 	QTime perf;
 	perf.start();
+	double until = m_runUntil->text().toDouble();
 	for (int i = 0; i < m_instPerCycle; ++i) {
 		m_sim->execNextEvent();
 		if (m_breakpointManager->shouldBreak()) {
+			onSimulationStep(m_sim->nextEventTime());
 			m_pauseAction->setChecked(true);
 			pauseSimulation(true);
+			return;
+		}
+
+		if (m_sim->nextEventTime() >= until) {
+			refreshDockWidgets();
+			onSimulationStep(m_sim->nextEventTime());
+			stopSimulation();
 			return;
 		}
 	}

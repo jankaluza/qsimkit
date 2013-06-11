@@ -30,7 +30,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_maxY(3.3), m_pinHistory0(0),
+Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_minX(0), m_maxY(3.3), m_pinHistory0(0),
 	m_pinHistory1(0), m_fromX(-1), m_toX(-1)  {
 	setMouseTracking(true);
 
@@ -78,12 +78,16 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 	QLinkedList<PinEvent>::iterator it = pin->getEvents().begin();
 	for (; it != pin->getEvents().end(); ++it) {
 		// Do not paint pins which are out of boundaries
+		if ((*it).t < m_minX) {
+			continue;
+		}
+
 		if ((*it).t > m_maxX) {
 			break;
 		}
 
 		// Draw the horizontal line to toX and vertial line to toY
-		toX = ((*it).t / m_maxX) * (width() - 35) + 25;
+		toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
 		toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
 		if (toX - fromX < 10 && toX != fromX) {
 			skipped = true;
@@ -103,7 +107,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 			p.setPen(n);
 			
 			for (int s = fromX; s < toX; s += 3) {
-				p.drawLine(s, height() - 20, s, toY);
+				p.drawLine(s, fromY, s, toY);
 			}
 			p.setPen(pen);
 		}
@@ -161,7 +165,7 @@ void Plot::paintEvent(QPaintEvent *e) {
 	p.drawText(21, height() - 20, 10, 20, Qt::AlignCenter, "0");
 	p.drawText(0, 0, 20, 20, Qt::AlignCenter, QString::number(m_maxY));
 
-	double x = (double(m_pos.x() - 25) / (width() - 35)) * m_maxX;
+	double x = (double(m_pos.x() - 25) / (width() - 35)) * (m_maxX - m_minX) + m_minX;
 	double y = m_maxY - (double(m_pos.y() - 10) / (height() - 30)) * m_maxY;
 
 	if (m_fromX != -1 && m_toX != -1) {
@@ -211,9 +215,19 @@ int Plot::correctX(int x, double &t) {
 
 void Plot::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
-		m_fromX = -1;
-		m_toX = -1;
-		repaint();
+		QList<QAction *> actions;
+
+		QAction *action = new QAction("Zoom", 0);
+		actions.append(action);
+
+		action = QMenu::exec(actions, event->globalPos(), 0, 0);
+		if (action) {
+			m_minX = m_fromT;
+			m_maxX = m_toT;
+			m_fromX = -1;
+			m_toX = -1;
+			repaint();
+		}
 		return;
 	}
 
@@ -223,6 +237,15 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 	}
 	else if (m_toX == -1) {
 		m_toX = correctX(event->pos().x(), m_toT);
+		if (m_toX < m_fromX) {
+			double tmp = m_toX;
+			m_toX = m_fromX;
+			m_fromX = tmp;
+
+			tmp = m_toT;
+			m_toT = m_fromT;
+			m_fromT = tmp;
+		}
 	}
 	else {
 		m_fromX = correctX(event->pos().x(), m_fromT);
