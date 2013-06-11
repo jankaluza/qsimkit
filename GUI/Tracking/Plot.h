@@ -47,6 +47,7 @@ class Plot : public QWidget
 
 	private:
 		int correctX(int x, double &t);
+		void paintPin(QPainter &p, PinHistory *pin, double x, double y);
 
 	private:
 		double m_maxX;

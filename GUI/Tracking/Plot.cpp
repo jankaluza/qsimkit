@@ -65,6 +65,60 @@ void Plot::showPinHistory1(PinHistory *pinHistory) {
 	repaint();
 }
 
+void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y) {
+	double toX = 0;
+	double toY = 0;
+	double fromX = 25;
+	double fromY = height() - 20;
+	bool draw = false;
+	double previousV = 0;
+
+	QLinkedList<PinEvent>::iterator it = pin->getEvents().begin();
+	for (; it != pin->getEvents().end(); ++it) {
+		// Do not paint pins which are out of boundaries
+		if ((*it).t > m_maxX) {
+			break;
+		}
+
+		// Draw the horizontal line to toX and vertial line to toY
+		toX = ((*it).t / m_maxX) * (width() - 35) + 25;
+		toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
+		p.drawLine(fromX, fromY, toX, fromY);
+		p.drawLine(toX, fromY, toX, toY);
+
+		// If the mouse pointer is close to some point, snap to this point
+		if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
+			p.drawRect(toX - 4, toY - 4, 8, 8);
+			QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
+			p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+			draw = true;
+		}
+		else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
+			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
+			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
+			if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+				label += ", delta t=" + QString::number(m_toT - m_fromT);
+			}
+			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+		}
+
+		previousV = (*it).v;
+		fromX = toX;
+		fromY = toY;
+	}
+
+	// Display label for last line
+	if (!draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
+		it--;
+		p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
+		QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
+		p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
+	}
+
+	// Last line is only horizontal and ends up in the infinity
+	p.drawLine(fromX, fromY, width() - 20, fromY);
+}
+
 void Plot::paintEvent(QPaintEvent *e) {
 	QPainter p;
 	p.begin(this);
@@ -89,114 +143,15 @@ void Plot::paintEvent(QPaintEvent *e) {
 		p.fillRect(m_fromX, 10, m_pos.x() - m_fromX, height() - 30, palette().highlight());
 	}
 
-	p.setPen(QPen(QColor(255, 0, 0, 0x80), 2, Qt::SolidLine));
 	if (m_pinHistory0) {
-		double toX = 0;
-		double toY = 0;
-		double fromX = 25;
-		double fromY = height() - 20;
-		bool draw = false;
-		double previousV = 0;
-		QLinkedList<PinEvent>::iterator it = m_pinHistory0->getEvents().begin();
-		for (; it != m_pinHistory0->getEvents().end(); ++it) {
-			if ((*it).t > m_maxX) {
-				break;
-			}
-			toX = ((*it).t / m_maxX) * (width() - 35) + 25;
-			toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
-			p.drawLine(fromX, fromY, toX, fromY);
-			p.drawLine(toX, fromY, toX, toY);
-			
-			if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
-				p.drawRect(toX - 4, toY - 4, 8, 8);
-				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-				p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-				draw = true;
-			}
-			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
-				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
-				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-					label += ", delta t=" + QString::number(m_toT - m_fromT);
-				}
-				p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-			}
-
-			previousV = (*it).v;
-			fromX = toX;
-			fromY = toY;
-		}
-
-		if (!draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
-			it--;
-			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
-			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-		}
-		p.drawLine(fromX, fromY, width() - 20, fromY);
+		p.setPen(QPen(QColor(255, 0, 0, 0x80), 2, Qt::SolidLine));
+		paintPin(p, m_pinHistory0, x, y);
 	}
 
-	p.setPen(QPen(QColor(0, 255, 0, 0x80), 2, Qt::SolidLine));
+	p.setPen(QPen(QColor(50, 255, 50, 0x80), 2, Qt::SolidLine));
 	if (m_pinHistory1) {
-		double toX = 0;
-		double toY = 0;
-		double fromX = 25;
-		double fromY = height() - 20;
-		bool draw = false;
-		double previousV = 0;
-		QLinkedList<PinEvent>::iterator it = m_pinHistory1->getEvents().begin();
-		for (; it != m_pinHistory1->getEvents().end(); ++it) {
-			if ((*it).t > m_maxX) {
-				break;
-			}
-			toX = ((*it).t / m_maxX) * (width() - 35) + 25;
-			toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
-			p.drawLine(fromX, fromY, toX, fromY);
-			p.drawLine(toX, fromY, toX, toY);
-			
-			if (m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
-				p.drawRect(toX - 4, toY - 4, 8, 8);
-				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-				p.drawText(toX - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-				draw = true;
-			}
-			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
-				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
-				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-					label += ", delta t=" + QString::number(m_toT - m_fromT);
-				}
-				p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-			}
-
-			previousV = (*it).v;
-			fromX = toX;
-			fromY = toY;
-		}
-
-		if (!draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
-			it--;
-			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
-			p.drawText(m_pos.x() - 150, height() - 20, 300, 20, Qt::AlignCenter, label);
-		}
-		p.drawLine(fromX, fromY, width() - 20, fromY);
+		paintPin(p, m_pinHistory1, x, y);
 	}
-
-// 	// Show gray lines at cursor position
-// 	p.setPen(QPen(QColor(210, 210, 210), 1, Qt::SolidLine));
-// 	p.drawLine(25, m_pos.y(), width() - 10, m_pos.y());
-// 	p.drawLine(m_pos.x(), 10, m_pos.x(), height() - 20);
-// 
-// 	p.setPen(QPen(QColor(0, 0, 0), 1, Qt::SolidLine));
-// 
-// 	// Show time and value of current cursor position
-// 	if (m_pos.x() > 100) {
-// 		p.drawText(m_pos.x() - 100, m_pos.y(), 100, 20, Qt::AlignCenter, QString::number(y));
-// 	}
-// 	else {
-// 		p.drawText(m_pos.x() + 20, m_pos.y(), 100, 20, Qt::AlignCenter, QString::number(y));
-// 	}
 
 	p.end();
 }
