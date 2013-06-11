@@ -39,6 +39,8 @@ class Plot : public QWidget
 		void showPinHistory1(PinHistory *pinHistory);
 		void clear();
 
+		void resetView();
+
 	protected:
 		void paintEvent(QPaintEvent *e);
 		void mouseMoveEvent(QMouseEvent *event);
@@ -60,6 +62,7 @@ class Plot : public QWidget
 		int m_toX;
 		double m_fromT;
 		double m_toT;
+		double m_realMaxX;
 
 };
 

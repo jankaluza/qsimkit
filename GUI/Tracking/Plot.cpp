@@ -43,11 +43,18 @@ Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_minX(0), m_maxY(3.
 
 void Plot::setMaximumX(double x) {
 	m_maxX = x;
+	m_realMaxX = x;
 	repaint();
 }
 
 void Plot::setMaximumY(double y) {
 	m_maxY = y;
+	repaint();
+}
+
+void Plot::resetView() {
+	m_minX = 0;
+	m_maxX = m_realMaxX;
 	repaint();
 }
 
@@ -192,18 +199,20 @@ void Plot::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 int Plot::correctX(int x, double &t) {
-	t = (double(x - 25) / (width() - 35)) * m_maxX;
+	t = (double(x - 25) / (width() - 35)) * (m_maxX - m_minX) + m_minX;
 	if (!m_pinHistory0) {
 		return x;
 	}
 
 	QLinkedList<PinEvent>::iterator it = m_pinHistory0->getEvents().begin();
 	for (; it != m_pinHistory0->getEvents().end(); ++it) {
+		if ((*it).t < m_minX) {
+			continue;
+		}
 		if ((*it).t > m_maxX) {
 			break;
 		}
-		double toX = ((*it).t / m_maxX) * (width() - 35) + 25;
-		double toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);		
+		double toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
 		if (x > toX - 5 && x < toX + 5) {
 			t = (*it).t;
 			return toX;
@@ -217,16 +226,32 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		QList<QAction *> actions;
 
-		QAction *action = new QAction("Zoom", 0);
-		actions.append(action);
+		if (m_fromX != -1 && m_toX != -1) {
+			QAction *action = new QAction("Zoom", 0);
+			action->setData(0);
+			actions.append(action);
+		}
 
-		action = QMenu::exec(actions, event->globalPos(), 0, 0);
-		if (action) {
-			m_minX = m_fromT;
-			m_maxX = m_toT;
-			m_fromX = -1;
-			m_toX = -1;
-			repaint();
+		if (m_realMaxX != m_maxX) {
+			QAction *action = new QAction("Reset zoom", 0);
+			action->setData(1);
+			actions.append(action);
+		}
+
+		if (!actions.isEmpty()) {
+			QAction *action = QMenu::exec(actions, event->globalPos(), 0, 0);
+			if (action) {
+				if (action->data() == 0) {
+					m_minX = m_fromT;
+					m_maxX = m_toT;
+					m_fromX = -1;
+					m_toX = -1;
+					repaint();
+				}
+				else {
+					resetView();
+				}
+			}
 		}
 		return;
 	}
