@@ -30,6 +30,70 @@
 
 namespace MSP430 {
 
+#define SET_N(REG, R, B) REG->getp(2)->setBit(SR_N, R & B);
+#define SET_Z(REG, R, B) REG->getp(2)->setBit(SR_Z, (R & B) == 0);
+#define SET_C(REG, R, B) REG->getp(2)->setBit(SR_C, R < 0 || R > B);
+
+static int execRRC(RegisterSet *reg, Memory *mem, Instruction *i) {
+	if (i->bw) {
+		int32_t d, r, c;
+		d = i->getDst()->getByte();
+		c = reg->getp(2)->isBitSet(SR_C);
+		r = (c << 7) | ((d >> 1) & 0x7f);
+		i->getDst()->setByte(r);
+		i->getDst()->callWatchers();
+		
+		SET_N(reg, r, 0x80);
+		SET_Z(reg, r, 0x80);
+		reg->getp(2)->setBit(SR_C, d & 1);
+		reg->getp(2)->setBit(SR_V, 0);
+	}
+	else {
+		int32_t d, r, c;
+		d = i->getDst()->getByte();
+		c = reg->getp(2)->isBitSet(SR_C);
+		r = (c << 15) | ((d >> 1) & 0x7fff);
+		i->getDst()->setByte(r);
+		i->getDst()->callWatchers();
+		
+		SET_N(reg, r, 0x8000);
+		SET_Z(reg, r, 0x8000);
+		reg->getp(2)->setBit(SR_C, d & 1);
+		reg->getp(2)->setBit(SR_V, 0);
+	}
+
+	return 0;
+}
+
+static int execRRA(RegisterSet *reg, Memory *mem, Instruction *i) {
+	if (i->bw) {
+		int32_t d, r;
+		d = i->getDst()->getByte();
+		r = (d & 0x080) | ((d >> 1) & 0x7f);
+		i->getDst()->setByte(r);
+		i->getDst()->callWatchers();
+		
+		SET_N(reg, r, 0x80);
+		SET_Z(reg, r, 0x80);
+		reg->getp(2)->setBit(SR_C, d & 1);
+		reg->getp(2)->setBit(SR_V, 0);
+	}
+	else {
+		int32_t d, r;
+		d = i->getDst()->getBigEndian();
+		r = (d & 0x08000) | ((d >> 1) & 0x7fff);
+		i->getDst()->setBigEndian(r);
+		i->getDst()->callWatchers();
+		
+		SET_N(reg, r, 0x8000);
+		SET_Z(reg, r, 0x8000);
+		reg->getp(2)->setBit(SR_C, d & 1);
+		reg->getp(2)->setBit(SR_V, 0);
+	}
+
+	return 0;
+}
+
 static int execPUSH(RegisterSet *reg, Memory *mem, Instruction *i) {
 	// Decrease SP, Store current PC, change PC
 	uint16_t sp = reg->get(1)->getBigEndian() - 2;
@@ -74,6 +138,8 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 	return 0;
 }
 
+MSP430_INSTRUCTION("rrc",  Instruction1, 0, &execRRC);
+MSP430_INSTRUCTION("rra",  Instruction1, 2, &execRRA);
 MSP430_INSTRUCTION("push", Instruction1, 4, &execPUSH);
 MSP430_INSTRUCTION("call", Instruction1, 5, &execCALL);
 MSP430_INSTRUCTION("reti", Instruction1, 6, &execRETI);
