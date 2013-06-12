@@ -1,7 +1,7 @@
 CC=msp430-gcc
 CFLAGS=-Os -Wall -g -mmcu=msp430x168
 
-OBJS=main.c lcd16.c
+OBJS=main.c
 
 
 all: $(OBJS)

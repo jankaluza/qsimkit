@@ -44,22 +44,37 @@ static int execRRC(RegisterSet *reg, Memory *mem, Instruction *i) {
 		i->getDst()->callWatchers();
 		
 		SET_N(reg, r, 0x80);
-		SET_Z(reg, r, 0x80);
+		SET_Z(reg, r, 0xff);
 		reg->getp(2)->setBit(SR_C, d & 1);
 		reg->getp(2)->setBit(SR_V, 0);
 	}
 	else {
 		int32_t d, r, c;
-		d = i->getDst()->getByte();
+		d = i->getDst()->getBigEndian();
 		c = reg->getp(2)->isBitSet(SR_C);
 		r = (c << 15) | ((d >> 1) & 0x7fff);
-		i->getDst()->setByte(r);
+		i->getDst()->setBigEndian(r);
 		i->getDst()->callWatchers();
 		
 		SET_N(reg, r, 0x8000);
-		SET_Z(reg, r, 0x8000);
+		SET_Z(reg, r, 0xffff);
 		reg->getp(2)->setBit(SR_C, d & 1);
 		reg->getp(2)->setBit(SR_V, 0);
+	}
+
+	return 0;
+}
+
+static int execSWPB(RegisterSet *reg, Memory *mem, Instruction *i) {
+	if (i->bw) {
+		return 0;
+	}
+	else {
+		int32_t d, r;
+		d = i->getDst()->getBigEndian();
+		r = ((d & 0xff00) >> 8) | ((d & 0x00ff) << 8);
+		i->getDst()->setBigEndian(r);
+		i->getDst()->callWatchers();
 	}
 
 	return 0;
@@ -74,7 +89,7 @@ static int execRRA(RegisterSet *reg, Memory *mem, Instruction *i) {
 		i->getDst()->callWatchers();
 		
 		SET_N(reg, r, 0x80);
-		SET_Z(reg, r, 0x80);
+		SET_Z(reg, r, 0xff);
 		reg->getp(2)->setBit(SR_C, d & 1);
 		reg->getp(2)->setBit(SR_V, 0);
 	}
@@ -86,8 +101,32 @@ static int execRRA(RegisterSet *reg, Memory *mem, Instruction *i) {
 		i->getDst()->callWatchers();
 		
 		SET_N(reg, r, 0x8000);
-		SET_Z(reg, r, 0x8000);
+		SET_Z(reg, r, 0xffff);
 		reg->getp(2)->setBit(SR_C, d & 1);
+		reg->getp(2)->setBit(SR_V, 0);
+	}
+
+	return 0;
+}
+
+static int execSXT(RegisterSet *reg, Memory *mem, Instruction *i) {
+	if (i->bw) {
+		return 0;
+	}
+	else {
+		int32_t d, r;
+		d = i->getDst()->getBigEndian();
+		r = d & 0xff;
+		if (d & 0x80) {
+			r |= 0xff00;
+		}
+
+		i->getDst()->setBigEndian(r);
+		i->getDst()->callWatchers();
+		
+		SET_N(reg, r, 0x8000);
+		SET_Z(reg, r, 0xffff);
+		reg->getp(2)->setBit(SR_C, (r & 0xffff) != 0);
 		reg->getp(2)->setBit(SR_V, 0);
 	}
 
@@ -139,7 +178,9 @@ static int execRETI(RegisterSet *reg, Memory *mem, Instruction *i) {
 }
 
 MSP430_INSTRUCTION("rrc",  Instruction1, 0, &execRRC);
+MSP430_INSTRUCTION("swpb", Instruction1, 1, &execSWPB);
 MSP430_INSTRUCTION("rra",  Instruction1, 2, &execRRA);
+MSP430_INSTRUCTION("sxt",  Instruction1, 3, &execSXT);
 MSP430_INSTRUCTION("push", Instruction1, 4, &execPUSH);
 MSP430_INSTRUCTION("call", Instruction1, 5, &execCALL);
 MSP430_INSTRUCTION("reti", Instruction1, 6, &execRETI);
