@@ -1,0 +1,9 @@
+<peripheral type='python'>
+   <name>LCD - HD44708</name>
+   <comment>LCD</comment>
+   <author>Jan Kaluza</author>
+   <email>hanzz.k@gmail.com</email>
+   <version>0.1</version>
+   <license>GNU/GPL</license>
+   <library>lcd</library>
+</peripheral>
