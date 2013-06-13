@@ -37,7 +37,7 @@ class Peripheral():
 		self.state = False;
 
 	def externalEvent(self, pin, value):
-		self.state = value;
+		self.state = value >  1.5;
 		self.screen.update();
 
 	def timeAdvance(self):

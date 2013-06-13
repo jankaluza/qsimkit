@@ -64,14 +64,14 @@ class Peripheral():
 		self.screen.update()
 		if self.state:
 			if self.highWhenPushed:
-				self.out.append((0, 1.0))
+				self.out.append((0, 3.0))
 			else:
 				self.out.append((0, 0.0))
 		else:
 			if self.highWhenPushed:
 				self.out.append((0, 0.0))
 			else:
-				self.out.append((0, 1.0))
+				self.out.append((0, 3.0))
 		self.hasNewOutput = True
 
 	def paint(self):
