@@ -380,9 +380,9 @@ void Timer::reset() {
 	m_source->addHandler(this);
 }
 
-void Timer::generateOutput(CCR &ccr, double value) {
+void Timer::generateOutput(CCR &ccr, bool value) {
 	for (std::vector<PinMultiplexer *>::iterator it = ccr.outputMpxs.begin(); it != ccr.outputMpxs.end(); ++it) {
-		(*it)->generateOutput(this, value);
+		(*it)->generateOutput(this, value ? 3.0 : 0.0);
 	}
 }
 
@@ -461,7 +461,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						if (!ccr.cciaMpx) {
 							break;
 						}
-						value = ccr.cciaMpx->getValue(isInput);
+						value = ccr.cciaMpx->getValue(isInput) ? 3.0 : 0.0;
 						if (isInput) {
 							handlePinInput(ccr, i, ccr.ccia, value);
 						}
@@ -471,7 +471,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						if (!ccr.ccibMpx) {
 							break;
 						}
-						value = ccr.ccibMpx->getValue(isInput);
+						value = ccr.ccibMpx->getValue(isInput) ? 3.0 : 0.0;;
 						if (isInput) {
 							handlePinInput(ccr, i, ccr.ccib, value);
 						}
@@ -482,7 +482,7 @@ void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
 						break;
 					case 3:
 						// VCC
-						handlePinInput(ccr, i, "VCC", 1.0);
+						handlePinInput(ccr, i, "VCC", 3.0);
 						break;
 				}
 
@@ -598,7 +598,7 @@ void Timer::handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, doub
 	bool old_value = tacctl & 8;
 
 	// Set CCI bit
-	m_mem->setBit(ccr.tacctl, 8, value == 1);
+	m_mem->setBit(ccr.tacctl, 8, value >= 1.5);
 
 	// Running in compare mode, so return
 	if ((tacctl & (1 << 8)) == 0) {
@@ -638,19 +638,19 @@ void Timer::handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, doub
 			return;
 		case 1:
 			// Capture on rising edge
-			if (old_value == 0 && value == 1) {
+			if (old_value == 0 && value >= 1.5) {
 				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;
 		case 2:
 			// Capture on failing edge
-			if (old_value == 1 && value == 0.0) {
+			if (old_value == 1 && value <= 1.3) {
 				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;
 		case 3:
 			// Capture on failing and rising edge
-			if (old_value != (value == 0.0)) {
+			if (old_value != (value <= 1.3)) {
 				doCapture(ccr, ccrIndex, tacctl);
 			}
 			break;

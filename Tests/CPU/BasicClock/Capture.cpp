@@ -295,7 +295,7 @@ class CaptureTest : public CPPUNIT_NS :: TestFixture {
 		for (int x = 0; x < 16; ++x) {
 			// Generate rising edge
 			pinManager->handlePinInput(0, 0.0);
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			for (int t = 0; t < 10; ++t) { bc->getTimerA()->tick(); }
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 

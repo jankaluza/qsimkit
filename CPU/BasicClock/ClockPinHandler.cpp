@@ -41,7 +41,7 @@ ClockPinHandler::~ClockPinHandler() {
 
 void ClockPinHandler::tick() {
 	// Generate signal on output
-	m_mpx->generateOutput(this, 1.0);
+	m_mpx->generateOutput(this, 3.0);
 	m_mpx->generateOutput(this, 0.0);
 }
 

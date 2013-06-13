@@ -103,27 +103,46 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 		toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
 		toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
 		if (toX - fromX < 10 && toX != fromX) {
-			skipped = true;
-			fromY = toY;
 			previousV = (*it).v;
-			continue;
-		}
-		p.drawLine(fromX, fromY, toX, fromY);
-		p.drawLine(toX, fromY, toX, toY);
-
-		if (skipped) {
-			skipped = false;
 			QPen pen = p.pen();
 			QPen n = pen;
 			n.setWidth(1);
 			n.setStyle(Qt::DashLine);
 			p.setPen(n);
-			
-			for (int s = fromX; s < toX; s += 3) {
-				p.drawLine(s, fromY, s, toY);
-			}
+			p.drawLine(toX, fromY, toX, toY);
+			p.setPen(pen);
+			skipped = true;
+			fromY = toY;
+			continue;
+		}
+		p.drawLine(fromX, fromY, toX, fromY);
+		int toX2 = ((*(it + 1)).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
+		if (toX2 - toX < 10 && toX2 != toX) {
+			QPen pen = p.pen();
+			QPen n = pen;
+			n.setWidth(1);
+			n.setStyle(Qt::DashLine);
+			p.setPen(n);
+			p.drawLine(toX, fromY, toX, toY);
 			p.setPen(pen);
 		}
+		else {
+			p.drawLine(toX, fromY, toX, toY);
+		}
+
+// 		if (skipped) {
+// 			skipped = false;
+// 			QPen pen = p.pen();
+// 			QPen n = pen;
+// 			n.setWidth(1);
+// 			n.setStyle(Qt::DashLine);
+// 			p.setPen(n);
+// 			
+// 			for (int s = fromX; s < toX; s += 3) {
+// 				p.drawLine(s, fromY, s, toY);
+// 			}
+// 			p.setPen(pen);
+// 		}
 
 		// If the mouse pointer is close to some point, snap to this point
 		if (!draw && m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
@@ -189,13 +208,13 @@ void Plot::paintEvent(QPaintEvent *e) {
 	}
 
 	if (m_pinHistory0) {
-		p.setPen(QPen(QColor(255, 0, 0, 255), 2, Qt::SolidLine));
+		p.setPen(QPen(QColor(255, 0, 0, 128), 2, Qt::SolidLine));
 		paintPin(p, m_pinHistory0, x, y, 30);
 	}
 
 	p.setPen(QPen(QColor(0, 160, 0, 255), 2, Qt::SolidLine));
 	if (m_pinHistory1) {
-		paintPin(p, m_pinHistory1, x, y, 330);
+		paintPin(p, m_pinHistory1, x, y, 128);
 	}
 
 	p.end();

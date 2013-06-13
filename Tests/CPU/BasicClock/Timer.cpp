@@ -303,7 +303,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			// We should not have interrupt until we ->tick(), because we are
 			// in SCS mode
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
@@ -320,7 +320,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
 			// Change from 1 to 1 should not raise the interrupt
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
@@ -331,7 +331,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 
 			// We have not really read TA0CCR0 yet, so another capture should
 			// set COV bit
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
@@ -348,7 +348,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 
 			// Next capture should raise an interrupt
 			pinManager->handlePinInput(0, 0.0);
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			bc->getTimerA()->tick();
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 8, m->getBigEndian(v->getTA0CCR0(), false));
@@ -366,14 +366,14 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			pinManager->handlePinInput(0, 0.0);
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
 
 			intManager->clearQueuedInterrupts();
 
 			// Change from 1 to 1 should not raise the interrupt
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
 			// Change from 1 to 0 should not raise the interrupt
@@ -383,7 +383,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			// We have not really read TA0CCR0 yet, so another capture should
 			// set COV bit
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL0(), 2)); // COV
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
@@ -399,7 +399,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			// Next capture should raise an interrupt
 			pinManager->handlePinInput(0, 0.0);
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 			CPPUNIT_ASSERT_EQUAL((uint16_t) 0, m->getBigEndian(v->getTA0CCR0(), false));
 		}
@@ -418,7 +418,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			// but it should not be sampled yet, so SCCI should be 0
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 8));
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
-			pinManager->handlePinInput(1, 1.0);
+			pinManager->handlePinInput(1, 3.0);
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 8));
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
 
@@ -434,7 +434,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 4));
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getTA0CCTL1(), 1 << 10));
 			CPPUNIT_ASSERT_EQUAL(1, watcher->id);
-			CPPUNIT_ASSERT_EQUAL(1.0, watcher->value);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->value);
 			intManager->clearQueuedInterrupts();
 
 			// TAR == 3, no interrupt yet
@@ -472,7 +472,7 @@ class TimerTest : public CPPUNIT_NS :: TestFixture{
 			// Set P1.0 to be handled by Timer
 			m->setBitWatcher(v->getP1SEL(), 1, true);
 			// Set P1.0 to 1
-			pinManager->handlePinInput(0, 1.0);
+			pinManager->handlePinInput(0, 3.0);
 
 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 			// No interrupt yet, because Timer input is still GND

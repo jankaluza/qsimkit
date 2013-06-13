@@ -54,7 +54,7 @@ void GPPinHandler::handleMemoryChanged(Memory *memory, uint16_t address) {
 
 	bool value = m_mem->isBitSet(m_out, m_id);
 	if (m_oldValue != value) {
-		m_mpx->generateOutput(this, value ? 1.0 : 0.0);
+		m_mpx->generateOutput(this, value ? 3.0 : 0.0);
 		m_oldValue = value;
 	}
 }
@@ -64,7 +64,7 @@ void GPPinHandler::handlePinInput(const std::string &name, double value) {
 	// Checks if the pin is input and stores the value in the
 	// proper address in memory
 	if (!(m_mem->getByte(m_dir) & m_id)) {
-		m_mem->setBit(m_in, m_id, value >= 2.0); \
+		m_mem->setBit(m_in, m_id, value >= 1.5); \
 	}
 
 	// No interrupt handling for this PIN.
@@ -80,14 +80,14 @@ void GPPinHandler::handlePinInput(const std::string &name, double value) {
 		// Interrupt enabled
 		if (m_mem->getByte(m_ies) & m_id) {
 			// Low to high
-			if (old_value == 0 && value >= 2.0) {
+			if (old_value == 0 && value >= 1.5) {
 				m_mem->setBit(m_ifg, m_id, 1);
 				m_intManager->queueInterrupt(m_intvec);
 			}
 		}
 		else {
 			// High to low
-			if (old_value == 1 && value < 1.0) {
+			if (old_value == 1 && value <= 1.3) {
 				m_mem->setBit(m_ifg, m_id, 1);
 				m_intManager->queueInterrupt(m_intvec);
 			}

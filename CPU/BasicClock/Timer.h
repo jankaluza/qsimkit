@@ -84,7 +84,7 @@ class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 		void doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl);
 		void finishPendingCaptures(uint16_t tar);
 		void changeTAR(uint8_t mode);
-		void generateOutput(CCR &ccr, double value);
+		void generateOutput(CCR &ccr, bool value);
 		void doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt);
 		void handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, double value);
 		void latchTBCL(uint16_t tar, bool direction_changed);
