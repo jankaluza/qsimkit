@@ -92,6 +92,7 @@ void TrackedPins::handlePinChanged(int color, int id) {
 void TrackedPins::handleSimulationStarted(bool wasPaused) {
 	m_history.clear();
 	plot->clear();
+	plot->resetView();
 	plotHeader->clear();
 
 	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();

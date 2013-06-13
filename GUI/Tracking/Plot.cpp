@@ -102,7 +102,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 		// Draw the horizontal line to toX and vertial line to toY
 		toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
 		toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
-		if (toX - fromX < 10 && toX != fromX) {
+		if (toX - fromX < 3 && toX != fromX) {
 			previousV = (*it).v;
 			QPen pen = p.pen();
 			QPen n = pen;
@@ -117,7 +117,7 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 		}
 		p.drawLine(fromX, fromY, toX, fromY);
 		int toX2 = ((*(it + 1)).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
-		if (toX2 - toX < 10 && toX2 != toX) {
+		if (toX2 - toX < 3 && toX2 != toX) {
 			QPen pen = p.pen();
 			QPen n = pen;
 			n.setWidth(1);
