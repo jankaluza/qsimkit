@@ -18,6 +18,7 @@
  **/
 
 #include "TrackedPins.h"
+#include "Table.h"
 
 #include "ui/QSimKit.h"
 #include "ui/Screen.h"
@@ -43,9 +44,21 @@ QDockWidget(parent), m_simkit(simkit) {
 	connect(m_simkit, SIGNAL(onSimulationStep(double)), this, SLOT(handleSimulationStep(double)));
 	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
 	connect(plotHeader, SIGNAL(onPinChanged(int, int)), this, SLOT(handlePinChanged(int, int)));
+	connect(plotHeader, SIGNAL(onShowTable()), this, SLOT(showTable()));
 	connect(m_simkit->getScreen(), SIGNAL(onPinTracked(QObject *, int)), this, SLOT(handlePinTracked(QObject *, int)));
 
 	setTitleBarWidget(plotHeader);
+}
+
+void TrackedPins::showTable() {
+	Table dialog(this);
+
+	for (int i = 0; i < m_history.size(); ++i) {
+		dialog.addPinHistory(m_history[i]);
+	}
+
+	dialog.populate();
+	dialog.exec();
 }
 
 void TrackedPins::handlePinTracked(QObject *obj, int pin) {

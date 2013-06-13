@@ -84,11 +84,17 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 
 	QLinkedList<PinEvent>::iterator it = pin->getEvents().begin();
 	for (; it != pin->getEvents().end(); ++it) {
-		// Do not paint pins which are out of boundaries
 		if ((*it).t < m_minX) {
 			continue;
 		}
-
+		if (it != pin->getEvents().begin()) {
+			it--;
+		}
+		break;
+	}
+	
+	for (; it != pin->getEvents().end(); ++it) {
+		// Do not paint pins which are out of boundaries
 		if ((*it).t > m_maxX) {
 			break;
 		}
@@ -242,6 +248,7 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 			QAction *action = QMenu::exec(actions, event->globalPos(), 0, 0);
 			if (action) {
 				if (action->data() == 0) {
+					std::cout << "Zoom " << m_fromT << " " << m_toT << "\n";
 					m_minX = m_fromT;
 					m_maxX = m_toT;
 					m_fromX = -1;

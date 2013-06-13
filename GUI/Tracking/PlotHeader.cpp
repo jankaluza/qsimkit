@@ -27,6 +27,7 @@
 #include <QString>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QPushButton>
 
 PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
 	m_index = 0;
@@ -49,6 +50,10 @@ PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
 	m_greenPin->setItemData(0, -1);
 	m_layout->addWidget(m_greenPin);
 
+	QPushButton *button = new QPushButton("Show in table");
+	connect(button, SIGNAL(clicked(bool)), this, SLOT(showTable()));
+	m_layout->addWidget(button);
+
 	m_layout->addStretch();
 
 	connect(m_redPin, SIGNAL(currentIndexChanged(int)), this, SLOT(handleRedIndexChanged(int)));
@@ -57,6 +62,10 @@ PlotHeader::PlotHeader(QWidget *parent) : QWidget(parent) {
 
 PlotHeader::~PlotHeader() {
 
+}
+
+void PlotHeader::showTable(bool checked) {
+	onShowTable();
 }
 
 void PlotHeader::handleRedIndexChanged(int id) {

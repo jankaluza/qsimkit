@@ -39,11 +39,13 @@ class PlotHeader : public QWidget
 		void clear();
 
 	public slots:
+		void showTable(bool checked = false);
 		void handleRedIndexChanged(int);
 		void handleGreenIndexChanged(int);
 
 	signals:
 		void onPinChanged(int color, int pin);
+		void onShowTable();
 
 	private:
 		QHBoxLayout *m_layout;
