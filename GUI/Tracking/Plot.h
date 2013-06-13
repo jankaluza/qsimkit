@@ -41,6 +41,9 @@ class Plot : public QWidget
 
 		void resetView();
 
+	signals:
+		void onPointToInstruction(int pc);
+
 	protected:
 		void paintEvent(QPaintEvent *e);
 		void mouseMoveEvent(QMouseEvent *event);
@@ -63,6 +66,7 @@ class Plot : public QWidget
 		double m_fromT;
 		double m_toT;
 		double m_realMaxX;
+		int m_context;
 
 };
 

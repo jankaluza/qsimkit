@@ -192,6 +192,7 @@ InstructionArgument *InstructionDecoder::getDestArg(int &cycles, uint16_t &pc, b
 int InstructionDecoder::decodeCurrentInstruction(Instruction *instruction) {
 	Register *pc_reg = m_reg->getp(0);
 	uint16_t pc = pc_reg->getBigEndian();
+	instruction->original_pc = pc;
 
 	uint16_t data = m_mem->getBigEndian(pc);
 	int cycles = 1; // instruction fetch

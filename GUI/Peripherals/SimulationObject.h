@@ -27,19 +27,11 @@
 #include <map>
 
 #include "adevs.h"
+#include <stdint.h>
 
 class PinHistory;
 
 typedef adevs::PortValue<double> SimulationEvent;
-
-// class SimulationEvent {
-// 	public:
-// 		SimulationEvent(int port = -1, bool high = false) : port(port), high(high) {}
-// 		virtual ~SimulationEvent() {}
-// 
-// 		int port;
-// 		bool high;
-// };
 
 typedef adevs::Bag<SimulationEvent> SimulationEventList;
 
@@ -108,6 +100,10 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 			return m_history;
 		}
 
+		void setContext(uint16_t context) {
+			m_context = context;
+		}
+
 	private:
 		void addChangeToHistory(int pin, double value);
 
@@ -116,5 +112,6 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 		SimulationObject *m_obj;
 		QList<int> m_monitoredPins;
 		QList<PinHistory *> m_history;
+		uint16_t m_context;
 };
 

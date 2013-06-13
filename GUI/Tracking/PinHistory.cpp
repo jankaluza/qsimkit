@@ -28,9 +28,10 @@ PinHistory::~PinHistory() {
 
 }
 
-void PinHistory::addEvent(double t, double v) {
+void PinHistory::addEvent(double t, double v, uint16_t context) {
 	PinEvent e;
 	e.t = t;
 	e.v = v;
+	e.context = context;
 	m_events.append(e);
 }

@@ -23,7 +23,7 @@
 #include <QDebug>
 
 SimulationObjectWrapper::SimulationObjectWrapper( SimulationObject *obj, const QList<int> &monitoredPins) :
-m_obj(obj), m_monitoredPins(monitoredPins) {
+m_obj(obj), m_monitoredPins(monitoredPins), m_context(0) {
 
 	if (!m_monitoredPins.empty()) {
 		qSort(m_monitoredPins);
@@ -58,7 +58,7 @@ void SimulationObjectWrapper::addChangeToHistory(int pin, double value) {
 		return;
 	}
 
-	h->addEvent(m_sim->nextEventTime(), value);
+	h->addEvent(m_sim->nextEventTime(), value, m_context);
 }
 
 void SimulationObjectWrapper::delta_ext(double e, const SimulationEventList& xb) {

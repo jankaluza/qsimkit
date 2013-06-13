@@ -26,6 +26,7 @@
 typedef struct {
 	double t;
 	double v;
+	uint16_t context;
 } PinEvent;
 
 class PinHistory {
@@ -33,7 +34,7 @@ class PinHistory {
 		PinHistory();
 		~PinHistory();
 
-		void addEvent(double t, double value);
+		void addEvent(double t, double value, uint16_t context);
 
 		QLinkedList<PinEvent> &getEvents() {
 			return m_events;

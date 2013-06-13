@@ -45,6 +45,7 @@ QDockWidget(parent), m_simkit(simkit) {
 	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
 	connect(plotHeader, SIGNAL(onPinChanged(int, int)), this, SLOT(handlePinChanged(int, int)));
 	connect(plotHeader, SIGNAL(onShowTable()), this, SLOT(showTable()));
+	connect(plot, SIGNAL(onPointToInstruction(int)), m_simkit, SLOT(pointToInstruction(int)));
 	connect(m_simkit->getScreen(), SIGNAL(onPinTracked(QObject *, int)), this, SLOT(handlePinTracked(QObject *, int)));
 
 	setTitleBarWidget(plotHeader);

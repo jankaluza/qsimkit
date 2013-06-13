@@ -224,6 +224,7 @@ void Plot::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 int Plot::correctX(int x, double &t) {
+	m_context = 0;
 	t = (double(x - 25) / (width() - 35)) * (m_maxX - m_minX) + m_minX;
 	if (!m_pinHistory0) {
 		return x;
@@ -240,6 +241,7 @@ int Plot::correctX(int x, double &t) {
 		double toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
 		if (x > toX - 5 && x < toX + 5) {
 			t = (*it).t;
+			m_context = (*it).context;
 			return toX;
 		}
 	}
@@ -250,6 +252,14 @@ int Plot::correctX(int x, double &t) {
 void Plot::mousePressEvent(QMouseEvent *event) {
 	if (event->button() == Qt::RightButton) {
 		QList<QAction *> actions;
+
+		double dummy;
+		correctX(event->pos().x(), dummy);
+		if (m_context != 0) {
+			QAction *action = new QAction("Point to instruction", 0);
+			action->setData(2);
+			actions.append(action);
+		}
 
 		if (m_fromX != -1 && m_toX != -1) {
 			QAction *action = new QAction("Zoom", 0);
@@ -274,8 +284,11 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 					m_toX = -1;
 					repaint();
 				}
-				else {
+				else if (action->data() == 1) {
 					resetView();
+				}
+				else if (action->data() == 2) {
+					onPointToInstruction(m_context);
 				}
 			}
 		}

@@ -119,6 +119,10 @@ void QSimKit::populateToolBar() {
 	toolbar->addWidget(m_runUntil);
 }
 
+void QSimKit::pointToInstruction(int pc) {
+	m_disassembler->pointToInstruction(pc);
+}
+
 Screen *QSimKit::getScreen() {
 	return screen;
 }

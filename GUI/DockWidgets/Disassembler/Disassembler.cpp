@@ -167,8 +167,8 @@ void Disassembler::reloadCode() {
 	view->resizeColumnToContents(0);
 }
 
-void Disassembler::refresh() {
-	QString addr = QString("%1").arg(m_mcu->getRegisterSet()->get(0)->getBigEndian(), 0, 16);
+void Disassembler::pointToInstruction(uint16_t pc) {
+	QString addr = QString("%1").arg(pc, 0, 16);
 	QList<QTreeWidgetItem *> item = view->findItems(addr, Qt::MatchExactly);
 	if (item.empty()) {
 		return;
@@ -181,6 +181,10 @@ void Disassembler::refresh() {
 	m_currentItem = item[item.size() - 1];
 	m_currentItem->setBackground(1, QBrush(Qt::green));
 	view->scrollToItem(m_currentItem);
+}
+
+void Disassembler::refresh() {
+	pointToInstruction(m_mcu->getRegisterSet()->get(0)->getBigEndian());
 }
 
 void Disassembler::setMCU(MCU *mcu) {

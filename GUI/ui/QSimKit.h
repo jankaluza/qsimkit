@@ -75,6 +75,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void resetSimulation();
 
 		void showTrackedPins();
+		void pointToInstruction(int pc);
 
 	signals:
 		void onSimulationStarted(bool wasPaused);

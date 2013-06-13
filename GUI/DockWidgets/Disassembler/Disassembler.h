@@ -44,6 +44,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void refresh();
 
 		void showSourceCode(bool show);
+		void pointToInstruction(uint16_t pc);
 
 	public slots:
 		void handleContextMenu(const QPoint &point);
