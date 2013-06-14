@@ -21,7 +21,6 @@
 
 #include <stdint.h>
 #include <QLinkedList>
-#include "CPU/Memory/Register.h"
 
 typedef struct {
 	double t;

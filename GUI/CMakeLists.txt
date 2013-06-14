@@ -23,15 +23,22 @@ TARGET_LINK_LIBRARIES(qsimkit ${QT_LIBRARIES} ${PYTHONQT_LIBRARIES})
 ADD_SUBDIRECTORY(Peripherals)
 ADD_SUBDIRECTORY(MCU)
 
+# simkitperipheral library
 
 FILE(GLOB PERIPHERAL_HEADERS Peripherals/Peripheral.h
 	Peripherals/PeripheralInterface.h
 	Peripherals/SimulationObject.h
 	ui/ScreenObject.h
+	MCU/MCU.h
+	MCU/Register.h
+	MCU/RegisterSet.h
+	MCU/Memory.h
+	Tracking/PinHistory.h
 	)
 
 FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	ui/ScreenObject.cpp
+	Tracking/PinHistory.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})
