@@ -44,6 +44,7 @@
 
 #include "ScriptEngine.h"
 #include "Script.h"
+#include <iostream>
 
 ScriptEngine::ScriptEngine() : m_quiet(false) {
 	// Initialize engine
@@ -80,7 +81,7 @@ ScriptEngine::~ScriptEngine() {
 }
 
 void ScriptEngine::printOutput(const QString& str) {
-	qDebug("%s",str.toStdString().c_str());
+	std::cerr << str.toStdString();
 	emit(outputPrinted(str));
 }
 

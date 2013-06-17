@@ -32,6 +32,11 @@ PythonPeripheral::PythonPeripheral(Script *script) : m_script(script), m_screenR
 		m_pins.push_back(Pin(pins[i].toRect(), "", 0));
 	}
 
+	pins = m_script->getVariable("pins_desc").toList();
+	for (int i = 0; i < pins.size(); ++i) {
+		m_pins[i].name = pins[i].toString();
+	}
+
 }
 
 PythonPeripheral::~PythonPeripheral() {
