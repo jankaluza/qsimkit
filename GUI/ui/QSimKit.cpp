@@ -199,7 +199,7 @@ void QSimKit::simulationStep() {
 		if (m_sim->nextEventTime() >= until) {
 			refreshDockWidgets();
 			onSimulationStep(m_sim->nextEventTime());
-			stopSimulation();
+			pauseSimulation(true);
 			return;
 		}
 	}
@@ -248,6 +248,7 @@ void QSimKit::startSimulation() {
 }
 
 void QSimKit::stopSimulation() {
+	m_pauseAction->setChecked(false);
 	m_timer->stop();
 	m_pauseAction->setEnabled(false);
 	onSimulationStopped();
