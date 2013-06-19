@@ -195,7 +195,7 @@ void Disassembler::loadFileLines(QStringList &lines) {
 		QTextStream in(&file);
 
 		while(!in.atEnd()) {
-			lines.append(Qt::escape(in.readLine()));
+			lines.append(in.readLine());
 		}
 
 		file.close();
@@ -259,11 +259,11 @@ void Disassembler::reloadFileAssembler(QStringList &lines) {
 					i = qMax(l.getLineNumber() - 5, 0);
 					for (; i < l.getLineNumber() + 5 && i < lines.size(); ++i) {
 						if (i == l.getLineNumber()) {
-							tooltip += "<b>" + lines[i - 1] + "</b>";
+							tooltip += "<b>" + Qt::escape(lines[i - 1]) + "</b>";
 							addSourceLine(l.getAddr(), lines[i - 1]);
 						}
 						else {
-							tooltip += lines[i - 1];
+							tooltip += Qt::escape(lines[i - 1]);
 						}
 						tooltip += "<br/>";
 					}
