@@ -51,9 +51,11 @@ void Disassembler::handleFileChanged(int id) {
 }
 
 void Disassembler::showSourceCode(bool show) {
-	QList<QTreeWidgetItem *> items = view->findItems("", Qt::MatchExactly);
-	for (int i = 0; i < items.size(); ++i) {
-		items[i]->setHidden(!show);
+	for (int i = 0; i < view->topLevelItemCount(); ++i) {
+		QTreeWidgetItem *item = view->topLevelItem(i);
+		if (item->data(0, Qt::UserRole) == 0) {
+			item->setHidden(!show);
+		}
 	}
 
 	m_showSource = show;
