@@ -42,7 +42,7 @@
 #define INST_ITEM 1
 
 Disassembler::Disassembler(QSimKit *simkit) :
-DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true), m_pc(0) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -56,7 +56,14 @@ void Disassembler::handleFileChanged(int id) {
 
 void Disassembler::showAssembler(bool show) {
 	m_showAssembler = show;
+
+	uint16_t currentPc = m_pc;
+
 	reloadFile();
+
+	if (currentPc) {
+		pointToInstruction(currentPc);
+	}
 }
 
 void Disassembler::showSourceCode(bool show) {
@@ -271,6 +278,7 @@ void Disassembler::reloadFileAssembler(QStringList &lines) {
 void Disassembler::reloadFile() {
 	view->clear();
 	m_currentItems.clear();
+	m_pc = 0;
 	m_pairedInstructions.clear();
 
 	QStringList lines;
@@ -289,6 +297,7 @@ void Disassembler::reloadCode() {
 	file->clear();
 	func->clear();
 	m_currentItems.clear();
+	m_pc = 0;
 	m_currentFile = "";
 
 	if (!m_mcu) {
@@ -323,6 +332,7 @@ QString Disassembler::findFileWithAddr(uint16_t addr) {
 }
 
 void Disassembler::pointToInstruction(uint16_t pc) {
+	m_pc = pc;
 	if (m_pairedInstructions.contains(pc)) {
 		pc = m_pairedInstructions[pc];
 	}

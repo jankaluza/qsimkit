@@ -78,5 +78,6 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		DisassembledFiles m_files;
 		QString m_currentFile;
 		QHash<uint16_t, uint16_t> m_pairedInstructions;
+		uint16_t m_pc;
 };
 
