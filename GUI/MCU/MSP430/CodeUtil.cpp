@@ -24,7 +24,11 @@
 
 namespace CodeUtil {
 	
-static void parseCode(DisassembledCode &dc, QString &code) {
+static void parseCode(DisassembledFiles &df, QString &code) {
+	QString file;
+	DisassembledLine pendingSection;
+	int num = 0;
+
 	QStringList lines = code.split("\n", QString::SkipEmptyParts);
 	for (int i = 0; i < lines.size(); ++i) {
 		QString &line = lines[i];
@@ -54,25 +58,32 @@ static void parseCode(DisassembledCode &dc, QString &code) {
 					continue;
 				}
 
-				dc.append(DisassembledLine(addr.toInt(0, 16), DisassembledLine::Instruction, inst));
+				df[file].append(DisassembledLine(addr.toInt(0, 16), num, DisassembledLine::Instruction, inst));
 			}
 			else {
-				dc.append(DisassembledLine(0, DisassembledLine::Code, line));
+				df[file].append(DisassembledLine(0, num, DisassembledLine::Code, line));
 			}
 		}
 		else if (line[0] == '0') {
 			QString addr = line.left(8).right(4);
-			dc.append(DisassembledLine(addr.toInt(0, 16), DisassembledLine::Section, line.mid(9)));
+			pendingSection = DisassembledLine(addr.toInt(0, 16), num, DisassembledLine::Section, line.mid(9));
 		}
-		else if (i > 2) {
-			
-			dc.append(DisassembledLine(0, DisassembledLine::Code, line));
+		else if (line.startsWith("+<")) {
+			file = line.mid(6, line.indexOf(':') - 6);
+			num = line.mid(line.indexOf(':') + 1).toInt();
+			if (pendingSection.getAddr()) {
+				df[file].append(pendingSection);
+				pendingSection = DisassembledLine();
+			}
 		}
+// 		else if (i > 2) {
+// 			df[file].append(DisassembledLine(0, 0, DisassembledLine::Code, line));
+// 		}
 	}
 }
 
-DisassembledCode disassemble(const QByteArray &elf, const QString &a43) {
-	DisassembledCode dc;
+DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
+	DisassembledFiles df;
 
 	bool hasELF = true;
 	QByteArray code = elf;
@@ -83,30 +94,30 @@ DisassembledCode disassemble(const QByteArray &elf, const QString &a43) {
 
 	QFile file("test.dump");
 	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
-		return dc;
+		return df;
 
 	file.write(code);
 	file.close();
 
 	QProcess objdump;
 	if (hasELF) {
-		objdump.start("msp430-objdump", QStringList() << "-dS" << "test.dump");
+		objdump.start("msp430-objdump", QStringList() << "-dSl" << "--prefix=+<FILE" << "test.dump");
 	}
 	else {
 		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << "test.dump");
 	}
 	
 	if (!objdump.waitForStarted()) {
-		return dc;
+		return df;
 	}
 
 	if (!objdump.waitForFinished())
-		return dc;
+		return df;
 
 	QString result = QString(objdump.readAll());
-	parseCode(dc, result);
+	parseCode(df, result);
 
-	return dc;
+	return df;
 }
 
 QString ELFToA43(const QByteArray &elf) {

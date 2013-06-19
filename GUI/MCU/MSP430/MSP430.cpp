@@ -339,7 +339,7 @@ void MCU_MSP430::loadELFOption() {
 	loadELF(file.readAll());
 }
 
-DisassembledCode MCU_MSP430::getDisassembledCode() {
+DisassembledFiles MCU_MSP430::getDisassembledCode() {
 	return CodeUtil::disassemble(m_elf, m_code);
 }
 

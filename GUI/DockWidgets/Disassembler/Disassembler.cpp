@@ -38,10 +38,16 @@
 #include <QDebug>
 
 Disassembler::Disassembler(QSimKit *simkit) :
-DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_currentItem(0), m_showSource(true) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
+	connect(file, SIGNAL(currentIndexChanged(int)), this, SLOT(handleFileChanged(int)));
+}
+
+void Disassembler::handleFileChanged(int id) {
+	m_currentFile = file->itemData(id).toString();
+	reloadFile();
 }
 
 void Disassembler::showSourceCode(bool show) {
@@ -92,8 +98,12 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 
 void Disassembler::addBreakpoint() {
 	QTreeWidgetItem *item = view->currentItem();
-	item->setBackground(0, QBrush(Qt::red));
-	m_breakpoints.append(item);
+
+	QList<QTreeWidgetItem *> items = view->findItems(item->text(0), Qt::MatchExactly);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, QBrush(Qt::red));
+		m_breakpoints.append(it);
+	}
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->addRegisterBreak(0, item->text(0).toInt(0, 16));
@@ -102,17 +112,21 @@ void Disassembler::addBreakpoint() {
 
 void Disassembler::removeBreakpoint() {
 	QTreeWidgetItem *item = view->currentItem();
-	item->setBackground(0, view->palette().window());
-	m_breakpoints.removeAll(item);
+	QList<QTreeWidgetItem *> items = view->findItems(item->text(0), Qt::MatchExactly);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, view->palette().window());
+		m_breakpoints.removeAll(it);
+	}
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->removeRegisterBreak(0, item->text(0).toInt(0, 16));
 	qDebug() << "removing break when PC is" << item->text(0).toInt(0, 16);
 }
 
-void Disassembler::addSourceLine(const QString &line) {
+void Disassembler::addSourceLine(uint16_t addr, const QString &line) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
-	item->setText(0, "");
+	item->setText(0, QString::number(addr, 16));
+	item->setData(0, Qt::UserRole, 0);
 	item->setText(1, line);
 	item->setBackground(0, QBrush(QColor(200, 255, 200)));
 	item->setBackground(1, QBrush(QColor(200, 255, 200)));
@@ -122,10 +136,12 @@ void Disassembler::addSourceLine(const QString &line) {
 	item->setFont(1, f);
 }
 
-void Disassembler::addInstructionLine(uint16_t addr, const QString &line) {
+void Disassembler::addInstructionLine(uint16_t addr, const QString &line, const QString &tooltip) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
 	item->setText(0, QString::number(addr, 16));
+	item->setData(0, Qt::UserRole, 1);
 	item->setText(1, "  " + line);
+	item->setToolTip(1, tooltip);
 	item->setBackground(0, view->palette().window());
 }
 
@@ -141,46 +157,123 @@ void Disassembler::addSectionLine(uint16_t addr, const QString &line) {
 	item->setBackground(1, view->palette().window());
 }
 
-void Disassembler::reloadCode() {
+void Disassembler::reloadFile() {
 	view->clear();
-	m_currentItem = 0;
+	m_currentItems.clear();
 
-	if (!m_mcu) {
-		return;
+	QStringList lines;
+	QFile file(m_currentFile);
+	if(file.open(QIODevice::ReadOnly)) {
+		QTextStream in(&file);
+
+		while(!in.atEnd()) {
+			lines.append(in.readLine());
+		}
+
+		file.close();
 	}
 
-	DisassembledCode code = m_mcu->getDisassembledCode();
+	QString tooltip = "";
+	int i;
+	int previousLine = 0;
+	DisassembledCode &code = m_files[m_currentFile];
 	foreach(const DisassembledLine &l, code) {
 		switch(l.getType()) {
-			case DisassembledLine::Code:
-				addSourceLine(l.getData());
-				break;
 			case DisassembledLine::Instruction:
-				addInstructionLine(l.getAddr(), l.getData());
+				if (l.getLineNumber() != previousLine) {
+					tooltip = "";
+					i = l.getLineNumber() - 5;
+					i = i < 0 ? 0 : i;
+					for (; i < l.getLineNumber() + 5 && i < lines.size(); ++i) {
+						if (i == l.getLineNumber()) {
+							tooltip += "<b>" + lines[i - 1] + "</b>";
+							addSourceLine(l.getAddr(), lines[i - 1]);
+						}
+						else {
+							tooltip += lines[i - 1];
+						}
+						tooltip += "<br/>";
+					}
+					previousLine = l.getLineNumber();
+				}
+
+				addInstructionLine(l.getAddr(), l.getData(), tooltip);
 				break;
 			case DisassembledLine::Section:
 				addSectionLine(l.getAddr(), l.getData());
 				break;
 		}
 	}
+}
+
+void Disassembler::reloadCode() {
+	view->clear();
+	file->clear();
+	func->clear();
+	m_currentItems.clear();
+	m_currentFile = "";
+
+	if (!m_mcu) {
+		return;
+	}
+
+	m_files = m_mcu->getDisassembledCode();
+	DisassembledFiles::iterator it = m_files.begin();
+	while (it != m_files.end()) {
+		QString f = it.key();
+		f = f.mid(f.lastIndexOf("/"));
+		file->addItem(f, it.key());
+		++it;
+	}
 
 	view->resizeColumnToContents(0);
+}
+
+QString Disassembler::findFileWithAddr(uint16_t addr) {
+	DisassembledFiles::iterator it = m_files.begin();
+	while (it != m_files.end()) {
+		DisassembledCode &code = it.value();
+		foreach(const DisassembledLine &l, code) {
+			if (l.getAddr() == addr) {
+				return it.key();
+			}
+		}
+		++it;
+	}
+	return QString();
 }
 
 void Disassembler::pointToInstruction(uint16_t pc) {
 	QString addr = QString("%1").arg(pc, 0, 16);
 	QList<QTreeWidgetItem *> item = view->findItems(addr, Qt::MatchExactly);
 	if (item.empty()) {
+		QString f = findFileWithAddr(pc);
+		if (f.isEmpty()) {
+			return;
+		}
+
+		m_currentFile = f;
+		file->setCurrentIndex(file->findData(f));
+		reloadFile();
+		pointToInstruction(pc);
 		return;
 	}
 
-	if (m_currentItem) {
-		m_currentItem->setBackground(1, view->palette().base());
+	for (int i = 0; i < m_currentItems.size(); ++i) {
+		if (m_currentItems[i]->data(0, Qt::UserRole) == 0) {
+			m_currentItems[i]->setBackground(1, QBrush(QColor(200, 255, 200)));
+		}
+		else {
+			m_currentItems[i]->setBackground(1, view->palette().base());
+		}
 	}
 
-	m_currentItem = item[item.size() - 1];
-	m_currentItem->setBackground(1, QBrush(Qt::green));
-	view->scrollToItem(m_currentItem);
+	m_currentItems = item;
+	for (int i = 0; i < m_currentItems.size(); ++i) {
+		m_currentItems[i]->setBackground(1, QBrush(Qt::green));
+	}
+
+	view->scrollToItem(m_currentItems[0]);
 }
 
 void Disassembler::refresh() {

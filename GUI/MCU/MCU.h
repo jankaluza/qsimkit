@@ -20,6 +20,7 @@
 #pragma once
 
 #include <QWidget>
+#include <QHash>
 #include <QString>
 #include <QStringList>
 #include <QChar>
@@ -38,8 +39,8 @@ class DisassembledLine {
 	public:
 		typedef enum {Instruction, Code, Section} Type;
 
-		DisassembledLine(uint16_t addr, Type type = Instruction, const QString &data = "") :
-			m_addr(addr), m_type(type), m_data(data) {}
+		DisassembledLine(uint16_t addr = 0, int lineNumber = 0, Type type = Instruction, const QString &data = "") :
+			m_addr(addr), m_type(type), m_data(data), m_line(lineNumber) {}
 
 		uint16_t getAddr() const {
 			return m_addr;
@@ -53,13 +54,20 @@ class DisassembledLine {
 			return m_data;
 		}
 
+		int getLineNumber() const {
+			return m_line;
+		}
+
 	private:
 		uint16_t m_addr;
 		Type m_type;
 		QString m_data;
+		int m_line;
 };
 
 typedef QList<DisassembledLine> DisassembledCode;
+
+typedef QHash<QString, DisassembledCode> DisassembledFiles;
 
 class MCU : public Peripheral {
 	Q_OBJECT
@@ -75,7 +83,7 @@ class MCU : public Peripheral {
 
 		virtual Memory *getMemory() = 0;
 
-		virtual DisassembledCode getDisassembledCode() = 0;
+		virtual DisassembledFiles getDisassembledCode() = 0;
 
 
 	signals:

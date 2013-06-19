@@ -110,7 +110,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		void loadELF(const QByteArray &elf);
 
-		DisassembledCode getDisassembledCode();
+		DisassembledFiles getDisassembledCode();
 
 	private:
 		void loadELFOption();
