@@ -47,6 +47,11 @@ DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssemb
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
 	connect(file, SIGNAL(currentIndexChanged(int)), this, SLOT(handleFileChanged(int)));
+	connect(showMode, SIGNAL(clicked()), this, SLOT(handleShowModeClicked()));
+}
+
+void Disassembler::handleShowModeClicked() {
+	showAssembler(not m_showAssembler);
 }
 
 void Disassembler::handleFileChanged(int id) {
@@ -56,6 +61,13 @@ void Disassembler::handleFileChanged(int id) {
 
 void Disassembler::showAssembler(bool show) {
 	m_showAssembler = show;
+
+	if (m_showAssembler) {
+		showMode->setText("Show C");
+	}
+	else {
+		showMode->setText("Show ASM");
+	}
 
 	uint16_t currentPc = m_pc;
 
@@ -98,11 +110,6 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 	showSource->setChecked(m_showSource);
 	actions.append(showSource);
 
-	QAction *showAsm = new QAction("Show assembler", 0);
-	showAsm->setCheckable(true);
-	showAsm->setChecked(m_showAssembler);
-	actions.append(showAsm);
-
 	QAction *action = QMenu::exec(actions, view->mapToGlobal(pos), 0, 0);
 	if (!action) {
 		return;
@@ -116,9 +123,6 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 	}
 	else if (action == showSource) {
 		showSourceCode(action->isChecked());
-	}
-	else if (action == showAsm) {
-		showAssembler(action->isChecked());
 	}
 }
 
