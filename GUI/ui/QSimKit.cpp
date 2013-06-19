@@ -67,7 +67,7 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	connect(actionSave_project, SIGNAL(triggered()), this, SLOT(saveProject()) );
 	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
 	connect(actionProject_options, SIGNAL(triggered()), this, SLOT(projectOptions()) );
-	connect(actionTracked_pins, SIGNAL(triggered()), this, SLOT(showTrackedPins()) );
+	connect(actionTracked_pins, SIGNAL(triggered(bool)), this, SLOT(showTrackedPins(bool)) );
 
 	populateToolBar();
 
@@ -127,8 +127,8 @@ Screen *QSimKit::getScreen() {
 	return screen;
 }
 
-void QSimKit::showTrackedPins() {
-	m_trackedPins->show();
+void QSimKit::showTrackedPins(bool value) {
+	m_trackedPins->setVisible(value);
 }
 
 void QSimKit::addDockWidget(DockWidget *widget, Qt::DockWidgetArea area) {
