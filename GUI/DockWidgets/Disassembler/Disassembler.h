@@ -29,6 +29,8 @@
 
 #include "ui_Disassembler.h"
 
+#include "MCU/MCU.h"
+
 class MCU;
 class QSimKit;
 
@@ -49,19 +51,26 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 	public slots:
 		void handleContextMenu(const QPoint &point);
 		void reloadCode();
+		void reloadFile();
+
+	private slots:
+		void handleFileChanged(int id);
 
 	private:
 		void addBreakpoint();
 		void removeBreakpoint();
-		void addSourceLine(const QString &line);
-		void addInstructionLine(uint16_t addr, const QString &line);
+		void addSourceLine(uint16_t addr, const QString &line);
+		void addInstructionLine(uint16_t addr, const QString &line, const QString &tooltip);
 		void addSectionLine(uint16_t addr, const QString &line);
+		QString findFileWithAddr(uint16_t addr);
 
 	private:
 		MCU *m_mcu;
 		QSimKit *m_simkit;
-		QTreeWidgetItem *m_currentItem;
+		QList<QTreeWidgetItem *> m_currentItems;
 		QList<QTreeWidgetItem *> m_breakpoints;
 		bool m_showSource;
+		DisassembledFiles m_files;
+		QString m_currentFile;
 };
 
