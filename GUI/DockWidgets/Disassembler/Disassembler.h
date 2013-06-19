@@ -46,6 +46,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void refresh();
 
 		void showSourceCode(bool show);
+		void showAssembler(bool show);
 		void pointToInstruction(uint16_t pc);
 
 	public slots:
@@ -63,6 +64,9 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void addInstructionLine(uint16_t addr, const QString &line, const QString &tooltip);
 		void addSectionLine(uint16_t addr, const QString &line);
 		QString findFileWithAddr(uint16_t addr);
+		void loadFileLines(QStringList &lines);
+		void reloadFileAssembler(QStringList &lines);
+		void reloadFileSource(QStringList &lines);
 
 	private:
 		MCU *m_mcu;
@@ -70,7 +74,9 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		QList<QTreeWidgetItem *> m_currentItems;
 		QList<QTreeWidgetItem *> m_breakpoints;
 		bool m_showSource;
+		bool m_showAssembler;
 		DisassembledFiles m_files;
 		QString m_currentFile;
+		QHash<uint16_t, uint16_t> m_pairedInstructions;
 };
 

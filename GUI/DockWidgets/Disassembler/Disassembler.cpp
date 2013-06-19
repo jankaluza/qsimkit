@@ -36,9 +36,13 @@
 #include <QProcess>
 #include <QTreeWidgetItem>
 #include <QDebug>
+#include <QTextDocument>
+
+#define SRC_ITEM 0
+#define INST_ITEM 1
 
 Disassembler::Disassembler(QSimKit *simkit) :
-DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -50,10 +54,15 @@ void Disassembler::handleFileChanged(int id) {
 	reloadFile();
 }
 
+void Disassembler::showAssembler(bool show) {
+	m_showAssembler = show;
+	reloadFile();
+}
+
 void Disassembler::showSourceCode(bool show) {
 	for (int i = 0; i < view->topLevelItemCount(); ++i) {
 		QTreeWidgetItem *item = view->topLevelItem(i);
-		if (item->data(0, Qt::UserRole) == 0) {
+		if (item->data(0, Qt::UserRole) == SRC_ITEM) {
 			item->setHidden(!show);
 		}
 	}
@@ -77,10 +86,15 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 		actions.append(remove);
 	}
 
-	QAction *showSource = new QAction("Show source code", 0);
+	QAction *showSource = new QAction("Show inline source code", 0);
 	showSource->setCheckable(true);
 	showSource->setChecked(m_showSource);
 	actions.append(showSource);
+
+	QAction *showAsm = new QAction("Show assembler", 0);
+	showAsm->setCheckable(true);
+	showAsm->setChecked(m_showAssembler);
+	actions.append(showAsm);
 
 	QAction *action = QMenu::exec(actions, view->mapToGlobal(pos), 0, 0);
 	if (!action) {
@@ -95,6 +109,9 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 	}
 	else if (action == showSource) {
 		showSourceCode(action->isChecked());
+	}
+	else if (action == showAsm) {
+		showAssembler(action->isChecked());
 	}
 }
 
@@ -127,11 +144,13 @@ void Disassembler::removeBreakpoint() {
 
 void Disassembler::addSourceLine(uint16_t addr, const QString &line) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
-	item->setText(0, QString::number(addr, 16));
-	item->setData(0, Qt::UserRole, 0);
+	item->setText(0, addr ? QString::number(addr, 16) : "");
+	item->setData(0, Qt::UserRole, SRC_ITEM);
 	item->setText(1, line);
-	item->setBackground(0, QBrush(QColor(200, 255, 200)));
-	item->setBackground(1, QBrush(QColor(200, 255, 200)));
+	if (addr) {
+		item->setBackground(0, QBrush(QColor(200, 255, 200)));
+		item->setBackground(1, QBrush(QColor(200, 255, 200)));
+	}
 	QFont f = item->font(1);
 	f.setPointSize(f.pointSize() - 2);
 	item->setFont(0, f);
@@ -141,7 +160,7 @@ void Disassembler::addSourceLine(uint16_t addr, const QString &line) {
 void Disassembler::addInstructionLine(uint16_t addr, const QString &line, const QString &tooltip) {
 	QTreeWidgetItem *item = new QTreeWidgetItem(view);
 	item->setText(0, QString::number(addr, 16));
-	item->setData(0, Qt::UserRole, 1);
+	item->setData(0, Qt::UserRole, INST_ITEM);
 	item->setText(1, "  " + line);
 	item->setToolTip(1, tooltip);
 	item->setBackground(0, view->palette().window());
@@ -159,22 +178,62 @@ void Disassembler::addSectionLine(uint16_t addr, const QString &line) {
 	item->setBackground(1, view->palette().window());
 }
 
-void Disassembler::reloadFile() {
-	view->clear();
-	m_currentItems.clear();
-
-	QStringList lines;
+void Disassembler::loadFileLines(QStringList &lines) {
 	QFile file(m_currentFile);
 	if(file.open(QIODevice::ReadOnly)) {
 		QTextStream in(&file);
 
 		while(!in.atEnd()) {
-			lines.append(in.readLine());
+			lines.append(Qt::escape(in.readLine()));
 		}
 
 		file.close();
 	}
+}
 
+void Disassembler::reloadFileSource(QStringList &lines) {
+	//FIXME: This function should be rewriten to scale better. Current
+	// complexity is not good!
+	
+	DisassembledCode &code = m_files[m_currentFile];
+	int n = 1;
+	foreach(const QString &line, lines) {
+		bool found = false;
+		foreach(const DisassembledLine &l, code) {
+			if (l.getLineNumber() == n) {
+				addSourceLine(l.getAddr(), line);
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			addSourceLine(0, line);
+		}
+		++n;
+	}
+
+	// Paired instructions are used in this mode to show proper line in C
+	// even when it's compiled to more ASM instructions
+	int previousLine = 0;
+	uint16_t previousAddress = 0;
+	foreach(const DisassembledLine &l, code) {
+		switch(l.getType()) {
+			case DisassembledLine::Instruction:
+				if (l.getLineNumber() != previousLine) {
+					previousLine = l.getLineNumber();
+					previousAddress = l.getAddr();
+				}
+				else {
+					m_pairedInstructions[l.getAddr()] = previousAddress;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+void Disassembler::reloadFileAssembler(QStringList &lines) {
 	QString tooltip = "";
 	int i;
 	int previousLine = 0;
@@ -184,8 +243,9 @@ void Disassembler::reloadFile() {
 			case DisassembledLine::Instruction:
 				if (l.getLineNumber() != previousLine) {
 					tooltip = "";
-					i = l.getLineNumber() - 5;
-					i = i < 0 ? 0 : i;
+					// As a tooltip, set the 10 source code lines around the
+					// line for which this instruction is generated.
+					i = qMax(l.getLineNumber() - 5, 0);
 					for (; i < l.getLineNumber() + 5 && i < lines.size(); ++i) {
 						if (i == l.getLineNumber()) {
 							tooltip += "<b>" + lines[i - 1] + "</b>";
@@ -208,6 +268,22 @@ void Disassembler::reloadFile() {
 	}
 }
 
+void Disassembler::reloadFile() {
+	view->clear();
+	m_currentItems.clear();
+	m_pairedInstructions.clear();
+
+	QStringList lines;
+	loadFileLines(lines);
+
+	if (m_showAssembler || lines.isEmpty()) {
+		reloadFileAssembler(lines);
+	}
+	else {
+		reloadFileSource(lines);
+	}
+}
+
 void Disassembler::reloadCode() {
 	view->clear();
 	file->clear();
@@ -219,11 +295,12 @@ void Disassembler::reloadCode() {
 		return;
 	}
 
+	// Fill in the files list
 	m_files = m_mcu->getDisassembledCode();
 	DisassembledFiles::iterator it = m_files.begin();
 	while (it != m_files.end()) {
 		QString f = it.key();
-		f = f.mid(f.lastIndexOf("/"));
+		f = f.mid(f.lastIndexOf("/") + 1);
 		file->addItem(f, it.key());
 		++it;
 	}
@@ -246,11 +323,25 @@ QString Disassembler::findFileWithAddr(uint16_t addr) {
 }
 
 void Disassembler::pointToInstruction(uint16_t pc) {
+	if (m_pairedInstructions.contains(pc)) {
+		pc = m_pairedInstructions[pc];
+	}
+
 	QString addr = QString("%1").arg(pc, 0, 16);
-	QList<QTreeWidgetItem *> item = view->findItems(addr, Qt::MatchExactly);
-	if (item.empty()) {
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
+	if (items.empty()) {
+		// If we don't have any item with this PC, maybe it is devined in
+		// different file. Try to find that file, load it and rerun ourself
 		QString f = findFileWithAddr(pc);
 		if (f.isEmpty()) {
+			return;
+		}
+
+		// If the file with addr is the same as the currently loaded file,
+		// we are probably showing C code and not assembler one (view has
+		// been populated using reloadFileSource()) and therefore there's
+		// nothing to point to right now.
+		if (m_currentFile == f) {
 			return;
 		}
 
@@ -261,8 +352,10 @@ void Disassembler::pointToInstruction(uint16_t pc) {
 		return;
 	}
 
+	// If we have previous items, change their background colors to the
+	// original one.
 	for (int i = 0; i < m_currentItems.size(); ++i) {
-		if (m_currentItems[i]->data(0, Qt::UserRole) == 0) {
+		if (m_currentItems[i]->data(0, Qt::UserRole) == SRC_ITEM) {
 			m_currentItems[i]->setBackground(1, QBrush(QColor(200, 255, 200)));
 		}
 		else {
@@ -270,7 +363,8 @@ void Disassembler::pointToInstruction(uint16_t pc) {
 		}
 	}
 
-	m_currentItems = item;
+	// Change background of current items to Green.
+	m_currentItems = items;
 	for (int i = 0; i < m_currentItems.size(); ++i) {
 		m_currentItems[i]->setBackground(1, QBrush(Qt::green));
 	}
