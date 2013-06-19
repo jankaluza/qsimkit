@@ -203,44 +203,35 @@ void Disassembler::loadFileLines(QStringList &lines) {
 }
 
 void Disassembler::reloadFileSource(QStringList &lines) {
-	//FIXME: This function should be rewriten to scale better. Current
-	// complexity is not good!
-	
 	DisassembledCode &code = m_files[m_currentFile];
-	int n = 1;
-	foreach(const QString &line, lines) {
-		bool found = false;
-		foreach(const DisassembledLine &l, code) {
-			if (l.getLineNumber() == n) {
-				addSourceLine(l.getAddr(), line);
-				found = true;
-				break;
-			}
-		}
-		if (!found) {
-			addSourceLine(0, line);
-		}
-		++n;
-	}
 
 	// Paired instructions are used in this mode to show proper line in C
 	// even when it's compiled to more ASM instructions
-	int previousLine = 0;
-	uint16_t previousAddress = 0;
+	QHash<int, uint16_t> line2addr;
 	foreach(const DisassembledLine &l, code) {
 		switch(l.getType()) {
 			case DisassembledLine::Instruction:
-				if (l.getLineNumber() != previousLine) {
-					previousLine = l.getLineNumber();
-					previousAddress = l.getAddr();
+				if (!line2addr.contains(l.getLineNumber())) {
+					line2addr[l.getLineNumber()] = l.getAddr();
 				}
 				else {
-					m_pairedInstructions[l.getAddr()] = previousAddress;
+					m_pairedInstructions[l.getAddr()] = line2addr[l.getLineNumber()];
 				}
 				break;
 			default:
 				break;
 		}
+	}
+
+	int n = 1;
+	foreach(const QString &line, lines) {
+		if (line2addr.contains(n)) {
+			addSourceLine(line2addr[n], line);
+		}
+		else {
+			addSourceLine(0, line);
+		}
+		++n;
 	}
 }
 
