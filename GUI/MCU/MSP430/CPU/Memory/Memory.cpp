@@ -23,6 +23,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 
 namespace MSP430 {
 
@@ -201,17 +202,46 @@ void Memory::setByte(uint16_t address, uint8_t value) {
 	callWatcher(address);
 }
 
-void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode) {
+void Memory::addWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode) {
 	switch (mode) {
-		case Read:
+		case MemoryWatcher::Read:
 			m_readWatchers[address].push_back(watcher);
 			break;
-		case Write:
+		case MemoryWatcher::Write:
 			m_watchers[address].push_back(watcher);
 			break;
-		case ReadWrite:
+		case MemoryWatcher::ReadWrite:
 			m_readWatchers[address].push_back(watcher);
 			m_watchers[address].push_back(watcher);
+			break;
+	}
+}
+
+void Memory::removeWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode) {
+	std::vector<MemoryWatcher *>::iterator it;
+	switch (mode) {
+		case MemoryWatcher::Read:
+			it = std::find(m_readWatchers[address].begin(), m_readWatchers[address].end(), watcher);
+			if (it != m_readWatchers[address].end()) {
+				m_readWatchers[address].erase(it);
+			}
+			break;
+		case MemoryWatcher::Write:
+			it = std::find(m_watchers[address].begin(), m_watchers[address].end(), watcher);
+			if (it != m_watchers[address].end()) {
+				m_watchers[address].erase(it);
+			}
+			break;
+		case MemoryWatcher::ReadWrite:
+			it = std::find(m_readWatchers[address].begin(), m_readWatchers[address].end(), watcher);
+			if (it != m_readWatchers[address].end()) {
+				m_readWatchers[address].erase(it);
+			}
+
+			it = std::find(m_watchers[address].begin(), m_watchers[address].end(), watcher);
+			if (it != m_watchers[address].end()) {
+				m_watchers[address].erase(it);
+			}
 			break;
 	}
 }

@@ -54,7 +54,7 @@ class PinMultiplexer : public MemoryWatcher {
 
 		void reset();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 		double getValue(bool &isInput);
 

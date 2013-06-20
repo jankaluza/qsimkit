@@ -42,7 +42,7 @@ GPPinHandler::~GPPinHandler() {
 	
 }
 
-void GPPinHandler::handleMemoryChanged(Memory *memory, uint16_t address) {
+void GPPinHandler::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	if (!m_active) {
 		return;
 	}

@@ -48,8 +48,8 @@ class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 			  uint16_t taiv, uint16_t intvect0, uint16_t intvect1);
 		virtual ~Timer();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
-		void handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
+		void handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value);
 
 		void handleInterruptFinished(InterruptManager *intManager, int vector);
 

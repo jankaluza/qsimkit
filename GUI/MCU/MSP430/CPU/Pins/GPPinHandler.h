@@ -44,7 +44,7 @@ class GPPinHandler : public PinHandler, public MemoryWatcher {
 
 		void handlePinDeactivated(const std::string &name);
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 	private:
 		Memory *m_mem;

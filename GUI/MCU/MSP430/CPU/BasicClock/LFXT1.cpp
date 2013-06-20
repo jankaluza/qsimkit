@@ -60,7 +60,7 @@ bool LFXT1::isChosen() {
 	}
 }
 
-void LFXT1::handleMemoryChanged(Memory *memory, uint16_t address) {
+void LFXT1::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	uint16_t value = m_mem->getBigEndian(m_variant->getBCSCTL3());
 
 	// TODO:

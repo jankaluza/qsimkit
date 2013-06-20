@@ -29,19 +29,9 @@
 namespace MSP430 {
 
 class RegisterSet;
-class Memory;
-
-class MemoryWatcher {
-	public:
-		virtual void handleMemoryChanged(Memory *memory, uint16_t address) = 0;
-
-		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {}
-		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint8_t &value) {}
-};
 
 class Memory : public ::Memory {
 	public:
-		typedef enum { Read, Write, ReadWrite } Mode;
 		Memory(unsigned int size);
 		virtual ~Memory();
 
@@ -55,7 +45,9 @@ class Memory : public ::Memory {
 		uint8_t getByte(uint16_t address);
 		void setByte(uint16_t address, uint8_t value);
 
-		void addWatcher(uint16_t address, MemoryWatcher *watcher, Mode mode = Write);
+		void addWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::Write);
+		void removeWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::ReadWrite);
+
 		void callWatcher(uint16_t address);
 		void callReadWatcher(uint16_t address, uint16_t &value);
 		void callReadWatcher(uint16_t address, uint8_t &value);

@@ -24,6 +24,18 @@
 #include <vector>
 #include <map>
 
+class Memory;
+
+class MemoryWatcher {
+	public:
+		typedef enum { Read, Write, ReadWrite } Mode;
+
+		virtual void handleMemoryChanged(Memory *memory, uint16_t address) = 0;
+
+		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {}
+		virtual void handleMemoryRead(Memory *memory, uint16_t address, uint8_t &value) {}
+};
+
 class Memory {
 	public:
 		Memory() {};
@@ -35,5 +47,10 @@ class Memory {
 
 		virtual uint8_t getByte(uint16_t address) = 0;
 		virtual void setByte(uint16_t address, uint8_t value) = 0;
+		virtual bool isBitSet(uint16_t address, uint16_t bit) = 0;
+		virtual void setBit(uint16_t address, uint16_t bit, bool value) = 0;
+		
+		virtual void addWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::Write) = 0;
+		virtual void removeWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::ReadWrite) = 0;
 };
 

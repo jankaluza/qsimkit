@@ -46,7 +46,7 @@ class LFXT1 : public Oscillator, public MemoryWatcher {
 
 		bool isChosen();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 	private:
 		Memory *m_mem;

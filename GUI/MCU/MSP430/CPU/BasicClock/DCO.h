@@ -36,7 +36,7 @@ class DCO : public Oscillator, public MemoryWatcher {
 		DCO(Memory *mem, Variant *variant);
 		virtual ~DCO();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 		virtual void reset();
 

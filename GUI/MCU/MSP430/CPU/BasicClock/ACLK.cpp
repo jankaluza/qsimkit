@@ -63,7 +63,7 @@ void ACLK::reset() {
 }
 
 
-void ACLK::handleMemoryChanged(Memory *memory, uint16_t address) {
+void ACLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	uint16_t value = m_mem->getBigEndian(address);
 	if (address == m_variant->getBCSCTL1()) {
 		// Set divider according DIVAx bits

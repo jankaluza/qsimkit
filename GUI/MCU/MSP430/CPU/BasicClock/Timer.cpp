@@ -44,7 +44,7 @@ m_tar(tar), m_taiv(taiv), m_intvect0(intvect0), m_intvect1(intvect1),
 m_type(type), m_counterMax(0xffff), m_counter(0) {
 
 	m_mem->addWatcher(tactl, this);
-	m_mem->addWatcher(taiv, this, Memory::Read);
+	m_mem->addWatcher(taiv, this, MemoryWatcher::Read);
 
 	m_intManager->addWatcher(m_intvect0, this);
 	m_intManager->addWatcher(m_intvect1, this);
@@ -81,9 +81,9 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	m_ccr.push_back(ccr);
 
 	// Setup memory watcher for ccr so we can generate Capture overflow (COV).
-	m_mem->addWatcher(taccr, this, Memory::ReadWrite);
+	m_mem->addWatcher(taccr, this, MemoryWatcher::ReadWrite);
 	// Setup memory watcher for cctl so we can change output according to OUT
-	m_mem->addWatcher(tacctl, this, Memory::Write);
+	m_mem->addWatcher(tacctl, this, MemoryWatcher::Write);
 }
 
 void Timer::doOutput(CCR &ccr, uint16_t tacctl, bool ccr0_interrupt) {
@@ -386,7 +386,7 @@ void Timer::generateOutput(CCR &ccr, bool value) {
 	}
 }
 
-void Timer::handleMemoryChanged(Memory *memory, uint16_t address) {
+void Timer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	uint16_t val = memory->getBigEndian(address, false);
 
 	if (address == m_tactl) {
@@ -533,7 +533,7 @@ void Timer::handleInterruptFinished(InterruptManager *intManager, int vector) {
 	}
 }
 
-void Timer::handleMemoryRead(Memory *memory, uint16_t address, uint16_t &value) {
+void Timer::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) {
 	if (address == m_taiv) {
 		// Check what interrupts we have queued and set 'value' to the one
 		// with highest priority. TAIV will remain 0.

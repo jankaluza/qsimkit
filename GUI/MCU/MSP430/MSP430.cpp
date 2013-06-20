@@ -109,6 +109,10 @@ RegisterSet *MCU_MSP430::getRegisterSet() {
 	return m_reg;
 }
 
+Memory *MCU_MSP430::getMemory() {
+	
+}
+
 QString MCU_MSP430::getVariant() {
 	if (!m_variant) {
 		return "";

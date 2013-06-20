@@ -41,7 +41,7 @@ class MCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1);
 		virtual ~MCLK();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 		void reset();
 

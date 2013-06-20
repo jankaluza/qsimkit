@@ -62,7 +62,7 @@ double MCLK::getStep() {
 	return m_source->getStep();
 }
 
-void MCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
+void MCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	// Set divider and source
 	uint16_t ctl2 = m_mem->getBigEndian(m_variant->getBCSCTL2());
 

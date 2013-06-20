@@ -28,7 +28,6 @@ class Variant;
 
 namespace MSP430 {
 
-class Memory;
 class RegisterSet;
 class Instruction;
 class InterruptManager;

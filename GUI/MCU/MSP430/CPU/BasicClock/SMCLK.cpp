@@ -58,7 +58,7 @@ void SMCLK::reset() {
 }
 
 
-void SMCLK::handleMemoryChanged(Memory *memory, uint16_t address) {
+void SMCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	uint16_t ctl2 = m_mem->getBigEndian(m_variant->getBCSCTL2());
 
 	// Choose divider - DIVSx

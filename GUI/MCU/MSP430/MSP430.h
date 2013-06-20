@@ -104,9 +104,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		RegisterSet *getRegisterSet();
 
-		Memory *getMemory() {
-			return m_mem;
-		}
+		Memory *getMemory();
 
 		void loadELF(const QByteArray &elf);
 

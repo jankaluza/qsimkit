@@ -98,7 +98,7 @@ double PinMultiplexer::getValue(bool &isInput) {
 	return m_value;
 }
 
-void PinMultiplexer::handleMemoryChanged(Memory *memory, uint16_t address) {
+void PinMultiplexer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	for (int i = 0; i < m_conds.size(); ++i) {
 		const Condition &c = m_conds[i];
 		bool satisfied = true;

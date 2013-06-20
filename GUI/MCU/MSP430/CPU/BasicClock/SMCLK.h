@@ -39,7 +39,7 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		SMCLK(Memory *mem, Variant *variant, DCO *dco);
 		virtual ~SMCLK();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 		void reset();
 

@@ -40,7 +40,7 @@ class ACLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1);
 		virtual ~ACLK();
 
-		void handleMemoryChanged(Memory *memory, uint16_t address);
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
 		void reset();
 
