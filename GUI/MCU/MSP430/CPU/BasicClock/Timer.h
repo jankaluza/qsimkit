@@ -61,7 +61,9 @@ class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 
 		void addCCR(const std::string &taName, const std::string &cciaName, const std::string &ccibName, uint16_t tacctl, uint16_t taccr);
 
-		void tick();
+		void tickRising();
+		void tick() { tickRising(); }
+		void tickFalling() {}
 
 		void reset();
 

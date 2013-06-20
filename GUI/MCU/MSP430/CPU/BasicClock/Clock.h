@@ -27,22 +27,27 @@ namespace MSP430 {
 
 class ClockHandler {
 	public:
-		virtual void tick() = 0;
+		virtual void tickRising() = 0;
+		virtual void tickFalling() = 0;
 };
 
 class Clock {
 	public:
+		typedef enum { Rising, Falling, RisingFalling } Mode;
+
 		Clock();
 		virtual ~Clock();
 
-		void addHandler(ClockHandler *handler);
+		void addHandler(ClockHandler *handler, Mode mode = RisingFalling);
 		void removeHandler(ClockHandler *handler);
-		void callHandlers();
+		void callRisingHandlers();
+		void callFallingHandlers();
 
 		virtual void reset() = 0;
 
 	private:
 		std::vector<ClockHandler *> m_handlers;
+		std::vector<ClockHandler *> m_fallingHandlers;
 };
 
 }

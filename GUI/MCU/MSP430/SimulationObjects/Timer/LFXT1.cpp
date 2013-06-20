@@ -41,5 +41,6 @@ void LFXT1::output(SimulationEventList &output) {
 }
 
 double LFXT1::timeAdvance() {
-	return getStep();
+	// Oscillator has to tick 2x faster, because it has to rise up and fall down.
+	return getStep() / 2;
 }

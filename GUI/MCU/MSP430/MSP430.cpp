@@ -77,7 +77,7 @@ m_syncing(0) {
 	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
 
 	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
-	m_basicClock->getMCLK()->addHandler(this);
+	m_basicClock->getMCLK()->addHandler(this, MSP430::Clock::Rising);
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
@@ -165,7 +165,7 @@ void MCU_MSP430::output(SimulationEventList &output) {
 	}
 }
 
-void MCU_MSP430::tick() {
+void MCU_MSP430::tickRising() {
 // 	std::cout << "tick\n";
 	if (++m_counter == m_instructionCycles) {
 // 		std::cout << "executed\n";

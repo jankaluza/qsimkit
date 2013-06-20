@@ -43,7 +43,8 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 
 		void reset();
 
-		void tick();
+		void tickRising();
+		void tickFalling();
 
 	private:
 		Memory *m_mem;

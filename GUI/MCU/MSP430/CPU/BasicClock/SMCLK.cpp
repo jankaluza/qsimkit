@@ -41,10 +41,16 @@ SMCLK::~SMCLK() {
 
 }
 
-void SMCLK::tick() {
+void SMCLK::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;
-		callHandlers();
+		callRisingHandlers();
+	}
+}
+
+void SMCLK::tickFalling() {
+	if (m_counter == (m_divider >> 2)) {
+		callFallingHandlers();
 	}
 }
 

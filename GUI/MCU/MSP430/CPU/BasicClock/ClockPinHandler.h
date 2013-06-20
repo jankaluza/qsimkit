@@ -43,7 +43,8 @@ class ClockPinHandler : public PinHandler, public ClockHandler {
 		virtual ~ClockPinHandler();
 
 		/// Called by Clock on every tick. Generates output signal on pin.
-		void tick();
+		void tickRising();
+		void tickFalling();
 
 		/// Called by PinMultiplexer in case of input signal. Any input is
 		/// ignored.

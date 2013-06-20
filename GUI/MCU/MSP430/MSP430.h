@@ -76,7 +76,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		double timeAdvance();
 
-		void tick();
+		void tickRising();
+		void tickFalling() {}
 
 		void reset();
 

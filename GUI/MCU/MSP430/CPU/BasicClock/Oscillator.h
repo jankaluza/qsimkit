@@ -27,7 +27,8 @@ namespace MSP430 {
 
 class OscillatorHandler {
 	public:
-		virtual void tick() = 0;
+		virtual void tickRising() = 0;
+		virtual void tickFalling() = 0;
 };
 
 class Oscillator {
@@ -46,6 +47,7 @@ class Oscillator {
 
 	private:
 		std::vector<OscillatorHandler *> m_handlers;
+		bool m_rising;
 };
 
 }

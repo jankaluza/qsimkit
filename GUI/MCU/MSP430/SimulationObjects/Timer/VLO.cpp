@@ -41,5 +41,6 @@ void VLO::output(SimulationEventList &output) {
 }
 
 double VLO::timeAdvance() {
-	return getStep();
+	// Oscillator has to tick 2x faster, because it has to rise up and fall down.
+	return getStep() / 2;
 }

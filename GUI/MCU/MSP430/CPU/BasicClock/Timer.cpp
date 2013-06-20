@@ -364,7 +364,7 @@ void Timer::changeTAR(uint8_t mode) {
 	}
 }
 
-void Timer::tick() {
+void Timer::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;
 		uint8_t mode = (m_mem->getByte(m_tactl) >> 4) & 3;
@@ -377,7 +377,7 @@ void Timer::reset() {
 		m_source->removeHandler(this);
 	}
 	m_source = m_aclk;
-	m_source->addHandler(this);
+	m_source->addHandler(this, Clock::Rising);
 }
 
 void Timer::generateOutput(CCR &ccr, bool value) {
@@ -415,14 +415,14 @@ void Timer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 					m_source->removeHandler(this);
 				}
 				m_source = m_aclk;
-				m_source->addHandler(this);
+				m_source->addHandler(this, Clock::Rising);
 				break;
 			case 2:
 				if (m_source) {
 					m_source->removeHandler(this);
 				}
 				m_source = m_smclk;
-				m_source->addHandler(this);
+				m_source->addHandler(this, Clock::Rising);
 				break;
 			case 3: break;
 			default: break;

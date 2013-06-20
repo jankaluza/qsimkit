@@ -41,5 +41,6 @@ void DCO::output(SimulationEventList &output) {
 }
 
 double DCO::timeAdvance() {
-	return getStep();
+	// Oscillator has to tick 2x faster, because it has to rise up and fall down.
+	return getStep() / 2;
 }

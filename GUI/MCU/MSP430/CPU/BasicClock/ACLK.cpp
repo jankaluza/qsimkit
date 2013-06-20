@@ -45,10 +45,16 @@ ACLK::~ACLK() {
 
 }
 
-void ACLK::tick() {
+void ACLK::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;
-		callHandlers();
+		callRisingHandlers();
+	}
+}
+
+void ACLK::tickFalling() {
+	if (m_counter == (m_divider >> 2)) {
+		callFallingHandlers();
 	}
 }
 

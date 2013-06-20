@@ -30,8 +30,19 @@ Clock::~Clock() {
 	
 }
 
-void Clock::addHandler(ClockHandler *handler) {
-	m_handlers.push_back(handler);
+void Clock::addHandler(ClockHandler *handler, Mode mode) {
+	switch (mode) {
+		case Rising:
+			m_handlers.push_back(handler);
+			break;
+		case Falling:
+			m_fallingHandlers.push_back(handler);
+			break;
+		case RisingFalling:
+			m_handlers.push_back(handler);
+			m_fallingHandlers.push_back(handler);
+			break;
+	}
 }
 
 void Clock::removeHandler(ClockHandler *handler) {
@@ -39,11 +50,22 @@ void Clock::removeHandler(ClockHandler *handler) {
 	if (it != m_handlers.end()) {
 		m_handlers.erase(it);
 	}
+
+	it = std::find(m_fallingHandlers.begin(), m_fallingHandlers.end(), handler);
+	if (it != m_fallingHandlers.end()) {
+		m_fallingHandlers.erase(it);
+	}
 }
 
-void Clock::callHandlers() {
+void Clock::callRisingHandlers() {
 	for (std::vector<ClockHandler *>::const_iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
-		(*it)->tick();
+		(*it)->tickRising();
+	}
+}
+
+void Clock::callFallingHandlers() {
+	for (std::vector<ClockHandler *>::const_iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
+		(*it)->tickFalling();
 	}
 }
 

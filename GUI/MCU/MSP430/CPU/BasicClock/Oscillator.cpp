@@ -23,7 +23,7 @@
 
 namespace MSP430 {
 	
-Oscillator::Oscillator() {
+Oscillator::Oscillator() : m_rising(true) {
 }
 
 Oscillator::~Oscillator() {
@@ -43,7 +43,12 @@ void Oscillator::removeHandler(OscillatorHandler *handler) {
 
 void Oscillator::tick() {
 	for (std::vector<OscillatorHandler *>::const_iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
-		(*it)->tick();
+		if (m_rising) {
+			(*it)->tickRising();
+		}
+		else {
+			(*it)->tickFalling();
+		}
 	}
 }
 
