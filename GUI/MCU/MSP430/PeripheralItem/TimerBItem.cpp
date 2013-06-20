@@ -25,6 +25,7 @@
 #include "MCU/Register.h"
 #include "MCU/Memory.h"
 #include "Peripherals/Peripheral.h"
+#include "DockWidgets/Peripherals/MemoryItem.h"
 #include "CPU/Variants/Variant.h"
 
 #include <QWidget>
@@ -48,11 +49,7 @@ TimerBItem::TimerBItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	Variant *v = m_cpu->getVariantPtr();
 
 #define ADD_ITEM(METHOD, NAME) if (METHOD != 0) { \
-	item = new QTreeWidgetItem(this); \
-	item->setData(0, Qt::UserRole, METHOD); \
-	item->setText(0, NAME); \
-	item->setText(1, 0x00); \
-	item->setBackground(0, QApplication::palette().window()); \
+	item = new MemoryItem(this, NAME, METHOD); \
 }
 
 	ADD_ITEM(v->getTBCTL(), "TBCTL");
@@ -80,23 +77,7 @@ TimerBItem::~TimerBItem() {
 
 void TimerBItem::refresh() {
 	for (int i = 0; i < childCount(); ++i) {
-		QTreeWidgetItem *item = child(i);
-		int address = item->data(0, Qt::UserRole).toInt();
-		if (!address) {
-			continue;
-		}
-
-		int16_t n = m_cpu->getMemory()->getBigEndian(address);
-		QString dec = QString::number(n);
-		QString hex = QString("0x%1").arg((uint16_t) n, 0, 16);
-		QString bin = QString("%1").arg((uint16_t) n, 0, 2);
-
-		item->setText(1, hex);
-
-		QString tooltip = "Dec: " + dec + "<br/>";
-		tooltip += "Hex: " + hex + "<br/>";
-		tooltip += "Bin: " + bin;
-		item->setToolTip(1, tooltip);
-	
+		MemoryItem *item = static_cast<MemoryItem *>(child(i));
+		item->refresh(m_cpu->getMemory());
 	}
 }

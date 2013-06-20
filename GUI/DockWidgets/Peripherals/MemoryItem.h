@@ -25,14 +25,18 @@
 #include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
-#define PeripheralItemType (QTreeWidgetItem::UserType)
+#include <stdint.h>
 
-class PeripheralItem : public QTreeWidgetItem
+#define MemoryItemType (QTreeWidgetItem::UserType + 1)
+
+class Memory;
+
+class MemoryItem : public QTreeWidgetItem
 {
 	public:
-		PeripheralItem() : QTreeWidgetItem(PeripheralItemType) {}
+		MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr);
 
-		virtual void refresh() = 0;
+		void refresh(Memory *mem);
 
 };
 

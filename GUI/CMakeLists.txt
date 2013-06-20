@@ -39,11 +39,13 @@ FILE(GLOB PERIPHERAL_HEADERS Peripherals/Peripheral.h
 	MCU/RegisterSet.h
 	MCU/Memory.h
 	Tracking/PinHistory.h
+	DockWidgets/Peripherals/MemoryItem.h
 	)
 
 FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	ui/ScreenObject.cpp
 	Tracking/PinHistory.cpp
+	DockWidgets/Peripherals/MemoryItem.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})
