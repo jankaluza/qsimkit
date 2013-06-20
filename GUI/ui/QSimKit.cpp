@@ -48,6 +48,7 @@
 #include <QIODevice>
 #include <QDebug>
 #include <QDomDocument>
+#include <QSettings>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
 m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
@@ -89,6 +90,8 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	QMainWindow::addDockWidget(Qt::BottomDockWidgetArea, m_trackedPins);
 
 	setDockWidgetsEnabled(false);
+
+	readSettings();
 }
 
 void QSimKit::populateToolBar() {
@@ -336,3 +339,17 @@ void QSimKit::projectOptions() {
 
 	}
 }
+
+void QSimKit::readSettings() {
+	QSettings settings("QSimKit", "QSimKit");
+	restoreGeometry(settings.value("geometry").toByteArray());
+	restoreState(settings.value("windowState").toByteArray());
+}
+
+void QSimKit::closeEvent(QCloseEvent *event) {
+	QSettings settings("QSimKit", "QSimKit");
+	settings.setValue("geometry", saveGeometry());
+	settings.setValue("windowState", saveState());
+	QMainWindow::closeEvent(event);
+}
+

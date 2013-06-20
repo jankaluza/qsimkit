@@ -83,11 +83,15 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void onSimulationStopped();
 		void onSimulationStep(double t);
 
+	protected:
+		void closeEvent(QCloseEvent *event);
+
 	private:
 		void refreshDockWidgets();
 		void setDockWidgetsEnabled(bool enabled);
 		void setDockWidgetsMCU(MCU *cpu);
 		void populateToolBar();
+		void readSettings();
 
 	private:
 		adevs::Digraph<double> *m_dig;
