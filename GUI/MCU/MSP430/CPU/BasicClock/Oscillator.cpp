@@ -50,6 +50,7 @@ void Oscillator::tick() {
 			(*it)->tickFalling();
 		}
 	}
+	m_rising = !m_rising;
 }
 
 }
