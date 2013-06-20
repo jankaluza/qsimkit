@@ -19,10 +19,12 @@
 
 #include "Peripherals.h"
 #include "PeripheralItem.h"
+#include "MemoryItem.h"
 
 #include "ui/QSimKit.h"
 #include "MCU/MCU.h"
 #include "Peripherals/Peripheral.h"
+#include "Breakpoints/BreakpointManager.h"
 #include "MCU/RegisterSet.h"
 #include "MCU/Register.h"
 
@@ -36,10 +38,71 @@
 #include <QProcess>
 #include <QTreeWidgetItem>
 #include <QDebug>
+#include <QInputDialog>
 
 Peripherals::Peripherals(QSimKit *simkit) :
 DockWidget(simkit), m_mcu(0), m_simkit(simkit) {
 	setupUi(this);
+
+	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
+}
+
+void Peripherals::addBreakpoint() {
+	bool ok = false;
+	int val = QInputDialog::getInt(this, "Add memory breakpoint", "Memory value:", 0, 0, 65535, 1, &ok);
+	if (!ok) {
+		return;
+	}
+
+	QTreeWidgetItem *item = view->currentItem();
+
+	item->setBackground(0, QBrush(Qt::red));
+	m_breakpoints.append(item);
+
+	BreakpointManager *m = m_simkit->getBreakpointManager();
+	m->addMemoryBreak(item->data(0, Qt::UserRole).toInt(), val);
+}
+
+void Peripherals::removeBreakpoint() {
+	QTreeWidgetItem *item = view->currentItem();
+
+	item->setBackground(0, view->palette().window());
+	m_breakpoints.removeAll(item);
+
+	BreakpointManager *m = m_simkit->getBreakpointManager();
+	m->removeMemoryBreak(item->data(0, Qt::UserRole).toInt());
+}
+
+void Peripherals::handleContextMenu(const QPoint &pos) {
+	QList<QAction *> actions;
+
+	QTreeWidgetItem *item = view->currentItem();
+	if (item->type() != MemoryItemType) {
+		return;
+	}
+
+	QAction *add = 0;
+	QAction *remove = 0;
+	if (!m_breakpoints.contains(item)) {
+		add = new QAction("Add breakpoint", 0);
+		actions.append(add);
+	}
+	else {
+		remove = new QAction("Remove breakpoint", 0);
+		actions.append(remove);
+	}
+
+	QAction *action = QMenu::exec(actions, view->mapToGlobal(pos), 0, 0);
+	if (!action) {
+		return;
+	}
+
+	if (action == add) {
+		addBreakpoint();
+	}
+	else if (action == remove) {
+		removeBreakpoint();
+	}
 }
 
 void Peripherals::refresh() {

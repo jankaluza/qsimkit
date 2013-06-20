@@ -48,12 +48,32 @@ bool BreakpointManager::handleRegisterChanged(Register *reg, int id, uint16_t va
 	return true;
 }
 
+void BreakpointManager::handleMemoryChanged(Memory *memory, uint16_t address) {
+	if (m_break) {
+		return;
+	}
+
+	if (m_membreaks[address] == memory->getBigEndian(address)) {
+		m_break = true;
+	}
+}
+
 void BreakpointManager::setMCU(MCU *mcu) {
 	m_mcu = mcu;
 
 	for (int i = 0; i < m_mcu->getRegisterSet()->size(); ++i) {
 		m_breaks.append(QList<uint16_t>());
 	}
+}
+
+void BreakpointManager::addMemoryBreak(uint16_t addr, uint16_t value) {
+	m_mcu->getMemory()->addWatcher(addr, this);
+	m_membreaks[addr] = value;
+}
+
+void BreakpointManager::removeMemoryBreak(uint16_t addr) {
+	m_mcu->getMemory()->removeWatcher(addr, this);
+	m_membreaks.remove(addr);
 }
 
 void BreakpointManager::addRegisterBreak(int reg, uint16_t value) {
@@ -75,16 +95,4 @@ bool BreakpointManager::shouldBreak() {
 		return true;
 	}
 	return false;
-
-// 	if (m_breaks.empty()) {
-// 		return false;
-// 	}
-// 
-// 	QList<uint16_t>::iterator it;
-// 	it = qBinaryFind(m_breaks.begin(), m_breaks.end(), m_mcu->getRegisterSet()->get(0)->getBigEndian());
-// 	if (it != m_breaks.end()) {
-// 		return true;
-// 	}
-// 
-// 	return false;
 }

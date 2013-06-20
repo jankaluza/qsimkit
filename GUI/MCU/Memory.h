@@ -38,7 +38,6 @@ class MemoryWatcher {
 
 class Memory {
 	public:
-		Memory() {};
 
 		virtual uint16_t get(uint16_t address) = 0;
 		virtual uint16_t getBigEndian(uint16_t address, bool watchers = true) = 0;

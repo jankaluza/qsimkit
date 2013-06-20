@@ -51,8 +51,15 @@ class Peripherals : public DockWidget, public Ui::Peripherals
 
 		void removePeripheral(QObject *peripheral);
 
+		void handleContextMenu(const QPoint &point);
+
+	private:
+		void addBreakpoint();
+		void removeBreakpoint();
+
 	private:
 		MCU *m_mcu;
 		QSimKit *m_simkit;
+		QList<QTreeWidgetItem *> m_breakpoints;
 };
 

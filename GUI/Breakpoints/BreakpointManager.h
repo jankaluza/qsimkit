@@ -21,11 +21,13 @@
 
 #include <stdint.h>
 #include <QList>
+#include <QHash>
 #include "MCU/Register.h"
+#include "MCU/Memory.h"
 
 class MCU;
 
-class BreakpointManager : public RegisterWatcher {
+class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 	public:
 		BreakpointManager();
 		~BreakpointManager();
@@ -35,17 +37,18 @@ class BreakpointManager : public RegisterWatcher {
 		void addRegisterBreak(int reg, uint16_t value);
 		void removeRegisterBreak(int reg, uint16_t value);
 
+		void addMemoryBreak(uint16_t addr, uint16_t value);
+		void removeMemoryBreak(uint16_t addr);
+
 		bool shouldBreak();
 
-		void breakNow() {
-			m_break = true;
-		}
-
 		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
+		void handleMemoryChanged(Memory *memory, uint16_t address);
 
 	private:
 		MCU *m_mcu;
 		QList<QList<uint16_t> > m_breaks;
+		QHash<uint16_t, uint16_t> m_membreaks;
 		bool m_break;
 
 };
