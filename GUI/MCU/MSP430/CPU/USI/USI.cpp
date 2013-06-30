@@ -35,6 +35,11 @@ m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(varian
 m_divider(1), m_aclk(aclk), m_smclk(smclk), m_usictl(usictl), m_usicctl(usicctl),
 m_usisr(usisr), m_counter(0) {
 
+	m_mem->addWatcher(m_usicctl, this);
+	m_sdiMpx = m_pinManager->addPinHandler("SDI", this);
+	m_sdoMpx = m_pinManager->addPinHandler("SDO", this);
+	m_sclkMpx = m_pinManager->addPinHandler("SCLK", this);
+
 	reset();
 }
 
@@ -61,7 +66,47 @@ void USI::reset() {
 }
 
 void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
+	// USICKCTL - Clock Control
+	if (address == m_usicctl) {
+		uint8_t val = m_mem->getByte(address);
 
+		// divider
+		m_divider = 1 << ((val >> 5) & 7);
+
+		if (m_source) {
+			m_source->removeHandler(this);
+		}
+
+		// source
+		switch((val >> 2) & 7) {
+			case 0:
+				// TODO: SCLK
+				break;
+			case 1:
+				m_source = m_aclk;
+				break;
+			case 2: case 3:
+				m_source = m_smclk;
+				break;
+			case 4:
+				// USISWCLK - software clock
+				m_source = 0;
+				break;
+			case 5:
+				// TODO: TACCR0
+				break;
+			case 6:
+				// TODO: TACCR1
+				break;
+			case 7:
+				// TODO: TACCR2
+				break;
+		}
+
+		if (m_source) {
+			m_source->addHandler(this, Clock::Rising);
+		}
+	}
 }
 
 void USI::handleInterruptFinished(InterruptManager *intManager, int vector) {
