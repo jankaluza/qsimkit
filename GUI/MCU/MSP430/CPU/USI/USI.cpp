@@ -123,6 +123,16 @@ void USI::handleFirstEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usi
 	}
 }
 
+void USI::handleSecondEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
+	// Check USICKPH:
+	if (usictl1 & (1 << 7)) {
+		doSPIOutput(usictl0, usictl1, usicnt);
+	}
+	else {
+		doSPICapture(usictl0, usictl1, usicnt);
+	}
+}
+
 void USI::handleRisingSPI(uint8_t usictl0, uint8_t usictl1) {
 	// Master
 	if (usictl0 & (1 << 3)) {
