@@ -61,6 +61,14 @@ class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, 
 		void reset();
 
 	private:
+		void generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value);
+		void handleFirstEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
+		void handleSecondEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
+		void handleRisingSPI(uint8_t usictl0, uint8_t usictl1);
+		void doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
+		void doSPIOutput(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
+
+	private:
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
 		Memory *m_mem;
@@ -76,6 +84,10 @@ class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, 
 		std::vector<PinMultiplexer *> m_sdiMpx;
 		std::vector<PinMultiplexer *> m_sdoMpx;
 		std::vector<PinMultiplexer *> m_sclkMpx;
+		bool m_sclk;
+		bool m_usickpl;
+		bool m_input;
+		bool m_output;
 };
 
 }
