@@ -103,7 +103,7 @@ header h2 {
 #main-content {
   width: 790px;
   float: left;
-  padding-right:200px;
+  margin-left:200px;
 }
 
 #main-content img {
