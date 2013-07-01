@@ -130,12 +130,12 @@ aside#sidebar p.repo-owner a {
 
 a.button {
   width: 134px;
-  height: 38px;
+  height: 58px;
   line-height: 1.2;
   font-size: 23px;
   color: #fff;
   padding-left: 68px;
-/*   padding-top: 22px; */
+  padding-top: 22px;
   font-family: 'Helvetica Neue', Helvetica, Arial, serif; 
 }
 a.button small {
@@ -150,10 +150,12 @@ header a.button {
 }
 aside a.button {
   width: 138px;
+  height: 38px;
   padding-left: 64px;
   display: block;
   background: transparent url(../images/download-button.png) 0 0 no-repeat;
 /*   margin-bottom: 20px; */
+  padding-top: 3px;
   font-size: 21px;
 }
 
