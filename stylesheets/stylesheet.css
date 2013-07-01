@@ -114,7 +114,7 @@ aside#sidebar {
   padding-right: 20px;
   min-height: 504px;
   float: left;
-  background: transparent url(../images/sidebar-bg.jpg) 0 0 no-repeat;
+  background: transparent url(../images/sidebar-bg.jpg) right 0 no-repeat;
   font-size: 12px;
   line-height: 1.3;
 }
