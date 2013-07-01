@@ -151,11 +151,11 @@ header a.button {
 aside a.button {
   width: 138px;
   height: 38px;
-  padding-left: 64px;
+  padding-left: 20px;
   display: block;
   background: transparent url(../images/download-button.png) 0 0 no-repeat;
 /*   margin-bottom: 20px; */
-  padding-top: 3px;
+  padding-top: 10px;
   font-size: 21px;
 }
 
