@@ -149,13 +149,13 @@ header a.button {
   background: transparent url(../images/github-button.png) 0 0 no-repeat;
 }
 aside a.button {
-  width: 138px;
+  width: 164px;
   height: 38px;
   padding-left: 20px;
   display: block;
   background: transparent url(../images/download-button.png) 0 0 no-repeat;
 /*   margin-bottom: 20px; */
-  padding-top: 10px;
+  padding-top: 7px;
   font-size: 21px;
 }
 
