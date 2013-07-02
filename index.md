@@ -12,6 +12,7 @@ QSimKit is released under GPLv2+ license.
 ## Features
 
 **QSimKit graphical user interface:**
+
 * Adding peripherals written in C++ or Python
 * Connecting pins
 * Inspecting MCU memory and registers
@@ -21,6 +22,7 @@ QSimKit is released under GPLv2+ license.
 * Tracking pins in oscilloscope-like view (ability to "point to instruction" which caused particular change)
 
 **MSP430 MCU module:**
+
 * Loading ELF/A43 code and disassembling the code using msp430-objdump (only msp430-gcc supported so far)
 * All instructions implemented
 * BasicClock module supported (TimerA/TimerB support)
