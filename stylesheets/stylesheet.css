@@ -187,7 +187,8 @@ pre code {
 }
 
 ul, ol, dl {
-/*   margin-bottom: 20px; */
+  margin-top: -15px;
+  margin-bottom: 20px;
 }
 
 
