@@ -110,10 +110,13 @@ void USI::doSPIOutput(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 		}
 	}
 
-	generateOutput(m_sdoMpx, m_output);
+	// generate output only when USIOE
+	if (usictl0 & 2) {
+		generateOutput(m_sdoMpx, m_output);
+	}
 }
 
-void USI::handleFirstEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
+void USI::handleFirstEdgeSPI(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 	// Check USICKPH:
 	if (usictl1 & (1 << 7)) {
 		doSPICapture(usictl0, usictl1, usicnt);
@@ -123,7 +126,7 @@ void USI::handleFirstEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usi
 	}
 }
 
-void USI::handleSecondEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
+void USI::handleSecondEdgeSPI(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 	// Check USICKPH:
 	if (usictl1 & (1 << 7)) {
 		doSPIOutput(usictl0, usictl1, usicnt);
@@ -133,25 +136,21 @@ void USI::handleSecondEdgeSPIMaster(uint8_t usictl0, uint8_t usictl1, uint8_t us
 	}
 }
 
-void USI::handleRisingSPI(uint8_t usictl0, uint8_t usictl1) {
-	// Master
-	if (usictl0 & (1 << 3)) {
-		uint8_t usicnt = m_mem->getByte(m_usicctl + 1);
-		uint8_t cnt = usicnt & 31;
-		// Master starts clocking data in/out when IFG = 0 and CNT > 0
-		if ((usictl1 & 1) == 0 && cnt > 0) {
-			// Rising is first edge when m_usickpl == 0, otherwise
-			// it's second edge
-			bool first_edge = m_usickpl == 0;
-			if (first_edge) {
-				handleFirstEdgeSPIMaster(usictl0, usictl1, usicnt);
-			}
-			else {
-				handleSecondEdgeSPIMaster(usictl0, usictl1, usicnt);
-			}
+void USI::handleTickSPI(bool rising, uint8_t usictl0, uint8_t usictl1) {
+	uint8_t usicnt = m_mem->getByte(m_usicctl + 1);
+	uint8_t cnt = usicnt & 31;
+	// Master starts clocking data in/out when IFG = 0 and CNT > 0
+	// Slave checks only CNT > 0 ???
+	if ((!(usictl0 & (1 << 3)) || (usictl1 & 1) == 0) && cnt > 0) {
+		// Rising is first edge when m_usickpl == !rising, otherwise
+		// it's second edge
+		bool first_edge = m_usickpl == !rising;
+		if (first_edge) {
+			handleFirstEdgeSPI(usictl0, usictl1, usicnt);
 		}
-	}
-	else {
+		else {
+			handleSecondEdgeSPI(usictl0, usictl1, usicnt);
+		}
 	}
 }
 
@@ -167,13 +166,24 @@ void USI::tickRising() {
 			
 		}
 		else {
-			handleRisingSPI(usictl0, usictl1);
+			handleTickSPI(true, usictl0, usictl1);
 		}
 	}
 }
 
 void USI::tickFalling() {
-	
+	if (m_counter == (m_divider >> 2)) {
+		uint8_t usictl0 = m_mem->getByte(m_usictl);
+		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
+
+		// I2C
+		if (usictl0 & (1 << 6)) {
+			
+		}
+		else {
+			handleTickSPI(false, usictl0, usictl1);
+		}
+	}
 }
 
 void USI::reset() {
@@ -251,11 +261,24 @@ void USI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) 
 
 
 void USI::handlePinInput(const std::string &name, double value) {
-	if (name != "SDO") {
+	if (name == "SDO") {
+		m_input = value > 1.5;
 		return;
 	}
 
-	m_input = value > 1.5;
+	if (name == "SCLK") {
+		uint8_t usictl0 = m_mem->getByte(m_usictl);
+		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
+
+		// I2C
+		if (usictl0 & (1 << 6)) {
+			
+		}
+		else {
+			handleTickSPI(value > 1.5, usictl0, usictl1);
+		}
+		return;
+	}
 }
 
 void USI::handlePinActivated(const std::string &name) {
