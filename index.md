@@ -3,6 +3,6 @@ layout: default
 title: Welcome
 ---
 
-## About
+# About
 
 Welcome!
