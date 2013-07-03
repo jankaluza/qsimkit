@@ -242,6 +242,8 @@ class USITest : public CPPUNIT_NS :: TestFixture{
 			// prepare '0' to be captured
 			pinManager->handlePinInput(2, 0.0);
 
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
 			// cnt--, bit captured from SDI
 			usi->tickFalling();
 			CPPUNIT_ASSERT_EQUAL(0, (int) m->getByte(v->getUSICCTL() + 1));
@@ -249,6 +251,7 @@ class USITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUSISR())); // 1|1010101 (after shift) -> |10101010
 
 		/// INTERRUPT
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 		}
 };
 

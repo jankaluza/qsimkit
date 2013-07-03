@@ -91,7 +91,8 @@ void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 	usicnt--;
 	m_mem->setByte(m_usicctl + 1, usicnt);
 	if ((usicnt & 31) == 0) {
-		// TODO: interrupt
+		m_mem->setByte(m_usictl + 1, usictl1);
+		m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
 	}
 }
 

@@ -121,6 +121,7 @@ class Variant {
 		virtual unsigned int getUSISR() = 0;
 		virtual unsigned int getUSICTL() = 0;
 		virtual unsigned int getUSICCTL() = 0;
+		virtual unsigned int getUSI_VECTOR() = 0;
 		virtual double getSRSEL() = 0;
 		virtual double getSDCO() = 0;
 		virtual double getDCOZERO() = 0;

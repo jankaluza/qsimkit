@@ -3713,6 +3713,15 @@ class Variant_msp430x16x : public Variant {
 		}
 
 
+		unsigned int getUSI_VECTOR() {
+#ifdef USI_VECTOR
+			return USI_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;

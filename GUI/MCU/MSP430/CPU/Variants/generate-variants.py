@@ -44,7 +44,7 @@ defines += ["TIMERB0_VECTOR", "TIMERB1_VECTOR"]
 defines += ["INTVECT"]
 
 # USI
-defines += ["USISR_", "USICTL_", "USICCTL_"]
+defines += ["USISR_", "USICTL_", "USICCTL_", "USI_VECTOR"]
 
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
