@@ -30,13 +30,16 @@
 namespace MSP430 {
 
 USI::USI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
-			 ACLK *aclk, SMCLK *smclk, uint16_t usictl, uint16_t usicctl, uint16_t usisr) :
+			 ACLK *aclk, SMCLK *smclk) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
-m_divider(1), m_aclk(aclk), m_smclk(smclk), m_usictl(usictl), m_usicctl(usicctl),
-m_usisr(usisr), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
+m_divider(1), m_aclk(aclk), m_smclk(smclk), m_usictl(variant->getUSICTL()), m_usicctl(variant->getUSICCTL()),
+m_usisr(variant->getUSISR()), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
 m_output(false) {
 
 	m_mem->addWatcher(m_usicctl, this);
+	m_mem->addWatcher(m_usisr, this);
+	m_mem->addWatcher(m_usictl, this);
+
 	m_sdiMpx = m_pinManager->addPinHandler("SDI", this);
 	m_sdoMpx = m_pinManager->addPinHandler("SDO", this);
 	m_sclkMpx = m_pinManager->addPinHandler("SCLK", this);
@@ -49,8 +52,8 @@ USI::~USI() {
 }
 
 void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
-	uint16_t usisr = m_mem->getBigEndian(m_usisr);
-	// USICKPH = 1 - we should capture data on first edge
+// 	std::cout << "capture\n";
+	uint16_t usisr = m_mem->getBigEndian(m_usisr, false);
 	if (usictl0 & (1 << 4)) {
 		// LSB mode -> shift right
 		usisr = usisr >> 1;
@@ -93,8 +96,8 @@ void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 }
 
 void USI::doSPIOutput(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
-	uint16_t usisr = m_mem->getBigEndian(m_usisr);
-	// USICKPH = 0 - we should output data on first edge
+// 	std::cout << "output\n";
+	uint16_t usisr = m_mem->getBigEndian(m_usisr, false);
 	// Check LSB vs. MSB
 	if (usictl0 & (1 << 4)) {
 		// Load LSB bit
@@ -110,8 +113,8 @@ void USI::doSPIOutput(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 		}
 	}
 
-	// generate output only when USIOE
-	if (usictl0 & 2) {
+	// generate output only when USIOE and pin enabled
+	if ((usictl0 & 2) && (usictl0 & (1 << 6))) {
 		generateOutput(m_sdoMpx, m_output);
 	}
 }
@@ -151,6 +154,12 @@ void USI::handleTickSPI(bool rising, uint8_t usictl0, uint8_t usictl1) {
 		else {
 			handleSecondEdgeSPI(usictl0, usictl1, usicnt);
 		}
+
+		// Master generates output clock
+		if (usictl0 & (1 << 3) && (usictl0 & (1 << 5))) {
+			m_sclk = rising;
+			generateOutput(m_sclkMpx, m_sclk != m_usickpl);
+		}
 	}
 }
 
@@ -161,8 +170,13 @@ void USI::tickRising() {
 		uint8_t usictl0 = m_mem->getByte(m_usictl);
 		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
 
+		// Logic is held in reset state
+		if (usictl0 & 1) {
+			return;
+		}
+
 		// I2C
-		if (usictl0 & (1 << 6)) {
+		if (usictl1 & (1 << 6)) {
 			
 		}
 		else {
@@ -176,8 +190,13 @@ void USI::tickFalling() {
 		uint8_t usictl0 = m_mem->getByte(m_usictl);
 		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
 
+		// Logic is held in reset state
+		if (usictl0 & 1) {
+			return;
+		}
+
 		// I2C
-		if (usictl0 & (1 << 6)) {
+		if (usictl1 & (1 << 6)) {
 			
 		}
 		else {
@@ -192,11 +211,27 @@ void USI::reset() {
 	}
 	m_source = m_aclk;
 	m_source->addHandler(this, Clock::Rising);
+
+	// Set default values
+	m_mem->setByte(m_usictl, 1);
+	m_mem->setByte(m_usictl + 1, 1);
 }
 
 void USI::generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value) {
 	for (std::vector<PinMultiplexer *>::iterator it = mpxs.begin(); it != mpxs.end(); ++it) {
+// 		std::cout << "outputing\n";
 		(*it)->generateOutput(this, value ? 3.0 : 0.0);
+	}
+}
+
+void USI::maybeOutputMSB() {
+	uint8_t usictl0 = m_mem->getByte(m_usictl);
+	uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
+	// if USICKPH ==1, output is enabled and we are not in reset state,
+	// MSB/LSB should be visible on SDO right when we load it.
+	if (usictl1 & (1 << 7) && usictl0 & 2 && !(usictl0 & 1)) {
+		uint8_t usicnt = m_mem->getByte(m_usicctl + 1);
+		doSPIOutput(usictl0, usictl1, usicnt);
 	}
 }
 
@@ -246,8 +281,18 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		bool usickpl = val & 2;
 		if (usickpl != m_usickpl) {
 			m_usickpl = usickpl;
-			generateOutput(m_sclkMpx, m_sclk == m_usickpl);
+
+			uint8_t usictl0 = m_mem->getByte(m_usictl);
+			if ((usictl0 & (1 << 5))) {
+				generateOutput(m_sclkMpx, m_sclk != m_usickpl);
+			}
 		}
+	}
+	else if (address == m_usisr) {
+		maybeOutputMSB();
+	}
+	else if (address == m_usictl) {
+		maybeOutputMSB();
 	}
 }
 
@@ -268,6 +313,11 @@ void USI::handlePinInput(const std::string &name, double value) {
 
 	if (name == "SCLK") {
 		uint8_t usictl0 = m_mem->getByte(m_usictl);
+		// SCLK pin not enabled
+		if (!(usictl0 & (1 << 5))) {
+			return;
+		}
+
 		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
 
 		// I2C

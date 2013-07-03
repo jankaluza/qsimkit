@@ -43,6 +43,9 @@ defines += ["TIMERB0_VECTOR", "TIMERB1_VECTOR"]
 
 defines += ["INTVECT"]
 
+# USI
+defines += ["USISR_", "USICTL_", "USICCTL_"]
+
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
 
@@ -72,13 +75,13 @@ f = open("Variant.h", "w")
 f.write(output)
 f.close()
 
-for header in os.listdir("../../3rdparty/msp430gcc"):
+for header in os.listdir("../../../../../3rdparty/msp430gcc"):
 	if not header.startswith("msp430x"):
 		continue
 
 	output = ""
 
-	child = subprocess.Popen("msp430-gcc -D__ASSEMBLER__=1 -E -dM -I../../3rdparty/msp430gcc/ ../../3rdparty/msp430gcc/" + header, shell=True, stdout=subprocess.PIPE)
+	child = subprocess.Popen("msp430-gcc -D__ASSEMBLER__=1 -E -dM -I../../../../../3rdparty/msp430gcc/ ../../../../../3rdparty/msp430gcc/" + header, shell=True, stdout=subprocess.PIPE)
 	for line in child.communicate()[0].split('\n'):
 		if len(line) == 0 or line.find("(") != -1:
 			continue

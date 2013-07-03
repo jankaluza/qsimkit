@@ -2389,6 +2389,33 @@ class Variant_msp430x20x2 : public Variant {
 		}
 
 
+		unsigned int getUSISR() {
+#ifdef USISR_
+			return USISR_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSICTL() {
+#ifdef USICTL_
+			return USICTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSICCTL() {
+#ifdef USICCTL_
+			return USICCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;

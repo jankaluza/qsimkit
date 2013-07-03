@@ -41,7 +41,7 @@ class PinMultiplexer;
 class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler {
 	public:
 		USI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
-			  ACLK *aclk, SMCLK *smclk, uint16_t usictl, uint16_t usicctl, uint16_t usisr);
+			  ACLK *aclk, SMCLK *smclk);
 		virtual ~USI();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
@@ -67,6 +67,7 @@ class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, 
 		void handleTickSPI(bool rising, uint8_t usictl0, uint8_t usictl1);
 		void doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
 		void doSPIOutput(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt);
+		void maybeOutputMSB();
 
 	private:
 		PinManager *m_pinManager;

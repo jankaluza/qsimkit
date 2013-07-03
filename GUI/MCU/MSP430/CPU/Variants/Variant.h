@@ -118,6 +118,9 @@ class Variant {
 		virtual unsigned int getTIMERB0_VECTOR() = 0;
 		virtual unsigned int getTIMERB1_VECTOR() = 0;
 		virtual unsigned int getINTVECT() = 0;
+		virtual unsigned int getUSISR() = 0;
+		virtual unsigned int getUSICTL() = 0;
+		virtual unsigned int getUSICCTL() = 0;
 		virtual double getSRSEL() = 0;
 		virtual double getSDCO() = 0;
 		virtual double getDCOZERO() = 0;

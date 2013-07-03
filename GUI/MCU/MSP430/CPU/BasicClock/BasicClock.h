@@ -80,6 +80,14 @@ class BasicClock {
 			m_timerB;
 		}
 
+		ACLK *getACLK() {
+			return m_aclk;
+		}
+
+		SMCLK *getSMCLK() {
+			return m_smclk;
+		}
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
