@@ -306,7 +306,7 @@ void USI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) 
 
 
 void USI::handlePinInput(const std::string &name, double value) {
-	if (name == "SDO") {
+	if (name == "SDI") {
 		m_input = value > 1.5;
 		return;
 	}
