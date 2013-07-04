@@ -9,6 +9,6 @@ This page shows screenshots of QSimKit simulator. Since there is no released ver
 look of the development version you install can be little bit different, but this page should be more or
 less actual.
 
-![QSimKit main window](dev.jpg)
+![QSimKit main window](dev.png)
 
 
