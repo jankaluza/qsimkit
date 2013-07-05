@@ -12,9 +12,9 @@ important information about improving MSP430 module or implementing new peripher
 
 * [Peripherals overview](peripherals_overview)
 * C++ Peripherals
-** [SimulationObject class](simulationobject.html)
-** [ScreenObject class](screenobject.html)
-** [Peripheral class](peripheral.html)
+	* [SimulationObject class](simulationobject.html)
+	* [ScreenObject class](screenobject.html)
+	* [Peripheral class](peripheral.html)
 * Python peripherals
 
 ### QSimKit MCU modules
