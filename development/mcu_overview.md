@@ -17,7 +17,7 @@ them and QSimKit
 [MCU class](https://github.com/hanzz/qsimkit/blob/master/GUI/MCU/MCU.h) is the basic class for
 MCU modules which must be implemented by any MCU.
 
-It inherits Peripheral class which is described in [Peripherals overview](peripherals_overview)
+It inherits [Peripheral](peripheral.html) class which is described in [Peripherals overview](peripherals_overview)
 part of the Development documentation. You should read [Peripherals overview](peripherals_overview)
 before continuing reading this document to fully understand how the simulation works and how
 peripherals (including the MCU) communicate together.
