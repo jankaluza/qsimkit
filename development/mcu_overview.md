@@ -33,6 +33,22 @@ This is reflected in MCU class by two methods:
 
 #### MCU Registers
 
+Every MCU register is represented by [Register class](https://github.com/hanzz/qsimkit/blob/master/GUI/MCU/Register.h) and 
+all registers are grouped into [RegisterSet class](https://github.com/hanzz/qsimkit/blob/master/GUI/MCU/RegisterSet.h).
+
+Registers are described more deeply in [Registers] chapter of Development documentation.
+
+#### MCU Memory
+
+MCU Memory is represented by [Memory class](https://github.com/hanzz/qsimkit/blob/master/GUI/MCU/Memory.h)
+
+This class is described more deeply in [Memory] chapter of Development documentation.
+
+#### Disassembler
+
+MCU class has to provide QSimKit access to disassembled code once it is loaded. This is later used
+in Disassembler part of QSimKit GUI.
+
 
 
 
