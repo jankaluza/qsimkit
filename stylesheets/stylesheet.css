@@ -186,10 +186,10 @@ pre code {
   padding: 0;
 }
 
-/* ul, ol, dl { */
+ul, ol, dl {
 /*   margin-top: -15px; */
-/*   margin-bottom: 20px; */
-/* } */
+  margin-bottom: 20px;
+}
 
 
 /* COMMON STYLES */
