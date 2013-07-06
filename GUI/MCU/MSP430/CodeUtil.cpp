@@ -21,6 +21,8 @@
 
 #include <QFile>
 #include <QProcess>
+#include <QDir>
+#include <QDebug>
 
 namespace CodeUtil {
 	
@@ -92,7 +94,8 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
 		code = a43.toAscii();
 	}
 
-	QFile file("test.dump");
+	QString f_in = QDir::tempPath() + "/test.dump";
+	QFile file(f_in);
 	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
 		return df;
 
@@ -101,10 +104,10 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
 
 	QProcess objdump;
 	if (hasELF) {
-		objdump.start("msp430-objdump", QStringList() << "-dSl" << "--prefix=+<FILE" << "test.dump");
+		objdump.start("msp430-objdump", QStringList() << "-dSl" << "--prefix=+<FILE" << f_in);
 	}
 	else {
-		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << "test.dump");
+		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << f_in);
 	}
 	
 	if (!objdump.waitForStarted()) {
@@ -121,25 +124,34 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
 }
 
 QString ELFToA43(const QByteArray &elf) {
-	QFile file("test.dump");
-	if (!file.open(QFile::WriteOnly | QFile::Truncate))
+	QString f_in = QDir::tempPath() + "/test.dump";
+	QString f_out = QDir::tempPath() + "/test.a43";
+	QFile file(f_in);
+	if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
+		qDebug() << "Cannot open" << f_in;
 		return "";
+	}
 
 	file.write(elf);
 	file.close();
 
 	QProcess objdump;
-	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << "test.dump" << "test.a43");
+	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << f_in << f_out);
 	if (!objdump.waitForStarted()) {
+		qDebug() << "Cannot start msp430-objdump";
 		return "";
  	}
  
-	if (!objdump.waitForFinished())
+	if (!objdump.waitForFinished()) {
+		qDebug() << "msp430-objdump did not finish cleanly";
 		return "";
+	}
 
-	QFile file2("test.a43");
-	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text))
+	QFile file2(f_out);
+	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		qDebug() << "cannot open " << f_out;
 		return "";
+	}
 
 	return file2.readAll();
 }
