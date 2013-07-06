@@ -5,5 +5,5 @@
    <email>hanzz.k@gmail.com</email>
    <version>0.1</version>
    <license>GNU/GPL</license>
-   <library>libmsp430</library>
+   <library>msp430</library>
 </mcu>

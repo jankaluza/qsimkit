@@ -96,6 +96,10 @@ bool PeripheralManager::loadXML(QString file) {
 PeripheralInterface *PeripheralManager::loadBinaryPeripheral(QString f) {
 	QStringList extensions = QStringList() << ".dll" << ".so";
 
+#ifdef Q_OS_LINUX
+	f = QString("lib") + f;
+#endif
+
 	foreach(const QString& ext, extensions) {
 		QPluginLoader pluginLoader(f + ext);
 		QObject *plugin = pluginLoader.instance();
