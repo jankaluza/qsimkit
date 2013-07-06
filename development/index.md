@@ -12,6 +12,7 @@ important information about improving MSP430 module or implementing new peripher
 
 * [Simulation basics (Simulation objects, Simulation flow, Simulation objects examples)](simulation_basics.html)
 
+<!---
 ### QSimKit peripherals
 
 * [Peripherals overview](peripherals_overview)
@@ -28,4 +29,4 @@ describes the relationship between this shared library and the rest of QSimKit.
 
 * [MCU modules overview](mcu_overview.html)
 
-
+-->
