@@ -70,6 +70,7 @@ static void parseCode(DisassembledFiles &df, QString &code) {
 			QString addr = line.left(8).right(4);
 			pendingSection = DisassembledLine(addr.toInt(0, 16), num, DisassembledLine::Section, line.mid(9));
 		}
+#ifdef Q_OS_LINUX
 		else if (line.startsWith("+<")) {
 			file = line.mid(6, line.indexOf(':') - 6);
 			num = line.mid(line.indexOf(':') + 1).toInt();
@@ -78,6 +79,16 @@ static void parseCode(DisassembledFiles &df, QString &code) {
 				pendingSection = DisassembledLine();
 			}
 		}
+#else
+		else if (line[1] == ':' && line[2] == '\\') {
+			file = line.left(line.lastIndexOf(':'));
+			num = line.mid(line.lastIndexOf(':') + 1).toInt();
+			if (pendingSection.getAddr()) {
+				df[file].append(pendingSection);
+				pendingSection = DisassembledLine();
+			}
+		}
+#endif
 // 		else if (i > 2) {
 // 			df[file].append(DisassembledLine(0, 0, DisassembledLine::Code, line));
 // 		}
@@ -104,7 +115,11 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
 
 	QProcess objdump;
 	if (hasELF) {
+#ifdef Q_OS_LINUX
 		objdump.start("msp430-objdump", QStringList() << "-dSl" << "--prefix=+<FILE" << f_in);
+#else
+		objdump.start("msp430-objdump", QStringList() << "-dSl" << f_in);
+#endif
 	}
 	else {
 		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << f_in);
