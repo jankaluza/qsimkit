@@ -136,7 +136,13 @@ void PeripheralManager::loadPeripherals() {
 		pluginsDir.cdUp();
 	}
 #endif
-	pluginsDir.cd("Peripherals");
+	
+	if (pluginsDir.exists("Peripherals")) {
+		pluginsDir.cd("Peripherals");
+	}
+	else {
+		pluginsDir = QString(MODULES_DIR) + "/peripheral";
+	}
 	foreach (QString fileName, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
 		loadXML(pluginsDir.absoluteFilePath(fileName));
 	}

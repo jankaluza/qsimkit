@@ -266,7 +266,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
   
-add_library(PythonQt SHARED
+add_library(PythonQt STATIC
             ${sources}
             ${gen_moc_sources}
             ${gen_ui_sources}
@@ -286,12 +286,3 @@ target_link_libraries(PythonQt
               ${PYTHON_LIBRARY}
               ${QT_LIBRARIES}
   )
-
-#-----------------------------------------------------------------------------
-# Install library (on windows, put the dll in 'bin' and the archive in 'lib')
-
-install(TARGETS PythonQt
-        RUNTIME DESTINATION bin
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib)
-install(FILES ${headers} DESTINATION include/PythonQt)

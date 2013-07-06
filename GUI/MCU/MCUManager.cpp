@@ -120,7 +120,14 @@ void MCUManager::loadMCUs() {
 		pluginsDir.cdUp();
 	}
 #endif
-	pluginsDir.cd("MCU");
+	if (pluginsDir.exists("MCU")) {
+		pluginsDir.cd("MCU");
+	}
+	else {
+		pluginsDir = QString(MODULES_DIR) + "/mcu";
+	}
+
+	qDebug() << "Trying to load MCUs from " << pluginsDir;
 	foreach (QString fileName, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
 		loadXML(pluginsDir.absoluteFilePath(fileName));
 	}

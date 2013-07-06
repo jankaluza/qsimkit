@@ -63,7 +63,12 @@ m_syncing(0) {
 		return;
 	}
 
-	QString package = QString("Packages/") + variant + ".xml";
+	QString package = QApplication::applicationDirPath() + QString("Packages/") + variant + ".xml";
+
+	QDir pluginsDir(QApplication::applicationDirPath());
+	if (!pluginsDir.exists("Packages")) {
+		package = QString(PACKAGES) + "/Packages/" + variant + ".xml";
+	}
 
 	m_name = "MSP430";
 
