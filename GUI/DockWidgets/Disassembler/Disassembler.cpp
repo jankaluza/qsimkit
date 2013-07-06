@@ -51,7 +51,7 @@ DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssemb
 }
 
 void Disassembler::handleShowModeClicked() {
-	showAssembler(not m_showAssembler);
+	showAssembler(! m_showAssembler);
 }
 
 void Disassembler::handleFileChanged(int id) {

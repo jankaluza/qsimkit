@@ -735,6 +735,7 @@ bool ConnectionManager::mouseReleaseEvent(QMouseEvent *event) {
 			m_movingConn = 0;
 		}
 	}
+	return true;
 }
 
 bool ConnectionManager::mouseMoveEvent(QMouseEvent *event) {

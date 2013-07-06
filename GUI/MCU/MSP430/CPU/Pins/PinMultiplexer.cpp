@@ -68,6 +68,7 @@ bool PinMultiplexer::handleInput(double value) {
 
 	m_value = value;
 	m_valueIsInput = true;
+	return true;
 }
 
 void PinMultiplexer::generateOutput(PinHandler *handler, double value) {

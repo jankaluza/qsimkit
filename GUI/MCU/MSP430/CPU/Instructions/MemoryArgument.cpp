@@ -49,7 +49,7 @@ void MemoryArgument::setBigEndian(uint16_t value) {
 }
 
 uint8_t MemoryArgument::getByte() {
-	m_mem->getByte(m_address);
+	return m_mem->getByte(m_address);
 }
 
 void MemoryArgument::setByte(uint8_t value) {

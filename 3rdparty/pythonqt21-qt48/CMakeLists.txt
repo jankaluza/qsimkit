@@ -265,14 +265,30 @@ qt4_add_resources(gen_qrc_sources ${qrc_sources})
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/src
   )
-  
+
+IF(WIN32)
+add_library(PythonQt SHARED
+            ${sources}
+            ${gen_moc_sources}
+            ${gen_ui_sources}
+            ${gen_qrc_sources}
+  )
+
+INSTALL(TARGETS PythonQt
+	DESTINATION ${LIB_INSTALL_DIR}
+	COMPONENT qsimkit
+)
+else()
 add_library(PythonQt STATIC
             ${sources}
             ${gen_moc_sources}
             ${gen_ui_sources}
             ${gen_qrc_sources}
   )
-set_target_properties(PythonQt PROPERTIES DEFINE_SYMBOL PYTHONQT_EXPORTS)
+endif()
+add_definitions(-DPYTHONQT_EXPORTS)
+add_definitions(-DPYTHONQT_QTALL_EXPORTS)
+
 
 #
 # That should solve linkage error on Mac when the project is used in a superbuild setup

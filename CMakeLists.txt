@@ -46,7 +46,6 @@ ADD_DEFINITIONS(-DMODULES_DIR="${LIB_INSTALL_DIR}/qsimkit")
 ADD_DEFINITIONS(-DPACKAGES="${CMAKE_INSTALL_PREFIX}/share/qsimkit")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/adevs-2.6/include)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/msp430gcc)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -59,3 +58,23 @@ ADD_SUBDIRECTORY(GUI)
 if (CPPUNIT_FOUND)
 	ADD_SUBDIRECTORY(Tests)
 endif()
+
+
+# CPACK
+
+set(CPACK_PACKAGE_NAME "QSimKit")
+set(CPACK_PACKAGE_VENDOR "qsimkit.org")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "QSimKit - MSP430 Simulator")
+set(CPACK_PACKAGE_VERSION "0.0.1")
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "1")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "QSimKit")
+
+set(CPACK_COMPONENTS_ALL qsimkit msp430 button lcd led)
+
+# This must always be last!
+include(CPack)
+
+
+

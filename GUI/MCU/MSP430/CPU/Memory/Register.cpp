@@ -83,6 +83,7 @@ bool Register::setBit(uint16_t bit, bool value) {
 	}
 
 	setBigEndian(v);
+	return true;
 }
 
 void Register::addWatcher(RegisterWatcher *watcher) {

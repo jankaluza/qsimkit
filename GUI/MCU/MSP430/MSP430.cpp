@@ -276,7 +276,7 @@ void MCU_MSP430::paint(QWidget *screen) {
 			else {
 				qp.drawText(it->rect.adjusted(0, -pin_size - 13, 5, 0), Qt::AlignCenter, QString::number(id + 1));
 			}
-			even = not even;
+			even = !even;
 		}
 		else if (m_sides[id] == 'u') {
 			if (even == -1) {
@@ -290,7 +290,7 @@ void MCU_MSP430::paint(QWidget *screen) {
 			else {
 				qp.drawText(it->rect.adjusted(0, pin_size + 18, 5, 0), Qt::AlignCenter, QString::number(id + 1));
 			}
-			even = not even;
+			even = !even;
 		}
 	}
 
