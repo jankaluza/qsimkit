@@ -63,7 +63,7 @@ class Screen : public QWidget
 		void clear();
 
 		void save(QTextStream &stream);
-		void load(QDomDocument &doc);
+		bool load(QDomDocument &doc);
 
 		void prepareSimulation(adevs::Digraph<double> *dig);
 		void setSimulator(adevs::Simulator<SimulationEvent> *sim);

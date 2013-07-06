@@ -43,6 +43,7 @@
 #include <QIODevice>
 #include <QMouseEvent>
 #include <QDebug>
+#include <QMessageBox>
 
 #define NORM(X) ((X) - (X) % 12)
 
@@ -209,7 +210,7 @@ void Screen::save(QTextStream &stream) {
 	m_conns->save(stream);
 }
 
-void Screen::load(QDomDocument &doc) {
+bool Screen::load(QDomDocument &doc) {
 	QDomElement root = doc.firstChild().toElement();
 	QDomElement objects = root.firstChildElement("objects");
 
@@ -219,6 +220,12 @@ void Screen::load(QDomDocument &doc) {
 
 		ScreenObject *obj = 0;
 		if (object.attribute("interface") == "mcu") {
+			if (!m_mcuManager->hasMCU(type)) {
+				QMessageBox::critical(this, tr("Loading error"),
+									  tr("File you want to load uses MCU module '%1'. This module is not installed or cannot be loaded.").arg(type));
+				return false;
+			}
+
 			QString variant = object.firstChildElement("variant").text();
 			obj = m_mcuManager->getMCU(type).create(variant);
 		}
@@ -226,6 +233,11 @@ void Screen::load(QDomDocument &doc) {
 			obj = new ConnectionNode();
 		}
 		else {
+			if (!m_peripherals->hasPeripheral(type)) {
+				QMessageBox::critical(this, tr("Loading error"),
+									  tr("File you want to load uses Peripheral module '%1'. This module is not installed or cannot be loaded.").arg(type));
+				return false;
+			}
 			obj = m_peripherals->getPeripheral(type).create();
 		}
 
@@ -249,6 +261,7 @@ void Screen::load(QDomDocument &doc) {
 	m_conns->load(doc);
 
 	repaint();
+	return true;
 }
 
 void Screen::showObjectMenu(ScreenObject *object, const QPoint &pos) {

@@ -316,7 +316,11 @@ bool QSimKit::loadProject(const QString &file) {
 			return false;
 	}
 
-	screen->load(document);
+	if (!screen->load(document)) {
+		screen->clear();
+		return false;
+	}
+
 	m_filename = file;
 	setDockWidgetsMCU(screen->getMCU());
 	m_breakpointManager->setMCU(screen->getMCU());

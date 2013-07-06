@@ -73,7 +73,12 @@ bool MCUManager::loadXML(QString file) {
 			library = element.text();
 			info.m_library = library;
 			if (type == "binary") {
+#ifdef Q_OS_LINUX
+				info.m_mcu = loadBinaryMCU(file + "/lib" + element.text());
+#else
 				info.m_mcu = loadBinaryMCU(file + "/" + element.text());
+#endif
+				
 			}
 		}
 		else if (element.nodeName() == "name") {
@@ -89,10 +94,6 @@ bool MCUManager::loadXML(QString file) {
 
 MCUInterface *MCUManager::loadBinaryMCU(QString f) {
 	QStringList extensions = QStringList() << ".so" << ".dll";
-
-#ifdef Q_OS_LINUX
-	f = QString("lib") + f;
-#endif
 
 	foreach(const QString& ext, extensions) {
 		QPluginLoader pluginLoader(f + ext);

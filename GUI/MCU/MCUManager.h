@@ -64,6 +64,10 @@ class MCUManager : public QObject {
 			return m_mcu[name];
 		}
 
+		bool hasMCU(const QString &name) {
+			return m_mcu.contains(name);
+		}
+
 		const MCUList &getMCUs() {
 			return m_mcu;
 		}

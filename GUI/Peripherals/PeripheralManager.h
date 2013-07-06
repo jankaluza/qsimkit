@@ -66,6 +66,10 @@ class PeripheralManager : public QObject {
 			return m_peripherals[name];
 		}
 
+		bool hasPeripheral(const QString &name) {
+			return m_peripherals.contains(name);
+		}
+
 		const PeripheralList &getPeripherals() {
 			return m_peripherals;
 		}
