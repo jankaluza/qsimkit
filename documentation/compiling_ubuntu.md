@@ -15,6 +15,10 @@ Get the sources from Git repository:
 
 Compile and install QSimKit:
 
-	cmake .
+	cmake . -DCMAKE_INSTALL_PREFIX=/usr
 	make
 	sudo make install
+
+Run QSimKit:
+
+	qsimkit
