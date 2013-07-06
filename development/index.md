@@ -8,6 +8,10 @@ title: Development
 This page describes various parts of QSimKit from developers view. You should find all
 important information about improving MSP430 module or implementing new peripherals.
 
+### QSimKit basics
+
+* [Simulation basics](simulation_basics.html)
+
 ### QSimKit peripherals
 
 * [Peripherals overview](peripherals_overview)
