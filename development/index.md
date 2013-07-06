@@ -10,7 +10,7 @@ important information about improving MSP430 module or implementing new peripher
 
 ### QSimKit basics
 
-* [Simulation basics](simulation_basics.html)
+* [Simulation basics (Simulation objects, Simulation flow, Simulation objects examples)](simulation_basics.html)
 
 ### QSimKit peripherals
 
