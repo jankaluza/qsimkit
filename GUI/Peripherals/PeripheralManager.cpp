@@ -128,7 +128,7 @@ void PeripheralManager::loadPeripherals() {
 	QDir pluginsDir(QApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
 	pluginsDir.cd("qsimkit");
-	pluginsDir.cd("peripherals");
+	pluginsDir.cd("peripheral");
 #elif defined(Q_OS_MAC)
 	if (pluginsDir.dirName() == "MacOS") {
 		pluginsDir.cdUp();

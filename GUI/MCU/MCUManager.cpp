@@ -112,7 +112,7 @@ void MCUManager::loadMCUs() {
 	QDir pluginsDir(QApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
 	pluginsDir.cd("qsimkit");
-	pluginsDir.cd("peripherals");
+	pluginsDir.cd("mcu");
 #elif defined(Q_OS_MAC)
 	if (pluginsDir.dirName() == "MacOS") {
 		pluginsDir.cdUp();
