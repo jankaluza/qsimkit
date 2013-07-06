@@ -12,10 +12,24 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 # Find PythonQt
 set(PythonQt_DIR "${CMAKE_SOURCE_DIR}/cmake_modules")
-find_package(PythonQt REQUIRED)
-include_directories(${PYTHONQT_INCLUDE_PATH})
+find_package(PythonQt)
 
-message(STATUS "Using PythonQt: ${PYTHONQT_LIBRARIES} ${PYTHONQT_INCLUDE_PATH}")
+
+if (PYTHONQT_INCLUDE_PATH AND PYTHONQT_LIBRARIES)
+	include_directories(${PYTHONQT_INCLUDE_PATH})
+	message(STATUS "Using PythonQt: ${PYTHONQT_LIBRARIES} ${PYTHONQT_INCLUDE_PATH}")
+else()
+	if (QT_VERSION_MINOR GREATER 7)
+		message(STATUS "Using bundled PythonQt for Qt-4.8")
+		ADD_SUBDIRECTORY(3rdparty/pythonqt21-qt48)
+		include_directories(3rdparty/pythonqt21-qt48/)
+	else()
+		message(STATUS "Using bundled PythonQt for Qt-4.6.2")
+		ADD_SUBDIRECTORY(3rdparty/pythonqt21-qt462)
+		include_directories(3rdparty/pythonqt21-qt462)
+	endif()
+	set(PYTHONQT_LIBRARIES PythonQt)
+endif()
 
 if(NOT CPPUNIT_FOUND AND CPPUNIT_INCLUDE_DIR AND CPPUNIT_LIBRARY)
 	set(CCPUNIT_LIBRARIES ${CPPUNIT_LIBRARY})

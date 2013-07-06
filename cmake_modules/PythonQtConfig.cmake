@@ -17,7 +17,7 @@ if(PYTHONQT_INCLUDE_PATH AND PYTHONQT_LIBRARIES AND PYTHONQTALL_LIBRARIES)
 set(PythonQt_FOUND TRUE)
 set(PYTHONQT_LIBRARIES ${PYTHONQT_LIBRARIES} ${PYTHONQTALL_LIBRARIES})
 else()
-message(FATAL_ERROR "Could not find PythonQt or PythonQt_QtAll")
+# message(FATAL_ERROR "Could not find PythonQt or PythonQt_QtAll")
 set(PythonQt_FOUND FALSE)
 endif()
 
