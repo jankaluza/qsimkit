@@ -127,22 +127,23 @@ PeripheralInterface *PeripheralManager::loadPythonPeripheral(QString f, QString 
 void PeripheralManager::loadPeripherals() {
 	QDir pluginsDir(QApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
-	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-		pluginsDir.cdUp();
+	pluginsDir.cd("qsimkit");
+	pluginsDir.cd("peripherals");
 #elif defined(Q_OS_MAC)
 	if (pluginsDir.dirName() == "MacOS") {
 		pluginsDir.cdUp();
 		pluginsDir.cdUp();
 		pluginsDir.cdUp();
 	}
-#endif
-	
+#else
 	if (pluginsDir.exists("Peripherals")) {
 		pluginsDir.cd("Peripherals");
 	}
 	else {
 		pluginsDir = QString(MODULES_DIR) + "/peripheral";
 	}
+#endif
+
 	foreach (QString fileName, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
 		loadXML(pluginsDir.absoluteFilePath(fileName));
 	}

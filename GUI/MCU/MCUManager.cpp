@@ -111,21 +111,22 @@ MCUInterface *MCUManager::loadBinaryMCU(QString f) {
 void MCUManager::loadMCUs() {
 	QDir pluginsDir(QApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
-	if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-		pluginsDir.cdUp();
+	pluginsDir.cd("qsimkit");
+	pluginsDir.cd("peripherals");
 #elif defined(Q_OS_MAC)
 	if (pluginsDir.dirName() == "MacOS") {
 		pluginsDir.cdUp();
 		pluginsDir.cdUp();
 		pluginsDir.cdUp();
 	}
-#endif
+#else
 	if (pluginsDir.exists("MCU")) {
 		pluginsDir.cd("MCU");
 	}
 	else {
 		pluginsDir = QString(MODULES_DIR) + "/mcu";
 	}
+#endif
 
 	qDebug() << "Trying to load MCUs from " << pluginsDir;
 	foreach (QString fileName, pluginsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)) {
