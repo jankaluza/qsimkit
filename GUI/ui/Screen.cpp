@@ -245,11 +245,18 @@ bool Screen::load(QDomDocument &doc) {
 			continue;
 		}
 
+		QString error;
+		obj->load(object, error);
+		if (!error.isEmpty()) {
+			QMessageBox::critical(this, tr("Peripheral loading error"), error);
+			delete obj;
+			return false;
+		}
+
 		QDomElement position = object.firstChildElement("position");
 		obj->setX(position.attribute("x").toInt());
 		obj->setY(position.attribute("y").toInt());
 
-		obj->load(object);
 		if (m_objects.empty()) {
 			setMCU(dynamic_cast<MCU *>(obj));
 		}

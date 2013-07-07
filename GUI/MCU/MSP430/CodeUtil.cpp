@@ -95,7 +95,7 @@ static void parseCode(DisassembledFiles &df, QString &code) {
 	}
 }
 
-DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
+DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString &error) {
 	DisassembledFiles df;
 
 	bool hasELF = true;
@@ -138,7 +138,8 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43) {
 	return df;
 }
 
-QString ELFToA43(const QByteArray &elf) {
+QString ELFToA43(const QByteArray &elf, QString &error) {
+// 	error = "4";
 	QString f_in = QDir::tempPath() + "/test.dump";
 	QString f_out = QDir::tempPath() + "/test.a43";
 	QFile file(f_in);

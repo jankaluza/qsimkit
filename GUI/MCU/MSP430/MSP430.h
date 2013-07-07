@@ -101,7 +101,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		void executeOption(int option);
 
 		virtual void save(QTextStream &stream);
-		virtual void load(QDomElement &object);
+		void load(QDomElement &object, QString &error);
 
 		RegisterSet *getRegisterSet();
 
@@ -114,6 +114,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 	private:
 		void loadELFOption();
 		void loadA43Option();
+		bool loadPackage(QString &variant, QString &error);
 
 	private:
 		std::map<int, QChar> m_sides;
@@ -140,6 +141,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		PeripheralItem *m_peripheralItem;
 		int8_t m_counter;
 		bool m_syncing;
+		QString m_variantStr;;
 };
 
 class MSP430Interface : public QObject, MCUInterface {

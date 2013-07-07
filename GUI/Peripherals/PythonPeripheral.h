@@ -59,7 +59,7 @@ class PythonPeripheral : public Peripheral {
 		bool clicked(const QPoint &p);
 
 		void save(QTextStream &stream);
-		void load(QDomElement &object);
+		void load(QDomElement &object, QString &error);
 
 	private:
 		Script *m_script;

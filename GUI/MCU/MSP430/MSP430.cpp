@@ -49,6 +49,7 @@
 #include <QDebug>
 #include <QDomDocument>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <QtCore/qplugin.h>
 
 MCU_MSP430::MCU_MSP430(const QString &variant) :
@@ -58,16 +59,10 @@ m_instruction(new MSP430::Instruction), m_variant(0),
 m_timerFactory(new AdevsTimerFactory()), m_ignoreNextStep(false), m_counter(-1),
 m_syncing(0) {
 
+	m_variantStr = variant;
 	m_variant = ::getVariant(variant.toStdString().c_str());
 	if (!m_variant) {
 		return;
-	}
-
-	QString package = QApplication::applicationDirPath() + QString("Packages/") + variant + ".xml";
-
-	QDir pluginsDir(QApplication::applicationDirPath());
-	if (!pluginsDir.exists("Packages")) {
-		package = QString(PACKAGES) + "/Packages/" + variant + ".xml";
 	}
 
 	m_name = "MSP430";
@@ -79,7 +74,9 @@ m_syncing(0) {
 	m_intManager = new MSP430::InterruptManager(m_reg, m_mem, m_variant);
 	m_pinManager = new MSP430::PinManager(m_mem, m_intManager, m_variant);
 	m_pinManager->setWatcher(this);
-	Package::loadPackage(this, m_pinManager, package, m_pins, m_sides);
+
+	QString error;
+	loadPackage(m_variantStr, error);
 
 	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	m_basicClock->getMCLK()->addHandler(this, MSP430::Clock::Rising);
@@ -234,7 +231,28 @@ void MCU_MSP430::save(QTextStream &stream) {
 	stream << "</elf>";
 }
 
-void MCU_MSP430::load(QDomElement &object) {
+bool MCU_MSP430::loadPackage(QString &variant, QString &error) {
+	QString package = QApplication::applicationDirPath() + QString("/Packages/") + variant + ".xml";
+
+	QDir pluginsDir(QApplication::applicationDirPath());
+	if (!pluginsDir.exists("Packages")) {
+		package = QString(PACKAGES) + "/Packages/" + variant + ".xml";
+	}
+
+	if (!Package::loadPackage(this, m_pinManager, package, m_pins, m_sides)) {
+		error = QString("MSP430 variant '%1' cannot be loaded.").arg(variant);
+		return false;
+	}
+
+	return true;
+}
+
+void MCU_MSP430::load(QDomElement &object, QString &error) {
+	if (m_pins.empty()) {
+		error = QString("MSP430 variant '%1' cannot be loaded.").arg(m_variantStr);
+		return;
+	}
+
 	loadA43(object.firstChildElement("code").text());
 	loadELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
@@ -330,7 +348,12 @@ void MCU_MSP430::loadELF(const QByteArray &elf) {
 	m_elf = elf;
 
 	if (!m_elf.isEmpty()) {
-		QString a43 = CodeUtil::ELFToA43(elf);
+		QString error;
+		QString a43 = CodeUtil::ELFToA43(elf, error);
+		if (!error.isEmpty()) {
+			QMessageBox::critical(0, tr("Loading error"), error);
+			return;
+		}
 		loadA43(a43);
 	}
 }
@@ -349,7 +372,13 @@ void MCU_MSP430::loadELFOption() {
 }
 
 DisassembledFiles MCU_MSP430::getDisassembledCode() {
-	return CodeUtil::disassemble(m_elf, m_code);
+	QString error;
+	DisassembledFiles files = CodeUtil::disassemble(m_elf, m_code, error);
+	if (!error.isEmpty()) {
+		QMessageBox::critical(0, tr("Loading error"), error);
+	}
+
+	return files;
 }
 
 MCU *MSP430Interface::create(const QString &variant) {

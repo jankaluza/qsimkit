@@ -26,9 +26,9 @@
 
 namespace CodeUtil {
 
-	DisassembledFiles disassemble(const QByteArray &elf, const QString &a43);
+	DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString &error);
 
-	QString ELFToA43(const QByteArray &elf);
+	QString ELFToA43(const QByteArray &elf, QString &error);
 
 }
 

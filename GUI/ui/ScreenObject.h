@@ -64,7 +64,7 @@ class ScreenObject : public QObject
 		void resize(int w, int h) { m_width = w; m_height = h; }
 
 		virtual void save(QTextStream &stream);
-		virtual void load(QDomElement &object) {}
+		virtual void load(QDomElement &object, QString &error) {}
 
 		virtual void paint(QWidget *screen) = 0;
 

@@ -109,7 +109,7 @@ void PythonPeripheral::save(QTextStream &stream) {
 	stream << str;
 }
 
-void PythonPeripheral::load(QDomElement &object) {
+void PythonPeripheral::load(QDomElement &object, QString &error) {
 	QString str;
 	QTextStream stream(&str);
 	object.save(stream, 0);

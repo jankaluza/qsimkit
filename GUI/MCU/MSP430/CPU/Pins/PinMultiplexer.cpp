@@ -36,7 +36,7 @@ m_sel(sel), m_index(1 << index), m_value(0), m_valueIsInput(false) {
 }
 
 PinMultiplexer::~PinMultiplexer() {
-	
+
 }
 
 void PinMultiplexer::addMultiplexing(Condition &c, const std::string &outputName) {
