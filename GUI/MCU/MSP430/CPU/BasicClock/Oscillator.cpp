@@ -23,7 +23,7 @@
 
 namespace MSP430 {
 	
-Oscillator::Oscillator() : m_rising(true) {
+Oscillator::Oscillator() : m_rising(true), m_inTick(false) {
 }
 
 Oscillator::~Oscillator() {
@@ -31,10 +31,23 @@ Oscillator::~Oscillator() {
 }
 
 void Oscillator::addHandler(OscillatorHandler *handler) {
+	// If this method is called from the handler itself, it would segfaulf
+	// if we add the handler right now. Postpone adding in the end of tick().
+	if (m_inTick) {
+		m_toAdd.push_back(handler);
+		return;
+	}
 	m_handlers.push_back(handler);
 }
 
 void Oscillator::removeHandler(OscillatorHandler *handler) {
+	// If this method is called from the handler itself, it would segfaulf
+	// if we remove it right now. Postpone removal in the end of tick().
+	if (m_inTick) {
+		m_toRemove.push_back(handler);
+		return;
+	}
+
 	std::vector<OscillatorHandler *>::iterator it = std::find(m_handlers.begin(), m_handlers.end(), handler);
 	if (it != m_handlers.end()) {
 		m_handlers.erase(it);
@@ -42,6 +55,7 @@ void Oscillator::removeHandler(OscillatorHandler *handler) {
 }
 
 void Oscillator::tick() {
+	m_inTick = true;
 	for (std::vector<OscillatorHandler *>::const_iterator it = m_handlers.begin(); it != m_handlers.end(); ++it) {
 		if (m_rising) {
 			(*it)->tickRising();
@@ -51,6 +65,23 @@ void Oscillator::tick() {
 		}
 	}
 	m_rising = !m_rising;
+	m_inTick = false;
+
+	// Remove handlers which called removeHandler() during their callbacks.
+	if (!m_toRemove.empty()) {
+		for (std::vector<OscillatorHandler *>::const_iterator it = m_toRemove.begin(); it != m_toRemove.end(); ++it) {
+			removeHandler(*it);
+		}
+		m_toRemove.clear();
+	}
+
+	// Add handlers which called addHandler() during their callbacks.
+	if (!m_toAdd.empty()) {
+		for (std::vector<OscillatorHandler *>::const_iterator it = m_toAdd.begin(); it != m_toAdd.end(); ++it) {
+			addHandler(*it);
+		}
+		m_toAdd.clear();
+	}
 }
 
 }

@@ -48,6 +48,9 @@ class Oscillator {
 	private:
 		std::vector<OscillatorHandler *> m_handlers;
 		bool m_rising;
+		bool m_inTick;
+		std::vector<OscillatorHandler *> m_toRemove;
+		std::vector<OscillatorHandler *> m_toAdd;
 };
 
 }
