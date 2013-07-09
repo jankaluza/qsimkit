@@ -69,6 +69,7 @@ TimerBItem::TimerBItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	ADD_ITEM(v->getTBCCTL6(), "TBCCTL6");
 	ADD_ITEM(v->getTBCCR6(), "TBCCR6");
 	ADD_ITEM(v->getTBIV(), "TBIV");
+	item = new MemoryItem(this, "test", 68056);
 }
 
 TimerBItem::~TimerBItem() {

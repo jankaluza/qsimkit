@@ -26,7 +26,7 @@
 
 namespace CodeUtil {
 	
-static void parseCode(DisassembledFiles &df, QString &code) {
+static void parseCode(DisassembledFiles &df, QString &code, QString &error) {
 	QString file;
 	DisassembledLine pendingSection;
 	int num = 0;
@@ -107,8 +107,10 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 
 	QString f_in = QDir::tempPath() + "/test.dump";
 	QFile file(f_in);
-	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text))
+	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text)) {
+		error = QString("Cannot open '%1' for writing.").arg(f_in);
 		return df;
+	}
 
 	file.write(code);
 	file.close();
@@ -126,14 +128,17 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 	}
 	
 	if (!objdump.waitForStarted()) {
+		error = QString("'msp430-objdump' cannot be started. Is msp430-gcc installed and is msp430-objdump in PATH?");
 		return df;
 	}
 
-	if (!objdump.waitForFinished())
+	if (!objdump.waitForFinished()) {
+		error = QString("'msp430-objdump' did not finish properly.");
 		return df;
+	}
 
 	QString result = QString(objdump.readAll());
-	parseCode(df, result);
+	parseCode(df, result, error);
 
 	return df;
 }
@@ -144,7 +149,7 @@ QString ELFToA43(const QByteArray &elf, QString &error) {
 	QString f_out = QDir::tempPath() + "/test.a43";
 	QFile file(f_in);
 	if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
-		qDebug() << "Cannot open" << f_in;
+		error = QString("Cannot open '%1' for writting.").arg(f_in);
 		return "";
 	}
 
@@ -154,18 +159,18 @@ QString ELFToA43(const QByteArray &elf, QString &error) {
 	QProcess objdump;
 	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << f_in << f_out);
 	if (!objdump.waitForStarted()) {
-		qDebug() << "Cannot start msp430-objdump";
+		error = QString("'msp430-objcopy' cannot be started. Is msp430-gcc installed and is msp430-objcopy in PATH?");
 		return "";
  	}
  
 	if (!objdump.waitForFinished()) {
-		qDebug() << "msp430-objdump did not finish cleanly";
+		error = QString("'msp430-objcopy' did not finish properly.");
 		return "";
 	}
 
 	QFile file2(f_out);
 	if (!file2.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		qDebug() << "cannot open " << f_out;
+		error = QString("Cannot open '%1' for reading.").arg(f_out);
 		return "";
 	}
 
