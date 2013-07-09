@@ -100,7 +100,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		void executeOption(int option);
 
-		virtual void save(QTextStream &stream);
+		void save(QTextStream &stream);
 		void load(QDomElement &object, QString &error);
 
 		RegisterSet *getRegisterSet();
