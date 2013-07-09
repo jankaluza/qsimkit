@@ -17,7 +17,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "LFXT1.h"
+#include "XT2.h"
 #include "CPU/Variants/Variant.h"
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
@@ -26,52 +26,31 @@
 
 namespace MSP430 {
 
-LFXT1::LFXT1(Memory *mem, Variant *variant, PinManager *pinManager) :
-m_mem(mem), m_variant(variant), m_state(false), m_enabled(false) {
+XT2::XT2(Memory *mem, Variant *variant, PinManager *pinManager) :
+m_mem(mem), m_variant(variant), m_state(false) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 
-	ADD_WATCHER(m_variant->getBCSCTL1());
-	ADD_WATCHER(m_variant->getBCSCTL3());
+// 	ADD_WATCHER(m_variant->getBCSCTL1());
+// 	ADD_WATCHER(m_variant->getBCSCTL3());
 
-	pinManager->addPinHandler("XIN", this);
+	pinManager->addPinHandler("XT2IN", this);
 
 	reset();
 }
 
-LFXT1::~LFXT1() {
+XT2::~XT2() {
 
 }
 
-void LFXT1::reset() {
+void XT2::reset() {
 }
 
-bool LFXT1::isChosen() {
-	uint16_t value = m_mem->getBigEndian(m_variant->getBCSCTL3(), false);
-	// Choose between VLO and LFXT1
-	bool xts = m_mem->isBitSet(m_variant->getBCSCTL1(), 1 << 6);
-	if (xts) {
-		return true;
-	}
-	else {
-		switch((value >> 4) & 3) {
-			case 2: return false;
-			default:
-				return true;
-		}
-	}
+void XT2::handleMemoryChanged(::Memory *memory, uint16_t address) {
 }
 
-void LFXT1::handleMemoryChanged(::Memory *memory, uint16_t address) {
-	m_enabled = isChosen();
-}
-
-void LFXT1::handlePinInput(const std::string &name, double value) {
-	if (!m_enabled) {
-		return;
-	}
-
+void XT2::handlePinInput(const std::string &name, double value) {
 	bool newState = value > 1.5;
 	if (m_state != newState) {
 		m_state = newState;
@@ -79,11 +58,11 @@ void LFXT1::handlePinInput(const std::string &name, double value) {
 	}
 }
 
-void LFXT1::handlePinActivated(const std::string &name) {
+void XT2::handlePinActivated(const std::string &name) {
 	
 }
 
-void LFXT1::handlePinDeactivated(const std::string &name) {
+void XT2::handlePinDeactivated(const std::string &name) {
 	
 }
 

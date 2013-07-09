@@ -32,13 +32,13 @@ class Memory;
 class DCO;
 class VLO;
 class LFXT1;
+class PinManager;
 
 class TimerFactory {
 	public:
 		virtual ~TimerFactory() {}
 		virtual DCO *createDCO(Memory *mem, Variant *variant) = 0;
 		virtual VLO *createVLO() = 0;
-		virtual LFXT1 *createLFXT1(Memory *mem, Variant *variant) = 0;
 };
 
 }

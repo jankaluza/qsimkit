@@ -42,5 +42,4 @@ class AdevsTimerFactory : public MSP430::TimerFactory {
 
 		MSP430::DCO *createDCO(MSP430::Memory *mem, Variant *variant);
 		MSP430::VLO *createVLO();
-		MSP430::LFXT1 *createLFXT1(MSP430::Memory *mem, Variant *variant);
 };

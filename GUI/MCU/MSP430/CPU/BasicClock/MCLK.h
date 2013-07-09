@@ -34,11 +34,12 @@ namespace MSP430 {
 class DCO;
 class VLO;
 class LFXT1;
+class XT2;
 class Oscillator;
 
 class MCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 	public:
-		MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1);
+		MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1, XT2 *xt2);
 		virtual ~MCLK();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
@@ -57,6 +58,7 @@ class MCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		DCO *m_dco;
 		VLO *m_vlo;
 		LFXT1 *m_lfxt1;
+		XT2 *m_xt2;
 		uint8_t m_divider;
 		uint8_t m_counter;
 };

@@ -24,12 +24,13 @@
 #include <iostream>
 
 #include "DCO.h"
+#include "XT2.h"
 
 namespace MSP430 {
 
-SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco) :
-m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_divider(1),
-m_counter(0) {
+SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco, XT2 *xt2) :
+m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_xt2(xt2),
+m_divider(1), m_counter(0) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -75,6 +76,18 @@ void SMCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		case 3: m_divider = 8; break;
 		default: break;
 	}
+
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
+	// Choose source - SELSx
+	switch ((ctl2 >> 3) & 1) {
+		case 0: m_source = m_dco; break;
+		case 1: m_source = m_xt2; break;
+		default:
+			break;
+	}
+	m_source->addHandler(this);
 }
 
 }

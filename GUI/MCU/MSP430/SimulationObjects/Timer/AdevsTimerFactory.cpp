@@ -23,7 +23,6 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/Pins/PinManager.h"
 #include "DCO.h"
-#include "LFXT1.h"
 #include "VLO.h"
 #include <iostream>
 
@@ -37,8 +36,4 @@ MSP430::DCO *AdevsTimerFactory::createDCO(MSP430::Memory *mem, Variant *variant)
 
 MSP430::VLO *AdevsTimerFactory::createVLO() {
 	return new VLO();
-}
-
-MSP430::LFXT1 *AdevsTimerFactory::createLFXT1(MSP430::Memory *mem, Variant *variant) {
-	return new LFXT1(mem, variant);
 }

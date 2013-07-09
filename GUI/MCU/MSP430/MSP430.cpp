@@ -37,7 +37,6 @@
 #include "SimulationObjects/Timer/AdevsTimerFactory.h"
 #include "SimulationObjects/Timer/DCO.h"
 #include "SimulationObjects/Timer/VLO.h"
-#include "SimulationObjects/Timer/LFXT1.h"
 #include "PeripheralItem/MSP430PeripheralItem.h"
 
 #include <QWidget>
@@ -147,7 +146,6 @@ void MCU_MSP430::handlePinChanged(int id, double value) {
 void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &objects) {
 	objects.push_back(dynamic_cast<DCO *>(m_basicClock->getDCO()));
 	objects.push_back(dynamic_cast<VLO *>(m_basicClock->getVLO()));
-	objects.push_back(dynamic_cast<LFXT1 *>(m_basicClock->getLFXT1()));
 }
 
 void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {

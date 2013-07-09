@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,26 +19,49 @@
 
 #pragma once
 
-#include <QWidget>
-#include <QString>
-#include <QChar>
-#include <QRect>
-#include <QList>
-#include <map>
+#include "Oscillator.h"
+#include "CPU/Memory/Memory.h"
+#include "CPU/Pins/PinHandler.h"
 
-#include "Peripherals/SimulationObject.h"
-#include "CPU/BasicClock/LFXT1.h"
+#include <stdint.h>
+#include <string>
+#include <vector>
 
-class LFXT1 : public SimulationObject, public MSP430::LFXT1 {
+class Variant;
+
+namespace MSP430 {
+
+class PinManager;
+class PinMultiplexer;
+
+class XT2 : public Oscillator, public MemoryWatcher, public PinHandler {
 	public:
-		LFXT1(MSP430::Memory *mem, Variant *variant);
-		~LFXT1();
+		XT2(Memory *mem, Variant *variant, PinManager *pinManager);
+		virtual ~XT2();
 
-		void internalTransition();
+		void reset();
+		unsigned long getFrequency() {
+			return 0;
+		}
 
-		void externalEvent(double t, const SimulationEventList &);
+		double getStep() {
+			return 0;
+		}
 
-		void output(SimulationEventList &output);
+		bool isChosen();
 
-		double timeAdvance();
+		void handleMemoryChanged(::Memory *memory, uint16_t address);
+
+		void handlePinInput(const std::string &name, double value);
+
+		void handlePinActivated(const std::string &name);
+
+		void handlePinDeactivated(const std::string &name);
+
+	private:
+		Memory *m_mem;
+		Variant *m_variant;
+		bool m_state;
 };
+
+}

@@ -21,6 +21,7 @@
 
 #include "Oscillator.h"
 #include "CPU/Memory/Memory.h"
+#include "CPU/Pins/PinHandler.h"
 
 #include <stdint.h>
 #include <string>
@@ -30,29 +31,38 @@ class Variant;
 
 namespace MSP430 {
 
-class LFXT1 : public Oscillator, public MemoryWatcher {
+class PinManager;
+class PinMultiplexer;
+
+class LFXT1 : public Oscillator, public MemoryWatcher, public PinHandler {
 	public:
-		LFXT1(Memory *mem, Variant *variant);
+		LFXT1(Memory *mem, Variant *variant, PinManager *pinManager);
 		virtual ~LFXT1();
 
 		void reset();
 		unsigned long getFrequency() {
-			return m_freq;
+			return 0;
 		}
 
 		double getStep() {
-			return m_step;
+			return 0;
 		}
 
 		bool isChosen();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
+		void handlePinInput(const std::string &name, double value);
+
+		void handlePinActivated(const std::string &name);
+
+		void handlePinDeactivated(const std::string &name);
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;
-		unsigned long m_freq;
-		double m_step;
+		bool m_state;
+		bool m_enabled;
 };
 
 }

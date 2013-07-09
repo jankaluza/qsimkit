@@ -25,6 +25,7 @@
 
 #include "VLO.h"
 #include "LFXT1.h"
+#include "XT2.h"
 #include "ACLK.h"
 #include "SMCLK.h"
 #include "DCO.h"
@@ -43,12 +44,13 @@ m_pinManager(pinManager) {
 	uint16_t intvec0;
 	uint16_t intvec1;
 	m_vlo = m_factory->createVLO();
-	m_lfxt1 = m_factory->createLFXT1(m_mem, m_variant);
+	m_lfxt1 = new LFXT1(m_mem, m_variant, pinManager);
+	m_xt2 = new XT2(m_mem, m_variant, pinManager);
 	m_dco = m_factory->createDCO(m_mem, m_variant);
 
 	m_aclk = new ACLK(m_mem, m_variant, m_vlo, m_lfxt1);
-	m_smclk = new SMCLK(m_mem, m_variant, m_dco);
-	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1);
+	m_smclk = new SMCLK(m_mem, m_variant, m_dco, m_xt2);
+	m_mclk = new MCLK(m_mem, m_variant, m_dco, m_vlo, m_lfxt1, m_xt2);
 
 	m_aclkHandler = new ClockPinHandler(m_pinManager, m_aclk, "ACLK");
 	m_smclkHandler = new ClockPinHandler(m_pinManager, m_smclk, "SMCLK");

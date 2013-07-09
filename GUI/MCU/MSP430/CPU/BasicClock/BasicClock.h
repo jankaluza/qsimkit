@@ -38,6 +38,7 @@ class VLO;
 class ACLK;
 class SMCLK;
 class LFXT1;
+class XT2;
 class Timer;
 class TimerFactory;
 class PinManager;
@@ -62,6 +63,10 @@ class BasicClock {
 
 		LFXT1 *getLFXT1() {
 			return m_lfxt1;
+		}
+
+		XT2 *getXT2() {
+			return m_xt2;
 		}
 
 		MCLK *getMCLK() {
@@ -97,6 +102,7 @@ class BasicClock {
 		ACLK *m_aclk;
 		SMCLK *m_smclk;
 		LFXT1 *m_lfxt1;
+		XT2 *m_xt2;
 		Timer *m_timerA0;
 		Timer *m_timerA1;
 		Timer *m_timerB;

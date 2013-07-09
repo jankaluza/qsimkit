@@ -26,12 +26,13 @@
 #include "DCO.h"
 #include "LFXT1.h"
 #include "VLO.h"
+#include "XT2.h"
 
 namespace MSP430 {
 
-MCLK::MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1) :
+MCLK::MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1, XT2 *xt2) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_vlo(vlo),
-m_lfxt1(lfxt1), m_divider(1), m_counter(0) {
+m_lfxt1(lfxt1), m_xt2(xt2), m_divider(1), m_counter(0) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
@@ -78,7 +79,7 @@ void MCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	// Choose source - SELMx
 	switch ((ctl2 >> 6) & 3) {
 		case 0: case 1: m_source = m_dco; break;
-		case 2: // TODO: XT2 when present on chip
+		case 2: m_source = m_xt2; break;
 		case 3:
 			if (m_lfxt1->isChosen()) {
 				m_source = m_lfxt1;

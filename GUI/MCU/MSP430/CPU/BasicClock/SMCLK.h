@@ -32,11 +32,12 @@ class Variant;
 namespace MSP430 {
 
 class DCO;
+class XT2;
 class Oscillator;
 
 class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 	public:
-		SMCLK(Memory *mem, Variant *variant, DCO *dco);
+		SMCLK(Memory *mem, Variant *variant, DCO *dco, XT2 *xt2);
 		virtual ~SMCLK();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
@@ -51,6 +52,7 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		Variant *m_variant;
 		Oscillator *m_source;
 		DCO *m_dco;
+		XT2 *m_xt2;
 		uint8_t m_divider;
 		uint8_t m_counter;
 };

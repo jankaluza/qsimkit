@@ -28,7 +28,6 @@ namespace MSP430 {
 class DummyTimerFactory : public TimerFactory {
 	public:
 		DCO *createDCO(Memory *mem, Variant *variant) { return new DCO(mem, variant); }
-		LFXT1 *createLFXT1(Memory *mem, Variant *variant) { return new LFXT1(mem, variant); }
 		VLO *createVLO() { return new VLO(); }
 };
 
