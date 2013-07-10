@@ -37,6 +37,11 @@ void Oscillator::addHandler(OscillatorHandler *handler) {
 		m_toAdd.push_back(handler);
 		return;
 	}
+
+	if (m_handlers.empty()) {
+		start();
+	}
+
 	m_handlers.push_back(handler);
 }
 
@@ -51,6 +56,10 @@ void Oscillator::removeHandler(OscillatorHandler *handler) {
 	std::vector<OscillatorHandler *>::iterator it = std::find(m_handlers.begin(), m_handlers.end(), handler);
 	if (it != m_handlers.end()) {
 		m_handlers.erase(it);
+	}
+
+	if (m_handlers.empty()) {
+		pause();
 	}
 }
 

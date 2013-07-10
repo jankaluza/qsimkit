@@ -39,7 +39,7 @@ class SimulationObjectWrapper;
 
 class SimulationObject {
 	public:
-		SimulationObject() {}
+		SimulationObject() : m_wrapper(0) {}
 		virtual ~SimulationObject() {}
 
 		virtual void internalTransition() = 0;

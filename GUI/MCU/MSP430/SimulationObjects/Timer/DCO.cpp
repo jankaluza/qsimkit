@@ -20,7 +20,8 @@
 #include "DCO.h"
 #include <QDebug>
 
-DCO::DCO(MSP430::Memory *mem, Variant *variant) : MSP430::DCO(mem, variant) {
+DCO::DCO(MSP430::Memory *mem, Variant *variant) : MSP430::DCO(mem, variant),
+m_paused(false) {
 	
 }
 
@@ -41,6 +42,19 @@ void DCO::output(SimulationEventList &output) {
 }
 
 double DCO::timeAdvance() {
+	if (m_paused)
+		return 999;
 	// Oscillator has to tick 2x faster, because it has to rise up and fall down.
 	return getStep() / 2;
+}
+
+void DCO::start() {
+	m_paused = false;
+	if (m_wrapper) {
+		m_wrapper->reschedule();
+	}
+}
+
+void DCO::pause() {
+	m_paused = true;
 }

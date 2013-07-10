@@ -41,4 +41,10 @@ class DCO : public SimulationObject, public MSP430::DCO {
 		void output(SimulationEventList &output);
 
 		double timeAdvance();
+
+		void start();
+		void pause();
+
+	private:
+		bool m_paused;
 };

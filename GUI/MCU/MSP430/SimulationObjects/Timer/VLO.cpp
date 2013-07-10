@@ -20,7 +20,7 @@
 #include "VLO.h"
 #include <QDebug>
 
-VLO::VLO() {
+VLO::VLO() : m_paused(false) {
 	
 }
 
@@ -43,4 +43,15 @@ void VLO::output(SimulationEventList &output) {
 double VLO::timeAdvance() {
 	// Oscillator has to tick 2x faster, because it has to rise up and fall down.
 	return getStep() / 2;
+}
+
+void VLO::start() {
+	m_paused = false;
+	if (m_wrapper) {
+		m_wrapper->reschedule();
+	}
+}
+
+void VLO::pause() {
+	m_paused = true;
 }

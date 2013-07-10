@@ -84,6 +84,7 @@ PinMultiplexer *PinManager::addPin(PinType type, int subtype) {
 			CREATE_MPX_AND_HANDLER(P8, subtype);
 			break;
 		default:
+			mpx = new PinMultiplexer(this, m_multiplexers.size(), m_mem, m_variant, 0, 0, subtype);
 			break;
 	}
 

@@ -166,9 +166,7 @@ void MCU_MSP430::output(SimulationEventList &output) {
 }
 
 void MCU_MSP430::tickRising() {
-// 	std::cout << "tick\n";
 	if (++m_counter == m_instructionCycles) {
-// 		std::cout << "executed\n";
 		int cycles = executeInstruction(m_reg, m_mem, m_instruction);
 		if (cycles == -1) {
 			qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;

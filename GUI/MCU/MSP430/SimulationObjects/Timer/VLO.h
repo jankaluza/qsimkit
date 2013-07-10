@@ -41,4 +41,9 @@ class VLO : public SimulationObject, public MSP430::VLO {
 		void output(SimulationEventList &output);
 
 		double timeAdvance();
+		void start();
+		void pause();
+
+	private:
+		bool m_paused;
 };

@@ -45,6 +45,9 @@ class Oscillator {
 
 		void tick();
 
+		virtual void pause() {}
+		virtual void start() {}
+
 	private:
 		std::vector<OscillatorHandler *> m_handlers;
 		bool m_rising;
