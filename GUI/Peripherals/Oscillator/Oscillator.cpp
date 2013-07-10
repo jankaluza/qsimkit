@@ -31,10 +31,10 @@
 #include <QtCore/qplugin.h>
 
 Oscillator::Oscillator() : m_state(false) {
-	resize(36, 48);
+	resize(36, 24);
 
-	m_pins.push_back(Pin(QRect(24, 12, 10, 10), "XIN", 0));
-	m_pins.push_back(Pin(QRect(24, 24, 10, 10), "XOUT", 0));
+	m_pins.push_back(Pin(QRect(24, 0, 10, 10), "XIN", 0));
+	m_pins.push_back(Pin(QRect(24, 12, 10, 10), "XOUT", 0));
 
 	m_freq = 7372800;
 	m_step = 1.0 / m_freq / 2;
@@ -97,17 +97,20 @@ double Oscillator::timeAdvance() {
 
 void Oscillator::paint(QWidget *screen) {
 	QPainter qp(screen);
-	QPen pen(Qt::black, 2, Qt::SolidLine);
-	qp.setPen(pen);
-	qp.drawEllipse(m_x + 6, m_y, m_width - 6, m_height - 12);
+	// Draw crystal oscillator sign -[]-
+	qp.drawRect(m_x, m_y, m_width - 12, m_height);
+	qp.drawLine(m_x + 3 + 9, m_y + 7, m_x + 3 + 9, m_y + 2);
+	qp.drawLine(m_x + 3, m_y + 7, m_x + 3 + 18, m_y + 7);
+	qp.drawRect(m_x + 3, m_y + 9, 18, 6);
+	qp.drawLine(m_x + 3, m_y + 17, m_x + 3 + 18, m_y + 17);
+	qp.drawLine(m_x + 3 + 9, m_y + 17, m_x + 3 + 9, m_y + 22);
 
-// 	int even = -1;
-// 	for (std::map<int, Pin>::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
-// 		if (m_state) {
-// 			qp.fillRect(it->second.rect, QBrush(QColor(0,255,0)));
-// 		}
-// 		qp.drawRect(it->second.rect);
-// 	}
+	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+		if (m_state) {
+			qp.fillRect(it->rect, QBrush(QColor(0,255,0)));
+		}
+		qp.drawRect(it->rect);
+	}
 }
 
 Peripheral *OscillatorInterface::create() {
