@@ -111,6 +111,10 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		DisassembledFiles getDisassembledCode();
 
+		MSP430::BasicClock *getBasicClock() {
+			return m_basicClock;
+		}
+
 	private:
 		void loadELFOption();
 		void loadA43Option();

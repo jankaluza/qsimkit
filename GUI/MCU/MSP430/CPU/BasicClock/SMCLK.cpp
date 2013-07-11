@@ -42,6 +42,22 @@ SMCLK::~SMCLK() {
 
 }
 
+unsigned long SMCLK::getFrequency() {
+	if (!m_source) {
+		return 0;
+	}
+
+	return m_source->getFrequency() / m_divider;
+}
+
+std::string SMCLK::getSourceName() {
+	if (!m_source) {
+		return "None";
+	}
+
+	return m_source->getName();
+}
+
 void SMCLK::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;

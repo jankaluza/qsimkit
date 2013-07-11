@@ -25,7 +25,7 @@
 
 namespace MSP430 {
 
-VLO::VLO() : m_freq(12000), m_step(1.0/12000) {
+VLO::VLO() : Oscillator("VLO"), m_freq(12000), m_step(1.0/12000) {
 }
 
 VLO::~VLO() {

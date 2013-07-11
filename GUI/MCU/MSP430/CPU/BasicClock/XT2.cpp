@@ -27,7 +27,7 @@
 namespace MSP430 {
 
 XT2::XT2(Memory *mem, Variant *variant, PinManager *pinManager) :
-m_mem(mem), m_variant(variant), m_state(false) {
+Oscillator("XT2"), m_mem(mem), m_variant(variant), m_state(false) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }

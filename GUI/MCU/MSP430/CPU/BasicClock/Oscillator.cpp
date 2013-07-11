@@ -23,7 +23,8 @@
 
 namespace MSP430 {
 	
-Oscillator::Oscillator() : m_rising(true), m_inTick(false) {
+Oscillator::Oscillator(const std::string &name) : m_name(name),
+m_rising(true), m_inTick(false) {
 }
 
 Oscillator::~Oscillator() {

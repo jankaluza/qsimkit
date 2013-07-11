@@ -29,7 +29,7 @@ namespace MSP430 {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 
-DCO::DCO(Memory *mem, Variant *variant) : m_mem(mem), m_variant(variant),
+DCO::DCO(Memory *mem, Variant *variant) : Oscillator("DCO"), m_mem(mem), m_variant(variant),
 m_freq(1000000), m_step(1.0/1000000) {
 	ADD_WATCHER(m_variant->getDCOCTL());
 	ADD_WATCHER(m_variant->getBCSCTL1());

@@ -51,6 +51,10 @@ class MCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 
 		double getStep();
 
+		unsigned long getFrequency();
+
+		std::string getSourceName();
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;

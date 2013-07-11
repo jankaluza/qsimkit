@@ -33,7 +33,7 @@ class OscillatorHandler {
 
 class Oscillator {
 	public:
-		Oscillator();
+		Oscillator(const std::string &name = "Unnamed oscillator");
 		virtual ~Oscillator();
 
 		void addHandler(OscillatorHandler *handler);
@@ -48,7 +48,12 @@ class Oscillator {
 		virtual void pause() {}
 		virtual void start() {}
 
+		const std::string &getName() {
+			return m_name;
+		}
+
 	private:
+		std::string m_name;
 		std::vector<OscillatorHandler *> m_handlers;
 		bool m_rising;
 		bool m_inTick;

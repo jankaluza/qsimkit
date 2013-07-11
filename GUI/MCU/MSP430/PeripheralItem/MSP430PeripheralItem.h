@@ -31,6 +31,7 @@ class MCU_MSP430;
 class RegistersItem;
 class TimerAItem;
 class TimerBItem;
+class BasicClockItem;
 
 class MSP430PeripheralItem : public PeripheralItem
 {
@@ -45,5 +46,6 @@ class MSP430PeripheralItem : public PeripheralItem
 		RegistersItem *m_registersItem;
 		TimerAItem *m_timerAItem;
 		TimerBItem *m_timerBItem;
+		BasicClockItem *m_bcItem;
 };
 

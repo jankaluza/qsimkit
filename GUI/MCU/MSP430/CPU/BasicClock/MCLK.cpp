@@ -48,6 +48,22 @@ MCLK::~MCLK() {
 
 }
 
+unsigned long MCLK::getFrequency() {
+	if (!m_source) {
+		return 0;
+	}
+
+	return m_source->getFrequency() / m_divider;
+}
+
+std::string MCLK::getSourceName() {
+	if (!m_source) {
+		return "None";
+	}
+
+	return m_source->getName();
+}
+
 void MCLK::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;

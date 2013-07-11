@@ -42,6 +42,10 @@ class ACLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
 
+		unsigned long getFrequency();
+
+		std::string getSourceName();
+
 		void reset();
 
 		void tickRising();

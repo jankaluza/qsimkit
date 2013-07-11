@@ -27,7 +27,7 @@
 namespace MSP430 {
 
 LFXT1::LFXT1(Memory *mem, Variant *variant, PinManager *pinManager) :
-m_mem(mem), m_variant(variant), m_state(false), m_enabled(false) {
+Oscillator("LFXT1"), m_mem(mem), m_variant(variant), m_state(false), m_enabled(false) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
