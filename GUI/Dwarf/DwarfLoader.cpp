@@ -36,7 +36,7 @@ DwarfLoader::~DwarfLoader() {
 	
 }
 
-bool DwarfLoader::loadVariableTypes(const QString &out, DebugData *dd, QString &error) {
+bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QString &error) {
 	QStringList lines = out.split("\n", QString::SkipEmptyParts);
 	for (int i = 0; i < lines.size(); ++i) {
 		QString &line = lines[i];
@@ -58,7 +58,7 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DebugData *dd, QString &
 		} \
 	}
 
-bool DwarfLoader::loadSubprograms(const QString &out, DebugData *dd, QString &error) {
+bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QString &error) {
 	int x;
 	QString currentFile;
 	DwarfSubprogram *currentSubprogram = 0;
@@ -103,6 +103,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DebugData *dd, QString &er
 			}
 
 			currentSubprogram = new DwarfSubprogram(name, pcLow, pcHigh);
+			dd->addSubprogram(currentFile, currentSubprogram);
 		}
 		else if (line.contains("DW_TAG_variable")) {
 			if (line[2] == '2') {
@@ -133,7 +134,7 @@ DebugData *DwarfLoader::load(QString &file, QString &error) {
 		return 0;
 	}
 
-	DebugData *dd = new DwarfDebugData();
+	DwarfDebugData *dd = new DwarfDebugData();
 
 	QString result = QString(objdump.readAll());
 	if (!loadVariableTypes(result, dd, error)) {

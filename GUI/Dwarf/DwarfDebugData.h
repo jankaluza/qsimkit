@@ -33,16 +33,16 @@ class DwarfDebugData : public DebugData {
 		DwarfDebugData();
 		~DwarfDebugData();
 
-		void addSubprogram(Subprogram *subprogram);
+		void addSubprogram(const QString &file, Subprogram *subprogram);
 
-		const Subprograms &getSubprograms();
+		const Subprograms &getSubprograms(const QString &file);
 
 		void addVariableType(VariableType *type) {
 			m_types.append(type);
 		}
 
 	private:
-		Subprograms m_subprograms;
+		QMap<QString, Subprograms> m_subprograms;
 		QList<VariableType *> m_types;
 };
 

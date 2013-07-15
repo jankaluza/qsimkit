@@ -22,6 +22,7 @@
 #include <QByteArray>
 #include <QString>
 
+class DwarfDebugData;
 class DebugData;
 
 class DwarfLoader {
@@ -32,8 +33,8 @@ class DwarfLoader {
 		DebugData *load(QString &file, QString &error);
 
 	private:
-		bool loadVariableTypes(const QString &out, DebugData *dd, QString &error);
-		bool loadSubprograms(const QString &out, DebugData *dd, QString &error);
+		bool loadVariableTypes(const QString &out, DwarfDebugData *dd, QString &error);
+		bool loadSubprograms(const QString &out, DwarfDebugData *dd, QString &error);
 
 	private:
 		QString m_objdump;

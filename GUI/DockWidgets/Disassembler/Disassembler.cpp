@@ -42,7 +42,8 @@
 #define INST_ITEM 1
 
 Disassembler::Disassembler(QSimKit *simkit) :
-DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true), m_pc(0) {
+DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true), m_pc(0),
+m_dd(0) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -285,6 +286,13 @@ void Disassembler::reloadFile() {
 	else {
 		reloadFileSource(lines);
 	}
+
+	if (m_dd) {
+		Subprograms subprograms = m_dd->getSubprograms(file->currentText());
+		foreach(const Subprogram *s, subprograms) {
+			func->addItem(s->getName());
+		}
+	}
 }
 
 void Disassembler::reloadCode() {
@@ -308,6 +316,8 @@ void Disassembler::reloadCode() {
 		file->addItem(f, it.key());
 		++it;
 	}
+
+	m_dd = m_mcu->getDebugData();
 
 	view->resizeColumnToContents(0);
 }

@@ -131,7 +131,7 @@ class DebugData {
 		DebugData() {}
 		virtual ~DebugData() {}
 
-		virtual const Subprograms &getSubprograms() = 0;
+		virtual const Subprograms &getSubprograms(const QString &file) = 0;
 };
 
 class MCU : public Peripheral {

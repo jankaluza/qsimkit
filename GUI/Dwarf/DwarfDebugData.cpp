@@ -27,10 +27,10 @@ DwarfDebugData::~DwarfDebugData() {
 	
 }
 
-void DwarfDebugData::addSubprogram(Subprogram *subprogram) {
-	m_subprograms.append(subprogram);
+void DwarfDebugData::addSubprogram(const QString &file, Subprogram *subprogram) {
+	m_subprograms[file].append(subprogram);
 }
 
-const Subprograms &DwarfDebugData::getSubprograms() {
-	return m_subprograms;
+const Subprograms &DwarfDebugData::getSubprograms(const QString &file) {
+	return m_subprograms[file];
 }
