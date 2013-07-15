@@ -102,6 +102,8 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QStrin
 				}
 			}
 
+			i--; // Otherwise we would skip next header
+
 			currentSubprogram = new DwarfSubprogram(name, pcLow, pcHigh);
 			dd->addSubprogram(currentFile, currentSubprogram);
 		}

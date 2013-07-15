@@ -288,6 +288,8 @@ void Disassembler::reloadFile() {
 	}
 
 	if (m_dd) {
+		func->clear();
+
 		Subprograms subprograms = m_dd->getSubprograms(file->currentText());
 		foreach(const Subprogram *s, subprograms) {
 			func->addItem(s->getName());
