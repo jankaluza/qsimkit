@@ -69,6 +69,71 @@ typedef QList<DisassembledLine> DisassembledCode;
 
 typedef QHash<QString, DisassembledCode> DisassembledFiles;
 
+class VariableType {
+	public:
+		VariableType(const QString &name) : m_name(name) {
+		}
+
+		const QString &getName() { return m_name; }
+
+	private:
+		QString m_name;
+};
+
+class Variable {
+	public:
+
+		Variable(const QString &name, VariableType *type) :
+			m_name(name), m_type(type) { }
+
+		VariableType *getType() { return m_type; }
+
+		virtual QString getValue() = 0;
+
+	private:
+		QString m_name;
+		VariableType *m_type;
+};
+
+typedef QList<Variable> Variables;
+
+class Subprogram {
+	public:
+		Subprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh) :
+			m_name(name), m_pcLow(pcLow), m_pcHigh(pcHigh) {}
+
+		uint16_t getPCLow() const {
+			return m_pcLow;
+		}
+
+		uint16_t getPCHigh() const {
+			return m_pcHigh;
+		}
+
+		const QString &getName() const {
+			return m_name;
+		}
+
+		virtual Variables &getVariables() = 0;
+
+		virtual Variables &getArgs() = 0;
+
+	private:
+		QString m_name;
+		uint16_t m_pcLow;
+		uint16_t m_pcHigh;
+};
+
+typedef QList<Subprogram> Subprograms;
+
+class DebugData {
+	public:
+		DebugData() {}
+		virtual ~DebugData() {}
+
+		virtual const Subprograms &getSubprograms() = 0;
+};
+
 class MCU : public Peripheral {
 	Q_OBJECT
 

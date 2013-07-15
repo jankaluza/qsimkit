@@ -5,9 +5,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 FILE(GLOB SRC ui/*.cpp Peripherals/*.cpp Script/*.cpp MCU/*.cpp)
-FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp Tracking/*.cpp)
+FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp Tracking/*.cpp Dwarf/*.cpp)
 FILE(GLOB HEADERS ui/*.h Peripherals/*.h Script/*.h MCU/*.h)
-FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h Tracking/*.h)
+FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h Tracking/*.h Dwarf/*.h)
 FILE(GLOB FORMS ui/*.ui)
 FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui)
 
@@ -61,12 +61,16 @@ FILE(GLOB PERIPHERAL_HEADERS Peripherals/Peripheral.h
 	MCU/Memory.h
 	Tracking/PinHistory.h
 	DockWidgets/Peripherals/MemoryItem.h
+	Dwarf/DwarfDebugData.h
+	Dwarf/DwarfLoader.h
 	)
 
 FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	ui/ScreenObject.cpp
 	Tracking/PinHistory.cpp
 	DockWidgets/Peripherals/MemoryItem.cpp
+	Dwarf/DwarfDebugData.cpp
+	Dwarf/DwarfLoader.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})

@@ -24,6 +24,8 @@
 #include <QDir>
 #include <QDebug>
 
+#include "GUI/Dwarf/DwarfLoader.h"
+
 namespace CodeUtil {
 	
 static void parseCode(DisassembledFiles &df, QString &code, QString &error) {
@@ -139,6 +141,9 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 
 	QString result = QString(objdump.readAll());
 	parseCode(df, result, error);
+
+	DwarfLoader dl("msp430-objdump");
+	dl.load(f_in, error);
 
 	return df;
 }
