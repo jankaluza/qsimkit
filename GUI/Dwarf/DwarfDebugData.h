@@ -33,6 +33,8 @@ class DwarfDebugData : public DebugData {
 		DwarfDebugData();
 		~DwarfDebugData();
 
+		void addSubprogram(Subprogram *subprogram);
+
 		const Subprograms &getSubprograms();
 
 		void addVariableType(VariableType *type) {

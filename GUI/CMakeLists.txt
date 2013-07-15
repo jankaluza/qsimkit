@@ -63,6 +63,7 @@ FILE(GLOB PERIPHERAL_HEADERS Peripherals/Peripheral.h
 	DockWidgets/Peripherals/MemoryItem.h
 	Dwarf/DwarfDebugData.h
 	Dwarf/DwarfLoader.h
+	Dwarf/DwarfSubprogram.h
 	)
 
 FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
@@ -71,6 +72,7 @@ FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	DockWidgets/Peripherals/MemoryItem.cpp
 	Dwarf/DwarfDebugData.cpp
 	Dwarf/DwarfLoader.cpp
+	Dwarf/DwarfSubprogram.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})

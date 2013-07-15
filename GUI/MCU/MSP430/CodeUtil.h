@@ -28,6 +28,8 @@ namespace CodeUtil {
 
 	DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString &error);
 
+	DebugData *getDebugData(const QByteArray &elf, QString &error);
+
 	QString ELFToA43(const QByteArray &elf, QString &error);
 
 }

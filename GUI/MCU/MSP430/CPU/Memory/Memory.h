@@ -24,7 +24,7 @@
 #include <vector>
 #include <map>
 
-#include "../../GUI/MCU/Memory.h"
+#include "GUI/MCU/Memory.h"
 
 namespace MSP430 {
 

@@ -17,20 +17,23 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "DwarfDebugData.h"
+#include "DwarfSubprogram.h"
 
 #include <QDebug>
 
-DwarfDebugData::DwarfDebugData() {}
-
-DwarfDebugData::~DwarfDebugData() {
+DwarfSubprogram::DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh) :
+Subprogram(name, pcLow, pcHigh) {
 	
 }
 
-void DwarfDebugData::addSubprogram(Subprogram *subprogram) {
-	m_subprograms.append(subprogram);
+DwarfSubprogram::~DwarfSubprogram() {
+	
 }
 
-const Subprograms &DwarfDebugData::getSubprograms() {
-	return m_subprograms;
+Variables &DwarfSubprogram::getVariables() {
+	return m_vars;
+}
+
+Variables &DwarfSubprogram::getArgs() {
+	return m_args;
 }

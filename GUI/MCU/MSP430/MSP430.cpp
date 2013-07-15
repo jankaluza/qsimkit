@@ -377,6 +377,17 @@ DisassembledFiles MCU_MSP430::getDisassembledCode() {
 	return files;
 }
 
+DebugData *MCU_MSP430::getDebugData() {
+	QString error;
+	DebugData *dd = CodeUtil::getDebugData(m_elf, error);
+	if (!error.isEmpty()) {
+		delete dd;
+		QMessageBox::critical(0, tr("Loading error"), error);
+	}
+
+	return dd;
+}
+
 MCU *MSP430Interface::create(const QString &variant) {
 	return new MCU_MSP430(variant);
 }

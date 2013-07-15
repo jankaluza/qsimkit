@@ -124,7 +124,7 @@ class Subprogram {
 		uint16_t m_pcHigh;
 };
 
-typedef QList<Subprogram> Subprograms;
+typedef QList<Subprogram *> Subprograms;
 
 class DebugData {
 	public:
@@ -149,6 +149,8 @@ class MCU : public Peripheral {
 		virtual Memory *getMemory() = 0;
 
 		virtual DisassembledFiles getDisassembledCode() = 0;
+
+		virtual DebugData *getDebugData() = 0;
 
 
 	signals:

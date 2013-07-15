@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "../../GUI/MCU/RegisterSet.h"
+#include "GUI/MCU/RegisterSet.h"
 
 namespace MSP430 {
 

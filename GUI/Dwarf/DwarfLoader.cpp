@@ -19,6 +19,7 @@
 
 #include "DwarfLoader.h"
 #include "DwarfDebugData.h"
+#include "DwarfSubprogram.h"
 
 #include <QFile>
 #include <QProcess>
@@ -36,7 +37,7 @@ DwarfLoader::~DwarfLoader() {
 }
 
 bool DwarfLoader::loadVariableTypes(const QString &out, DebugData *dd, QString &error) {
-	QStringList lines = code.split("\n", QString::SkipEmptyParts);
+	QStringList lines = out.split("\n", QString::SkipEmptyParts);
 	for (int i = 0; i < lines.size(); ++i) {
 		QString &line = lines[i];
 		
@@ -45,15 +46,71 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DebugData *dd, QString &
 	return true;
 }
 
-bool DwarfLoader::loadSubprograms(const QString &out, DebugData *dd, QString &error) {
-	QString currentFile;
+#define SCROLL_TO(X, TO) \
+	for (X = i + 1; X < lines.size(); ++X) { \
+		QString &l = lines[X];\
+		if (l.contains(TO)) { \
+			break; \
+		} \
+		else if (l.size() > 3 && l[1] == '<' && l[3] == '>') { \
+			X = -1; \
+			break; \
+		} \
+	}
 
-	QStringList lines = code.split("\n", QString::SkipEmptyParts);
+bool DwarfLoader::loadSubprograms(const QString &out, DebugData *dd, QString &error) {
+	int x;
+	QString currentFile;
+	DwarfSubprogram *currentSubprogram = 0;
+
+	QStringList lines = out.split("\n", QString::SkipEmptyParts);
 	for (int i = 0; i < lines.size(); ++i) {
 		QString &line = lines[i];
 
 		if (line.contains("DW_TAG_compile_unit")) {
-			
+			SCROLL_TO(x, "DW_AT_name");
+			if (x > 0) {
+				currentFile = lines[x];
+				if (currentFile.contains("/")) {
+					currentFile = currentFile.mid(currentFile.lastIndexOf("/") + 1);
+				}
+				else {
+					currentFile = currentFile.mid(currentFile.lastIndexOf(":") + 2);
+				}
+				currentFile = currentFile.trimmed();
+			}
+		}
+		else if (line.contains("DW_TAG_subprogram")) {
+			QString name;
+			uint16_t pcLow;
+			uint16_t pcHigh;
+
+			for (i++; i < lines.size(); ++i) { 
+				QString &l = lines[i];
+
+				if (l.contains("DW_AT_name")) {
+					name = l.mid(l.lastIndexOf(":") + 2).trimmed();
+				}
+				else if (l.contains("DW_AT_low_pc")) {
+					pcLow = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
+				}
+				else if (l.contains("DW_AT_high_pc")) {
+					pcLow = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
+				}
+				else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
+					break;
+				}
+			}
+
+			currentSubprogram = new DwarfSubprogram(name, pcLow, pcHigh);
+		}
+		else if (line.contains("DW_TAG_variable")) {
+			if (line[2] == '2') {
+				// Variable related to 'currentSubprogram'
+			}
+			else {
+				// Variable related to 'currentFile'
+			}
 		}
 	}
 
