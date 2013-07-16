@@ -89,6 +89,10 @@ class Variable {
 
 		VariableType *getType() { return m_type; }
 
+		const QString &getName() {
+			return m_name;
+		}
+
 		virtual QString getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) = 0;
 
 	private:
@@ -109,6 +113,10 @@ class Subprogram {
 
 		uint16_t getPCHigh() const {
 			return m_pcHigh;
+		}
+
+		bool contains(uint16_t pc) {
+			return pc >= m_pcLow && pc <= m_pcHigh;
 		}
 
 		const QString &getName() const {

@@ -35,9 +35,7 @@ class DwarfLocation {
 			return m_expr;
 		}
 
-		bool contains(uint16_t pc) {
-			return pc >= m_pcLow || pc <= m_pcHigh;
-		}
+		bool contains(uint16_t pc);
 
 	private:
 		DwarfExpression *m_expr;

@@ -20,6 +20,7 @@
 #include "DwarfVariable.h"
 #include "DwarfLocationList.h"
 #include "DwarfExpression.h"
+#include "DwarfSubprogram.h"
 
 #include "GUI/MCU/RegisterSet.h"
 #include "GUI/MCU/Register.h"
@@ -37,6 +38,15 @@ DwarfVariable::~DwarfVariable() {
 }
 
 QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) {
-	QString v;
+	QString v = "??";
+	uint16_t data;
+	if (m_ll) {
+		data = m_ll->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc);
+	}
+	else {
+		data = m_expr->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc);
+	}
+
+	v = QString("0x%1").arg(m->getBigEndian(data, false), 0, 16);
 	return v;
 }

@@ -75,12 +75,10 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	m_timer = new QTimer(this);
 	connect(m_timer, SIGNAL(timeout()), this, SLOT(simulationStep()));
 
-	m_disassembler = new Disassembler(this);
-	addDockWidget(m_disassembler, Qt::RightDockWidgetArea);
-// 	addDockWidget(new Registers(this), Qt::LeftDockWidgetArea);
-// 	addDockWidget(new MemoryTracker(this), Qt::LeftDockWidgetArea);
-// 	addDockWidget(new Stack(this), Qt::LeftDockWidgetArea);
 	m_peripheralsWidget = new Peripherals(this);
+	m_disassembler = new Disassembler(this);
+
+	addDockWidget(m_disassembler, Qt::RightDockWidgetArea);	
 	addDockWidget(m_peripheralsWidget, Qt::LeftDockWidgetArea);
 
 	connect(screen, SIGNAL(onPeripheralAdded(QObject *)), m_peripheralsWidget, SLOT(addPeripheral(QObject *)));

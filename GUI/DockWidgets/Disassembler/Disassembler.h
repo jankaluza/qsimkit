@@ -43,11 +43,18 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 
 		void setMCU(MCU *mcu);
 
+		MCU *getMCU() {
+			return m_mcu;
+		}
+
 		void refresh();
 
 		void showSourceCode(bool show);
 		void showAssembler(bool show);
 		void pointToInstruction(uint16_t pc);
+
+		Subprogram *getCurrentSubprogram();
+
 
 	public slots:
 		void handleContextMenu(const QPoint &point);

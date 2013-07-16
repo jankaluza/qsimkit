@@ -17,44 +17,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "DwarfSubprogram.h"
-#include "DwarfLocationList.h"
-#include "DwarfExpression.h"
-#include "DwarfVariable.h"
+#include "DisassemblerItem.h"
+#include "GUI/MCU/MCU.h"
+#include "Disassembler.h"
 
+#include "GUI/MCU/RegisterSet.h"
+#include "GUI/MCU/Register.h"
+#include "GUI/MCU/Memory.h"
+
+#include <QWidget>
+#include <QString>
+#include <QTreeWidgetItem>
 #include <QDebug>
 
-DwarfSubprogram::DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh,
-	DwarfLocationList *ll, DwarfExpression *expr) :
-	Subprogram(name, pcLow, pcHigh), m_ll(ll), m_expr(expr) {
-	
+DisassemblerItem::DisassemblerItem(Disassembler *dis) : m_dis(dis) {
+	setText(0, "Variables");
 }
 
-DwarfSubprogram::~DwarfSubprogram() {
-	
-}
+void DisassemblerItem::refresh() {
+	MCU *mcu = m_dis->getMCU();
+	Subprogram *s = m_dis->getCurrentSubprogram();
 
-void DwarfSubprogram::addVariable(DwarfVariable *v) {
-	m_vars.append(v);
-}
-
-uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
-	uint16_t base;
-	if (m_ll) {
-		base = m_ll->getValue(r, m, this, pc);
-	}
-	else {
-		base = m_expr->getValue(r, m, this, pc);
+	while(childCount()) {
+		delete takeChild(0);
 	}
 
-	qDebug() << getName() << "base is" << base;
-	return base;
+	if (!s) {
+		return;
+	}
+
+	Variables &vars = s->getVariables();
+	foreach(Variable *v, vars) {
+		QTreeWidgetItem *it = new QTreeWidgetItem(this);
+		it->setText(0, v->getName());
+		it->setText(1, v->getValue(mcu->getRegisterSet(), mcu->getMemory(), s, mcu->getRegisterSet()->get(0)->getBigEndian()));
+	}
 }
 
-Variables &DwarfSubprogram::getVariables() {
-	return m_vars;
-}
-
-Variables &DwarfSubprogram::getArgs() {
-	return m_args;
-}

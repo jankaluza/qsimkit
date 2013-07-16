@@ -17,19 +17,26 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "DwarfLocation.h"
-#include <QDebug>
+#pragma once
 
-DwarfLocation::DwarfLocation(DwarfExpression *expr, uint16_t pcLow, uint16_t pcHigh) :
-m_expr(expr), m_pcLow(pcLow), m_pcHigh(pcHigh) {
-	
-}
+#include <QDialog>
+#include <QString>
+#include <QTimer>
+#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
+#include <QTreeWidgetItem>
 
-DwarfLocation::~DwarfLocation() {
-	
-}
+#include <stdint.h>
 
-bool DwarfLocation::contains(uint16_t pc) {
-	qDebug() << pc << m_pcLow << m_pcHigh;
-	return pc >= m_pcLow && pc <= m_pcHigh;
-}
+class Disassembler;
+
+class DisassemblerItem : public PeripheralItem
+{
+	public:
+		DisassemblerItem(Disassembler *dis);
+
+		void refresh();
+
+	private:
+		Disassembler *m_dis;
+};
+

@@ -173,15 +173,15 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_reg30")) inst.op = DW_OP_reg30;
 	else if (expr.startsWith("DW_OP_reg31")) inst.op = DW_OP_reg31;
 	else if (expr.startsWith("DW_OP_breg0")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg1")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg2")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg3")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg4")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg5")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg6")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg7")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg8")) inst.op = DW_OP_breg0;
-	else if (expr.startsWith("DW_OP_breg9")) inst.op = DW_OP_breg0;
+	else if (expr.startsWith("DW_OP_breg1")) inst.op = DW_OP_breg1;
+	else if (expr.startsWith("DW_OP_breg2")) inst.op = DW_OP_breg2;
+	else if (expr.startsWith("DW_OP_breg3")) inst.op = DW_OP_breg3;
+	else if (expr.startsWith("DW_OP_breg4")) inst.op = DW_OP_breg4;
+	else if (expr.startsWith("DW_OP_breg5")) inst.op = DW_OP_breg5;
+	else if (expr.startsWith("DW_OP_breg6")) inst.op = DW_OP_breg6;
+	else if (expr.startsWith("DW_OP_breg7")) inst.op = DW_OP_breg7;
+	else if (expr.startsWith("DW_OP_breg8")) inst.op = DW_OP_breg8;
+	else if (expr.startsWith("DW_OP_breg9")) inst.op = DW_OP_breg9;
 	else if (expr.startsWith("DW_OP_breg10")) inst.op = DW_OP_breg10;
 	else if (expr.startsWith("DW_OP_breg11")) inst.op = DW_OP_breg11;
 	else if (expr.startsWith("DW_OP_breg12")) inst.op = DW_OP_breg12;
@@ -220,10 +220,16 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_bit_piece")) inst.op = DW_OP_bit_piece;
 	else if (expr.startsWith("DW_OP_implicit_value")) inst.op = DW_OP_implicit_value;
 	else if (expr.startsWith("DW_OP_stack_value")) inst.op = DW_OP_stack_value;
+	else { qDebug() << "UNKNOWN OP" << expr; }
 
 	int i = expr.lastIndexOf(':');
 	if (i > 0) {
-		inst.arg = expr.mid(i).trimmed().toUInt();
+		QString str = expr.mid(i + 1).trimmed().remove(')');
+		bool ok;
+		inst.arg = (uint16_t) str.toInt(&ok);
+		if (!ok) {
+			qDebug() << "Cannot convert " << str;
+		}
 	}
 	else {
 		inst.arg = 0;
@@ -249,6 +255,8 @@ uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s
 
 	foreach(const Instruction &inst, m_instructions) {
 		unsigned char opcode = inst.op;
+
+		qDebug() << "EXPR OP =" << opcode;
 
 		if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31)
 			stack[++sp] = opcode - DW_OP_lit0;

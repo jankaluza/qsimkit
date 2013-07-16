@@ -18,6 +18,8 @@
  **/
 
 #include "Disassembler.h"
+#include "DisassemblerItem.h"
+#include "GUI/DockWidgets/Peripherals/Peripherals.h"
 
 #include "ui/QSimKit.h"
 #include "MCU/MCU.h"
@@ -49,6 +51,8 @@ m_dd(0) {
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
 	connect(file, SIGNAL(currentIndexChanged(int)), this, SLOT(handleFileChanged(int)));
 	connect(showMode, SIGNAL(clicked()), this, SLOT(handleShowModeClicked()));
+
+	m_simkit->getPeripheralsWidget()->addPeripheralItem(new DisassemblerItem(this));
 }
 
 void Disassembler::handleShowModeClicked() {
@@ -295,6 +299,17 @@ void Disassembler::reloadFile() {
 			func->addItem(s->getName());
 		}
 	}
+}
+
+Subprogram *Disassembler::getCurrentSubprogram() {
+	Subprograms subprograms = m_dd->getSubprograms(file->currentText());
+	foreach(Subprogram *s, subprograms) {
+		qDebug() << s->getName() << m_pc << s->getPCLow() << s->getPCHigh();
+		if (s->contains(m_pc)) {
+			return s;
+		}
+	}
+	return 0;
 }
 
 void Disassembler::reloadCode() {

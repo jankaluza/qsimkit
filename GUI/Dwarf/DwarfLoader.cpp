@@ -66,7 +66,6 @@ bool DwarfLoader::loadLocations(QString &file, QMap<uint16_t, DwarfLocationList 
 
 	QString out = QString(objdump.readAll());
 
-	uint16_t currentAddr = 0;
 	QStringList lines = out.split("\n", QString::SkipEmptyParts);
 	foreach(const QString &line, lines) {
 		QString t = line.trimmed();
@@ -83,8 +82,7 @@ bool DwarfLoader::loadLocations(QString &file, QMap<uint16_t, DwarfLocationList 
 		uint16_t addr = words[0].toUInt(0, 16);
 		uint16_t pcLow = words[1].toUInt(0, 16);
 		uint16_t pcHigh = words[2].toUInt(0, 16);
-		QString exprString = t.mid(t.indexOf("("), t.lastIndexOf(")") - t.indexOf("("));
-
+		QString exprString = t.mid(t.indexOf("(") + 1, t.lastIndexOf(")") - t.indexOf("("));
 		if (!exprString.isEmpty()) {
 			DwarfExpression *expr = new DwarfExpression(exprString);
 			DwarfLocation *loc = new DwarfLocation(expr, pcLow, pcHigh);
@@ -147,15 +145,17 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 					pcLow = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
 				}
 				else if (l.contains("DW_AT_high_pc")) {
-					pcLow = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
+					pcHigh = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
 				}
 				else if (l.contains("DW_AT_frame_base")) {
 					if (l.contains("location list")) {
-						uint16_t key = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
+						QString keyStr = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") - 2).trimmed();
+						qDebug() << keyStr;
+						uint16_t key = keyStr.toUInt(0, 16);
 						ll = locations[key];
 					}
 					else {
-						QString exprString = l.mid(l.indexOf("("), l.lastIndexOf(")") - l.indexOf("("));
+						QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
 						expr = new DwarfExpression(exprString);
 					}
 				}
@@ -188,7 +188,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 							ll = locations[key];
 						}
 						else {
-							QString exprString = l.mid(l.indexOf("("), l.lastIndexOf(")") - l.indexOf("("));
+							QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
 							expr = new DwarfExpression(exprString);
 						}
 					}
@@ -199,7 +199,6 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 
 				i--; // Otherwise we would skip next header
 
-				qDebug() << name << ll << expr;
 				DwarfVariable *v = new DwarfVariable(name, ll, expr);
 				currentSubprogram->addVariable(v);
 			}
