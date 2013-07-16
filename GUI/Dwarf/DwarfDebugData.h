@@ -27,7 +27,6 @@
 #include <stdint.h>
 
 #include "GUI/MCU/MCU.h"
-// #include "DwarfLocation.h"
 
 class DwarfDebugData : public DebugData {
 	public:
@@ -45,7 +44,6 @@ class DwarfDebugData : public DebugData {
 	private:
 		QMap<QString, Subprograms> m_subprograms;
 		QList<VariableType *> m_types;
-// 		QMap<uint16_t, QList<DwarfLocation> > m_loc;
 };
 
 

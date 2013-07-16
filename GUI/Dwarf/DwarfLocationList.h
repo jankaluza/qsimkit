@@ -17,40 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "DwarfSubprogram.h"
-#include "DwarfLocationList.h"
+#pragma once
+
+#include <QByteArray>
+#include <QString>
+#include <QList>
+#include <stdint.h>
+
 #include "DwarfExpression.h"
-#include "DwarfVariable.h"
 
-#include <QDebug>
+class DwarfLocation;
+class RegisterSet;
+class Memory;
+class DwarfSubprogram;
 
-DwarfSubprogram::DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh,
-	DwarfLocationList *ll, DwarfExpression *expr) :
-	Subprogram(name, pcLow, pcHigh), m_ll(ll), m_expr(expr) {
-	
-}
+class DwarfLocationList {
+	public:
+		DwarfLocationList();
+		virtual ~DwarfLocationList();
 
-DwarfSubprogram::~DwarfSubprogram() {
-	
-}
+		void append(DwarfLocation *l) {
+			m_locations.append(l);
+		}
 
-void DwarfSubprogram::addVariable(DwarfVariable *v) {
-	m_vars.append(v);
-}
+		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc);
 
-uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
-	if (m_ll) {
-		return m_ll->getValue(r, m, this, pc);
-	}
-	else {
-		return m_expr->getValue(r, m, this, pc);
-	}
-}
+	private:
+		QList<DwarfLocation *> m_locations;
+};
 
-Variables &DwarfSubprogram::getVariables() {
-	return m_vars;
-}
-
-Variables &DwarfSubprogram::getArgs() {
-	return m_args;
-}

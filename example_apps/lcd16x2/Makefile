@@ -1,5 +1,5 @@
 CC=msp430-gcc
-CFLAGS=-Os -Wall -g -mmcu=msp430x168
+CFLAGS=-Os -Wall -g -mmcu=msp430f2410
 
 OBJS=main.c
 

@@ -21,9 +21,14 @@
 
 #include <QByteArray>
 #include <QString>
+#include <QMap>
+#include <QList>
+#include <stdint.h>
 
 class DwarfDebugData;
 class DebugData;
+class DwarfLocation;
+class DwarfLocationList;
 
 class DwarfLoader {
 	public:
@@ -34,7 +39,8 @@ class DwarfLoader {
 
 	private:
 		bool loadVariableTypes(const QString &out, DwarfDebugData *dd, QString &error);
-		bool loadSubprograms(const QString &out, DwarfDebugData *dd, QString &error);
+		bool loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<uint16_t, DwarfLocationList *> &locations, QString &error);
+		bool loadLocations(QString &file, QMap<uint16_t, DwarfLocationList *> &locations, QString &error);
 
 	private:
 		QString m_objdump;

@@ -28,18 +28,30 @@
 
 #include "GUI/MCU/MCU.h"
 
+class DwarfLocationList;
+class DwarfExpression;
+class DwarfVariable;
+class RegisterSet;
+class Memory;
+
 class DwarfSubprogram : public Subprogram {
 	public:
-		DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh);
+		DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh, DwarfLocationList *ll, DwarfExpression *expr);
 		~DwarfSubprogram();
+
+		void addVariable(DwarfVariable *v);
 
 		Variables &getVariables();
 
 		Variables &getArgs();
 
+		uint16_t getFrameBase(RegisterSet *r, Memory *m, uint16_t pc);
+
 	private:
 		Variables m_vars;
 		Variables m_args;
+		DwarfLocationList *m_ll;
+		DwarfExpression *m_expr;
 };
 
 

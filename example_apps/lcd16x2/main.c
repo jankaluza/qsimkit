@@ -311,8 +311,10 @@ int main(void)
     InitializeLcm();
 
     ClearLcmScreen();
+    char ahoj[] = "12345";
 
-    PrintStr("Hello World!");
+    LcmSetCursorPosition(10, 10);
+    PrintStr(ahoj);
 
     while (1)
     {

@@ -64,6 +64,10 @@ FILE(GLOB PERIPHERAL_HEADERS Peripherals/Peripheral.h
 	Dwarf/DwarfDebugData.h
 	Dwarf/DwarfLoader.h
 	Dwarf/DwarfSubprogram.h
+	Dwarf/DwarfLocation.h
+	Dwarf/DwarfLocationList.h
+	Dwarf/DwarfExpression.h
+	Dwarf/DwarfVariable.h
 	)
 
 FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
@@ -73,6 +77,10 @@ FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	Dwarf/DwarfDebugData.cpp
 	Dwarf/DwarfLoader.cpp
 	Dwarf/DwarfSubprogram.cpp
+	Dwarf/DwarfLocation.cpp
+	Dwarf/DwarfLocationList.cpp
+	Dwarf/DwarfExpression.cpp
+	Dwarf/DwarfVariable.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})

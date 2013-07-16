@@ -34,6 +34,7 @@
 
 class Memory;
 class RegisterSet;
+class Subprogram;
 
 class DisassembledLine {
 	public:
@@ -88,14 +89,14 @@ class Variable {
 
 		VariableType *getType() { return m_type; }
 
-		virtual QString getValue() = 0;
+		virtual QString getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) = 0;
 
 	private:
 		QString m_name;
 		VariableType *m_type;
 };
 
-typedef QList<Variable> Variables;
+typedef QList<Variable *> Variables;
 
 class Subprogram {
 	public:
