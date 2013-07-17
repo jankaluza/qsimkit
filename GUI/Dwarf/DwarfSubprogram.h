@@ -41,6 +41,8 @@ class DwarfSubprogram : public Subprogram {
 
 		void addVariable(DwarfVariable *v);
 
+		void addArg(DwarfVariable *v);
+
 		Variables &getVariables();
 
 		Variables &getArgs();

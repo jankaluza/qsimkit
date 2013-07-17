@@ -38,6 +38,11 @@ void DwarfSubprogram::addVariable(DwarfVariable *v) {
 	m_vars.append(v);
 }
 
+void DwarfSubprogram::addArg(DwarfVariable *v) {
+	m_args.append(v);
+	m_vars.append(v);
+}
+
 uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
 	uint16_t base;
 	bool isAddress;

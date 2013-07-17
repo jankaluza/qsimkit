@@ -94,6 +94,18 @@ bool DwarfLoader::loadLocations(QString &file, QMap<uint16_t, DwarfLocationList 
 	}
 }
 
+void DwarfLoader::parseLocation(const QString &l, QMap<uint16_t, DwarfLocationList *> &locations, DwarfLocationList **ll, DwarfExpression **expr) {
+	if (l.contains("location list")) {
+		QString keyStr = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") - 2).trimmed();
+		uint16_t key = keyStr.toUInt(0, 16);
+		*ll = locations[key];
+	}
+	else {
+		QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
+		*expr = new DwarfExpression(exprString);
+	}
+}
+
 #define SCROLL_TO(X, TO) \
 	for (X = i + 1; X < lines.size(); ++X) { \
 		QString &l = lines[X];\
@@ -148,16 +160,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 					pcHigh = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
 				}
 				else if (l.contains("DW_AT_frame_base")) {
-					if (l.contains("location list")) {
-						QString keyStr = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") - 2).trimmed();
-						qDebug() << keyStr;
-						uint16_t key = keyStr.toUInt(0, 16);
-						ll = locations[key];
-					}
-					else {
-						QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
-						expr = new DwarfExpression(exprString);
-					}
+					parseLocation(l, locations, &ll, &expr);
 				}
 				else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
 					break;
@@ -183,14 +186,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 						name = l.mid(l.lastIndexOf(":") + 2).trimmed();
 					}
 					else if (l.contains("DW_AT_location")) {
-						if (l.contains("location list")) {
-							uint16_t key = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
-							ll = locations[key];
-						}
-						else {
-							QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
-							expr = new DwarfExpression(exprString);
-						}
+						parseLocation(l, locations, &ll, &expr);
 					}
 					else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
 						break;
@@ -205,6 +201,30 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 			else {
 				// Variable related to 'currentFile'
 			}
+		}
+		else if (line.contains("DW_TAG_formal_parameter")) {
+			QString name;
+			DwarfLocationList *ll = 0;
+			DwarfExpression *expr = 0;
+
+			for (i++; i < lines.size(); ++i) { 
+				QString &l = lines[i];
+
+				if (l.contains("DW_AT_name")) {
+					name = l.mid(l.lastIndexOf(":") + 2).trimmed();
+				}
+				else if (l.contains("DW_AT_location")) {
+					parseLocation(l, locations, &ll, &expr);
+				}
+				else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
+					break;
+				}
+			}
+
+			i--; // Otherwise we would skip next header
+
+			DwarfVariable *v = new DwarfVariable(name, ll, expr);
+			currentSubprogram->addArg(v);
 		}
 	}
 

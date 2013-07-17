@@ -29,6 +29,7 @@ class DwarfDebugData;
 class DebugData;
 class DwarfLocation;
 class DwarfLocationList;
+class DwarfExpression;
 
 class DwarfLoader {
 	public:
@@ -41,6 +42,7 @@ class DwarfLoader {
 		bool loadVariableTypes(const QString &out, DwarfDebugData *dd, QString &error);
 		bool loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<uint16_t, DwarfLocationList *> &locations, QString &error);
 		bool loadLocations(QString &file, QMap<uint16_t, DwarfLocationList *> &locations, QString &error);
+		void parseLocation(const QString &line, QMap<uint16_t, DwarfLocationList *> &locations, DwarfLocationList **ll, DwarfExpression **expr);
 
 	private:
 		QString m_objdump;
