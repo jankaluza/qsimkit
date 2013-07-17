@@ -17,28 +17,32 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "VariableItem.h"
 
-#include <QDialog>
+#include "MCU/Memory.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
+#include "MCU/MCU.h"
+
+#include <QWidget>
+#include <QTime>
+#include <QMainWindow>
 #include <QString>
-#include <QTimer>
-#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QFile>
+#include <QProcess>
 #include <QTreeWidgetItem>
+#include <QDebug>
+#include <QApplication>
 
-#include <stdint.h>
+VariableItem::VariableItem(QTreeWidgetItem *parent, Variable *v) : QTreeWidgetItem(parent, VariableItemType), m_v(v) {
+	setText(0, v->getName());
+	setText(1, "??");
+	setBackground(0, QApplication::palette().window());
+}
 
-class Disassembler;
-class LocalItem;
-
-class DisassemblerItem : public PeripheralItem
-{
-	public:
-		DisassemblerItem(Disassembler *dis);
-
-		void refresh();
-
-	private:
-		Disassembler *m_dis;
-		LocalItem *m_localItem;
-};
+void VariableItem::refresh(RegisterSet *r, Memory *m, Subprogram *s, uint16_t pc) {
+	setText(1, m_v->getValue(r, m, s, pc));
+}
 

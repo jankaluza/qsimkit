@@ -21,6 +21,8 @@
 #include "GUI/MCU/MCU.h"
 #include "Disassembler.h"
 
+#include "LocalItem.h"
+
 #include "GUI/MCU/RegisterSet.h"
 #include "GUI/MCU/Register.h"
 #include "GUI/MCU/Memory.h"
@@ -31,26 +33,19 @@
 #include <QDebug>
 
 DisassemblerItem::DisassemblerItem(Disassembler *dis) : m_dis(dis) {
-	setText(0, "Variables");
+	setText(0, "Disassembler");
+
+	m_localItem = new LocalItem();
+	addChild(m_localItem);
 }
 
 void DisassemblerItem::refresh() {
 	MCU *mcu = m_dis->getMCU();
+	RegisterSet *r = mcu->getRegisterSet();
+	Memory *m = mcu->getMemory();
+	uint16_t pc = r->get(0)->getBigEndian();
 	Subprogram *s = m_dis->getCurrentSubprogram();
 
-	while(childCount()) {
-		delete takeChild(0);
-	}
-
-	if (!s) {
-		return;
-	}
-
-	Variables &vars = s->getVariables();
-	foreach(Variable *v, vars) {
-		QTreeWidgetItem *it = new QTreeWidgetItem(this);
-		it->setText(0, v->getName());
-		it->setText(1, v->getValue(mcu->getRegisterSet(), mcu->getMemory(), s, mcu->getRegisterSet()->get(0)->getBigEndian()));
-	}
+	m_localItem->refresh(r, m, s, pc);
 }
 

@@ -17,28 +17,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "LocalItem.h"
+#include "GUI/DockWidgets/Peripherals/VariableItem.h"
 
-#include <QDialog>
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
+#include "MCU/Memory.h"
+#include "MCU/MCU.h"
+
 #include <QString>
-#include <QTimer>
-#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
 #include <QTreeWidgetItem>
+#include <QDebug>
 
-#include <stdint.h>
+LocalItem::LocalItem() : QTreeWidgetItem(QTreeWidgetItem::UserType) {
+	setText(0, "Local Variables");
+	setFirstColumnSpanned(true);
+	setExpanded(true);
+}
 
-class Disassembler;
-class LocalItem;
+LocalItem::~LocalItem() {
+	
+}
 
-class DisassemblerItem : public PeripheralItem
-{
-	public:
-		DisassemblerItem(Disassembler *dis);
+void LocalItem::refresh(RegisterSet *r, Memory *m, Subprogram *s, uint16_t pc) {
+	while(childCount()) {
+		delete takeChild(0);
+	}
 
-		void refresh();
+	if (!s) {
+		return;
+	}
 
-	private:
-		Disassembler *m_dis;
-		LocalItem *m_localItem;
-};
-
+	Variables &vars = s->getVariables();
+	foreach(Variable *v, vars) {
+		VariableItem *it = new VariableItem(this, v);
+		it->refresh(r, m, s, pc);
+	}
+}

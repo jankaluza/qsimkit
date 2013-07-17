@@ -19,26 +19,20 @@
 
 #pragma once
 
-#include <QDialog>
 #include <QString>
-#include <QTimer>
-#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
 #include <QTreeWidgetItem>
-
 #include <stdint.h>
 
-class Disassembler;
-class LocalItem;
+class RegisterSet;
+class Memory;
+class Subprogram;
 
-class DisassemblerItem : public PeripheralItem
+class LocalItem : public QTreeWidgetItem
 {
 	public:
-		DisassemblerItem(Disassembler *dis);
+		LocalItem();
+		~LocalItem();
 
-		void refresh();
-
-	private:
-		Disassembler *m_dis;
-		LocalItem *m_localItem;
+		void refresh(RegisterSet *r, Memory *m, Subprogram *s, uint16_t pc);
 };
 

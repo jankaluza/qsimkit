@@ -22,23 +22,26 @@
 #include <QDialog>
 #include <QString>
 #include <QTimer>
-#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
+#include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
 #include <stdint.h>
 
-class Disassembler;
-class LocalItem;
+#define VariableItemType (QTreeWidgetItem::UserType + 3)
 
-class DisassemblerItem : public PeripheralItem
+class RegisterSet;
+class Memory;
+class Subprogram;
+class Variable;
+
+class VariableItem : public QTreeWidgetItem
 {
 	public:
-		DisassemblerItem(Disassembler *dis);
+		VariableItem(QTreeWidgetItem *parent, Variable *v);
 
-		void refresh();
-
+		void refresh(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc);
 	private:
-		Disassembler *m_dis;
-		LocalItem *m_localItem;
+		Variable *m_v;
+
 };
 
