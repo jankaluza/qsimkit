@@ -48,7 +48,7 @@ class DwarfExpression {
 		DwarfExpression(const QString &expression);
 		virtual ~DwarfExpression();
 
-		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc);
+		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress);
 
 		bool parse(const QString &expression);
 

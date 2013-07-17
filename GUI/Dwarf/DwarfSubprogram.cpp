@@ -40,11 +40,12 @@ void DwarfSubprogram::addVariable(DwarfVariable *v) {
 
 uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
 	uint16_t base;
+	bool isAddress;
 	if (m_ll) {
-		base = m_ll->getValue(r, m, this, pc);
+		base = m_ll->getValue(r, m, this, pc, isAddress);
 	}
 	else {
-		base = m_expr->getValue(r, m, this, pc);
+		base = m_expr->getValue(r, m, this, pc, isAddress);
 	}
 
 	qDebug() << getName() << "base is" << base;

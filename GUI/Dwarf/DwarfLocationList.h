@@ -40,7 +40,7 @@ class DwarfLocationList {
 			m_locations.append(l);
 		}
 
-		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc);
+		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc, bool &isAddress);
 
 	private:
 		QList<DwarfLocation *> m_locations;

@@ -249,21 +249,28 @@ bool DwarfExpression::parse(const QString &expression) {
 	}
 }
 
-uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc) {
+uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress) {
 	unsigned long tmp, stack[64];
 	unsigned sp = 0;
 
+	isAddress = true;
 	foreach(const Instruction &inst, m_instructions) {
 		unsigned char opcode = inst.op;
 
 		qDebug() << "EXPR OP =" << opcode;
 
-		if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31)
+		if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
 			stack[++sp] = opcode - DW_OP_lit0;
-		else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31)
+			isAddress = false;
+		}
+		else if (opcode >= DW_OP_reg0 && opcode <= DW_OP_reg31) {
 			stack[++sp] = r->get(opcode - DW_OP_reg0)->getBigEndian();
-		else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31)
+			isAddress = false;
+		}
+		else if (opcode >= DW_OP_breg0 && opcode <= DW_OP_breg31) {
 			stack[++sp] = r->get(opcode - DW_OP_breg0)->getBigEndian() + inst.arg;
+			isAddress = true;
+		}
 		else switch (opcode)
 		{
 		case DW_OP_nop: break;
@@ -278,7 +285,10 @@ uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s
 		case DW_OP_const8s: stack[++sp] = inst.arg; break;
 		case DW_OP_constu: stack[++sp] = inst.arg; break;
 		case DW_OP_consts: stack[++sp] = inst.arg; break;
-		case DW_OP_deref: stack[sp] = m->getBigEndian(stack[sp], false); break;
+		case DW_OP_deref:
+			isAddress = false;
+			stack[sp] = m->getBigEndian(stack[sp], false);
+			break;
 		case DW_OP_dup: stack[sp + 1] = stack[sp]; sp++; break;
 		case DW_OP_drop: sp--; break;
 		case DW_OP_over: stack[sp + 1] = stack[sp - 1]; sp++; break;
@@ -313,12 +323,15 @@ uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s
 // 			stack[++sp] = dwarf2_parse_augmentation_ptr(&ctx, tmp);
 // 			break;
 		case DW_OP_regx:
+			isAddress = false;
 			stack[++sp] = r->get(inst.arg)->getBigEndian();
 			break;
 		case DW_OP_bregx:
+			isAddress = true;
 			stack[++sp] = r->get(inst.arg)->getBigEndian() + inst.arg2;
 			break;
 		case DW_OP_fbreg:
+			isAddress = true;
 			stack[++sp] = s->getFrameBase(r, m, pc) + inst.arg;
 			break;
 // TODO

@@ -32,10 +32,10 @@ DwarfLocationList::~DwarfLocationList() {
 	
 }
 
-uint16_t DwarfLocationList::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc) {
+uint16_t DwarfLocationList::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc, bool &isAddress) {
 	foreach(DwarfLocation *loc, m_locations) {
 		if (loc->contains(pc)) {
-			return loc->getExpression()->getValue(r, m, p, pc);
+			return loc->getExpression()->getValue(r, m, p, pc, isAddress);
 		}
 	}
 

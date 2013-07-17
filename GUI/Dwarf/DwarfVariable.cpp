@@ -40,13 +40,19 @@ DwarfVariable::~DwarfVariable() {
 QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) {
 	QString v = "??";
 	uint16_t data;
+	bool isAddress;
 	if (m_ll) {
-		data = m_ll->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc);
+		data = m_ll->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc, isAddress);
 	}
 	else {
-		data = m_expr->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc);
+		data = m_expr->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc, isAddress);
 	}
 
-	v = QString("0x%1").arg(m->getBigEndian(data, false), 0, 16);
+	if (isAddress) {
+		v = QString("0x%1").arg(m->getBigEndian(data, false), 0, 16);
+	}
+	else {
+		v = QString("0x%1").arg(data, 0, 16);
+	}
 	return v;
 }
