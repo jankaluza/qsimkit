@@ -25,6 +25,7 @@
 #include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 #include <QList>
+#include <QHash>
 #include <stdint.h>
 
 #include "ui_Disassembler.h"
@@ -48,6 +49,8 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		}
 
 		void refresh();
+
+		bool isDifferentCLine(uint16_t pc);
 
 		void showSourceCode(bool show);
 		void showAssembler(bool show);
@@ -73,6 +76,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void addSectionLine(uint16_t addr, const QString &line);
 		QString findFileWithAddr(uint16_t addr);
 		void loadFileLines(QStringList &lines);
+		void loadPairedInstructions(QHash<int, uint16_t> &line2addr);
 		void reloadFileAssembler(QStringList &lines);
 		void reloadFileSource(QStringList &lines);
 

@@ -28,11 +28,7 @@
 #include "Peripherals/PeripheralManager.h"
 
 #include "DockWidgets/Disassembler/Disassembler.h"
-// #include "DockWidgets/Registers/Registers.h"
-// #include "DockWidgets/Stack/Stack.h"
-// #include "DockWidgets/MemoryTracker/MemoryTracker.h"
 #include "DockWidgets/Peripherals/Peripherals.h"
-
 #include "Breakpoints/BreakpointManager.h"
 
 #include "Tracking/TrackedPins.h"
@@ -92,6 +88,19 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	readSettings();
 }
 
+void QSimKit::setStepMode(StepMode mode) {
+	int index = m_stepModeCombo->findData((int) mode);
+	if (index == -1) {
+		return;
+	}
+
+	m_stepModeCombo->setCurrentIndex(index);
+}
+
+StepMode QSimKit::getStepMode() {
+	return (StepMode) m_stepModeCombo->itemData(m_stepModeCombo->currentIndex()).toInt();
+}
+
 void QSimKit::populateToolBar() {
 	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
@@ -108,6 +117,17 @@ void QSimKit::populateToolBar() {
 	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
 	connect(action, SIGNAL(triggered()), this, SLOT(singleStep()));
 
+	toolbar->addWidget(new QLabel("Single step mode:"));
+
+	m_stepModeCombo = new QComboBox();
+// 	m_stepModeCombo->setMaximumWidth(100);
+	m_stepModeCombo->addItem("Simulation event", (int) SimulationStep);
+	m_stepModeCombo->addItem("Assembler instr.", (int) AssemblerStep);
+	m_stepModeCombo->addItem("C line", (int) CStep);
+	toolbar->addWidget(m_stepModeCombo);
+
+	setStepMode(AssemblerStep);
+
 	toolbar->addSeparator();
 
 	toolbar->addWidget(new QLabel("Run until:"));
@@ -118,6 +138,8 @@ void QSimKit::populateToolBar() {
 	m_runUntil->setText("1.0");
 	connect(m_runUntil, SIGNAL(returnPressed()), this, SLOT(startSimulation()));
 	toolbar->addWidget(m_runUntil);
+
+
 }
 
 void QSimKit::pointToInstruction(int pc) {
@@ -161,13 +183,7 @@ void QSimKit::setDockWidgetsMCU(MCU *mcu) {
 	setDockWidgetsEnabled(true);
 }
 
-void QSimKit::singleStep() {
-	if (!m_dig || m_stopped) {
-		resetSimulation();
-		onSimulationStarted(false);
-		m_stopped = false;
-	}
-
+void QSimKit::doSingleAssemblerStep() {
 	uint16_t pc = screen->getMCU()->getRegisterSet()->get(0)->getBigEndian();
 	do {
 		double t = m_sim->nextEventTime();
@@ -178,6 +194,44 @@ void QSimKit::singleStep() {
 		while (t == m_sim->nextEventTime());
 	}
 	while(pc == screen->getMCU()->getRegisterSet()->get(0)->getBigEndian());
+}
+
+void QSimKit::doSingleCStep() {
+	uint16_t pc = screen->getMCU()->getRegisterSet()->get(0)->getBigEndian();
+	do {
+		do {
+			double t = m_sim->nextEventTime();
+
+			do {
+				m_sim->execNextEvent();
+			}
+			while (t == m_sim->nextEventTime());
+		}
+		while(!m_disassembler->isDifferentCLine(screen->getMCU()->getRegisterSet()->get(0)->getBigEndian()));
+	}
+	while(pc == screen->getMCU()->getRegisterSet()->get(0)->getBigEndian());
+}
+
+void QSimKit::singleStep() {
+	if (!m_dig || m_stopped) {
+		resetSimulation();
+		onSimulationStarted(false);
+		m_stopped = false;
+	}
+
+	switch(getStepMode()) {
+		case SimulationStep:
+			m_sim->execNextEvent();
+			break;
+		case AssemblerStep:
+			doSingleAssemblerStep();
+			break;
+		case CStep:
+			doSingleCStep();
+			break;
+		default:
+			break;
+	}
 
 	refreshDockWidgets();
 

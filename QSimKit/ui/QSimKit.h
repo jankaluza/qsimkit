@@ -24,6 +24,7 @@
 #include <QList>
 #include <QTimer>
 #include <QLineEdit>
+#include <QComboBox>
 
 #include "ui_QSimKit.h"
 
@@ -39,6 +40,12 @@ class DockWidget;
 class Peripherals;
 class TrackedPins;
 
+typedef enum {
+	SimulationStep,
+	AssemblerStep,
+	CStep,
+} StepMode;
+
 class QSimKit : public QMainWindow, public Ui::QSimKit
 {
 	Q_OBJECT
@@ -49,6 +56,9 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		bool loadProject(const QString &file);
 
 		void addDockWidget(DockWidget *widget, Qt::DockWidgetArea area);
+
+		void setStepMode(StepMode mode);
+		StepMode getStepMode();
 
 		BreakpointManager *getBreakpointManager() {
 			return m_breakpointManager;
@@ -92,6 +102,8 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void setDockWidgetsMCU(MCU *cpu);
 		void populateToolBar();
 		void readSettings();
+		void doSingleAssemblerStep();
+		void doSingleCStep();
 
 	private:
 		adevs::Digraph<double> *m_dig;
@@ -110,5 +122,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		int m_instPerCycle;
 		bool m_stopped;
 		QLineEdit *m_runUntil;
+		QComboBox *m_stepModeCombo;
 };
 

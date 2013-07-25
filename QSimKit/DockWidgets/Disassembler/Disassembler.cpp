@@ -207,12 +207,11 @@ void Disassembler::loadFileLines(QStringList &lines) {
 	}
 }
 
-void Disassembler::reloadFileSource(QStringList &lines) {
+void Disassembler::loadPairedInstructions(QHash<int, uint16_t> &line2addr) {
 	DisassembledCode &code = m_files[m_currentFile];
 
-	// Paired instructions are used in this mode to show proper line in C
+	// Paired instructions are used to show proper line in C
 	// even when it's compiled to more ASM instructions
-	QHash<int, uint16_t> line2addr;
 	foreach(const DisassembledLine &l, code) {
 		switch(l.getType()) {
 			case DisassembledLine::Instruction:
@@ -220,6 +219,11 @@ void Disassembler::reloadFileSource(QStringList &lines) {
 					line2addr[l.getLineNumber()] = l.getAddr();
 				}
 				else {
+					// Every instruction is pair with itself. However, we add that pair
+					// only for real multi-instruction C commands to save some space and time.
+					if (!m_pairedInstructions.contains(line2addr[l.getLineNumber()])) {
+						m_pairedInstructions[line2addr[l.getLineNumber()]] = line2addr[l.getLineNumber()];
+					}
 					m_pairedInstructions[l.getAddr()] = line2addr[l.getLineNumber()];
 				}
 				break;
@@ -227,6 +231,11 @@ void Disassembler::reloadFileSource(QStringList &lines) {
 				break;
 		}
 	}
+}
+
+void Disassembler::reloadFileSource(QStringList &lines) {
+	QHash<int, uint16_t> line2addr;
+	loadPairedInstructions(line2addr);
 
 	int n = 1;
 	foreach(const QString &line, lines) {
@@ -238,9 +247,14 @@ void Disassembler::reloadFileSource(QStringList &lines) {
 		}
 		++n;
 	}
+
+// 	m_simkit->setStepMode(CStep);
 }
 
 void Disassembler::reloadFileAssembler(QStringList &lines) {
+	QHash<int, uint16_t> line2addr;
+	loadPairedInstructions(line2addr);
+
 	QString tooltip = "";
 	int i;
 	int previousLine = 0;
@@ -273,6 +287,8 @@ void Disassembler::reloadFileAssembler(QStringList &lines) {
 				break;
 		}
 	}
+
+// 	m_simkit->setStepMode(AssemblerStep);
 }
 
 void Disassembler::reloadFile() {
@@ -353,6 +369,18 @@ QString Disassembler::findFileWithAddr(uint16_t addr) {
 	return QString();
 }
 
+bool Disassembler::isDifferentCLine(uint16_t pc) {
+	if (m_pairedInstructions.contains(m_pc)) {
+		if (m_pairedInstructions.contains(pc)) {
+			return m_pairedInstructions[pc] != m_pairedInstructions[m_pc];
+		}
+	}
+	// If we don't have any information about paired instructions, it's
+	// always different C line. This covers also situation where C code
+	// can't be loaded or simply does not exist.
+	return true;
+}
+
 void Disassembler::pointToInstruction(uint16_t pc) {
 	m_pc = pc;
 	if (m_pairedInstructions.contains(pc)) {
@@ -362,7 +390,7 @@ void Disassembler::pointToInstruction(uint16_t pc) {
 	QString addr = QString("%1").arg(pc, 0, 16);
 	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
 	if (items.empty()) {
-		// If we don't have any item with this PC, maybe it is devined in
+		// If we don't have any item with this PC, maybe it is defined in
 		// different file. Try to find that file, load it and rerun ourself
 		QString f = findFileWithAddr(pc);
 		if (f.isEmpty()) {
