@@ -17,40 +17,33 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "LocalItem.h"
-#include "GUI/DockWidgets/Peripherals/VariableItem.h"
-
-#include "MCU/RegisterSet.h"
-#include "MCU/Register.h"
-#include "MCU/Memory.h"
-#include "MCU/MCU.h"
+#pragma once
 
 #include <QString>
-#include <QTreeWidgetItem>
-#include <QDebug>
+#include <QStringList>
+#include <QChar>
+#include <QRect>
+#include <QList>
+#include <stdint.h>
 
-LocalItem::LocalItem() : QTreeWidgetItem(QTreeWidgetItem::UserType) {
-	setText(0, "Local Variables");
-	setFirstColumnSpanned(true);
-	setExpanded(true);
-}
+#include "QSimKit/MCU/MCU.h"
 
-LocalItem::~LocalItem() {
-	
-}
+class DwarfDebugData : public DebugData {
+	public:
+		DwarfDebugData();
+		~DwarfDebugData();
 
-void LocalItem::refresh(RegisterSet *r, Memory *m, Subprogram *s, uint16_t pc) {
-	while(childCount()) {
-		delete takeChild(0);
-	}
+		void addSubprogram(const QString &file, Subprogram *subprogram);
 
-	if (!s) {
-		return;
-	}
+		const Subprograms &getSubprograms(const QString &file);
 
-	Variables &vars = s->getVariables();
-	foreach(Variable *v, vars) {
-		VariableItem *it = new VariableItem(this, v);
-		it->refresh(r, m, s, pc);
-	}
-}
+		void addVariableType(VariableType *type) {
+			m_types.append(type);
+		}
+
+	private:
+		QMap<QString, Subprograms> m_subprograms;
+		QList<VariableType *> m_types;
+};
+
+

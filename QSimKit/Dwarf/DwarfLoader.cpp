@@ -30,7 +30,7 @@
 #include <QDir>
 #include <QDebug>
 
-#include "GUI/MCU/MCU.h"
+#include "QSimKit/MCU/MCU.h"
 
 DwarfLoader::DwarfLoader(const QString &objdump) : m_objdump(objdump) {
 	

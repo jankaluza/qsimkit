@@ -22,9 +22,9 @@
 #include "DwarfExpression.h"
 #include "DwarfSubprogram.h"
 
-#include "GUI/MCU/RegisterSet.h"
-#include "GUI/MCU/Register.h"
-#include "GUI/MCU/Memory.h"
+#include "QSimKit/MCU/RegisterSet.h"
+#include "QSimKit/MCU/Register.h"
+#include "QSimKit/MCU/Memory.h"
 
 #include <QDebug>
 

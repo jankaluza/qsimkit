@@ -19,7 +19,7 @@
 
 #include "Disassembler.h"
 #include "DisassemblerItem.h"
-#include "GUI/DockWidgets/Peripherals/Peripherals.h"
+#include "QSimKit/DockWidgets/Peripherals/Peripherals.h"
 
 #include "ui/QSimKit.h"
 #include "MCU/MCU.h"

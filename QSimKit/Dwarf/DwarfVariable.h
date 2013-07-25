@@ -19,26 +19,32 @@
 
 #pragma once
 
-#include <QDialog>
 #include <QString>
-#include <QTimer>
-#include <GUI/DockWidgets/Peripherals/PeripheralItem.h>
-#include <QTreeWidgetItem>
-
+#include <QStringList>
+#include <QChar>
+#include <QRect>
+#include <QList>
 #include <stdint.h>
 
-class Disassembler;
-class LocalItem;
+#include "QSimKit/MCU/MCU.h"
 
-class DisassemblerItem : public PeripheralItem
-{
+#include "DwarfExpression.h"
+
+class DwarfLocationList;
+class DwarfVariable;
+class RegisterSet;
+class Memory;
+
+class DwarfVariable : public Variable {
 	public:
-		DisassemblerItem(Disassembler *dis);
+		DwarfVariable(const QString &name, DwarfLocationList *ll, DwarfExpression *expr);
+		~DwarfVariable();
 
-		void refresh();
+		QString getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc);
 
 	private:
-		Disassembler *m_dis;
-		LocalItem *m_localItem;
+		DwarfLocationList *m_ll;
+		DwarfExpression *m_expr;
 };
+
 

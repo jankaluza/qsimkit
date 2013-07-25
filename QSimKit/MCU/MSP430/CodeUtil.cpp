@@ -24,7 +24,7 @@
 #include <QDir>
 #include <QDebug>
 
-#include "GUI/Dwarf/DwarfLoader.h"
+#include "QSimKit/Dwarf/DwarfLoader.h"
 
 namespace CodeUtil {
 	

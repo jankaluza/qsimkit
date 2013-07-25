@@ -25,7 +25,7 @@
 
 #include "CPU/Instructions/InstructionArgument.h"
 
-#include "GUI/MCU/Register.h"
+#include "QSimKit/MCU/Register.h"
 
 namespace MSP430 {
 

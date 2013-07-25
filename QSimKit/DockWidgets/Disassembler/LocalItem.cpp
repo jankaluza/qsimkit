@@ -17,34 +17,40 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "LocalItem.h"
+#include "QSimKit/DockWidgets/Peripherals/VariableItem.h"
+
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
+#include "MCU/Memory.h"
+#include "MCU/MCU.h"
 
 #include <QString>
-#include <QStringList>
-#include <QChar>
-#include <QRect>
-#include <QList>
-#include <stdint.h>
+#include <QTreeWidgetItem>
+#include <QDebug>
 
-#include "GUI/MCU/MCU.h"
+LocalItem::LocalItem() : QTreeWidgetItem(QTreeWidgetItem::UserType) {
+	setText(0, "Local Variables");
+	setFirstColumnSpanned(true);
+	setExpanded(true);
+}
 
-#include "DwarfExpression.h"
+LocalItem::~LocalItem() {
+	
+}
 
-class DwarfLocationList;
-class DwarfVariable;
-class RegisterSet;
-class Memory;
+void LocalItem::refresh(RegisterSet *r, Memory *m, Subprogram *s, uint16_t pc) {
+	while(childCount()) {
+		delete takeChild(0);
+	}
 
-class DwarfVariable : public Variable {
-	public:
-		DwarfVariable(const QString &name, DwarfLocationList *ll, DwarfExpression *expr);
-		~DwarfVariable();
+	if (!s) {
+		return;
+	}
 
-		QString getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc);
-
-	private:
-		DwarfLocationList *m_ll;
-		DwarfExpression *m_expr;
-};
-
-
+	Variables &vars = s->getVariables();
+	foreach(Variable *v, vars) {
+		VariableItem *it = new VariableItem(this, v);
+		it->refresh(r, m, s, pc);
+	}
+}

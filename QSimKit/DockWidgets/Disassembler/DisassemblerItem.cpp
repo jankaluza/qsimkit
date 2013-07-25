@@ -17,33 +17,35 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "DisassemblerItem.h"
+#include "QSimKit/MCU/MCU.h"
+#include "Disassembler.h"
 
+#include "LocalItem.h"
+
+#include "QSimKit/MCU/RegisterSet.h"
+#include "QSimKit/MCU/Register.h"
+#include "QSimKit/MCU/Memory.h"
+
+#include <QWidget>
 #include <QString>
-#include <QStringList>
-#include <QChar>
-#include <QRect>
-#include <QList>
-#include <stdint.h>
+#include <QTreeWidgetItem>
+#include <QDebug>
 
-#include "GUI/MCU/MCU.h"
+DisassemblerItem::DisassemblerItem(Disassembler *dis) : m_dis(dis) {
+	setText(0, "Disassembler");
 
-class DwarfDebugData : public DebugData {
-	public:
-		DwarfDebugData();
-		~DwarfDebugData();
+	m_localItem = new LocalItem();
+	addChild(m_localItem);
+}
 
-		void addSubprogram(const QString &file, Subprogram *subprogram);
+void DisassemblerItem::refresh() {
+	MCU *mcu = m_dis->getMCU();
+	RegisterSet *r = mcu->getRegisterSet();
+	Memory *m = mcu->getMemory();
+	uint16_t pc = r->get(0)->getBigEndian();
+	Subprogram *s = m_dis->getCurrentSubprogram();
 
-		const Subprograms &getSubprograms(const QString &file);
-
-		void addVariableType(VariableType *type) {
-			m_types.append(type);
-		}
-
-	private:
-		QMap<QString, Subprograms> m_subprograms;
-		QList<VariableType *> m_types;
-};
-
+	m_localItem->refresh(r, m, s, pc);
+}
 

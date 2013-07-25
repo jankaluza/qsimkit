@@ -6,12 +6,12 @@
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
@@ -19,35 +19,41 @@
 
 #pragma once
 
+#include <QString>
+#include <QStringList>
+#include <QChar>
+#include <QRect>
+#include <QList>
 #include <stdint.h>
-#include <string>
-#include <vector>
 
-#include "GUI/MCU/RegisterSet.h"
+#include "QSimKit/MCU/MCU.h"
 
-namespace MSP430 {
+class DwarfLocationList;
+class DwarfExpression;
+class DwarfVariable;
+class RegisterSet;
+class Memory;
 
-class Register;
-
-class RegisterSet : public ::RegisterSet {
+class DwarfSubprogram : public Subprogram {
 	public:
-		RegisterSet();
-		virtual ~RegisterSet();
+		DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t pcHigh, DwarfLocationList *ll, DwarfExpression *expr);
+		~DwarfSubprogram();
 
-		void addRegister(const std::string &name, uint16_t value, const std::string &desc = "");
-		void addDefaultRegisters();
+		void addVariable(DwarfVariable *v);
 
-		int size() {
-			return m_registers.size();
-		}
+		void addArg(DwarfVariable *v);
 
-		::Register *get(unsigned int reg);
-		::Register *operator[](unsigned int reg);
+		Variables &getVariables();
 
-		Register *getp(unsigned int reg);
+		Variables &getArgs();
+
+		uint16_t getFrameBase(RegisterSet *r, Memory *m, uint16_t pc);
 
 	private:
-		std::vector<Register *> m_registers;
+		Variables m_vars;
+		Variables m_args;
+		DwarfLocationList *m_ll;
+		DwarfExpression *m_expr;
 };
 
-}
+
