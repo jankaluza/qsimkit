@@ -169,8 +169,10 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 
 			i--; // Otherwise we would skip next header
 
-			currentSubprogram = new DwarfSubprogram(name, pcLow, pcHigh, ll, expr);
-			dd->addSubprogram(currentFile, currentSubprogram);
+			if (ll || expr) {
+				currentSubprogram = new DwarfSubprogram(name, pcLow, pcHigh, ll, expr);
+				dd->addSubprogram(currentFile, currentSubprogram);
+			}
 		}
 		else if (line.contains("DW_TAG_variable")) {
 			if (line[2] == '2') {
@@ -195,8 +197,10 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 
 				i--; // Otherwise we would skip next header
 
-				DwarfVariable *v = new DwarfVariable(name, ll, expr);
-				currentSubprogram->addVariable(v);
+				if (ll || expr) {
+					DwarfVariable *v = new DwarfVariable(name, ll, expr);
+					currentSubprogram->addVariable(v);
+				}
 			}
 			else {
 				// Variable related to 'currentFile'
@@ -223,8 +227,10 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 
 			i--; // Otherwise we would skip next header
 
-			DwarfVariable *v = new DwarfVariable(name, ll, expr);
-			currentSubprogram->addArg(v);
+			if (ll || expr) {
+				DwarfVariable *v = new DwarfVariable(name, ll, expr);
+				currentSubprogram->addArg(v);
+			}
 		}
 	}
 
