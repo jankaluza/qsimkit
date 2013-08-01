@@ -47,6 +47,7 @@ class DummyPinWatcher1 : public PinWatcher {
 class USITest : public CPPUNIT_NS :: TestFixture{
 	CPPUNIT_TEST_SUITE(USITest);
 	CPPUNIT_TEST(spiMaster);
+	CPPUNIT_TEST(spiMasterTA0);
 	CPPUNIT_TEST_SUITE_END();
 
 	Memory *m;
@@ -251,6 +252,55 @@ class USITest : public CPPUNIT_NS :: TestFixture{
 
 		/// INTERRUPT
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+		}
+
+		void spiMasterTA0() {
+			// USICTL0 |= USIPE7 +  USIPE6 + USIPE5 + USIMST + USIOE; // Port, SPI master
+			m->setByte(v->getUSICTL(), 234);
+			// USICTL1 |= USIIE;                     // Counter interrupt, flag remains set
+			m->setByte(v->getUSICTL() + 1, 16);
+			m->setByte(v->getUSISR(), 55); // 00110111
+			m->setByte(v->getUSICCTL(), 20); // 00010100
+
+			// nothing should happen until we set usicnt
+			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
+			usi->tickRising();
+			usi->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
+
+			// Set usicnt - we will transfer 8 bits
+			m->setByte(v->getUSICCTL() + 1, 8);
+			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
+
+		/// BIT 1
+			// First (MSB) bit should be sent and rising clock generated
+			pinManager->generateSignal("TA0.0", 3);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
+
+			// prepare '1' to be captured
+			pinManager->handlePinInput(2, 3.0);
+
+			// cnt--, bit captured from SDI
+			pinManager->generateSignal("TA0.0", 0);
+			CPPUNIT_ASSERT_EQUAL(7, (int) m->getByte(v->getUSICCTL() + 1));
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(111, (int) m->getByte(v->getUSISR())); // 00110111 (after shift) -> 0110111|1
+
+		/// BIT 2
+			// First (MSB) bit should be sent and rising clock generated
+			pinManager->generateSignal("TA0.0", 3);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(2, 0.0);
+
+			// cnt--, bit captured from SDI
+			pinManager->generateSignal("TA0.0", 0);
+			CPPUNIT_ASSERT_EQUAL(6, (int) m->getByte(v->getUSICCTL() + 1));
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(222, (int) m->getByte(v->getUSISR())); // 0110111|1 (after shift) -> 110111|10
 		}
 };
 

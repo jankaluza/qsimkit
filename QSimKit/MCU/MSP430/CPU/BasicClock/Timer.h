@@ -80,6 +80,7 @@ class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 			bool ccrRead;
 			uint8_t ccis;
 			uint16_t tbcl;
+			std::string taName;
 		} CCR;
 
 		void checkCCRInterrupts(uint16_t tar);

@@ -69,6 +69,7 @@ void Timer::addCCR(const std::string &taName, const std::string &cciaName, const
 	ccr.outputMpxs = mpxs;
 	ccr.ccia = cciaName;
 	ccr.ccib = ccibName;
+	ccr.taName = taName;
 	ccr.capturePending = false;
 	ccr.ccrRead = true;
 	ccr.ccis = 0;
@@ -384,6 +385,8 @@ void Timer::generateOutput(CCR &ccr, bool value) {
 	for (std::vector<PinMultiplexer *>::iterator it = ccr.outputMpxs.begin(); it != ccr.outputMpxs.end(); ++it) {
 		(*it)->generateOutput(this, value ? 3.0 : 0.0);
 	}
+
+	m_pinManager->generateSignal(ccr.taName, value ? 3.0 : 0.0);
 }
 
 void Timer::handleMemoryChanged(::Memory *memory, uint16_t address) {

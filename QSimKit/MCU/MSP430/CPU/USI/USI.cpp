@@ -206,6 +206,15 @@ void USI::tickFalling() {
 	}
 }
 
+void USI::handleSignal(const std::string &name, double value) {
+	if (value > 1.5) {
+		tickRising();
+	}
+	else {
+		tickFalling();
+	}
+}
+
 void USI::reset() {
 	if (m_source) {
 		m_source->removeHandler(this);
@@ -248,6 +257,10 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 			m_source->removeHandler(this);
 		}
 
+		m_pinManager->removeSignalHandler("TA0.0", this);
+		m_pinManager->removeSignalHandler("TA0.1", this);
+		m_pinManager->removeSignalHandler("TA0.2", this);
+
 		// source
 		switch((val >> 2) & 7) {
 			case 0:
@@ -264,13 +277,16 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 				m_source = 0;
 				break;
 			case 5:
-				// TODO: TACCR0
+				m_source = 0;
+				m_pinManager->addSignalHandler("TA0.0", this);
 				break;
 			case 6:
-				// TODO: TACCR1
+				m_source = 0;
+				m_pinManager->addSignalHandler("TA0.1", this);
 				break;
 			case 7:
-				// TODO: TACCR2
+				m_source = 0;
+				m_pinManager->addSignalHandler("TA0.2", this);
 				break;
 		}
 

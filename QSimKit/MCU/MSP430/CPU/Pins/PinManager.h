@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 #include "CPU/Memory/Memory.h"
+#include "SignalManager.h"
 
 class Variant;
 
@@ -50,7 +51,7 @@ class PinWatcher {
 		virtual void handlePinChanged(int id, double value) = 0;
 };
 
-class PinManager {
+class PinManager : public SignalManager {
 	public:
 		PinManager(Memory *mem, InterruptManager *intManager, Variant *variant);
 		virtual ~PinManager();

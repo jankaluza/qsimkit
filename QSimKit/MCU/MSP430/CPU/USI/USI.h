@@ -25,6 +25,7 @@
 #include "CPU/Memory/Memory.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/Pins/PinHandler.h"
+#include "CPU/Pins/SignalHandler.h"
 #include "CPU/BasicClock/Clock.h"
 
 class Variant;
@@ -38,7 +39,7 @@ class InterruptManager;
 class PinManager;
 class PinMultiplexer;
 
-class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler {
+class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler, public SignalHandler {
 	public:
 		USI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 			  ACLK *aclk, SMCLK *smclk);
@@ -54,6 +55,8 @@ class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, 
 		void handlePinActivated(const std::string &name);
 
 		void handlePinDeactivated(const std::string &name);
+
+		void handleSignal(const std::string &name, double value);
 
 		void tickRising();
 		void tickFalling();
