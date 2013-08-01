@@ -93,6 +93,10 @@ bool loadPackage(MCU_MSP430 *cpu, MSP430::PinManager *pinManager, const QString 
 		}
 	}
 
+	if (width < 100) {
+		width = 100;
+	}
+
 	for(QDomNode node = package.firstChild(); !node.isNull(); node = node.nextSibling()) {
 		QDomElement element = node.toElement();
 		QChar side = element.nodeName()[0];

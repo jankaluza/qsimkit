@@ -1,0 +1,28 @@
+<variant>
+<package name="MSP430x16x">
+	<left>
+		<pin id="1"><name>TEST/VPP</name></pin>
+		<pin id="2"><name>VCC</name></pin>
+		<pin id="3"><name sel="0">P2.5</name><name>Rosc</name></pin>
+		<pin id="4"><name>VSS</name></pin>
+		<pin id="5"><name>XOUT</name><name>TCLK</name></pin>
+		<pin id="6"><name>XIN</name></pin>
+		<pin id="7"><name>RST</name><name>NMI</name></pin>
+		<pin id="8"><name sel="0">P2.0</name><name>ACLK</name></pin>
+		<pin id="9"><name sel="0">P2.1</name><name>INCLK</name></pin>
+		<pin id="10"><name sel="0">P2.2</name><name>TA0</name></pin>
+	</left>
+	<right>
+		<pin id="11"><name sel="0">P1.7</name><name>TA2</name></pin>
+		<pin id="12"><name sel="0">P1.6</name><name>TA1</name></pin>
+		<pin id="13"><name sel="0">P1.5</name><name>TA0</name></pin>
+		<pin id="14"><name sel="0">P1.4</name><name>SMCLK</name></pin>
+		<pin id="15"><name sel="0">P1.3</name><name>TA2</name></pin>
+		<pin id="16"><name sel="0">P1.2</name><name>TA1</name></pin>
+		<pin id="17"><name sel="0">P1.1</name><name>TA0</name></pin>
+		<pin id="18"><name sel="0">P1.0</name><name>TACLK</name></pin>
+		<pin id="19"><name sel="0">P2.4</name><name>TA2</name></pin>
+		<pin id="20"><name sel="0">P2.3</name><name>TA1</name></pin>
+	</right>
+</package>
+</variant>

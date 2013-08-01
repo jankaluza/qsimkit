@@ -308,11 +308,25 @@ void MCU_MSP430::paint(QWidget *screen) {
 		}
 	}
 
+	if (m_pins.empty()) {
+		QPen pen(Qt::black, 1, Qt::SolidLine);
+		qp.setPen(pen);
+		qp.drawText(m_x - 70, m_y + 20, 140, 200, Qt::AlignHCenter | Qt::TextWordWrap,
+					"Package data for this variant has not been created yet.");
+		return;
+	}
+
 	if (m_code.isEmpty()) {
 		QPen pen(Qt::black, 1, Qt::SolidLine);
 		qp.setPen(pen);
-		qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
-					"No code loaded. Load the code by right clicking on this MCU and selecting \"Load ELF\".");
+		if (width() < 200) {
+			qp.drawText(m_x - 70, m_y + height() , width() + 140, height(), Qt::AlignHCenter | Qt::TextWordWrap,
+						"No code loaded. Load the code by right clicking on this MCU and selecting \"Load ELF\".");
+		}
+		else {
+			qp.drawText(m_x + 40, m_y , width() - 80, height(), Qt::AlignCenter | Qt::TextWordWrap,
+						"No code loaded. Load the code by right clicking on this MCU and selecting \"Load ELF\".");
+		}
 	}
 }
 

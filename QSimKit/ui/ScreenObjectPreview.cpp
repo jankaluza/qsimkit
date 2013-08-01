@@ -48,8 +48,8 @@ void ScreenObjectPreview::setObject(ScreenObject *object) {
 	delete m_object;
 	m_object = object;
 
-	object->setX(width()/2 - object->height()/2);
-	object->setY(height()/2 - object->width()/2);
+	object->setX(width()/2 - object->width()/2);
+	object->setY(height()/2 - object->height()/2);
 	repaint();
 }
 
