@@ -265,6 +265,7 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		switch((val >> 2) & 7) {
 			case 0:
 				// TODO: SCLK
+				m_source = 0;
 				break;
 			case 1:
 				m_source = m_aclk;
