@@ -45,7 +45,7 @@
 
 Disassembler::Disassembler(QSimKit *simkit) :
 DockWidget(simkit), m_mcu(0), m_simkit(simkit), m_showSource(true), m_showAssembler(true), m_pc(0),
-m_dd(0) {
+m_dd(0), m_showingAssembler(0) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
@@ -301,9 +301,11 @@ void Disassembler::reloadFile() {
 	loadFileLines(lines);
 
 	if (m_showAssembler || lines.isEmpty()) {
+		m_showingAssembler = true;
 		reloadFileAssembler(lines);
 	}
 	else {
+		m_showingAssembler = false;
 		reloadFileSource(lines);
 	}
 
@@ -383,7 +385,7 @@ bool Disassembler::isDifferentCLine(uint16_t pc) {
 
 void Disassembler::pointToInstruction(uint16_t pc) {
 	m_pc = pc;
-	if (m_pairedInstructions.contains(pc)) {
+	if (!m_showingAssembler && m_pairedInstructions.contains(pc)) {
 		pc = m_pairedInstructions[pc];
 	}
 
