@@ -16,6 +16,7 @@ QSimKit is released under GPLv2+ license.
 * Adding peripherals written in C++ or Python
 * Connecting pins
 * Inspecting MCU memory and registers
+* Inspecting local variables
 * Stepping assembler or C code
 * Adding register-based breakpoints (simulation stops when register, for example PC, has particular value)
 * Adding memory-based breakpoints (simulation stops when byte in memory has particular value)
