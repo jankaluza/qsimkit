@@ -13,11 +13,12 @@ FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui)
 
 QT4_WRAP_CPP(HEADERS_MOC ${HEADERS} ${HEADERSR})
 QT4_WRAP_UI(FORMS_HEADERS ${FORMS} ${FORMSR})
-# QT4_ADD_RESOURCES(helloworld_RESOURCES_RCC ${helloworld_RESOURCES})
+QT4_ADD_RESOURCES(RESOURCES icons/icons.qrc)
 
 ADD_EXECUTABLE(qsimkit ${SRC} ${SRCR} main.cpp
     ${HEADERS_MOC}
-    ${FORMS_HEADERS})
+    ${FORMS_HEADERS}
+    ${RESOURCES})
 
 IF(WIN32)
 #c:/Python27/lib/python27.lib

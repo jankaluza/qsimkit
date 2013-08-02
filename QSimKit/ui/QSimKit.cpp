@@ -102,19 +102,19 @@ StepMode QSimKit::getStepMode() {
 }
 
 void QSimKit::populateToolBar() {
-	QAction *action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
+	QAction *action = toolbar->addAction(QIcon(":/icons/22x22/actions/media-playback-start.png"), tr("Start &simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(startSimulation()));
 
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
+	action = toolbar->addAction(QIcon(":/icons/22x22/actions/media-playback-pause.png"), tr("P&ause simulation"));
 	action->setCheckable(true);
 	action->setEnabled(false);
 	connect(action, SIGNAL(triggered(bool)), this, SLOT(pauseSimulation(bool)));
 	m_pauseAction = action;
 
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-playback-stop.png"), tr("Sto&p simulation"));
+	action = toolbar->addAction(QIcon(":/icons/22x22/actions/media-playback-stop.png"), tr("Sto&p simulation"));
 	connect(action, SIGNAL(triggered()), this, SLOT(stopSimulation()));
 
-	action = toolbar->addAction(QIcon("./icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
+	action = toolbar->addAction(QIcon(":/icons/22x22/actions/media-skip-forward.png"), tr("Single step"));
 	connect(action, SIGNAL(triggered()), this, SLOT(singleStep()));
 
 	toolbar->addWidget(new QLabel("Single step mode:"));
