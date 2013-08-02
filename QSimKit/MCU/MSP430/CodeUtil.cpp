@@ -109,7 +109,7 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 
 	QString f_in = QDir::tempPath() + "/test.dump";
 	QFile file(f_in);
-	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text)) {
+	if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
 		error = QString("Cannot open '%1' for writing.").arg(f_in);
 		return df;
 	}
@@ -142,16 +142,13 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 	QString result = QString(objdump.readAll());
 	parseCode(df, result, error);
 
-	DwarfLoader dl("msp430-objdump");
-	dl.load(f_in, error);
-
 	return df;
 }
 
 DebugData *getDebugData(const QByteArray &code, QString &error) {
 	QString f_in = QDir::tempPath() + "/test.dump";
 	QFile file(f_in);
-	if (!file.open(QFile::WriteOnly | QFile::Truncate | QIODevice::Text)) {
+	if (!file.open(QFile::WriteOnly | QFile::Truncate)) {
 		error = QString("Cannot open '%1' for writing.").arg(f_in);
 		return 0;
 	}

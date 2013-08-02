@@ -101,7 +101,7 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_xor")) inst.op = DW_OP_xor;
 	else if (expr.startsWith("DW_OP_bra")) inst.op = DW_OP_bra;
 	else if (expr.startsWith("DW_OP_eq")) inst.op = DW_OP_eq;
-	else if (expr.startsWith("DW_OP_ge")) inst.op = DW_OP_ge;
+	if (expr.startsWith("DW_OP_ge")) inst.op = DW_OP_ge;
 	else if (expr.startsWith("DW_OP_gt")) inst.op = DW_OP_gt;
 	else if (expr.startsWith("DW_OP_le")) inst.op = DW_OP_le;
 	else if (expr.startsWith("DW_OP_lt")) inst.op = DW_OP_lt;
@@ -160,7 +160,7 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_reg28")) inst.op = DW_OP_reg28;
 	else if (expr.startsWith("DW_OP_reg29")) inst.op = DW_OP_reg29;
 	else if (expr.startsWith("DW_OP_reg30")) inst.op = DW_OP_reg30;
-	else if (expr.startsWith("DW_OP_reg31")) inst.op = DW_OP_reg31;
+	if (expr.startsWith("DW_OP_reg31")) inst.op = DW_OP_reg31;
 	else if (expr.startsWith("DW_OP_reg0")) inst.op = DW_OP_reg0;
 	else if (expr.startsWith("DW_OP_reg1")) inst.op = DW_OP_reg1;
 	else if (expr.startsWith("DW_OP_reg2")) inst.op = DW_OP_reg2;
@@ -206,7 +206,7 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_regx")) inst.op = DW_OP_regx;
 	else if (expr.startsWith("DW_OP_fbreg")) inst.op = DW_OP_fbreg;
 	else if (expr.startsWith("DW_OP_bregx")) inst.op = DW_OP_bregx;
-	else if (expr.startsWith("DW_OP_piece")) inst.op = DW_OP_piece;
+	if (expr.startsWith("DW_OP_piece")) inst.op = DW_OP_piece;
 	else if (expr.startsWith("DW_OP_deref_size")) inst.op = DW_OP_deref_size;
 	else if (expr.startsWith("DW_OP_xderef_size")) inst.op = DW_OP_xderef_size;
 	else if (expr.startsWith("DW_OP_nop")) inst.op = DW_OP_nop;
@@ -247,6 +247,8 @@ bool DwarfExpression::parse(const QString &expression) {
 		Instruction inst = getInstruction(cmd.trimmed());
 		m_instructions.append(inst);
 	}
+
+	return true;
 }
 
 uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress) {
