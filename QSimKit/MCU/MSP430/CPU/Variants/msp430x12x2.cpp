@@ -73,6 +73,9 @@
 #ifndef USART0TX_VECTOR
 #define USART0TX_VECTOR 12
 #endif
+#ifndef __ORDER_LITTLE_ENDIAN__
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#endif
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ 65535U
 #endif
@@ -135,6 +138,9 @@
 #endif
 #ifndef FSSEL1
 #define FSSEL1 0x0080
+#endif
+#ifndef __MSP430_MPY_TYPE_16__
+#define __MSP430_MPY_TYPE_16__ 16
 #endif
 #ifndef __DEC64_MAX_EXP__
 #define __DEC64_MAX_EXP__ 385
@@ -574,6 +580,9 @@
 #ifndef TA0CTL_
 #define TA0CTL_ 0x0160
 #endif
+#ifndef __MSP430_MPY_32__
+#define __MSP430_MPY_32__ 49
+#endif
 #ifndef TXBUF_
 #define TXBUF_ 0x0077
 #endif
@@ -679,6 +688,9 @@
 #ifndef SREF_AVCC_VEREF
 #define SREF_AVCC_VEREF SREF_4
 #endif
+#ifndef __MSP430_MPY_16SE__
+#define __MSP430_MPY_16SE__ 17
+#endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
 #endif
@@ -781,8 +793,11 @@
 #ifndef __FLT_MANT_DIG__
 #define __FLT_MANT_DIG__ 24
 #endif
-#ifndef __VERSION__
-#define __VERSION__ "4.5.3"
+#ifndef __MSP430_MPY_32DW__
+#define __MSP430_MPY_32DW__ 51
+#endif
+#ifndef __MSP430_MPY_HAS_DW__
+#define __MSP430_MPY_HAS_DW__ 2
 #endif
 #ifndef U0BR0_
 #define U0BR0_ 0x0074
@@ -838,6 +853,9 @@
 #ifndef SREF_VREF_AVSS
 #define SREF_VREF_AVSS SREF_1
 #endif
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
 #ifndef ADC10CTL0_
 #define ADC10CTL0_ 0x01B0
 #endif
@@ -861,6 +879,9 @@
 #endif
 #ifndef __DEC64_EPSILON__
 #define __DEC64_EPSILON__ 1E-15DD
+#endif
+#ifndef __ORDER_PDP_ENDIAN__
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif
 #ifndef USART0RX_VECTOR
 #define USART0RX_VECTOR 14
@@ -961,6 +982,9 @@
 #ifndef TACTL
 #define TACTL TA0CTL
 #endif
+#ifndef __MSP430_CPU_MSP430X__
+#define __MSP430_CPU_MSP430X__ 2
+#endif
 #ifndef CM_NEG
 #define CM_NEG CM_2
 #endif
@@ -969,6 +993,9 @@
 #endif
 #ifndef FXKEY
 #define FXKEY 0x3300
+#endif
+#ifndef __MSP430_MPY_NONE__
+#define __MSP430_MPY_NONE__ 0
 #endif
 #ifndef ADC10SHT_DIV64
 #define ADC10SHT_DIV64 ADC10SHT_3
@@ -1023,9 +1050,6 @@
 #endif
 #ifndef SREF_VREF_VEREF
 #define SREF_VREF_VEREF SREF_5
-#endif
-#ifndef __MSP430F110__
-#define __MSP430F110__ 1
 #endif
 #ifndef STC
 #define STC 0x02
@@ -1126,6 +1150,9 @@
 #ifndef __DBL_HAS_QUIET_NAN__
 #define __DBL_HAS_QUIET_NAN__ 1
 #endif
+#ifndef __MSP430_MPY_TYPE_32__
+#define __MSP430_MPY_TYPE_32__ 32
+#endif
 #ifndef U0RCTL_
 #define U0RCTL_ 0x0072
 #endif
@@ -1157,10 +1184,13 @@
 #define __MSP430_HAS_PORT2__ 
 #endif
 #ifndef __MSPGCC__
-#define __MSPGCC__ 20110706
+#define __MSPGCC__ 20120406
 #endif
 #ifndef ADC10SSEL_ADC10OSC
 #define ADC10SSEL_ADC10OSC ADC10SSEL_0
+#endif
+#ifndef __MSP430_MPY_16__
+#define __MSP430_MPY_16__ 16
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 32767
@@ -1234,6 +1264,9 @@
 #ifndef P2IN_
 #define P2IN_ 0x0028
 #endif
+#ifndef __MSP430_CPU_MSP430__
+#define __MSP430_CPU_MSP430__ 0
+#endif
 #ifndef FE
 #define FE 0x80
 #endif
@@ -1242,6 +1275,9 @@
 #endif
 #ifndef OUTMOD_SET_RESET
 #define OUTMOD_SET_RESET OUTMOD_3
+#endif
+#ifndef __MSP430_CPU_MSP430XV2__
+#define __MSP430_CPU_MSP430XV2__ 3
 #endif
 #ifndef ME2_
 #define ME2_ 0x0005
@@ -1288,6 +1324,9 @@
 #ifndef TAR
 #define TAR TA0R
 #endif
+#ifndef __DBL_DECIMAL_DIG__
+#define __DBL_DECIMAL_DIG__ 9
+#endif
 #ifndef OE
 #define OE 0x20
 #endif
@@ -1318,11 +1357,17 @@
 #ifndef ERASE
 #define ERASE 0x0002
 #endif
+#ifndef __ORDER_BIG_ENDIAN__
+#define __ORDER_BIG_ENDIAN__ 4321
+#endif
 #ifndef XT5V
 #define XT5V 0x08
 #endif
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ 9223372036854775807LL
+#endif
+#ifndef __BYTE_ORDER__
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
 #ifndef __FLT_DENORM_MIN__
 #define __FLT_DENORM_MIN__ 1.40129846e-45F
@@ -1369,8 +1414,11 @@
 #ifndef __DEC128_MAX_EXP__
 #define __DEC128_MAX_EXP__ 6145
 #endif
+#ifndef __MSP430_MPY_HAS_SE__
+#define __MSP430_MPY_HAS_SE__ 1
+#endif
 #ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 5
+#define __GNUC_MINOR__ 6
 #endif
 #ifndef __UINTMAX_MAX__
 #define __UINTMAX_MAX__ 18446744073709551615ULL
@@ -1444,6 +1492,9 @@
 #ifndef OSCOFF
 #define OSCOFF 0x0020
 #endif
+#ifndef __FLT_DECIMAL_DIG__
+#define __FLT_DECIMAL_DIG__ 9
+#endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
 #endif
@@ -1458,6 +1509,9 @@
 #endif
 #ifndef INCH_A0
 #define INCH_A0 INCH_0
+#endif
+#ifndef __MSP430_MPY_TYPE_ANY__
+#define __MSP430_MPY_TYPE_ANY__ 48
 #endif
 #ifndef BRK
 #define BRK 0x10

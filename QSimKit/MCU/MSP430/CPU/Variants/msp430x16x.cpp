@@ -115,6 +115,9 @@
 #ifndef SHT1_DIV384
 #define SHT1_DIV384 SHT1_9
 #endif
+#ifndef __ORDER_LITTLE_ENDIAN__
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#endif
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ 65535U
 #endif
@@ -216,6 +219,9 @@
 #endif
 #ifndef DMA1CTL_
 #define DMA1CTL_ 0x01E8
+#endif
+#ifndef __MSP430_MPY_TYPE_16__
+#define __MSP430_MPY_TYPE_16__ 16
 #endif
 #ifndef P4DIR_
 #define P4DIR_ 0x001E
@@ -1048,6 +1054,9 @@
 #ifndef ADC12MCTL8_
 #define ADC12MCTL8_ 0x0088
 #endif
+#ifndef __MSP430_MPY_32__
+#define __MSP430_MPY_32__ 49
+#endif
 #ifndef ADC12MCTL9_
 #define ADC12MCTL9_ 0x0089
 #endif
@@ -1237,6 +1246,9 @@
 #ifndef SREF_AVCC_VEREF
 #define SREF_AVCC_VEREF SREF_4
 #endif
+#ifndef __MSP430_MPY_16SE__
+#define __MSP430_MPY_16SE__ 17
+#endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
 #endif
@@ -1417,11 +1429,14 @@
 #ifndef __FLT_MANT_DIG__
 #define __FLT_MANT_DIG__ 24
 #endif
-#ifndef __VERSION__
-#define __VERSION__ "4.5.3"
+#ifndef __MSP430_MPY_32DW__
+#define __MSP430_MPY_32DW__ 51
 #endif
 #ifndef RXDMAEN
 #define RXDMAEN 0x80
+#endif
+#ifndef __MSP430_MPY_HAS_DW__
+#define __MSP430_MPY_HAS_DW__ 2
 #endif
 #ifndef U0BR0_
 #define U0BR0_ 0x0074
@@ -1519,6 +1534,9 @@
 #ifndef SREF_VREF_AVSS
 #define SREF_VREF_AVSS SREF_1
 #endif
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
 #ifndef ADC12_VECTOR
 #define ADC12_VECTOR 14
 #endif
@@ -1581,6 +1599,9 @@
 #endif
 #ifndef __DEC64_EPSILON__
 #define __DEC64_EPSILON__ 1E-15DD
+#endif
+#ifndef __ORDER_PDP_ENDIAN__
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif
 #ifndef DMACTL1_
 #define DMACTL1_ 0x0124
@@ -1732,6 +1753,9 @@
 #ifndef TACTL
 #define TACTL TA0CTL
 #endif
+#ifndef __MSP430_CPU_MSP430X__
+#define __MSP430_CPU_MSP430X__ 2
+#endif
 #ifndef CM_NEG
 #define CM_NEG CM_2
 #endif
@@ -1740,6 +1764,9 @@
 #endif
 #ifndef FXKEY
 #define FXKEY 0x3300
+#endif
+#ifndef __MSP430_MPY_NONE__
+#define __MSP430_MPY_NONE__ 0
 #endif
 #ifndef I2CBB
 #define I2CBB 0x01
@@ -1795,9 +1822,6 @@
 #ifndef SREF_VREF_VEREF
 #define SREF_VREF_VEREF SREF_5
 #endif
-#ifndef __MSP430F110__
-#define __MSP430F110__ 1
-#endif
 #ifndef STC
 #define STC 0x02
 #endif
@@ -1833,6 +1857,9 @@
 #endif
 #ifndef __DEC64_MAX__
 #define __DEC64_MAX__ 9.999999999999999E384DD
+#endif
+#ifndef ENNMI
+#define ENNMI 0x0001
 #endif
 #ifndef TIMERA1_VECTOR
 #define TIMERA1_VECTOR 10
@@ -1945,6 +1972,9 @@
 #ifndef STTIE
 #define STTIE 0x80
 #endif
+#ifndef __MSP430_MPY_TYPE_32__
+#define __MSP430_MPY_TYPE_32__ 32
+#endif
 #ifndef SHT0_DIV64
 #define SHT0_DIV64 SHT0_4
 #endif
@@ -2009,10 +2039,13 @@
 #define __MSP430_HAS_PORT2__ 
 #endif
 #ifndef __MSPGCC__
-#define __MSPGCC__ 20110706
+#define __MSPGCC__ 20120406
 #endif
 #ifndef CAREF_050
 #define CAREF_050 CAREF_2
+#endif
+#ifndef __MSP430_MPY_16__
+#define __MSP430_MPY_16__ 16
 #endif
 #ifndef __MSP430_HAS_MPY__
 #define __MSP430_HAS_MPY__ 
@@ -2143,6 +2176,9 @@
 #ifndef DAC12GRP
 #define DAC12GRP 0x0001
 #endif
+#ifndef __MSP430_CPU_MSP430__
+#define __MSP430_CPU_MSP430__ 0
+#endif
 #ifndef DMA1SA_
 #define DMA1SA_ 0x01EA
 #endif
@@ -2166,6 +2202,9 @@
 #endif
 #ifndef OUTMOD_SET_RESET
 #define OUTMOD_SET_RESET OUTMOD_3
+#endif
+#ifndef __MSP430_CPU_MSP430XV2__
+#define __MSP430_CPU_MSP430XV2__ 3
 #endif
 #ifndef U1RCTL_
 #define U1RCTL_ 0x007A
@@ -2242,6 +2281,9 @@
 #ifndef TAR
 #define TAR TA0R
 #endif
+#ifndef __DBL_DECIMAL_DIG__
+#define __DBL_DECIMAL_DIG__ 9
+#endif
 #ifndef OE
 #define OE 0x20
 #endif
@@ -2284,11 +2326,17 @@
 #ifndef I2CMM_0
 #define I2CMM_0 0
 #endif
+#ifndef __ORDER_BIG_ENDIAN__
+#define __ORDER_BIG_ENDIAN__ 4321
+#endif
 #ifndef XT5V
 #define XT5V 0x08
 #endif
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ 9223372036854775807LL
+#endif
+#ifndef __BYTE_ORDER__
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
 #ifndef CONSEQ_REPEAT_SEQUENCE
 #define CONSEQ_REPEAT_SEQUENCE CONSEQ_3
@@ -2383,6 +2431,9 @@
 #ifndef SHR1
 #define SHR1 0x4000
 #endif
+#ifndef __MSP430_MPY_HAS_SE__
+#define __MSP430_MPY_HAS_SE__ 1
+#endif
 #ifndef ADC12MEM3_
 #define ADC12MEM3_ 0x0146
 #endif
@@ -2390,7 +2441,7 @@
 #define SHS1 0x0800
 #endif
 #ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 5
+#define __GNUC_MINOR__ 6
 #endif
 #ifndef __UINTMAX_MAX__
 #define __UINTMAX_MAX__ 18446744073709551615ULL
@@ -2563,8 +2614,8 @@
 #ifndef OSCOFF
 #define OSCOFF 0x0020
 #endif
-#ifndef ENNMI
-#define ENNMI 0x0001
+#ifndef __FLT_DECIMAL_DIG__
+#define __FLT_DECIMAL_DIG__ 9
 #endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
@@ -2586,6 +2637,9 @@
 #endif
 #ifndef INCH_A0
 #define INCH_A0 0
+#endif
+#ifndef __MSP430_MPY_TYPE_ANY__
+#define __MSP430_MPY_TYPE_ANY__ 48
 #endif
 #ifndef BRK
 #define BRK 0x10

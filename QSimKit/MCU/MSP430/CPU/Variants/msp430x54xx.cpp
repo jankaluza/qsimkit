@@ -70,6 +70,9 @@
 #ifndef P8SEL_
 #define P8SEL_ __MSP430_PORT8_BASE__ + 0x0B
 #endif
+#ifndef __ORDER_LITTLE_ENDIAN__
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#endif
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ 65535U
 #endif
@@ -141,6 +144,9 @@
 #endif
 #ifndef P1DS_
 #define P1DS_ __MSP430_PORT1_BASE__ + 0x08
+#endif
+#ifndef __MSP430_MPY_TYPE_16__
+#define __MSP430_MPY_TYPE_16__ 16
 #endif
 #ifndef P4DIR_
 #define P4DIR_ __MSP430_PORT4_BASE__ + 0x05
@@ -631,6 +637,9 @@
 #ifndef UCA0CTL1_
 #define UCA0CTL1_ 0x05C0
 #endif
+#ifndef __MSP430_MPY_32__
+#define __MSP430_MPY_32__ 49
+#endif
 #ifndef PJIN_
 #define PJIN_ __MSP430_PORTJ_BASE__ + 0x00
 #endif
@@ -702,6 +711,9 @@
 #endif
 #ifndef __MSP430
 #define __MSP430 1
+#endif
+#ifndef __MSP430_MPY_16SE__
+#define __MSP430_MPY_16SE__ 17
 #endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
@@ -787,8 +799,11 @@
 #ifndef DMA_VECTOR
 #define DMA_VECTOR 0x64
 #endif
-#ifndef __VERSION__
-#define __VERSION__ "4.5.3"
+#ifndef __MSP430_MPY_32DW__
+#define __MSP430_MPY_32DW__ 51
+#endif
+#ifndef __MSP430_MPY_HAS_DW__
+#define __MSP430_MPY_HAS_DW__ 2
 #endif
 #ifndef PJDIR_
 #define PJDIR_ __MSP430_PORTJ_BASE__ + 0x04
@@ -853,6 +868,9 @@
 #ifndef USCIB2_RXTX_VECTOR
 #define USCIB2_RXTX_VECTOR 0x66
 #endif
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
 #ifndef P5DS_
 #define P5DS_ __MSP430_PORT5_BASE__ + 0x08
 #endif
@@ -879,6 +897,9 @@
 #endif
 #ifndef __DEC64_EPSILON__
 #define __DEC64_EPSILON__ 1E-15DD
+#endif
+#ifndef __ORDER_PDP_ENDIAN__
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif
 #ifndef UCSCTL1_L_
 #define UCSCTL1_L_ 0x0162
@@ -940,6 +961,9 @@
 #ifndef TA0EX0_H_
 #define TA0EX0_H_ 0x0361
 #endif
+#ifndef __MSP430_CPU_MSP430X__
+#define __MSP430_CPU_MSP430X__ 2
+#endif
 #ifndef CM_NEG
 #define CM_NEG CM_2
 #endif
@@ -948,6 +972,9 @@
 #endif
 #ifndef SYSBERRIV_
 #define SYSBERRIV_ __MSP430_SYS_BASE__ + 0x18
+#endif
+#ifndef __MSP430_MPY_NONE__
+#define __MSP430_MPY_NONE__ 0
 #endif
 #ifndef P9REN_
 #define P9REN_ __MSP430_PORT9_BASE__ + 0x06
@@ -966,9 +993,6 @@
 #endif
 #ifndef SYSCTL_
 #define SYSCTL_ __MSP430_SYS_BASE__ + 0x00
-#endif
-#ifndef __MSP430F110__
-#define __MSP430F110__ 1
 #endif
 #ifndef SFRRPCR_L_
 #define SFRRPCR_L_ SFRRPCR_
@@ -1081,6 +1105,9 @@
 #ifndef __DBL_HAS_QUIET_NAN__
 #define __DBL_HAS_QUIET_NAN__ 1
 #endif
+#ifndef __MSP430_MPY_TYPE_32__
+#define __MSP430_MPY_TYPE_32__ 32
+#endif
 #ifndef TA0CTL_L_
 #define TA0CTL_L_ 0x0340
 #endif
@@ -1115,10 +1142,13 @@
 #define SYSJMBC_ __MSP430_SYS_BASE__ + 0x06
 #endif
 #ifndef __MSPGCC__
-#define __MSPGCC__ 20110706
+#define __MSPGCC__ 20120406
 #endif
 #ifndef SFRIE1_L_
 #define SFRIE1_L_ SFRIE1_
+#endif
+#ifndef __MSP430_MPY_16__
+#define __MSP430_MPY_16__ 16
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 32767
@@ -1189,6 +1219,9 @@
 #ifndef P2IN_
 #define P2IN_ __MSP430_PORT2_BASE__ + 0x01
 #endif
+#ifndef __MSP430_CPU_MSP430__
+#define __MSP430_CPU_MSP430__ 0
+#endif
 #ifndef P8DIR_
 #define P8DIR_ __MSP430_PORT8_BASE__ + 0x05
 #endif
@@ -1206,6 +1239,9 @@
 #endif
 #ifndef OUTMOD_SET_RESET
 #define OUTMOD_SET_RESET OUTMOD_3
+#endif
+#ifndef __MSP430_CPU_MSP430XV2__
+#define __MSP430_CPU_MSP430XV2__ 3
 #endif
 #ifndef USCIB1_RXTX_VECTOR
 #define USCIB1_RXTX_VECTOR 0x5A
@@ -1243,6 +1279,9 @@
 #ifndef CCIS1
 #define CCIS1 0x2000
 #endif
+#ifndef __DBL_DECIMAL_DIG__
+#define __DBL_DECIMAL_DIG__ 9
+#endif
 #ifndef SYSJMBO1_L_
 #define SYSJMBO1_L_ __MSP430_SYS_BASE__ + 0x0E
 #endif
@@ -1270,11 +1309,17 @@
 #ifndef UCB0CTL1_
 #define UCB0CTL1_ 0x05E0
 #endif
+#ifndef __ORDER_BIG_ENDIAN__
+#define __ORDER_BIG_ENDIAN__ 4321
+#endif
 #ifndef UCA0MCTL_
 #define UCA0MCTL_ 0x05C8
 #endif
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ 9223372036854775807LL
+#endif
+#ifndef __BYTE_ORDER__
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
 #ifndef __FLT_DENORM_MIN__
 #define __FLT_DENORM_MIN__ 1.40129846e-45F
@@ -1327,11 +1372,14 @@
 #ifndef SYSJMBI0_H_
 #define SYSJMBI0_H_ __MSP430_SYS_BASE__ + 0x09
 #endif
+#ifndef __MSP430_MPY_HAS_SE__
+#define __MSP430_MPY_HAS_SE__ 1
+#endif
 #ifndef P5REN_
 #define P5REN_ __MSP430_PORT5_BASE__ + 0x06
 #endif
 #ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 5
+#define __GNUC_MINOR__ 6
 #endif
 #ifndef TA1CCTL1_H_
 #define TA1CCTL1_H_ 0x0385
@@ -1426,6 +1474,9 @@
 #ifndef P9SEL_
 #define P9SEL_ __MSP430_PORT9_BASE__ + 0x0A
 #endif
+#ifndef __FLT_DECIMAL_DIG__
+#define __FLT_DECIMAL_DIG__ 9
+#endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
 #endif
@@ -1440,6 +1491,9 @@
 #endif
 #ifndef UCA0IE_
 #define UCA0IE_ 0x05DC
+#endif
+#ifndef __MSP430_MPY_TYPE_ANY__
+#define __MSP430_MPY_TYPE_ANY__ 48
 #endif
 #ifndef TIMER1_A1_VECTOR
 #define TIMER1_A1_VECTOR 0x60

@@ -88,6 +88,9 @@
 #ifndef BTCTL_
 #define BTCTL_ 0x0040
 #endif
+#ifndef __ORDER_LITTLE_ENDIAN__
+#define __ORDER_LITTLE_ENDIAN__ 1234
+#endif
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ 65535U
 #endif
@@ -177,6 +180,9 @@
 #endif
 #ifndef FSSEL1
 #define FSSEL1 0x0080
+#endif
+#ifndef __MSP430_MPY_TYPE_16__
+#define __MSP430_MPY_TYPE_16__ 16
 #endif
 #ifndef P4DIR_
 #define P4DIR_ 0x001E
@@ -658,6 +664,9 @@
 #ifndef SCFQ_2M
 #define SCFQ_2M 0x3F
 #endif
+#ifndef __MSP430_MPY_32__
+#define __MSP430_MPY_32__ 49
+#endif
 #ifndef BT_fCLK2_ACLK
 #define BT_fCLK2_ACLK 0x00
 #endif
@@ -756,6 +765,9 @@
 #endif
 #ifndef CACTL27
 #define CACTL27 0x80
+#endif
+#ifndef __MSP430_MPY_16SE__
+#define __MSP430_MPY_16SE__ 17
 #endif
 #ifndef FLL_DIV_1
 #define FLL_DIV_1 0x00
@@ -856,8 +868,11 @@
 #ifndef __FLT_MANT_DIG__
 #define __FLT_MANT_DIG__ 24
 #endif
-#ifndef __VERSION__
-#define __VERSION__ "4.5.3"
+#ifndef __MSP430_MPY_32DW__
+#define __MSP430_MPY_32DW__ 51
+#endif
+#ifndef __MSP430_MPY_HAS_DW__
+#define __MSP430_MPY_HAS_DW__ 2
 #endif
 #ifndef WDTCTL_
 #define WDTCTL_ 0x0120
@@ -913,6 +928,9 @@
 #ifndef CARSEL
 #define CARSEL 0x40
 #endif
+#ifndef __FLOAT_WORD_ORDER__
+#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#endif
 #ifndef TACCR0
 #define TACCR0 TA0CCR0
 #endif
@@ -927,6 +945,9 @@
 #endif
 #ifndef __DEC64_EPSILON__
 #define __DEC64_EPSILON__ 1E-15DD
+#endif
+#ifndef __ORDER_PDP_ENDIAN__
+#define __ORDER_PDP_ENDIAN__ 3412
 #endif
 #ifndef P1SEL_
 #define P1SEL_ 0x0026
@@ -1024,6 +1045,9 @@
 #ifndef P2DIR_
 #define P2DIR_ 0x002A
 #endif
+#ifndef __MSP430_CPU_MSP430X__
+#define __MSP430_CPU_MSP430X__ 2
+#endif
 #ifndef CM_NEG
 #define CM_NEG CM_2
 #endif
@@ -1032,6 +1056,9 @@
 #endif
 #ifndef FXKEY
 #define FXKEY 0x3300
+#endif
+#ifndef __MSP430_MPY_NONE__
+#define __MSP430_MPY_NONE__ 0
 #endif
 #ifndef SCANIF_VECTOR
 #define SCANIF_VECTOR 18
@@ -1054,8 +1081,8 @@
 #ifndef LCDMA_
 #define LCDMA_ LCDM10_
 #endif
-#ifndef __MSP430F110__
-#define __MSP430F110__ 1
+#ifndef BASICTIMER_VECTOR
+#define BASICTIMER_VECTOR 0
 #endif
 #ifndef LCDMEM_
 #define LCDMEM_ LCD_BASE+1
@@ -1189,6 +1216,9 @@
 #ifndef __DBL_HAS_QUIET_NAN__
 #define __DBL_HAS_QUIET_NAN__ 1
 #endif
+#ifndef __MSP430_MPY_TYPE_32__
+#define __MSP430_MPY_TYPE_32__ 32
+#endif
 #ifndef __WCHAR_TYPE__
 #define __WCHAR_TYPE__ int
 #endif
@@ -1232,10 +1262,13 @@
 #define __MSP430_HAS_PORT2__ 
 #endif
 #ifndef __MSPGCC__
-#define __MSPGCC__ 20110706
+#define __MSPGCC__ 20120406
 #endif
 #ifndef CAREF_050
 #define CAREF_050 CAREF_2
+#endif
+#ifndef __MSP430_MPY_16__
+#define __MSP430_MPY_16__ 16
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 32767
@@ -1266,9 +1299,6 @@
 #endif
 #ifndef TA1CCR2_
 #define TA1CCR2_ 0x0196
-#endif
-#ifndef BASICTIMER_VECTOR
-#define BASICTIMER_VECTOR 0
 #endif
 #ifndef __DBL_MANT_DIG__
 #define __DBL_MANT_DIG__ 24
@@ -1327,6 +1357,9 @@
 #ifndef P2IN_
 #define P2IN_ 0x0028
 #endif
+#ifndef __MSP430_CPU_MSP430__
+#define __MSP430_CPU_MSP430__ 0
+#endif
 #ifndef __MSP430_HAS_SVS__
 #define __MSP430_HAS_SVS__ 
 #endif
@@ -1335,6 +1368,9 @@
 #endif
 #ifndef OUTMOD_SET_RESET
 #define OUTMOD_SET_RESET OUTMOD_3
+#endif
+#ifndef __MSP430_CPU_MSP430XV2__
+#define __MSP430_CPU_MSP430XV2__ 3
 #endif
 #ifndef BTCNT1_
 #define BTCNT1_ 0x0046
@@ -1393,6 +1429,9 @@
 #ifndef TAR
 #define TAR TA0R
 #endif
+#ifndef __DBL_DECIMAL_DIG__
+#define __DBL_DECIMAL_DIG__ 9
+#endif
 #ifndef TIMERA0_VECTOR
 #define TIMERA0_VECTOR TIMER0_A0_VECTOR
 #endif
@@ -1411,11 +1450,17 @@
 #ifndef ERASE
 #define ERASE 0x0002
 #endif
+#ifndef __ORDER_BIG_ENDIAN__
+#define __ORDER_BIG_ENDIAN__ 4321
+#endif
 #ifndef SCFI0_
 #define SCFI0_ 0x0050
 #endif
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ 9223372036854775807LL
+#endif
+#ifndef __BYTE_ORDER__
+#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
 #ifndef SCFI1_
 #define SCFI1_ 0x0051
@@ -1477,8 +1522,11 @@
 #ifndef FLLD_1
 #define FLLD_1 0
 #endif
+#ifndef __MSP430_MPY_HAS_SE__
+#define __MSP430_MPY_HAS_SE__ 1
+#endif
 #ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 5
+#define __GNUC_MINOR__ 6
 #endif
 #ifndef __UINTMAX_MAX__
 #define __UINTMAX_MAX__ 18446744073709551615ULL
@@ -1576,6 +1624,9 @@
 #ifndef OSCOFF
 #define OSCOFF 0x0020
 #endif
+#ifndef __FLT_DECIMAL_DIG__
+#define __FLT_DECIMAL_DIG__ 9
+#endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
 #endif
@@ -1599,6 +1650,9 @@
 #endif
 #ifndef WDTIS0
 #define WDTIS0 0x0001
+#endif
+#ifndef __MSP430_MPY_TYPE_ANY__
+#define __MSP430_MPY_TYPE_ANY__ 48
 #endif
 #ifndef TIMER1_A1_VECTOR
 #define TIMER1_A1_VECTOR 24
