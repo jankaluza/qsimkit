@@ -45,6 +45,7 @@
 #include <QDebug>
 #include <QDomDocument>
 #include <QSettings>
+#include <QMessageBox>
 
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
 m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
@@ -185,6 +186,7 @@ void QSimKit::setDockWidgetsMCU(MCU *mcu) {
 
 void QSimKit::doSingleAssemblerStep() {
 	uint16_t pc = screen->getMCU()->getRegisterSet()->get(0)->getBigEndian();
+	double start_t = m_sim->nextEventTime();
 	do {
 		double t = m_sim->nextEventTime();
 
@@ -192,12 +194,19 @@ void QSimKit::doSingleAssemblerStep() {
 			m_sim->execNextEvent();
 		}
 		while (t == m_sim->nextEventTime());
+
+		if (t - start_t > 0.01) {
+			QMessageBox::warning(this, tr("Instruction takes too long"),
+						tr("Single instruction takes more than 10ms. Possible loop detected."));
+			break;
+		}
 	}
 	while(pc == screen->getMCU()->getRegisterSet()->get(0)->getBigEndian());
 }
 
 void QSimKit::doSingleCStep() {
 	uint16_t pc = screen->getMCU()->getRegisterSet()->get(0)->getBigEndian();
+	double start_t = m_sim->nextEventTime();
 	do {
 		do {
 			double t = m_sim->nextEventTime();
@@ -206,6 +215,12 @@ void QSimKit::doSingleCStep() {
 				m_sim->execNextEvent();
 			}
 			while (t == m_sim->nextEventTime());
+			if (t - start_t > 0.01) {
+				pc = 0; // to get from outer loop
+				QMessageBox::warning(this, tr("C command takes too long"),
+							tr("Single C command takes more than 10ms. Possible loop detected."));
+				break;
+			}
 		}
 		while(!m_disassembler->isDifferentCLine(screen->getMCU()->getRegisterSet()->get(0)->getBigEndian()));
 	}

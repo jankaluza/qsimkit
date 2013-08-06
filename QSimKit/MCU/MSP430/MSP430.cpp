@@ -388,6 +388,12 @@ DisassembledFiles MCU_MSP430::getDisassembledCode() {
 		QMessageBox::critical(0, tr("Loading error"), error);
 	}
 
+	if (m_basicClock->getMCLK()->getStep() > 1) {
+		QMessageBox::critical(0, tr("MSP430 Variant error"),
+			tr("One MCLK tick for this variant takes more than 1 second which is suspicious. Variant is not implemented properly.")
+		);
+	}
+
 	return files;
 }
 
