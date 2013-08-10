@@ -5,7 +5,7 @@ title: Screenshots
 
 ## Download binary packages
 
-There are no prebuilt binary packages or Windows executables yet. Stay tuned!
+* [Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.1-win32.exe/download)
 
 ## Download source code
 
