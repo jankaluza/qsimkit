@@ -18,11 +18,13 @@
  **/
 
 #include "CodeUtil.h"
+#include "ui/PathDialog.h"
 
 #include <QFile>
 #include <QProcess>
 #include <QDir>
 #include <QDebug>
+#include <QSettings>
 
 #include "QSimKit/Dwarf/DwarfLoader.h"
 
@@ -118,15 +120,16 @@ DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString
 	file.close();
 
 	QProcess objdump;
+	QSettings settings("QSimKit", "MSP430");
 	if (hasELF) {
 #ifdef Q_OS_LINUX
-		objdump.start("msp430-objdump", QStringList() << "-dSl" << "--prefix=+<FILE" << f_in);
+		objdump.start(settings.value("objdump", "msp430-objdump").toString(), QStringList() << "-dSl" << "--prefix=+<FILE" << f_in);
 #else
-		objdump.start("msp430-objdump", QStringList() << "-dSl" << f_in);
+		objdump.start(settings.value("objdump", "msp430-objdump").toString(), QStringList() << "-dSl" << f_in);
 #endif
 	}
 	else {
-		objdump.start("msp430-objdump", QStringList() << "-D" << "-m" << "msp430:430" << f_in);
+		objdump.start(settings.value("objdump", "msp430-objdump").toString(), QStringList() << "-D" << "-m" << "msp430:430" << f_in);
 	}
 	
 	if (!objdump.waitForStarted()) {
@@ -156,7 +159,8 @@ DebugData *getDebugData(const QByteArray &code, QString &error) {
 	file.write(code);
 	file.close();
 
-	DwarfLoader dl("msp430-objdump");
+	QSettings settings("QSimKit", "MSP430");
+	DwarfLoader dl(settings.value("objdump", "msp430-objdump").toString());
 	DebugData *dd = dl.load(f_in, error);
 
 	return dd;
@@ -176,7 +180,8 @@ QString ELFToA43(const QByteArray &elf, QString &error) {
 	file.close();
 
 	QProcess objdump;
-	objdump.start("msp430-objcopy", QStringList() << "-O" << "ihex" << f_in << f_out);
+	QSettings settings("QSimKit", "MSP430");
+	objdump.start(settings.value("objcopy", "msp430-objcopy").toString(), QStringList() << "-O" << "ihex" << f_in << f_out);
 	if (!objdump.waitForStarted()) {
 		error = QString("'msp430-objcopy' cannot be started. Is msp430-gcc installed and is msp430-objcopy in PATH?");
 		return "";
@@ -194,6 +199,44 @@ QString ELFToA43(const QByteArray &elf, QString &error) {
 	}
 
 	return file2.readAll();
+}
+
+bool hasObjdump() {
+	QProcess objdump;
+	QSettings settings("QSimKit", "MSP430");
+	objdump.start(settings.value("objdump", "msp430-objdump").toString(), QStringList() << "-v");
+	if (!objdump.waitForStarted()) {
+		return false;
+	}
+	objdump.waitForFinished();
+ 
+	return true;
+}
+
+bool hasObjcopy() {
+	QProcess objdump;
+	QSettings settings("QSimKit", "MSP430");
+	objdump.start(settings.value("objcopy", "msp430-objcopy").toString(), QStringList() << "-v");
+	if (!objdump.waitForStarted()) {
+		return false;
+	}
+	objdump.waitForFinished();
+ 
+	return true;
+}
+
+void checkPaths() {
+	if (hasObjdump() && hasObjcopy()) {
+		return;
+	}
+
+	QSettings settings("QSimKit", "MSP430");
+	PathDialog p(settings.value("objcopy", "msp430-objcopy").toString(),
+		settings.value("objdump", "msp430-objdump").toString());
+	if (p.exec() == QDialog::Accepted) {
+		settings.setValue("objdump", p.getObjdump());
+		settings.setValue("objcopy", p.getObjcopy());
+	}
 }
 
 }

@@ -220,7 +220,7 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_implicit_value")) inst.op = DW_OP_implicit_value;
 	else if (expr.startsWith("DW_OP_stack_value")) inst.op = DW_OP_stack_value;
 	else if (expr.startsWith("DW_OP_deref")) inst.op = DW_OP_deref;
-	else { qDebug() << "UNKNOWN OP" << expr; }
+// 	else { qDebug() << "UNKNOWN OP" << expr; }
 
 	int i = expr.lastIndexOf(':');
 	if (i > 0) {

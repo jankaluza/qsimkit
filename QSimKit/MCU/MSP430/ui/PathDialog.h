@@ -19,24 +19,28 @@
 
 #pragma once
 
-#include <QByteArray>
+#include <QDialog>
 #include <QString>
+#include <QTimer>
+#include <QLineEdit>
 
-#include "MCU/MCU.h"
+#include "ui_PathDialog.h"
 
-namespace CodeUtil {
+class PathDialog : public QDialog, public Ui::PathDialog
+{
+	Q_OBJECT
 
-	DisassembledFiles disassemble(const QByteArray &elf, const QString &a43, QString &error);
+	public:
+		PathDialog(const QString &objcopy, const QString &objdump, QWidget *parent = 0);
 
-	DebugData *getDebugData(const QByteArray &elf, QString &error);
+		QString getObjdump();
 
-	QString ELFToA43(const QByteArray &elf, QString &error);
+		QString getObjcopy();
 
-	bool hasObjdump();
+	private slots:
+		void browse(QLineEdit *line);
+		void browseObjdump(bool checked = false);
+		void browseObjcopy(bool checked = false);
 
-	bool hasObjcopy();
-
-	void checkPaths();
-
-}
+};
 

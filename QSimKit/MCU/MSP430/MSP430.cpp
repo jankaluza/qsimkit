@@ -249,6 +249,8 @@ void MCU_MSP430::load(QDomElement &object, QString &error) {
 		return;
 	}
 
+	CodeUtil::checkPaths();
+
 	loadA43(object.firstChildElement("code").text());
 	loadELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
 }
@@ -350,6 +352,8 @@ void MCU_MSP430::loadA43Option() {
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
 		return;
 
+	CodeUtil::checkPaths();
+
 	m_elf.clear();
 	loadA43(file.readAll().data());
 }
@@ -377,6 +381,8 @@ void MCU_MSP430::loadELFOption() {
 	QFile file(filename);
 	if (!file.open(QIODevice::ReadOnly))
 		return;
+
+	CodeUtil::checkPaths();
 
 	loadELF(file.readAll());
 }
