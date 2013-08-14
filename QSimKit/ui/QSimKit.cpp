@@ -350,7 +350,8 @@ void QSimKit::newProject() {
 
 void QSimKit::saveProject() {
 	if (m_filename.isEmpty()) {
-		m_filename = QFileDialog::getSaveFileName(this);
+		m_filename = QFileDialog::getSaveFileName(this, tr("Save QSimKit project"),
+												  QString(), tr("QSimKit project (*.qsp)"));
 		if (m_filename.isEmpty()) {
 			return;
 		}
@@ -396,7 +397,8 @@ bool QSimKit::loadProject(const QString &file) {
 }
 
 void QSimKit::loadProject() {
-	QString filename = QFileDialog::getOpenFileName(this);
+	QString filename = QFileDialog::getOpenFileName(this, tr("Open QSimKit project"),
+													QString(), tr("QSimKit project (*.qsp)"));
 	if (filename.isEmpty()) {
 		return;
 	}
