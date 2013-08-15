@@ -38,6 +38,8 @@ class InstructionDecoder;
 class Instruction;
 class InterruptManager;
 class BasicClock;
+class USI;
+
 }
 
 class Timer;
@@ -138,6 +140,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		MSP430::PinManager *m_pinManager;
 		MSP430::InterruptManager *m_intManager;
 		MSP430::BasicClock *m_basicClock;
+		MSP430::USI *m_usi;
 		AdevsTimerFactory *m_timerFactory;
 		QString m_code;
 		SimulationEventList m_output;
@@ -147,7 +150,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		PeripheralItem *m_peripheralItem;
 		int8_t m_counter;
 		bool m_syncing;
-		QString m_variantStr;;
+		QString m_variantStr;
 };
 
 class MSP430Interface : public QObject, MCUInterface {

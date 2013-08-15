@@ -31,6 +31,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/BasicClock/BasicClock.h"
 #include "CPU/BasicClock/MCLK.h"
+#include "CPU/USI/USI.h"
 
 #include "Package.h"
 #include "CodeUtil.h"
@@ -79,6 +80,12 @@ m_syncing(0) {
 
 	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	m_basicClock->getMCLK()->addHandler(this, MSP430::Clock::Rising);
+
+	if (m_variant->getUSICTL() != 0) {
+		m_usi = new MSP430::USI(m_pinManager, m_intManager, m_mem, m_variant,
+								m_basicClock->getACLK(), m_basicClock->getSMCLK());
+	}
+
 	reset();
 
 	m_peripheralItem = new MSP430PeripheralItem(this);
