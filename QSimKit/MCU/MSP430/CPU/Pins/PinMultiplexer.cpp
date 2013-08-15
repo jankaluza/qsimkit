@@ -33,6 +33,10 @@ m_manager(manager), m_id(id), m_mem(mem), m_variant(variant), m_dir(dir),
 m_sel(sel), m_index(1 << index), m_value(0), m_valueIsInput(false) {
 	m_mem->addWatcher(m_dir, this);
 	m_mem->addWatcher(m_sel, this);
+
+	if (m_variant->getUSICTL() != 0) {
+		m_mem->addWatcher(m_variant->getUSICTL(), this);
+	}
 }
 
 PinMultiplexer::~PinMultiplexer() {
@@ -115,6 +119,17 @@ void PinMultiplexer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 					satisfied = false;
 					break;
 				}
+			}
+			else if (c_it->first == "usip" && m_variant->getUSICTL() != 0 &&
+				m_index >= 0x20 && m_index <= 0x80) {
+				if (((m_mem->getByte(m_variant->getUSICTL()) & m_index) == m_index) != c_it->second) {
+					satisfied = false;
+					break;
+				}
+			}
+			else {
+				satisfied = false;
+				break;
 			}
 		}
 
