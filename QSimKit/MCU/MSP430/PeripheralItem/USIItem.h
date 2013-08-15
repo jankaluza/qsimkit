@@ -19,35 +19,20 @@
 
 #pragma once
 
-#include <QDialog>
 #include <QString>
-#include <QTimer>
-#include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
 
-#include "DockWidgets/Peripherals/PeripheralItem.h"
-
 class MCU_MSP430;
-class RegistersItem;
-class TimerAItem;
-class TimerBItem;
-class BasicClockItem;
-class USIItem;
 
-class MSP430PeripheralItem : public PeripheralItem
+class USIItem : public QTreeWidgetItem
 {
 	public:
-		MSP430PeripheralItem(MCU_MSP430 *cpu);
-		~MSP430PeripheralItem();
+		USIItem(MCU_MSP430 *cpu);
+		~USIItem();
 
 		void refresh();
 
 	private:
 		MCU_MSP430 *m_cpu;
-		RegistersItem *m_registersItem;
-		TimerAItem *m_timerAItem;
-		TimerBItem *m_timerBItem;
-		BasicClockItem *m_bcItem;
-		USIItem *m_usiItem;
 };
 

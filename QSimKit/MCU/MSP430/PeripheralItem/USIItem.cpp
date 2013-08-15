@@ -17,20 +17,16 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "MSP430PeripheralItem.h"
+#include "USIItem.h"
 
 #include "ui/QSimKit.h"
 #include "MCU/MSP430/MSP430.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
+#include "MCU/Memory.h"
 #include "Peripherals/Peripheral.h"
-#include "CPU/Memory/RegisterSet.h"
-#include "CPU/Memory/Register.h"
+#include "DockWidgets/Peripherals/MemoryItem.h"
 #include "CPU/Variants/Variant.h"
-
-#include "RegistersItem.h"
-#include "TimerAItem.h"
-#include "TimerBItem.h"
-#include "BasicClockItem.h"
-#include "USIItem.h"
 
 #include <QWidget>
 #include <QTime>
@@ -43,43 +39,32 @@
 #include <QTreeWidgetItem>
 #include <QDebug>
 
-MSP430PeripheralItem::MSP430PeripheralItem(MCU_MSP430 *cpu) {
+USIItem::USIItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType) {
 	m_cpu = cpu;
-	setText(0, "MSP430");
+	setText(0, "USI");
 	setFirstColumnSpanned(true);
 	setExpanded(true);
 
-	m_registersItem = new RegistersItem(m_cpu);
-	addChild(m_registersItem);
-
-	m_bcItem = new BasicClockItem(m_cpu);
-	addChild(m_bcItem);
-
-	m_timerAItem = new TimerAItem(m_cpu);
-	addChild(m_timerAItem);
-
-	m_timerBItem = new TimerBItem(m_cpu);
-	addChild(m_timerBItem);
-
+	QTreeWidgetItem *item;
 	Variant *v = m_cpu->getVariantPtr();
 
-	if (v->getUSICTL() != 0) {
-		m_usiItem = new USIItem(m_cpu);
-		addChild(m_usiItem);
-	}
-	else {
-		m_usiItem = 0;
-	}
+#define ADD_ITEM(METHOD, NAME) if ((METHOD) > 1) { \
+	item = new MemoryItem(this, NAME, (METHOD)); \
 }
 
-MSP430PeripheralItem::~MSP430PeripheralItem() {
+	ADD_ITEM(v->getUSICTL(), "USICTL0");
+	ADD_ITEM(v->getUSICTL() + 1, "USICTL1");
+	ADD_ITEM(v->getUSICCTL(), "USIKCTL");
+	ADD_ITEM(v->getUSICCTL() + 1, "USICNT");
+}
+
+USIItem::~USIItem() {
 	
 }
 
-void MSP430PeripheralItem::refresh() {
-	m_registersItem->refresh();
-	m_bcItem->refresh();
-	m_timerAItem->refresh();
-	m_timerBItem->refresh();
-	if (m_usiItem) m_usiItem->refresh();
+void USIItem::refresh() {
+	for (int i = 0; i < childCount(); ++i) {
+		MemoryItem *item = static_cast<MemoryItem *>(child(i));
+		item->refresh(m_cpu->getMemory());
+	}
 }
