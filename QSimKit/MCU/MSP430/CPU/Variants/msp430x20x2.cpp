@@ -1399,6 +1399,10 @@
 #ifndef Z
 #define Z 0x0002
 #endif
+#define DCOZERO 0.1
+#define SRSEL 1.39
+#define SDCO 1.08
+#define INTVECT 0xffe0
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 

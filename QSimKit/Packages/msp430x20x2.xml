@@ -1,0 +1,22 @@
+<variant>
+<package name="MSP430x20x2">
+	<left>
+		<pin id="1"><name>VCC</name></pin>
+		<pin id="2"><name sel="0">P1.0</name><name dir="1" sel="1">TACLK</name><name dir="0" sel="1">TACLK</name></pin>
+		<pin id="3"><name sel="0">P1.1</name><name dir="1" sel="1">TA0</name><name dir="0" sel="1">TA0.CCI0A</name></pin>
+		<pin id="4"><name sel="0">P1.2</name><name dir="1" sel="1">TA1</name><name dir="0" sel="1">TA0.CCI1A</name></pin>
+		<pin id="5"><name sel="0">P1.3</name></pin>
+		<pin id="6"><name sel="0">P1.4</name><name dir="1" sel="1">SMCLK</name></pin>
+		<pin id="7"><name sel="0">P1.5</name><name usip="1">SCLK</name><name dir="1" sel="1">TA0</name></pin>
+	</left>
+	<right>
+		<pin id="8"><name sel="0">P1.6</name><name usip="1">SDO</name><name dir="1" sel="1">TA1</name><name dir="0" sel="1">TA0.CCI1B</name></pin>
+		<pin id="9"><name sel="0">P1.7</name><name usip="1">SDI</name></pin>
+		<pin id="10"><name>RST</name></pin>
+		<pin id="11"><name>TEST</name></pin>
+		<pin id="12"><name sel="0">P2.6</name><name dir="1" sel="1">TA1</name><name dir="0" sel="1">XIN</name></pin>
+		<pin id="13"><name sel="0">P2.7</name><name dir="1" sel="1">XOUT</name></pin>
+		<pin id="14"><name>VSS</name></pin>
+	</right>
+</package>
+</variant>
