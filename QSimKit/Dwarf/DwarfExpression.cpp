@@ -65,6 +65,7 @@ DwarfExpression::~DwarfExpression() {
 
 DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr) {
 	Instruction inst;
+	inst.op = 0;
 
 	if (expr.startsWith("DW_OP_addr")) inst.op = DW_OP_addr;
 	else if (expr.startsWith("DW_OP_const1u")) inst.op = DW_OP_const1u;
@@ -101,6 +102,8 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_xor")) inst.op = DW_OP_xor;
 	else if (expr.startsWith("DW_OP_bra")) inst.op = DW_OP_bra;
 	else if (expr.startsWith("DW_OP_eq")) inst.op = DW_OP_eq;
+
+	if (inst.op == 0) {
 	if (expr.startsWith("DW_OP_ge")) inst.op = DW_OP_ge;
 	else if (expr.startsWith("DW_OP_gt")) inst.op = DW_OP_gt;
 	else if (expr.startsWith("DW_OP_le")) inst.op = DW_OP_le;
@@ -160,6 +163,9 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_reg28")) inst.op = DW_OP_reg28;
 	else if (expr.startsWith("DW_OP_reg29")) inst.op = DW_OP_reg29;
 	else if (expr.startsWith("DW_OP_reg30")) inst.op = DW_OP_reg30;
+	}
+
+	if (inst.op == 0) {
 	if (expr.startsWith("DW_OP_reg31")) inst.op = DW_OP_reg31;
 	else if (expr.startsWith("DW_OP_reg0")) inst.op = DW_OP_reg0;
 	else if (expr.startsWith("DW_OP_reg1")) inst.op = DW_OP_reg1;
@@ -206,6 +212,9 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_regx")) inst.op = DW_OP_regx;
 	else if (expr.startsWith("DW_OP_fbreg")) inst.op = DW_OP_fbreg;
 	else if (expr.startsWith("DW_OP_bregx")) inst.op = DW_OP_bregx;
+	}
+
+	if (inst.op == 0) {
 	if (expr.startsWith("DW_OP_piece")) inst.op = DW_OP_piece;
 	else if (expr.startsWith("DW_OP_deref_size")) inst.op = DW_OP_deref_size;
 	else if (expr.startsWith("DW_OP_xderef_size")) inst.op = DW_OP_xderef_size;
@@ -220,6 +229,7 @@ DwarfExpression::Instruction DwarfExpression::getInstruction(const QString &expr
 	else if (expr.startsWith("DW_OP_implicit_value")) inst.op = DW_OP_implicit_value;
 	else if (expr.startsWith("DW_OP_stack_value")) inst.op = DW_OP_stack_value;
 	else if (expr.startsWith("DW_OP_deref")) inst.op = DW_OP_deref;
+	}
 // 	else { qDebug() << "UNKNOWN OP" << expr; }
 
 	int i = expr.lastIndexOf(':');
