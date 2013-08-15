@@ -70,27 +70,27 @@ class USITest : public CPPUNIT_NS :: TestFixture{
 			factory = new DummyTimerFactory();
 			pinManager = new PinManager(m, intManager, v);
 
-			PinMultiplexer *mpx = pinManager->addPin(P1, 0);
+			PinMultiplexer *mpx = pinManager->addPin(P1, 5);
 
 			{
 				PinMultiplexer::Condition c;
-				c["sel"] = 0;
+				c["usip"] = 1;
 				mpx->addMultiplexing(c, "SCLK");
 			}
 
-			mpx = pinManager->addPin(P1, 1);
+			mpx = pinManager->addPin(P1, 6);
 
 			{
 				PinMultiplexer::Condition c;
-				c["sel"] = 0;
+				c["usip"] = 1;
 				mpx->addMultiplexing(c, "SDO");
 			}
 
-			mpx = pinManager->addPin(P1, 2);
+			mpx = pinManager->addPin(P1, 7);
 
 			{
 				PinMultiplexer::Condition c;
-				c["sel"] = 0;
+				c["usip"] = 1;
 				mpx->addMultiplexing(c, "SDI");
 			}
 			
