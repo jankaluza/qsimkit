@@ -37,6 +37,7 @@ m_usisr(variant->getUSISR()), m_counter(0), m_sclk(false), m_usickpl(false), m_i
 m_output(false) {
 
 	m_mem->addWatcher(m_usicctl, this);
+	m_mem->addWatcher(m_usicctl + 1, this);
 	m_mem->addWatcher(m_usisr, this);
 	m_mem->addWatcher(m_usictl, this);
 
@@ -89,9 +90,9 @@ void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 
 	m_mem->setByte(m_usisr, usisr);
 	usicnt--;
-	m_mem->setByte(m_usicctl + 1, usicnt);
+	m_mem->setByte(m_usicctl + 1, usicnt, false);
 	if ((usicnt & 31) == 0) {
-		m_mem->setByte(m_usictl + 1, usictl1);
+		m_mem->setByte(m_usictl + 1, usictl1 | 1);
 		m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
 	}
 }
@@ -141,7 +142,7 @@ void USI::handleSecondEdgeSPI(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) 
 }
 
 void USI::handleTickSPI(bool rising, uint8_t usictl0, uint8_t usictl1) {
-	uint8_t usicnt = m_mem->getByte(m_usicctl + 1);
+	uint8_t usicnt = m_mem->getByte(m_usicctl + 1, false);
 	uint8_t cnt = usicnt & 31;
 	// Master starts clocking data in/out when IFG = 0 and CNT > 0
 	// Slave checks only CNT > 0 ???
@@ -240,7 +241,7 @@ void USI::maybeOutputMSB() {
 	// if USICKPH ==1, output is enabled and we are not in reset state,
 	// MSB/LSB should be visible on SDO right when we load it.
 	if (usictl1 & (1 << 7) && usictl0 & 2 && !(usictl0 & 1)) {
-		uint8_t usicnt = m_mem->getByte(m_usicctl + 1);
+		uint8_t usicnt = m_mem->getByte(m_usicctl + 1, false);
 		doSPIOutput(usictl0, usictl1, usicnt);
 	}
 }
@@ -248,7 +249,7 @@ void USI::maybeOutputMSB() {
 void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	// USICKCTL - Clock Control
 	if (address == m_usicctl) {
-		uint8_t val = m_mem->getByte(address);
+		uint8_t val = m_mem->getByte(address, false);
 
 		// divider
 		m_divider = 1 << ((val >> 5) & 7);
@@ -311,6 +312,19 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	}
 	else if (address == m_usictl) {
 		maybeOutputMSB();
+	}
+	else if (address == m_usicctl + 1) {
+		uint8_t val = m_mem->getByte(address, false);
+		if ((val & 31) == 0) {
+			uint8_t usictl1 = m_mem->getByte(m_usicctl + 1);
+			m_mem->setByte(m_usictl + 1, usictl1 | 1);
+			m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
+		}
+		else if ((val & 32) == 0) {
+			// USIIFGCC is 0, so USIIFG is cleared
+			uint8_t usictl1 = m_mem->getByte(m_usicctl + 1);
+			m_mem->setBit(m_usictl + 1, 1, false);
+		}
 	}
 }
 

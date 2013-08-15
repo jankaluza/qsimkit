@@ -42,8 +42,8 @@ class Memory : public ::Memory {
 		void set(uint16_t address, uint16_t value);
 		void setBigEndian(uint16_t address, uint16_t value, bool watchers = true);
 
-		uint8_t getByte(uint16_t address);
-		void setByte(uint16_t address, uint8_t value);
+		uint8_t getByte(uint16_t address, bool watchers = true);
+		void setByte(uint16_t address, uint8_t value, bool watchers = true);
 
 		void addWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::Write);
 		void removeWatcher(uint16_t address, MemoryWatcher *watcher, MemoryWatcher::Mode mode = MemoryWatcher::ReadWrite);

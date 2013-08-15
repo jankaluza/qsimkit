@@ -251,7 +251,16 @@ class USITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUSISR())); // 1|1010101 (after shift) -> |10101010
 
 		/// INTERRUPT
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSICTL() + 1, 1));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+
+		/// Writing to USICNT will clear the USIIFG bit
+			m->setByte(v->getUSICCTL() + 1, 8);
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUSICTL() + 1, 1));
+
+			// writing 0 will raise USIIFG bit again
+			m->setByte(v->getUSICCTL() + 1, 0);
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSICTL() + 1, 1));
 		}
 
 		void spiMasterTA0() {
