@@ -56,6 +56,7 @@ USIItem::USIItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType) {
 	ADD_ITEM(v->getUSICTL() + 1, "USICTL1");
 	ADD_ITEM(v->getUSICCTL(), "USIKCTL");
 	ADD_ITEM(v->getUSICCTL() + 1, "USICNT");
+	ADD_ITEM(v->getUSICCTL(), "USISR");
 }
 
 USIItem::~USIItem() {
