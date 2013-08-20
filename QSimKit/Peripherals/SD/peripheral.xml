@@ -1,0 +1,9 @@
+<peripheral type='python'>
+   <name>SD Card</name>
+   <comment>SD Card</comment>
+   <author>Jan Kaluza</author>
+   <email>hanzz.k@gmail.com</email>
+   <version>0.1</version>
+   <license>GNU/GPL</license>
+   <library>sd</library>
+</peripheral>
