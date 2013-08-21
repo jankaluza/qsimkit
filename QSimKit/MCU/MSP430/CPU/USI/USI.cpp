@@ -75,6 +75,7 @@ void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 			else {
 				usisr &= ~(1 << 8);
 			}
+			usisr &= 0xff;
 		}
 	}
 	else {
@@ -86,14 +87,21 @@ void USI::doSPICapture(uint8_t usictl0, uint8_t usictl1, uint8_t usicnt) {
 		else {
 			usisr &= ~(1);
 		}
+		if (!(usicnt & (1 << 6))) { 
+			usisr &= 0xff;
+		}
 	}
 
 	m_mem->setByte(m_usisr, usisr);
 	usicnt--;
 	m_mem->setByte(m_usicctl + 1, usicnt, false);
 	if ((usicnt & 31) == 0) {
+		std::cout << "USISR = " << usisr << "\n";
 		m_mem->setByte(m_usictl + 1, usictl1 | 1);
 		m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
+	}
+	else {
+		std::cout << "sample = " << m_input << " " << usisr << "\n";
 	}
 }
 
@@ -340,6 +348,7 @@ void USI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) 
 void USI::handlePinInput(const std::string &name, double value) {
 	if (name == "SDI") {
 		m_input = value > 1.5;
+		std::cout << "SDI input " << value << "\n";
 		return;
 	}
 

@@ -91,7 +91,7 @@
  #define halSPI_SEND(x) USISRL = x; USICNT = 8
  #define halSPITXREADY (USICTL1&USIIFG)
  #define halSPITXDONE  (1)
- #define halSPIRXREADY  1
+ #define halSPIRXREADY  (USICTL1&USIIFG)
  #define halSPIRXFG_CLR
  #define halSPI_PxIN  SPI_BITBANG_PxIN
  #define halSPI_SOMI  SPI_BITBANG_SOMI

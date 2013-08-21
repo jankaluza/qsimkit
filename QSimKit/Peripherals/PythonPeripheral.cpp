@@ -56,7 +56,7 @@ void PythonPeripheral::externalEvent(double t, const SimulationEventList &events
 void PythonPeripheral::output(SimulationEventList &output) {
 	QVariantList v = m_script->call("output").toList();
 	while (!v.empty()) {
-		output.insert(SimulationEvent(v[0].toInt(), v[1].toBool()));
+		output.insert(SimulationEvent(v[0].toInt(), v[1].toDouble()));
 		v = m_script->call("output").toList();
 	}
 }
