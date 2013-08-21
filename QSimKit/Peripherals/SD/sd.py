@@ -86,6 +86,7 @@ class Peripheral():
 		self.next_buf = 0xff
 		self.to_recv = 8
 		self.frame = []
+		self.frames_to_skip = 0
 
 	def output(self):
 		if len(self.out) == 0:
@@ -95,11 +96,21 @@ class Peripheral():
 	def handleFrameReceived(self):
 		print "frame received", self.frame
 		cmd = self.frame[0]
+
 		if cmd == MMC_GO_IDLE_STATE:
 			self.next_buf = 0x01
+			self.frames_to_skip = 2
+		elif cmd == MMC_SEND_OP_COND:
+			# TODO: Add delay between switch from 0x01 to 0x00
+			self.next_buf = 0x00
+			self.frames_to_skip = 2
 
 	def handleByteReceived(self):
 		self.next_buf = 0xff
+		self.frames_to_skip -= 1
+		if self.frames_to_skip >= 0:
+			return
+
 		self.frame.append(self.buf)
 		if len(self.frame) == 6:
 			self.handleFrameReceived()
@@ -128,7 +139,7 @@ class Peripheral():
 					self.handleByteReceived()
 					self.to_recv = 8
 					self.buf = buf
-					print "next output is", hex(self.buf)
+					#print "next output is", hex(self.buf)
 			elif self.states[pin] == True and not en:
 				# Change output
 				if self.buf & (1 << 7):
