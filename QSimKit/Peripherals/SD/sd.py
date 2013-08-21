@@ -1,10 +1,45 @@
 from PythonQt.QtCore import *
 from PythonQt.QtGui import *
 
+# Pins
 CS = 0
-MOSI = 1
+MOSI = 1 # Data In
 SCK = 4
-MISO = 6
+MISO = 6 # Data Out
+
+# Tokens
+MMC_START_DATA_BLOCK_TOKEN          = 0xfe   # Data token start byte, Start Single Block Read
+MMC_START_DATA_MULTIPLE_BLOCK_READ  = 0xfe   # Data token start byte, Start Multiple Block Read
+MMC_START_DATA_BLOCK_WRITE          = 0xfe   # Data token start byte, Start Single Block Write
+MMC_START_DATA_MULTIPLE_BLOCK_WRITE = 0xfc   # Data token start byte, Start Multiple Block Write
+MMC_STOP_DATA_MULTIPLE_BLOCK_WRITE  = 0xfd   # Data token stop byte, Stop Multiple Block Write
+
+# commands: first bit 0 (start bit), second 1 (transmission bit); CMD-number + 0ffsett = 0x40
+MMC_GO_IDLE_STATE          = 0x40     #CMD0
+MMC_SEND_OP_COND           = 0x41     #CMD1
+MMC_READ_CSD               = 0x49     #CMD9
+MMC_SEND_CID               = 0x4a     #CMD10
+MMC_STOP_TRANSMISSION      = 0x4c     #CMD12
+MMC_SEND_STATUS            = 0x4d     #CMD13
+MMC_SET_BLOCKLEN           = 0x50     #CMD16 Set block length for next read/write
+MMC_READ_SINGLE_BLOCK      = 0x51     #CMD17 Read block from memory
+MMC_READ_MULTIPLE_BLOCK    = 0x52     #CMD18
+MMC_CMD_WRITEBLOCK         = 0x54     #CMD20 Write block to memory
+MMC_WRITE_BLOCK            = 0x58     #CMD24
+MMC_WRITE_MULTIPLE_BLOCK   = 0x59     #CMD25
+MMC_WRITE_CSD              = 0x5b     #CMD27 PROGRAM_CSD
+MMC_SET_WRITE_PROT         = 0x5c     #CMD28
+MMC_CLR_WRITE_PROT         = 0x5d     #CMD29
+MMC_SEND_WRITE_PROT        = 0x5e     #CMD30
+MMC_TAG_SECTOR_START       = 0x60     #CMD32
+MMC_TAG_SECTOR_END         = 0x61     #CMD33
+MMC_UNTAG_SECTOR           = 0x62     #CMD34
+MMC_TAG_EREASE_GROUP_START = 0x63     #CMD35
+MMC_TAG_EREASE_GROUP_END   = 0x64     #CMD36
+MMC_UNTAG_EREASE_GROUP     = 0x65     #CMD37
+MMC_EREASE                 = 0x66     #CMD38
+MMC_READ_OCR               = 0x67     #CMD39
+MMC_CRC_ON_OFF             = 0x68     #CMD40
 
 class Peripheral():
 	def __init__(self):
@@ -47,70 +82,38 @@ class Peripheral():
 	def reset(self):
 		self.out = []
 		self.options = []
-		#self.dl = BIT8
-		self.n = False
-		self.secondCycle = False
-		self.current = self.states
-		self.addr = 0
-		self.cursorInc = 1
-		self.shift = False
-		self.disp = ['']*16
-		self.cursor = 0
+		self.buf = 0xff
+		self.to_recv = 8
 
 	def output(self):
 		if len(self.out) == 0:
 			return ()
 		return self.out.pop(0)
 
-	def dumpStates(self):
-		for i in range(D0, D7 + 1):
-			print i - D0, self.current[i]
-
-	def executeCommand(self):
-		#self.dumpStates()
-		if not self.current[RS] and not self.current[RW]:
-			if self.current[D7]:
-				print "Set DDRAM address"
-			elif self.current[D6]:
-				print "Set CGRAM address"
-			elif self.current[D5]:
-				self.dl = self.current[D4]
-				self.n = self.current[D3]
-				self.f = self.current[D2]
-				print "Function set, DL=", self.dl, "F=", self.f
-			elif self.current[D4]:
-				print "Cursor/display shift"
-			elif self.current[D3]:
-				print "Display on/off control"
-			elif self.current[D2]:
-				print "Entry mode set"
-				if self.current[D1]:
-					self.cursorInc = 1
-				else:
-					self.cursorInc = -1
-				self.shift = self.current[D0]
-			elif self.current[D1]:
-				print "Cursor home"
-				self.cursor = 0
-			elif self.current[D0]:
-				print "Clear display"
-				self.disp = ['']*16
-		elif self.current[RS] and not self.current[RW]:
-			data = 0
-			for i in range(8):
-				data |= self.current[D0 + i] << i
-			self.disp[self.cursor] = str(unichr(data));
-			self.cursor += self.cursorInc;
-			self.screen.update()
-
 	def externalEvent(self, pin, value):
 		if pin != SCK:
 			self.states[pin] = value >= 1.5
 		else:
+			if self.states[CS]:
+				return
 			en = self.states[pin]
 			self.states[pin] = value >= 1.5
 			if self.states[pin] == False and en:
-				print "sample"
+				# shift left (MSB mode)
+				self.buf = (self.buf << 1) & 0xff
+				# sample -> store to buffer
+				if self.states[MOSI]:
+					self.buf |= (1)
+				else:
+					self.buf &= ~(1)
+				self.to_recv -= 1
+				#print self.to_recv, self.states[MOSI], bin(self.buf)
+				if self.to_recv == 0:
+					print "SD Card received", hex(self.buf & 0xff)
+					self.to_recv = 8
+			elif self.states[pin] == True and not en:
+				# Change output
+				self.out.append((MISO, self.buf & (1 << 7)))
 
 	def timeAdvance(self):
 		if not len(self.out) == 0:
