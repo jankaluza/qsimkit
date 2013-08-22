@@ -99,7 +99,7 @@ m_syncing(0) {
 
 void MCU_MSP430::handleFileChanged(const QString &path) {
 	QMessageBox::StandardButton ret = QMessageBox::question(0, tr("Loaded file changed"),
-		"Loaded ELF/A43 file changed. Do you want to reload it?",
+		"Loaded ELF/A43 file changed in the meantime. Do you want to reload it?",
 		QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
 
 	if (ret != QMessageBox::Yes) {
@@ -279,11 +279,24 @@ void MCU_MSP430::load(QDomElement &object, QString &error) {
 	m_a43Path = object.firstChildElement("a43path").text().toAscii();
 	m_elfPath = object.firstChildElement("elfpath").text().toAscii();
 
+	// Check if the ELF/A43 file changed in the meantime and try to reload it
 	if (!m_elfPath.isEmpty()) {
 		m_fileWatcher->addPath(m_elfPath);
+		QFile file(m_elfPath);
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			if (file.readAll().data() != m_elf) {
+				handleFileChanged(m_elfPath);
+			}
+		}
 	}
 	else {
 		m_fileWatcher->addPath(m_a43Path);
+		QFile file(m_a43Path);
+		if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			if (file.readAll().data() != m_elf) {
+				handleFileChanged(m_a43Path);
+			}
+		}
 	}
 }
 
