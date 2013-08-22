@@ -24,6 +24,7 @@
 #include <QStringList>
 #include <QChar>
 #include <QRect>
+#include <QFileSystemWatcher>
 #include <map>
 #include "MCU/MCU.h"
 #include "MCU/MCUInterface.h"
@@ -58,6 +59,8 @@ class PinAddr {
 
 class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHandler
 {
+	Q_OBJECT
+
 	public:
 		MCU_MSP430(const QString &variant = "msp430x241x");
 
@@ -119,9 +122,12 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 			return m_basicClock;
 		}
 
+	private slots:
+		void handleFileChanged(const QString &path);
+
 	private:
-		void loadELFOption();
-		void loadA43Option();
+		void loadELFOption(const QString &filename = "");
+		void loadA43Option(const QString &filename = "");
 		bool loadPackage(QString &variant, QString &error);
 
 	private:
@@ -151,6 +157,9 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		int8_t m_counter;
 		bool m_syncing;
 		QString m_variantStr;
+		QString m_a43Path;
+		QString m_elfPath;
+		QFileSystemWatcher *m_fileWatcher;
 };
 
 class MSP430Interface : public QObject, MCUInterface {

@@ -65,6 +65,9 @@ m_syncing(0) {
 		return;
 	}
 
+	m_fileWatcher = new QFileSystemWatcher(this);
+	connect(m_fileWatcher, SIGNAL(fileChanged(const QString &)), this, SLOT(handleFileChanged(const QString &)) );
+
 	m_name = "MSP430";
 
 	m_mem = new MSP430::Memory(512000);
@@ -92,6 +95,23 @@ m_syncing(0) {
 
 	m_options << "Load ELF";
 	m_options << "Load A43 (IHEX)";
+}
+
+void MCU_MSP430::handleFileChanged(const QString &path) {
+	QMessageBox::StandardButton ret = QMessageBox::question(0, tr("Loaded file changed"),
+		"Loaded ELF/A43 file changed. Do you want to reload it?",
+		QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+
+	if (ret != QMessageBox::Yes) {
+		return;
+	}
+
+	if (path == m_elfPath) {
+		loadELFOption(m_elfPath);
+	}
+	else if (path == m_a43Path) {
+		loadA43Option(m_a43Path);
+	}
 }
 
 void MCU_MSP430::reset() {
@@ -223,15 +243,11 @@ void MCU_MSP430::executeOption(int option) {
 
 void MCU_MSP430::save(QTextStream &stream) {
 	ScreenObject::save(stream);
-	stream << "<code>";
-	stream << m_code;
-	stream << "</code>\n";
-	stream << "<variant>";
-	stream << QString(m_variant->getName());
-	stream << "</variant>\n";
-	stream << "<elf>";
-	stream << m_elf.toBase64();
-	stream << "</elf>";
+	stream << "<code>" << m_code << "</code>\n";
+	stream << "<variant>" << QString(m_variant->getName()) << "</variant>\n";
+	stream << "<a43path>" << m_a43Path << "</a43path>\n";
+	stream << "<elfpath>" << m_elfPath << "</elfpath>\n";
+	stream << "<elf>" << m_elf.toBase64() << "</elf>\n";
 }
 
 bool MCU_MSP430::loadPackage(QString &variant, QString &error) {
@@ -260,6 +276,15 @@ void MCU_MSP430::load(QDomElement &object, QString &error) {
 
 	loadA43(object.firstChildElement("code").text());
 	loadELF(QByteArray::fromBase64(object.firstChildElement("elf").text().toAscii()));
+	m_a43Path = object.firstChildElement("a43path").text().toAscii();
+	m_elfPath = object.firstChildElement("elfpath").text().toAscii();
+
+	if (!m_elfPath.isEmpty()) {
+		m_fileWatcher->addPath(m_elfPath);
+	}
+	else {
+		m_fileWatcher->addPath(m_a43Path);
+	}
 }
 
 void MCU_MSP430::paint(QWidget *screen) {
@@ -349,10 +374,13 @@ bool MCU_MSP430::loadA43(const QString &data) {
 	return ret;
 }
 
-void MCU_MSP430::loadA43Option() {
-	QString filename = QFileDialog::getOpenFileName();
+void MCU_MSP430::loadA43Option(const QString &f) {
+	QString filename = f;
 	if (filename.isEmpty()) {
-		return;
+		filename = QFileDialog::getOpenFileName();
+		if (filename.isEmpty()) {
+			return;
+		}
 	}
 
 	QFile file(filename);
@@ -363,6 +391,12 @@ void MCU_MSP430::loadA43Option() {
 
 	m_elf.clear();
 	loadA43(file.readAll().data());
+
+	m_fileWatcher->removePath(m_elfPath);
+	m_fileWatcher->removePath(m_a43Path);
+	m_fileWatcher->addPath(filename);
+	m_a43Path = filename;
+	m_elfPath = "";
 }
 
 void MCU_MSP430::loadELF(const QByteArray &elf) {
@@ -379,10 +413,13 @@ void MCU_MSP430::loadELF(const QByteArray &elf) {
 	}
 }
 
-void MCU_MSP430::loadELFOption() {
-	QString filename = QFileDialog::getOpenFileName();
+void MCU_MSP430::loadELFOption(const QString &f) {
+	QString filename = f;
 	if (filename.isEmpty()) {
-		return;
+		filename = QFileDialog::getOpenFileName();
+		if (filename.isEmpty()) {
+			return;
+		}
 	}
 
 	QFile file(filename);
@@ -392,6 +429,12 @@ void MCU_MSP430::loadELFOption() {
 	CodeUtil::checkPaths();
 
 	loadELF(file.readAll());
+
+	m_fileWatcher->removePath(m_elfPath);
+	m_fileWatcher->removePath(m_a43Path);
+	m_fileWatcher->addPath(filename);
+	m_elfPath = filename;
+	m_a43Path = "";
 }
 
 DisassembledFiles MCU_MSP430::getDisassembledCode() {
