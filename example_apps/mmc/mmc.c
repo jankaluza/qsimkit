@@ -82,7 +82,7 @@
 
 // Function Prototypes
 char mmcGetResponse(void);
-char mmcGetXXResponse(const char resp);
+unsigned char mmcGetXXResponse(const unsigned char resp);
 char mmcCheckBusy(void);
 char mmcGoIdle();
 
@@ -179,7 +179,7 @@ char mmcGetResponse(void)
   return response;
 }
 
-char mmcGetXXResponse(const char resp)
+unsigned char mmcGetXXResponse(const unsigned char resp)
 {
   //Response comes 1-8bytes after command
   //the first bit will be a 0
@@ -187,7 +187,7 @@ char mmcGetXXResponse(const char resp)
   //data will be 0xff until response
   int i=0;
 
-  char response;
+  unsigned char response;
 
   while(i<=1000)
   {

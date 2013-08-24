@@ -87,6 +87,12 @@ class Peripheral():
 		self.to_recv = 8
 		self.frame = []
 		self.frames_to_skip = 0
+		self.blocklen = 0
+		self.address = 0
+		self.waiting_for_data = False
+		self.cmd = 0
+		self.total_size = 2097152
+		self.mem = [0] * self.total_size
 
 	def output(self):
 		if len(self.out) == 0:
@@ -95,25 +101,76 @@ class Peripheral():
 
 	def handleFrameReceived(self):
 		print "frame received", self.frame
-		cmd = self.frame[0]
+		self.cmd = self.frame[0]
 
-		if cmd == MMC_GO_IDLE_STATE:
+		if self.cmd == MMC_GO_IDLE_STATE:
 			self.out_buf += [0xff, 0x01]
-		elif cmd == MMC_SEND_OP_COND:
+		elif self.cmd == MMC_SEND_OP_COND:
 			# TODO: Add delay between switch from 0x01 to 0x00
 			self.out_buf += [0xff, 0x00]
+		elif self.cmd == MMC_READ_CSD:
+			# dummy byte, R1 response, token
+			self.out_buf += [0xff, 0x00, 0xfe]
+			# CSD + reserved, TAAC, NSAC, TRAN_SPEED
+			self.out_buf += [0x00, 0x26, 0x00, 0x32]
+
+			read_bl_len = 9
+			size = 1023
+			size_mult = 0
+			# total bytes:
+			# (2**read_bl_len)*(2**(size_mult+2))*(size + 1)
+
+			# CCC, READ_BL_LEN
+			self.out_buf += [0x1f, 0x50 + read_bl_len]
+			self.out_buf += [0x80 + ((size & 0xc00) >> 10), (size & 0x3fc) >> 2, 0x3e + ((size & 0x3) << 6)]
+			self.out_buf += [0xf8 + size_mult & 0x6, 0x4f + ((size_mult & 0x1) << 7)]
+			self.out_buf += [0xff, 0x92, 0x40, 0x40]
+			self.out_buf += [0x1] # TODO: crc
+		elif self.cmd == MMC_SET_BLOCKLEN:
+			self.blocklen = 0
+			self.blocklen = (self.frame[1] << 24) | (self.frame[2] << 16) | (self.frame[3] << 8) | self.frame[4]
+			self.out_buf += [0xff, 0x00]
+		elif self.cmd == MMC_WRITE_BLOCK:
+			self.out_buf += [0xff, 0x00]
+			self.waiting_for_data = True
+			self.address = (self.frame[1] << 24) | (self.frame[2] << 16) | (self.frame[3] << 8) | self.frame[4]
+		elif self.cmd == MMC_READ_SINGLE_BLOCK:
+			print "READ SINGLE BLOCK"
+			self.out_buf += [0xff, 0x00, 0xff, 0xfe]
+			self.address = (self.frame[1] << 24) | (self.frame[2] << 16) | (self.frame[3] << 8) | self.frame[4]
+			self.out_buf += self.mem[self.address:self.address + self.blocklen]
 
 		self.frames_to_skip = len(self.out_buf)
 
-	def handleByteReceived(self):
-		self.frames_to_skip -= 1
-		if self.frames_to_skip >= 0:
-			return
+	def handleDataFrameReceived(self):
+		if self.cmd == MMC_WRITE_BLOCK:
+			self.out_buf += [0xff, 0xff, 0xff, 0x05] # success
+			self.waiting_for_data = False
 
-		self.frame.append(self.buf)
-		if len(self.frame) == 6:
-			self.handleFrameReceived()
-			self.frame = []
+			for i in range(len(self.frame) - 1):
+				self.mem[self.address + i] = self.frame[i + 1]
+			print self.mem[self.address:self.address + 20]
+
+	def handleByteReceived(self):
+		if self.waiting_for_data:
+			if len(self.frame) == 0 and self.buf != 0xfe:
+				return
+			self.frame.append(self.buf)
+			if len(self.frame) == self.blocklen:
+				self.handleDataFrameReceived()
+				self.frame = []
+		else:
+			self.frames_to_skip -= 1
+			if self.frames_to_skip >= 0:
+				return
+
+			if len(self.frame) == 0 and (not self.buf & 0x40 or self.buf & 0x80):
+				return
+
+			self.frame.append(self.buf)
+			if len(self.frame) == 6:
+				self.handleFrameReceived()
+				self.frame = []
 
 	def externalEvent(self, pin, value):
 		if pin != SCK:
@@ -140,7 +197,7 @@ class Peripheral():
 						self.buf = 0xff
 					else:
 						self.buf = self.out_buf.pop(0)
-					#print "next output is", hex(self.buf)
+					print "next output is", hex(self.buf)
 			elif self.states[pin] == True and not en:
 				# Change output
 				if self.buf & (1 << 7):

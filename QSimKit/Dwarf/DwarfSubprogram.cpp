@@ -53,7 +53,7 @@ uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
 		base = m_expr->getValue(r, m, this, pc, isAddress);
 	}
 
-	qDebug() << getName() << "base is" << base;
+// 	qDebug() << getName() << "base is" << base;
 	return base;
 }
 

@@ -269,7 +269,7 @@ uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s
 	foreach(const Instruction &inst, m_instructions) {
 		unsigned char opcode = inst.op;
 
-		qDebug() << "EXPR OP =" << opcode;
+// 		qDebug() << "EXPR OP =" << opcode;
 
 		if (opcode >= DW_OP_lit0 && opcode <= DW_OP_lit31) {
 			stack[++sp] = opcode - DW_OP_lit0;
@@ -364,6 +364,7 @@ uint16_t DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s
 // 			default: FIXME("Unknown size for deref 0x%lx\n", sz);
 // 			}
 // 			break;
+		case DW_OP_stack_value: break;
 		default:
 			qDebug() << "unhandled opcode " << opcode;
 		}

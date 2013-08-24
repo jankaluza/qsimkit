@@ -102,7 +102,7 @@ int main( void )
   cardSize =  mmcReadCardSize();
     
 // Clear Sectors on MMC
-  for (i = 0; i < 50; i++) buffer[i] = 0;
+  for (i = 0; i < 50; i++) buffer[i] = 1;
   mmcWriteSector(0, buffer);                // write a 50 Byte big block beginning at the (aligned) adress
 
   for (i = 0; i < 50; i++) buffer[i] = 0;

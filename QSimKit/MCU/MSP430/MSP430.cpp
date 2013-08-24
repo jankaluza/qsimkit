@@ -283,8 +283,8 @@ void MCU_MSP430::load(QDomElement &object, QString &error) {
 	if (!m_elfPath.isEmpty()) {
 		m_fileWatcher->addPath(m_elfPath);
 		QFile file(m_elfPath);
-		if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			if (file.readAll().data() != m_elf) {
+		if (file.open(QIODevice::ReadOnly)) {
+			if (file.readAll() != m_elf) {
 				handleFileChanged(m_elfPath);
 			}
 		}
@@ -293,7 +293,7 @@ void MCU_MSP430::load(QDomElement &object, QString &error) {
 		m_fileWatcher->addPath(m_a43Path);
 		QFile file(m_a43Path);
 		if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-			if (file.readAll().data() != m_elf) {
+			if (file.readAll().data() != m_code) {
 				handleFileChanged(m_a43Path);
 			}
 		}

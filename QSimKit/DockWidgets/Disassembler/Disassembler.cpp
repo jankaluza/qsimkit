@@ -322,7 +322,6 @@ void Disassembler::reloadFile() {
 Subprogram *Disassembler::getCurrentSubprogram() {
 	Subprograms subprograms = m_dd->getSubprograms(file->currentText());
 	foreach(Subprogram *s, subprograms) {
-		qDebug() << s->getName() << m_pc << s->getPCLow() << s->getPCHigh();
 		if (s->contains(m_pc)) {
 			return s;
 		}
