@@ -49,9 +49,10 @@ TimerAItem::TimerAItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	Variant *v = m_cpu->getVariantPtr();
 
 #define ADD_ITEM(METHOD, NAME) if (METHOD != 0) { \
-	item = new MemoryItem(this, NAME, METHOD); \
+	item = new MemoryItem(this, NAME, METHOD, t); \
 }
 
+	VariableType t("uint16_t", 1, VariableType::Unsigned, VariableType::Base);
 	ADD_ITEM(v->getTA0CTL(), "TA0CTL");
 	ADD_ITEM(v->getTA0R(), "TA0R");
 	ADD_ITEM(v->getTA0CCTL0(), "TA0CCTL0");

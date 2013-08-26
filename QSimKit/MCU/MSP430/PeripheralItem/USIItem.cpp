@@ -49,9 +49,10 @@ USIItem::USIItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserType) {
 	Variant *v = m_cpu->getVariantPtr();
 
 #define ADD_ITEM(METHOD, NAME) if ((METHOD) > 1) { \
-	item = new MemoryItem(this, NAME, (METHOD)); \
+	item = new MemoryItem(this, NAME, (METHOD), t); \
 }
 
+	VariableType t("uint16_t", 1, VariableType::Unsigned, VariableType::Base);
 	ADD_ITEM(v->getUSICTL(), "USICTL0");
 	ADD_ITEM(v->getUSICTL() + 1, "USICTL1");
 	ADD_ITEM(v->getUSICCTL(), "USIKCTL");

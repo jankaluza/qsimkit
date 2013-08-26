@@ -33,7 +33,9 @@
 #include <QDebug>
 #include <QApplication>
 
-MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr) : QTreeWidgetItem(parent, MemoryItemType) {
+MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name,
+					   uint16_t addr, const VariableType &type) :
+					   QTreeWidgetItem(parent, MemoryItemType), m_type(type) {
 	setData(0, Qt::UserRole, addr);
 	setText(0, name);
 	setText(1, 0x00);
@@ -42,11 +44,46 @@ MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t ad
 
 void MemoryItem::refresh(Memory *mem) {
 	int address = data(0, Qt::UserRole).toInt();
+	QString dec;
+	QString hex;
+	QString bin;
+	int16_t int16;
 
-	int16_t n = mem->getBigEndian(address, false);
-	QString dec = QString::number(n);
-	QString hex = QString("0x%1").arg((uint16_t) n, 0, 16);
-	QString bin = QString("%1").arg((uint16_t) n, 0, 2);
+#define SET_STRINGS(N) 	dec = QString::number(N); \
+	hex = QString("0x%1").arg(N, 0, 16); \
+	bin = QString("%1").arg(N, 0, 2); \
+
+	switch(m_type.getEncoding()) {
+		default:
+		case VariableType::Unsigned:
+		case VariableType::UnsignedChar:
+			switch(m_type.getByteSize()) {
+				case 1:
+					int16 = mem->getByte(address, false);
+					SET_STRINGS((uint8_t) int16);
+					break;
+				default:
+				case 2:
+					int16 = mem->getBigEndian(address, false);
+					SET_STRINGS((uint16_t) int16);
+					break;
+			};
+			break;
+		case VariableType::Signed:
+		case VariableType::SignedChar:
+			switch(m_type.getByteSize()) {
+				case 1:
+					int16 = mem->getByte(address, false);
+					SET_STRINGS((int8_t) int16);
+					break;
+				default:
+				case 2:
+					int16 = mem->getBigEndian(address, false);
+					SET_STRINGS((int16_t) int16);
+					break;
+			};
+			break;
+	};
 
 	setText(1, hex);
 

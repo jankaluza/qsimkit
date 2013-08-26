@@ -49,9 +49,10 @@ TimerBItem::TimerBItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	Variant *v = m_cpu->getVariantPtr();
 
 #define ADD_ITEM(METHOD, NAME) if (METHOD != 0) { \
-	item = new MemoryItem(this, NAME, METHOD); \
+	item = new MemoryItem(this, NAME, METHOD, t); \
 }
 
+	VariableType t("uint16_t", 1, VariableType::Unsigned, VariableType::Base);
 	ADD_ITEM(v->getTBCTL(), "TBCTL");
 	ADD_ITEM(v->getTBR(), "TBR");
 	ADD_ITEM(v->getTBCCTL0(), "TBCCTL0");
@@ -69,7 +70,6 @@ TimerBItem::TimerBItem(MCU_MSP430 *cpu) : QTreeWidgetItem(QTreeWidgetItem::UserT
 	ADD_ITEM(v->getTBCCTL6(), "TBCCTL6");
 	ADD_ITEM(v->getTBCCR6(), "TBCCR6");
 	ADD_ITEM(v->getTBIV(), "TBIV");
-	item = new MemoryItem(this, "test", 68074);
 }
 
 TimerBItem::~TimerBItem() {

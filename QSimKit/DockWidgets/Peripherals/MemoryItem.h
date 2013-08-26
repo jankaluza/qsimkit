@@ -24,6 +24,7 @@
 #include <QTimer>
 #include <DockWidgets/DockWidget.h>
 #include <QTreeWidgetItem>
+#include "MCU/MCU.h"
 
 #include <stdint.h>
 
@@ -34,9 +35,12 @@ class Memory;
 class MemoryItem : public QTreeWidgetItem
 {
 	public:
-		MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr);
+		MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr, const VariableType &type);
 
 		void refresh(Memory *mem);
+
+	private:
+		VariableType m_type;
 
 };
 
