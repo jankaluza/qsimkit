@@ -40,14 +40,108 @@ DwarfLoader::~DwarfLoader() {
 	
 }
 
-bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QString &error) {
+bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap<uint16_t, VariableType *> &types, QString &error) {
 	QStringList lines = out.split("\n", QString::SkipEmptyParts);
-	for (int i = 0; i < lines.size(); ++i) {
-		QString &line = lines[i];
-		
+	bool notFound = true;
+	int maxTries = 10;
+
+	while (notFound && maxTries-- > 0) {
+		notFound = false;
+		for (int i = 0; i < lines.size(); ++i) {
+			QString &line = lines[i];
+
+			if (line.contains("DW_TAG_base_type")) {
+				QString name;
+				uint16_t addr = 0;
+				uint8_t byteSize = 0;
+				VariableType::Encoding encoding;
+
+				addr = line.mid(line.lastIndexOf("<") + 1, line.lastIndexOf(">") - line.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+				if (types.contains(addr)) {
+					continue;
+				}
+
+				for (i++; i < lines.size(); ++i) { 
+					QString &l = lines[i];
+
+					if (l.contains("DW_AT_name")) {
+						name = l.mid(l.lastIndexOf(":") + 2).trimmed();
+					}
+					else if (l.contains("DW_AT_byte_size")) {
+						byteSize = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
+					}
+					else if (l.contains("DW_AT_encoding")) {
+						encoding = (VariableType::Encoding) l.mid(l.lastIndexOf(":") + 2, 2).trimmed().toUInt(0, 16);
+					}
+					else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
+						break;
+					}
+				}
+
+				i--; // Otherwise we would skip next header
+
+				if (byteSize != 0) {
+					VariableType *type = new VariableType(name, byteSize, encoding, VariableType::Base);
+					types[addr] = type;
+					dd->addVariableType(type);
+				}
+			}
+			else {
+				VariableType::Type type;
+				if (line.contains("DW_TAG_volatile_type")) {
+					type = VariableType::Volatile;
+				}
+				else if (line.contains("DW_TAG_const_type")) {
+					type = VariableType::Const;
+				}
+				else if (line.contains("DW_TAG_array_type")) {
+					type = VariableType::Array;
+				}
+				else if (line.contains("DW_TAG_pointer_type")) {
+					type = VariableType::Pointer;
+				}
+				else {
+					continue;
+				}
+
+				uint16_t addr = line.mid(line.lastIndexOf("<") + 1, line.lastIndexOf(">") - line.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+				if (types.contains(addr)) {
+					continue;
+				}
+
+				VariableType *t = 0;
+				for (i++; i < lines.size(); ++i) { 
+					QString &l = lines[i];
+					if (l.contains("DW_AT_type")) {
+						uint16_t address = l.mid(l.lastIndexOf("<") + 1, l.lastIndexOf(">") - l.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+						if (types.contains(address)) {
+							t = types[address];
+						}
+// 						else {
+// 							qDebug() << "Unknown type while loading types" << l;
+// 						}
+						break;
+					}
+					else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
+						i--;
+						break;
+					}
+				}
+
+				if (!t) {
+					notFound = true;
+					continue;
+				}
+
+				VariableType *typeCopy = new VariableType(t->getName(), t->getByteSize(), t->getEncoding(), type);
+				types[addr] = typeCopy;
+				dd->addVariableType(typeCopy);
+			}
+		}
 	}
 
-	return true;
+// 	qDebug() << maxTries;
+	return !notFound;
 }
 
 bool DwarfLoader::loadLocations(QString &file, QMap<uint16_t, DwarfLocationList *> &locations, QString &error) {
@@ -118,7 +212,10 @@ void DwarfLoader::parseLocation(const QString &l, QMap<uint16_t, DwarfLocationLi
 		} \
 	}
 
-bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<uint16_t, DwarfLocationList *> &locations, QString &error) {
+bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd,
+								  QMap<uint16_t, DwarfLocationList *> &locations,
+								  QMap<uint16_t, VariableType *> &types,
+								  QString &error) {
 	int x;
 	QString currentFile;
 	DwarfSubprogram *currentSubprogram = 0;
@@ -180,6 +277,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 				QString name;
 				DwarfLocationList *ll = 0;
 				DwarfExpression *expr = 0;
+				VariableType *type = 0;
 
 				for (i++; i < lines.size(); ++i) { 
 					QString &l = lines[i];
@@ -190,6 +288,13 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 					else if (l.contains("DW_AT_location")) {
 						parseLocation(l, locations, &ll, &expr);
 					}
+					else if (l.contains("DW_AT_type")) {
+						uint16_t addr = l.mid(l.lastIndexOf("<") + 1, l.lastIndexOf(">") - l.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+						type = types[addr];
+						if (type == 0) {
+							qDebug() << "Unknown type" << l;
+						}
+					}
 					else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
 						break;
 					}
@@ -198,7 +303,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 				i--; // Otherwise we would skip next header
 
 				if (ll || expr) {
-					DwarfVariable *v = new DwarfVariable(name, ll, expr);
+					DwarfVariable *v = new DwarfVariable(type, name, ll, expr);
 					currentSubprogram->addVariable(v);
 				}
 			}
@@ -210,6 +315,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 			QString name;
 			DwarfLocationList *ll = 0;
 			DwarfExpression *expr = 0;
+			VariableType *type = 0;
 
 			for (i++; i < lines.size(); ++i) { 
 				QString &l = lines[i];
@@ -220,6 +326,13 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 				else if (l.contains("DW_AT_location")) {
 					parseLocation(l, locations, &ll, &expr);
 				}
+				else if (l.contains("DW_AT_type")) {
+					uint16_t addr = l.mid(l.lastIndexOf("<") + 1, l.lastIndexOf(">") - l.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+					type = types[addr];
+					if (type == 0) {
+						qDebug() << "Unknown type" << l;
+					}
+				}
 				else if (l.size() > 3 && l[1] == '<' && l[3] == '>') {
 					break;
 				}
@@ -228,7 +341,7 @@ bool DwarfLoader::loadSubprograms(const QString &out, DwarfDebugData *dd, QMap<u
 			i--; // Otherwise we would skip next header
 
 			if (ll || expr) {
-				DwarfVariable *v = new DwarfVariable(name, ll, expr);
+				DwarfVariable *v = new DwarfVariable(type, name, ll, expr);
 				currentSubprogram->addArg(v);
 			}
 		}
@@ -254,7 +367,9 @@ DebugData *DwarfLoader::load(QString &file, QString &error) {
 	DwarfDebugData *dd = new DwarfDebugData();
 
 	QString result = QString(objdump.readAll());
-	if (!loadVariableTypes(result, dd, error)) {
+
+	QMap<uint16_t, VariableType *> types;
+	if (!loadVariableTypes(result, dd, types, error)) {
 		delete dd;
 		return 0;
 	}
@@ -262,7 +377,7 @@ DebugData *DwarfLoader::load(QString &file, QString &error) {
 	QMap<uint16_t, DwarfLocationList *> locations;
 	loadLocations(file, locations, error);
 
-	if (!loadSubprograms(result, dd, locations, error)) {
+	if (!loadSubprograms(result, dd, locations, types, error)) {
 		delete dd;
 		return 0;
 	}

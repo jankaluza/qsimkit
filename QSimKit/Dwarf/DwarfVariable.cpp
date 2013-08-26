@@ -28,8 +28,8 @@
 
 #include <QDebug>
 
-DwarfVariable::DwarfVariable(const QString &name, DwarfLocationList *ll, DwarfExpression *expr) :
-	Variable(name, 0), m_ll(ll), m_expr(expr) {
+DwarfVariable::DwarfVariable(VariableType *type, const QString &name, DwarfLocationList *ll, DwarfExpression *expr) :
+	Variable(name, type), m_ll(ll), m_expr(expr) {
 	
 }
 

@@ -37,7 +37,7 @@ class Memory;
 
 class DwarfVariable : public Variable {
 	public:
-		DwarfVariable(const QString &name, DwarfLocationList *ll, DwarfExpression *expr);
+		DwarfVariable(VariableType *type, const QString &name, DwarfLocationList *ll, DwarfExpression *expr);
 		~DwarfVariable();
 
 		QString getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc);

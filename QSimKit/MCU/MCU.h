@@ -72,13 +72,49 @@ typedef QHash<QString, DisassembledCode> DisassembledFiles;
 
 class VariableType {
 	public:
-		VariableType(const QString &name) : m_name(name) {
+		typedef enum {
+			Address       = 0x1,
+			Boolean       = 0x2,
+			ComplexFloat  = 0x3,
+			Float         = 0x4,
+			Signed        = 0x5,
+			SignedChar    = 0x6,
+			Unsigned      = 0x7,
+			UnsignedChar    = 0x8,
+			ImaginaryFloat  = 0x9,
+			PackedDecimal   = 0xa,
+			NumericString   = 0xb,
+			Edited          = 0xc,
+			SignedFixed     = 0xd,
+			UnsignedFixed   = 0xe,
+			DecimalFloat    = 0xf,
+		} Encoding;
+
+		typedef enum {
+			Base,
+			Volatile,
+			Const,
+			Array,
+			Pointer,
+		} Type;
+
+		VariableType(const QString &name, uint8_t byteSize, Encoding encoding, Type type) :
+		m_name(name), m_byteSize(byteSize), m_encoding(encoding), m_type(type) {
 		}
 
 		const QString &getName() { return m_name; }
 
+		uint8_t getByteSize() { return m_byteSize; }
+
+		Encoding getEncoding() { return m_encoding; }
+
+		Type getType() { return m_type; }
+
 	private:
 		QString m_name;
+		uint8_t m_byteSize;
+		Encoding m_encoding;
+		Type m_type;
 };
 
 class Variable {

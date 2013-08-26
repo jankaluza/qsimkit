@@ -197,7 +197,7 @@ class Peripheral():
 						self.buf = 0xff
 					else:
 						self.buf = self.out_buf.pop(0)
-					print "next output is", hex(self.buf)
+					#print "next output is", hex(self.buf)
 			elif self.states[pin] == True and not en:
 				# Change output
 				if self.buf & (1 << 7):
