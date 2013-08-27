@@ -42,8 +42,7 @@ MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name,
 	setBackground(0, QApplication::palette().window());
 }
 
-void MemoryItem::refresh(Memory *mem) {
-	int address = data(0, Qt::UserRole).toInt();
+void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
 	QString dec;
 	QString hex;
 	QString bin;
@@ -53,11 +52,11 @@ void MemoryItem::refresh(Memory *mem) {
 	hex = QString("0x%1").arg(N, 0, 16); \
 	bin = QString("%1").arg(N, 0, 2); \
 
-	switch(m_type.getEncoding()) {
+	switch(type->getEncoding()) {
 		default:
 		case VariableType::Unsigned:
 		case VariableType::UnsignedChar:
-			switch(m_type.getByteSize()) {
+			switch(type->getByteSize()) {
 				case 1:
 					int16 = mem->getByte(address, false);
 					SET_STRINGS((uint8_t) int16);
@@ -68,10 +67,11 @@ void MemoryItem::refresh(Memory *mem) {
 					SET_STRINGS((uint16_t) int16);
 					break;
 			};
+			out = hex;
 			break;
 		case VariableType::Signed:
 		case VariableType::SignedChar:
-			switch(m_type.getByteSize()) {
+			switch(type->getByteSize()) {
 				case 1:
 					int16 = mem->getByte(address, false);
 					SET_STRINGS((int8_t) int16);
@@ -82,14 +82,23 @@ void MemoryItem::refresh(Memory *mem) {
 					SET_STRINGS((int16_t) int16);
 					break;
 			};
+			out = hex;
 			break;
 	};
 
-	setText(1, hex);
-
-	QString tooltip = "Dec: " + dec + "<br/>";
+	tooltip = "Dec: " + dec + "<br/>";
 	tooltip += "Hex: " + hex + "<br/>";
 	tooltip += "Bin: " + bin;
+}
+
+void MemoryItem::refresh(Memory *mem) {
+	int address = data(0, Qt::UserRole).toInt();
+
+	QString tooltip;
+	QString out;
+	MemoryItem::format(mem, address, &m_type, out, tooltip);
+
+	setText(1, out);
 	setToolTip(1, tooltip);
 }
 

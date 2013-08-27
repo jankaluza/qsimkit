@@ -25,6 +25,7 @@
 #include "QSimKit/MCU/RegisterSet.h"
 #include "QSimKit/MCU/Register.h"
 #include "QSimKit/MCU/Memory.h"
+#include "QSimKit/DockWidgets/Peripherals/MemoryItem.h"
 
 #include <QDebug>
 
@@ -49,7 +50,8 @@ QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16
 	}
 
 	if (isAddress) {
-		v = QString("0x%1").arg(m->getBigEndian(data, false), 0, 16);
+		QString tooltip;
+		MemoryItem::format(m, data, getType(), v, tooltip);
 	}
 	else {
 		v = QString("0x%1").arg(data, 0, 16);

@@ -37,6 +37,8 @@ class MemoryItem : public QTreeWidgetItem
 	public:
 		MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr, const VariableType &type);
 
+		static void format(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip);
+
 		void refresh(Memory *mem);
 
 	private:
