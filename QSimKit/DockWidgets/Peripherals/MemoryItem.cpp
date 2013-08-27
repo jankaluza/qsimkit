@@ -42,7 +42,7 @@ MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name,
 	setBackground(0, QApplication::palette().window());
 }
 
-void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
+void MemoryItem::formatBase(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
 	QString dec;
 	QString hex;
 	QString bin;
@@ -89,6 +89,22 @@ void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QStri
 	tooltip = "Dec: " + dec + "<br/>";
 	tooltip += "Hex: " + hex + "<br/>";
 	tooltip += "Bin: " + bin;
+}
+
+void MemoryItem::formatArray(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
+	
+}
+
+void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
+	switch(type->getType()) {
+		case VariableType::Array:
+			MemoryItem::formatArray(mem, address, type, out, tooltip);
+			break;
+		default:
+			MemoryItem::formatBase(mem, address, type, out, tooltip);
+			break;
+			break;
+	};
 }
 
 void MemoryItem::refresh(Memory *mem) {

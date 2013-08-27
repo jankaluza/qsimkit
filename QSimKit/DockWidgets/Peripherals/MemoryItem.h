@@ -42,6 +42,10 @@ class MemoryItem : public QTreeWidgetItem
 		void refresh(Memory *mem);
 
 	private:
+		static void formatBase(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip);
+		static void formatArray(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip);
+
+	private:
 		VariableType m_type;
 
 };
