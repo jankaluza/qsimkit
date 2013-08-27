@@ -320,6 +320,10 @@ void Disassembler::reloadFile() {
 }
 
 Subprogram *Disassembler::getCurrentSubprogram() {
+	if (!m_dd) {
+		return 0;
+	}
+
 	Subprograms subprograms = m_dd->getSubprograms(file->currentText());
 	foreach(Subprogram *s, subprograms) {
 		if (s->contains(m_pc)) {
@@ -352,6 +356,9 @@ void Disassembler::reloadCode() {
 	}
 
 	m_dd = m_mcu->getDebugData();
+	if (!m_dd) {
+		qDebug() << "Warning: No DWARF debug data available";
+	}
 
 	view->resizeColumnToContents(0);
 }

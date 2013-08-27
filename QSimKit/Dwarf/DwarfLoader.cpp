@@ -113,7 +113,7 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 				int16_t subrange = 0;
 				for (i++; i < lines.size(); ++i) { 
 					QString &l = lines[i];
-					if (l.contains("DW_AT_type") && subrange != 0) {
+					if (l.contains("DW_AT_type") && subrange == 0) {
 						uint16_t address = l.mid(l.lastIndexOf("<") + 1, l.lastIndexOf(">") - l.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
 						if (types.contains(address)) {
 							t = types[address];
