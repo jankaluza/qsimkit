@@ -35,7 +35,8 @@ DwarfVariable::DwarfVariable(VariableType *type, const QString &name, DwarfLocat
 }
 
 DwarfVariable::~DwarfVariable() {
-	
+	delete m_ll;
+	delete m_expr;
 }
 
 QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) {

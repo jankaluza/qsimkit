@@ -18,6 +18,7 @@
  **/
 
 #include "DwarfLocation.h"
+#include "DwarfExpression.h"
 #include <QDebug>
 
 DwarfLocation::DwarfLocation(DwarfExpression *expr, uint16_t pcLow, uint16_t pcHigh) :
@@ -26,7 +27,7 @@ m_expr(expr), m_pcLow(pcLow), m_pcHigh(pcHigh) {
 }
 
 DwarfLocation::~DwarfLocation() {
-	
+	delete m_expr;
 }
 
 bool DwarfLocation::contains(uint16_t pc) {

@@ -31,7 +31,16 @@ DwarfSubprogram::DwarfSubprogram(const QString &name, uint16_t pcLow, uint16_t p
 }
 
 DwarfSubprogram::~DwarfSubprogram() {
-	
+	delete m_ll;
+	delete m_expr;
+
+	foreach(Variable *v, m_vars) {
+		delete v;
+	}
+
+	foreach(Variable *v, m_args) {
+		delete v;
+	}
 }
 
 void DwarfSubprogram::addVariable(DwarfVariable *v) {

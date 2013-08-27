@@ -29,7 +29,9 @@ DwarfLocationList::DwarfLocationList() {
 }
 
 DwarfLocationList::~DwarfLocationList() {
-	
+	foreach(DwarfLocation *loc, m_locations) {
+		delete loc;
+	}
 }
 
 uint16_t DwarfLocationList::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc, bool &isAddress) {

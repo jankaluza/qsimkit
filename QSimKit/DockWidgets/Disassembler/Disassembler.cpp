@@ -355,6 +355,7 @@ void Disassembler::reloadCode() {
 		++it;
 	}
 
+	delete m_dd;
 	m_dd = m_mcu->getDebugData();
 	if (!m_dd) {
 		qDebug() << "Warning: No DWARF debug data available";

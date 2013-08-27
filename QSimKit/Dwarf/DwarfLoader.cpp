@@ -199,6 +199,9 @@ void DwarfLoader::parseLocation(const QString &l, QMap<uint16_t, DwarfLocationLi
 		QString keyStr = l.mid(l.lastIndexOf(":") + 2, l.lastIndexOf("(") - l.lastIndexOf(":") - 2).trimmed();
 		uint16_t key = keyStr.toUInt(0, 16);
 		*ll = locations[key];
+		// Every DWARF location list is used only once, so we can remove it from
+		// locations variable now.
+		locations.remove(key);
 	}
 	else {
 		QString exprString = l.mid(l.indexOf("(") + 1, l.lastIndexOf(")") - l.indexOf("("));
@@ -385,8 +388,15 @@ DebugData *DwarfLoader::load(QString &file, QString &error) {
 
 	if (!loadSubprograms(result, dd, locations, types, error)) {
 		delete dd;
-		return 0;
+		dd = 0;
 	}
+
+	QMap<uint16_t, DwarfLocationList *>::iterator i = locations.begin();
+	while (i != locations.end()) {
+		delete i.value();
+		++i;
+	}
+
 
 	return dd;
 }

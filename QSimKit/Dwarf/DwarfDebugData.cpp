@@ -24,7 +24,18 @@
 DwarfDebugData::DwarfDebugData() {}
 
 DwarfDebugData::~DwarfDebugData() {
-	
+	QMap<QString, Subprograms>::iterator i = m_subprograms.begin();
+	while (i != m_subprograms.end()) {
+		Subprograms &subprograms = i.value();
+		foreach(Subprogram *s, subprograms) {
+			delete s;
+		}
+		++i;
+	}
+
+	foreach(VariableType *type, m_types) {
+		delete type;
+	}
 }
 
 void DwarfDebugData::addSubprogram(const QString &file, Subprogram *subprogram) {
