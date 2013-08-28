@@ -45,10 +45,16 @@ class DwarfExpression {
 			uint16_t offset;
 		} Location;
 
+		typedef struct {
+			uint32_t data;
+			bool isAddress;
+			uint8_t piece;
+		} Value;
+
 		DwarfExpression(const QString &expression);
 		virtual ~DwarfExpression();
 
-		uint16_t getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress);
+		QList<Value> getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress);
 
 		bool parse(const QString &expression);
 

@@ -32,5 +32,5 @@ DwarfLocation::~DwarfLocation() {
 
 bool DwarfLocation::contains(uint16_t pc) {
 // 	qDebug() << QString::number(pc, 16) << QString::number(m_pcLow, 16) << QString::number(m_pcHigh, 16);
-	return pc >= m_pcLow && pc <= m_pcHigh;
+	return pc >= m_pcLow && pc < m_pcHigh;
 }
