@@ -41,7 +41,7 @@ DwarfVariable::~DwarfVariable() {
 
 QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16_t pc) {
 	QString v = "??";
-	QList<DwarfExpression::Value> data;
+	VariableValue data;
 	bool isAddress;
 	if (m_ll) {
 		data = m_ll->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc, isAddress);
@@ -58,16 +58,16 @@ QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16
 	uint8_t lastPiece = 0;
 	// TODO: We only support DW_OP_piece split between more registers.
 	// It would be great to support combination of register and memory
-	foreach(const DwarfExpression::Value &value, data) {
-		if (value.isAddress) {
+	foreach(const VariableValuePiece &value, data) {
+		if (value.isAddress()) {
 			QString tooltip;
-			MemoryItem::format(m, value.data, getType(), v, tooltip);
+			MemoryItem::format(m, value.getData(), getType(), v, tooltip);
 			return v;
 		}
 		else {
-			ret |= value.data;
-			ret = ret << value.piece;
-			lastPiece = value.piece;
+			ret |= value.getData();
+			ret = ret << value.getPieceSize();
+			lastPiece = value.getPieceSize();
 		}
 	}
 	v = QString("0x%1").arg(ret >> lastPiece, 0, 16);

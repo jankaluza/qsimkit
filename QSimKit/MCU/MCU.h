@@ -120,6 +120,31 @@ class VariableType {
 		uint16_t m_upperBound;
 };
 
+class VariableValuePiece {
+	public:
+		VariableValuePiece(uint32_t data, bool isAddress, uint8_t pieceSize = 0) :
+			m_data(data), m_isAddress(isAddress), m_pieceSize(pieceSize) {}
+
+		uint32_t getData() const {
+			return m_data;
+		}
+
+		bool isAddress() const {
+			return m_isAddress;
+		}
+
+		uint8_t getPieceSize() const {
+			return m_pieceSize;
+		}
+
+	private:
+		uint32_t m_data;
+		bool m_isAddress;
+		uint8_t m_pieceSize;
+};
+
+typedef QList<VariableValuePiece> VariableValue;
+
 class Variable {
 	public:
 

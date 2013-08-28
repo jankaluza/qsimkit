@@ -34,12 +34,12 @@ DwarfLocationList::~DwarfLocationList() {
 	}
 }
 
-QList<DwarfExpression::Value> DwarfLocationList::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc, bool &isAddress) {
+VariableValue DwarfLocationList::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *p, uint16_t pc, bool &isAddress) {
 	foreach(DwarfLocation *loc, m_locations) {
 		if (loc->contains(pc)) {
 			return loc->getExpression()->getValue(r, m, p, pc, isAddress);
 		}
 	}
 
-	return QList<DwarfExpression::Value>();
+	return VariableValue();
 }

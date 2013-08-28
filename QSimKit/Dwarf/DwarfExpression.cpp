@@ -261,8 +261,8 @@ bool DwarfExpression::parse(const QString &expression) {
 	return true;
 }
 
-QList<DwarfExpression::Value> DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress) {
-	QList<Value> value;
+VariableValue DwarfExpression::getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress) {
+	VariableValue value;
 	unsigned long tmp, stack[64];
 	unsigned sp = 0;
 	bool hasPiece;
@@ -332,11 +332,7 @@ QList<DwarfExpression::Value> DwarfExpression::getValue(RegisterSet *r, Memory *
 		case DW_OP_ne: stack[sp-1] = (stack[sp-1] != stack[sp]); sp--; break;
 		case DW_OP_piece:
 			hasPiece = true;
-			Value v;
-			v.data = stack[sp];
-			v.isAddress = isAddress;
-			v.piece = inst.arg;
-			value.prepend(v);
+			value.prepend(VariableValuePiece(stack[sp], isAddress, inst.arg));
 			break;
 // 		case DW_OP_skip: tmp = (short)inst.arg; ctx.data += tmp; break;
 // 		case DW_OP_bra: tmp = (short)dwarf2_parse_u2(&ctx); if (!stack[sp--]) ctx.data += tmp; break;
@@ -381,10 +377,7 @@ QList<DwarfExpression::Value> DwarfExpression::getValue(RegisterSet *r, Memory *
 	}
 
 	if (!hasPiece) {
-		Value v;
-		v.data = stack[sp];
-		v.isAddress = isAddress;
-		v.piece = 0;
+		VariableValuePiece v(stack[sp], isAddress, 0);
 		value.append(v);
 	}
 

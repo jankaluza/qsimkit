@@ -23,6 +23,7 @@
 #include <QString>
 #include <QList>
 #include <stdint.h>
+#include "MCU/MCU.h"
 
 class DwarfDebugData;
 class DebugData;
@@ -54,7 +55,7 @@ class DwarfExpression {
 		DwarfExpression(const QString &expression);
 		virtual ~DwarfExpression();
 
-		QList<Value> getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress);
+		VariableValue getValue(RegisterSet *r, Memory *m, DwarfSubprogram *s, uint16_t pc, bool &isAddress);
 
 		bool parse(const QString &expression);
 
