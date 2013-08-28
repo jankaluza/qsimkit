@@ -54,7 +54,7 @@ QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16
 		return v;
 	}
 
-	uint64_t ret = 0;
+	int64_t ret = 0;
 	uint8_t lastPiece = 0;
 	// TODO: We only support DW_OP_piece split between more registers.
 	// It would be great to support combination of register and memory

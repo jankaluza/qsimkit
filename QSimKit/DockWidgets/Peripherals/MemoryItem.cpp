@@ -103,7 +103,6 @@ void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QStri
 		default:
 			MemoryItem::formatBase(mem, address, type, out, tooltip);
 			break;
-			break;
 	};
 }
 

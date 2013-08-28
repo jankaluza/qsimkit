@@ -289,16 +289,16 @@ QList<DwarfExpression::Value> DwarfExpression::getValue(RegisterSet *r, Memory *
 		{
 		case DW_OP_nop: break;
 		case DW_OP_addr: stack[++sp] = inst.arg; break;
-		case DW_OP_const1u: stack[++sp] = inst.arg; break;
-		case DW_OP_const1s: stack[++sp] = (signed char)inst.arg; break;
-		case DW_OP_const2u: stack[++sp] = inst.arg; break;
-		case DW_OP_const2s: stack[++sp] = (short)inst.arg; break;
-		case DW_OP_const4u: stack[++sp] = inst.arg; break;
-		case DW_OP_const4s: stack[++sp] = (signed int)inst.arg; break;
-		case DW_OP_const8u: stack[++sp] = inst.arg; break;
-		case DW_OP_const8s: stack[++sp] = inst.arg; break;
-		case DW_OP_constu: stack[++sp] = inst.arg; break;
-		case DW_OP_consts: stack[++sp] = inst.arg; break;
+		case DW_OP_const1u: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_const1s: stack[++sp] = (signed char)inst.arg; isAddress = false; break;
+		case DW_OP_const2u: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_const2s: stack[++sp] = (short)inst.arg; isAddress = false; break;
+		case DW_OP_const4u: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_const4s: stack[++sp] = (signed int)inst.arg; isAddress = false; break;
+		case DW_OP_const8u: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_const8s: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_constu: stack[++sp] = inst.arg; isAddress = false; break;
+		case DW_OP_consts: stack[++sp] = inst.arg; isAddress = false; break;
 		case DW_OP_deref:
 			isAddress = false;
 			stack[sp] = m->getBigEndian(stack[sp], false);
