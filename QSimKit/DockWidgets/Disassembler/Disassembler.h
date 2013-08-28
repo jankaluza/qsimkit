@@ -66,6 +66,7 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 
 	private slots:
 		void handleFileChanged(int id);
+		void handleFuncChanged(int id);
 		void handleShowModeClicked();
 
 	private:

@@ -51,6 +51,7 @@ m_dd(0), m_showingAssembler(0) {
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
 	connect(file, SIGNAL(currentIndexChanged(int)), this, SLOT(handleFileChanged(int)));
 	connect(showMode, SIGNAL(clicked()), this, SLOT(handleShowModeClicked()));
+	connect(func, SIGNAL(activated ( int )), this, SLOT(handleFuncChanged( int )));
 
 	m_simkit->getPeripheralsWidget()->addPeripheralItem(new DisassemblerItem(this));
 }
@@ -62,6 +63,18 @@ void Disassembler::handleShowModeClicked() {
 void Disassembler::handleFileChanged(int id) {
 	m_currentFile = file->itemData(id).toString();
 	reloadFile();
+}
+
+void Disassembler::handleFuncChanged(int id) {
+	uint16_t pcLow = func->itemData(id).toUInt();
+	QString addr = QString("%1").arg(pcLow, 0, 16);
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
+	if (items.isEmpty()) {
+		return;
+	}
+
+	view->scrollToItem(items[0], QAbstractItemView::PositionAtTop);
+	view->setCurrentItem(items[0], 1);
 }
 
 void Disassembler::showAssembler(bool show) {
@@ -314,7 +327,7 @@ void Disassembler::reloadFile() {
 
 		Subprograms subprograms = m_dd->getSubprograms(file->currentText());
 		foreach(const Subprogram *s, subprograms) {
-			func->addItem(s->getName());
+			func->addItem(s->getName(), s->getPCLow());
 		}
 	}
 }
@@ -439,6 +452,15 @@ void Disassembler::pointToInstruction(uint16_t pc) {
 	}
 
 	view->scrollToItem(m_currentItems[0]);
+
+	// Change func QComboBox to show the name of current function
+	Subprogram *s = m_dd->getSubprogram(file->currentText(), pc);
+	if (s) {
+		int id = func->findText(s->getName());
+		if (id != -1) {
+			func->setCurrentIndex(id);
+		}
+	}
 }
 
 void Disassembler::refresh() {

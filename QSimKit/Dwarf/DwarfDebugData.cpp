@@ -45,3 +45,14 @@ void DwarfDebugData::addSubprogram(const QString &file, Subprogram *subprogram) 
 const Subprograms &DwarfDebugData::getSubprograms(const QString &file) {
 	return m_subprograms[file];
 }
+
+Subprogram *DwarfDebugData::getSubprogram(const QString &file, uint16_t pc) {
+	Subprograms &ss = m_subprograms[file];
+	foreach(Subprogram *s, ss) {
+		if (pc >= s->getPCLow() && pc < s->getPCHigh()) {
+			return s;
+		}
+	}
+
+	return 0;
+}
