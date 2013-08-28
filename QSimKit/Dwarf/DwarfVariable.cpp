@@ -50,6 +50,10 @@ QString DwarfVariable::getValue(RegisterSet *r, Memory *m, Subprogram *p, uint16
 		data = m_expr->getValue(r, m, static_cast<DwarfSubprogram *>(p), pc, isAddress);
 	}
 
+	if (data.isEmpty()) {
+		return v;
+	}
+
 	uint64_t ret = 0;
 	uint8_t lastPiece = 0;
 	// TODO: We only support DW_OP_piece split between more registers.
