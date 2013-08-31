@@ -20,6 +20,7 @@
 #include "MemoryItem.h"
 
 #include "MCU/Memory.h"
+#include "MCU/VariableValueFormatter.h"
 
 #include <QWidget>
 #include <QTime>
@@ -40,70 +41,8 @@ MemoryItem::MemoryItem(QTreeWidgetItem *parent, const QString &name,
 	setText(0, name);
 	setText(1, 0x00);
 	setBackground(0, QApplication::palette().window());
-}
 
-void MemoryItem::formatBase(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
-	QString dec;
-	QString hex;
-	QString bin;
-	int16_t int16;
-
-#define SET_STRINGS(N) 	dec = QString::number(N); \
-	hex = QString("0x%1").arg(N, 0, 16); \
-	bin = QString("%1").arg(N, 0, 2); \
-
-	switch(type->getEncoding()) {
-		default:
-		case VariableType::Unsigned:
-		case VariableType::UnsignedChar:
-			switch(type->getByteSize()) {
-				case 1:
-					int16 = mem->getByte(address, false);
-					SET_STRINGS((uint8_t) int16);
-					break;
-				default:
-				case 2:
-					int16 = mem->getBigEndian(address, false);
-					SET_STRINGS((uint16_t) int16);
-					break;
-			};
-			out = hex;
-			break;
-		case VariableType::Signed:
-		case VariableType::SignedChar:
-			switch(type->getByteSize()) {
-				case 1:
-					int16 = mem->getByte(address, false);
-					SET_STRINGS((int8_t) int16);
-					break;
-				default:
-				case 2:
-					int16 = mem->getBigEndian(address, false);
-					SET_STRINGS((int16_t) int16);
-					break;
-			};
-			out = hex;
-			break;
-	};
-
-	tooltip = "Dec: " + dec + "<br/>";
-	tooltip += "Hex: " + hex + "<br/>";
-	tooltip += "Bin: " + bin;
-}
-
-void MemoryItem::formatArray(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
-	
-}
-
-void MemoryItem::format(Memory *mem, uint16_t address, VariableType *type, QString &out, QString &tooltip) {
-	switch(type->getType()) {
-		case VariableType::Array:
-			MemoryItem::formatArray(mem, address, type, out, tooltip);
-			break;
-		default:
-			MemoryItem::formatBase(mem, address, type, out, tooltip);
-			break;
-	};
+	m_value.append(VariableValuePiece(addr, true, 0));
 }
 
 void MemoryItem::refresh(Memory *mem) {
@@ -111,7 +50,7 @@ void MemoryItem::refresh(Memory *mem) {
 
 	QString tooltip;
 	QString out;
-	MemoryItem::format(mem, address, &m_type, out, tooltip);
+	VariableValueFormatter::format(mem, m_value, &m_type, out, tooltip);
 
 	setText(1, out);
 	setToolTip(1, tooltip);

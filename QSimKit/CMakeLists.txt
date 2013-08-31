@@ -83,6 +83,7 @@ FILE(GLOB PERIPHERAL_SRC Peripherals/SimulationObject.cpp
 	Dwarf/DwarfLocationList.cpp
 	Dwarf/DwarfExpression.cpp
 	Dwarf/DwarfVariable.cpp
+	MCU/VariableValueFormatter.cpp
 	)
 
 QT4_WRAP_CPP(PERIPHERAL_HEADERS_MOC ${PERIPHERAL_HEADERS})

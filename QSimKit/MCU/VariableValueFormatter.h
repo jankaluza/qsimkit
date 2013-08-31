@@ -19,29 +19,18 @@
 
 #pragma once
 
-#include <QDialog>
+#include <QWidget>
 #include <QString>
-#include <QTimer>
-#include <DockWidgets/DockWidget.h>
-#include <QTreeWidgetItem>
-#include "MCU/MCU.h"
+#include <QChar>
+#include <QRect>
+#include <QMap>
+#include <QDir>
 
-#include <stdint.h>
+#include "MCU.h"
 
-#define MemoryItemType (QTreeWidgetItem::UserType + 1)
+namespace VariableValueFormatter {
 
-class Memory;
+	void format(Memory *mem, VariableValue &value, VariableType *type, QString &out, QString &tooltip);
 
-class MemoryItem : public QTreeWidgetItem
-{
-	public:
-		MemoryItem(QTreeWidgetItem *parent, const QString &name, uint16_t addr, const VariableType &type);
-
-		void refresh(Memory *mem);
-
-	private:
-		VariableType m_type;
-		VariableValue m_value;
-
-};
+}
 
