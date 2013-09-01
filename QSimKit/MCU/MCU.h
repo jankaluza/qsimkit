@@ -98,9 +98,11 @@ class VariableType {
 			Pointer,
 		} Type;
 
-		VariableType(const QString &name, uint8_t byteSize, Encoding encoding, Type type, uint16_t upperBound = 0) :
-		m_name(name), m_byteSize(byteSize), m_encoding(encoding), m_type(type), m_upperBound(upperBound) {
+		VariableType(const QString &name, uint8_t byteSize, Encoding encoding, Type type, uint16_t upperBound = 0, VariableType *subtype = 0) :
+		m_name(name), m_byteSize(byteSize), m_encoding(encoding), m_type(type), m_upperBound(upperBound), m_subtype(subtype) {
 		}
+
+		VariableType *getSubtype() { return m_subtype; }
 
 		const QString &getName() { return m_name; }
 
@@ -118,6 +120,7 @@ class VariableType {
 		Encoding m_encoding;
 		Type m_type;
 		uint16_t m_upperBound;
+		VariableType *m_subtype;
 };
 
 class VariableValuePiece {

@@ -24,16 +24,7 @@
 
 namespace VariableValueFormatter {
 
-static void formatBase(Memory *mem, VariableValue &values, VariableType *type, QString &out, QString &tooltip) {
-	QString dec;
-	QString hex;
-	QString bin;
-	int16_t int16;
-
-#define SET_STRINGS(N) 	dec = QString::number(N); \
-	hex = QString("0x%1").arg(N, 0, 16); \
-	bin = QString("%1").arg(N, 0, 2); \
-
+static int64_t getValue(Memory *mem, VariableValue &values, VariableType *type) {
 	int64_t ret = 0;
 	foreach(const VariableValuePiece &value, values) {
 		if (value.isAddress()) {
@@ -69,6 +60,21 @@ static void formatBase(Memory *mem, VariableValue &values, VariableType *type, Q
 			ret |= value.getData();
 		}
 	}
+
+	return ret;
+}
+
+static void formatBase(Memory *mem, VariableValue &values, VariableType *type, QString &out, QString &tooltip) {
+	QString dec;
+	QString hex;
+	QString bin;
+	int16_t int16;
+
+#define SET_STRINGS(N) 	dec = QString::number(N); \
+	hex = QString("0x%1").arg(N, 0, 16); \
+	bin = QString("%1").arg(N, 0, 2); \
+
+	int64_t ret = getValue(mem, values, type);
 
 	switch(type->getEncoding()) {
 		default:

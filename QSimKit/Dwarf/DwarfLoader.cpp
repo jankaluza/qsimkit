@@ -111,6 +111,7 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 
 				VariableType *t = 0;
 				int16_t subrange = 0;
+				uint8_t byteSize = 0;
 				for (i++; i < lines.size(); ++i) { 
 					QString &l = lines[i];
 					if (l.contains("DW_AT_type") && subrange == 0) {
@@ -121,6 +122,9 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 // 						else {
 // 							qDebug() << "Unknown type while loading types" << l;
 // 						}
+					}
+					else if (l.contains("DW_AT_byte_size")) {
+						byteSize = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
 					}
 					else if (l.contains("DW_TAG_subrange_type")) {
 						subrange = -1;
@@ -139,7 +143,7 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 					continue;
 				}
 
-				VariableType *typeCopy = new VariableType(t->getName(), t->getByteSize(), t->getEncoding(), type, subrange);
+				VariableType *typeCopy = new VariableType("", byteSize, VariableType::Address, type, subrange, t);
 				types[addr] = typeCopy;
 				dd->addVariableType(typeCopy);
 			}
