@@ -22,9 +22,6 @@
 #ifndef EN1FG
 #define EN1FG 0x01
 #endif
-#ifndef B16
-#define B16 0x80
-#endif
 #ifndef __FLT_MIN__
 #define __FLT_MIN__ 1.17549435e-38F
 #endif
@@ -48,9 +45,6 @@
 #endif
 #ifndef BTCTL_
 #define BTCTL_ 0x0040
-#endif
-#ifndef __ORDER_LITTLE_ENDIAN__
-#define __ORDER_LITTLE_ENDIAN__ 1234
 #endif
 #ifndef __SIZE_MAX__
 #define __SIZE_MAX__ 65535U
@@ -114,9 +108,6 @@
 #endif
 #ifndef __GNUC_PATCHLEVEL__
 #define __GNUC_PATCHLEVEL__ 3
-#endif
-#ifndef __MSP430_MPY_TYPE_16__
-#define __MSP430_MPY_TYPE_16__ 16
 #endif
 #ifndef __DEC64_MAX_EXP__
 #define __DEC64_MAX_EXP__ 385
@@ -421,9 +412,6 @@
 #ifndef SCFQ_2M
 #define SCFQ_2M 0x3F
 #endif
-#ifndef __MSP430_MPY_32__
-#define __MSP430_MPY_32__ 49
-#endif
 #ifndef BT_fCLK2_ACLK
 #define BT_fCLK2_ACLK 0x00
 #endif
@@ -480,9 +468,6 @@
 #endif
 #ifndef __MSP430
 #define __MSP430 1
-#endif
-#ifndef __MSP430_MPY_16SE__
-#define __MSP430_MPY_16SE__ 17
 #endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
@@ -559,11 +544,8 @@
 #ifndef __FLT_MANT_DIG__
 #define __FLT_MANT_DIG__ 24
 #endif
-#ifndef __MSP430_MPY_32DW__
-#define __MSP430_MPY_32DW__ 51
-#endif
-#ifndef __MSP430_MPY_HAS_DW__
-#define __MSP430_MPY_HAS_DW__ 2
+#ifndef __VERSION__
+#define __VERSION__ "4.5.3"
 #endif
 #ifndef TCPLD
 #define TCPLD 0x0043
@@ -604,17 +586,11 @@
 #ifndef TPCNT1_EN_nTPIN5
 #define TPCNT1_EN_nTPIN5 ENB
 #endif
-#ifndef __FLOAT_WORD_ORDER__
-#define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
-#endif
 #ifndef __msp430x31x
 #define __msp430x31x 
 #endif
 #ifndef __DEC64_EPSILON__
 #define __DEC64_EPSILON__ 1E-15DD
-#endif
-#ifndef __ORDER_PDP_ENDIAN__
-#define __ORDER_PDP_ENDIAN__ 3412
 #endif
 #ifndef __SIZE_TYPE__
 #define __SIZE_TYPE__ unsigned int
@@ -703,9 +679,6 @@
 #ifndef LCDM9_
 #define LCDM9_ LCD_BASE+0x9
 #endif
-#ifndef __MSP430_CPU_MSP430X__
-#define __MSP430_CPU_MSP430X__ 2
-#endif
 #ifndef __SIZEOF_PTRDIFF_T__
 #define __SIZEOF_PTRDIFF_T__ 4
 #endif
@@ -714,9 +687,6 @@
 #endif
 #ifndef EPCTL_
 #define EPCTL_ 0x0054
-#endif
-#ifndef __MSP430_MPY_NONE__
-#define __MSP430_MPY_NONE__ 0
 #endif
 #ifndef __DEC32_SUBNORMAL_MIN__
 #define __DEC32_SUBNORMAL_MIN__ 0.000001E-95DF
@@ -733,8 +703,8 @@
 #ifndef LCDMA_
 #define LCDMA_ LCDM10_
 #endif
-#ifndef BASICTIMER_VECTOR
-#define BASICTIMER_VECTOR 2
+#ifndef __MSP430F110__
+#define __MSP430F110__ 1
 #endif
 #ifndef LCDMEM_
 #define LCDMEM_ LCD_BASE+1
@@ -814,9 +784,6 @@
 #ifndef __DBL_HAS_QUIET_NAN__
 #define __DBL_HAS_QUIET_NAN__ 1
 #endif
-#ifndef __MSP430_MPY_TYPE_32__
-#define __MSP430_MPY_TYPE_32__ 32
-#endif
 #ifndef __WCHAR_TYPE__
 #define __WCHAR_TYPE__ int
 #endif
@@ -842,10 +809,7 @@
 #define __FLT_DIG__ 6
 #endif
 #ifndef __MSPGCC__
-#define __MSPGCC__ 20120406
-#endif
-#ifndef __MSP430_MPY_16__
-#define __MSP430_MPY_16__ 16
+#define __MSPGCC__ 20110706
 #endif
 #ifndef __INT_MAX__
 #define __INT_MAX__ 32767
@@ -858,6 +822,9 @@
 #endif
 #ifndef TPSSEL_CLK1_ACLK
 #define TPSSEL_CLK1_ACLK TPSSEL0
+#endif
+#ifndef BASICTIMER_VECTOR
+#define BASICTIMER_VECTOR 2
 #endif
 #ifndef __DBL_MANT_DIG__
 #define __DBL_MANT_DIG__ 24
@@ -904,14 +871,8 @@
 #ifndef TIMERPORT_VECTOR
 #define TIMERPORT_VECTOR 10
 #endif
-#ifndef __MSP430_CPU_MSP430__
-#define __MSP430_CPU_MSP430__ 0
-#endif
 #ifndef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2
-#endif
-#ifndef __MSP430_CPU_MSP430XV2__
-#define __MSP430_CPU_MSP430XV2__ 3
 #endif
 #ifndef BTCNT1_
 #define BTCNT1_ 0x0046
@@ -922,8 +883,8 @@
 #ifndef BTCNT2_
 #define BTCNT2_ 0x0047
 #endif
-#ifndef __DBL_DECIMAL_DIG__
-#define __DBL_DECIMAL_DIG__ 9
+#ifndef B16
+#define B16 0x80
 #endif
 #ifndef __DEC_EVAL_METHOD__
 #define __DEC_EVAL_METHOD__ 2
@@ -946,9 +907,6 @@
 #ifndef __msp430_headers_basic_timer_h
 #define __msp430_headers_basic_timer_h 
 #endif
-#ifndef __ORDER_BIG_ENDIAN__
-#define __ORDER_BIG_ENDIAN__ 4321
-#endif
 #ifndef SCFI0_
 #define SCFI0_ 0x0050
 #endif
@@ -957,9 +915,6 @@
 #endif
 #ifndef __INTMAX_MAX__
 #define __INTMAX_MAX__ 9223372036854775807LL
-#endif
-#ifndef __BYTE_ORDER__
-#define __BYTE_ORDER__ __ORDER_LITTLE_ENDIAN__
 #endif
 #ifndef SCFI1_
 #define SCFI1_ 0x0051
@@ -991,11 +946,8 @@
 #ifndef __DEC128_MAX_EXP__
 #define __DEC128_MAX_EXP__ 6145
 #endif
-#ifndef __MSP430_MPY_HAS_SE__
-#define __MSP430_MPY_HAS_SE__ 1
-#endif
 #ifndef __GNUC_MINOR__
-#define __GNUC_MINOR__ 6
+#define __GNUC_MINOR__ 5
 #endif
 #ifndef __UINTMAX_MAX__
 #define __UINTMAX_MAX__ 18446744073709551615ULL
@@ -1084,9 +1036,6 @@
 #ifndef OSCOFF
 #define OSCOFF 0x0020
 #endif
-#ifndef __FLT_DECIMAL_DIG__
-#define __FLT_DECIMAL_DIG__ 9
-#endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
 #endif
@@ -1101,9 +1050,6 @@
 #endif
 #ifndef WDTIS0
 #define WDTIS0 0x0001
-#endif
-#ifndef __MSP430_MPY_TYPE_ANY__
-#define __MSP430_MPY_TYPE_ANY__ 48
 #endif
 #ifndef TPCNT1_EN_ON
 #define TPCNT1_EN_ON ENA
@@ -2194,6 +2140,402 @@ class Variant_msp430x31x : public Variant {
 		unsigned int getUSI_VECTOR() {
 #ifdef USI_VECTOR
 			return USI_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0CTL0() {
+#ifdef UCA0CTL0_
+			return UCA0CTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0CTL1() {
+#ifdef UCA0CTL1_
+			return UCA0CTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0BR0() {
+#ifdef UCA0BR0_
+			return UCA0BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0BR1() {
+#ifdef UCA0BR1_
+			return UCA0BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0MCTL() {
+#ifdef UCA0MCTL_
+			return UCA0MCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0STAT() {
+#ifdef UCA0STAT_
+			return UCA0STAT_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0RXBUF() {
+#ifdef UCA0RXBUF_
+			return UCA0RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0TXBUF() {
+#ifdef UCA0TXBUF_
+			return UCA0TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0ABCTL() {
+#ifdef UCA0ABCTL_
+			return UCA0ABCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0IRTCTL() {
+#ifdef UCA0IRTCTL_
+			return UCA0IRTCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA0IRRCTL() {
+#ifdef UCA0IRRCTL_
+			return UCA0IRRCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0CTL0() {
+#ifdef UCB0CTL0_
+			return UCB0CTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0CTL1() {
+#ifdef UCB0CTL1_
+			return UCB0CTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0BR0() {
+#ifdef UCB0BR0_
+			return UCB0BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0BR1() {
+#ifdef UCB0BR1_
+			return UCB0BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0I2CIE() {
+#ifdef UCB0I2CIE_
+			return UCB0I2CIE_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0STAT() {
+#ifdef UCB0STAT_
+			return UCB0STAT_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0RXBUF() {
+#ifdef UCB0RXBUF_
+			return UCB0RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0TXBUF() {
+#ifdef UCB0TXBUF_
+			return UCB0TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0I2COA() {
+#ifdef UCB0I2COA_
+			return UCB0I2COA_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB0I2CSA() {
+#ifdef UCB0I2CSA_
+			return UCB0I2CSA_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1CTL0() {
+#ifdef UCA1CTL0_
+			return UCA1CTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1CTL1() {
+#ifdef UCA1CTL1_
+			return UCA1CTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1BR0() {
+#ifdef UCA1BR0_
+			return UCA1BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1BR1() {
+#ifdef UCA1BR1_
+			return UCA1BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1MCTL() {
+#ifdef UCA1MCTL_
+			return UCA1MCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1STAT() {
+#ifdef UCA1STAT_
+			return UCA1STAT_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1RXBUF() {
+#ifdef UCA1RXBUF_
+			return UCA1RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1TXBUF() {
+#ifdef UCA1TXBUF_
+			return UCA1TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1ABCTL() {
+#ifdef UCA1ABCTL_
+			return UCA1ABCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1IRTCTL() {
+#ifdef UCA1IRTCTL_
+			return UCA1IRTCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCA1IRRCTL() {
+#ifdef UCA1IRRCTL_
+			return UCA1IRRCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1CTL0() {
+#ifdef UCB1CTL0_
+			return UCB1CTL0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1CTL1() {
+#ifdef UCB1CTL1_
+			return UCB1CTL1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1BR0() {
+#ifdef UCB1BR0_
+			return UCB1BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1BR1() {
+#ifdef UCB1BR1_
+			return UCB1BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1I2CIE() {
+#ifdef UCB1I2CIE_
+			return UCB1I2CIE_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1STAT() {
+#ifdef UCB1STAT_
+			return UCB1STAT_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1RXBUF() {
+#ifdef UCB1RXBUF_
+			return UCB1RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1TXBUF() {
+#ifdef UCB1TXBUF_
+			return UCB1TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1I2COA() {
+#ifdef UCB1I2COA_
+			return UCB1I2COA_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUCB1I2CSA() {
+#ifdef UCB1I2CSA_
+			return UCB1I2CSA_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUC1IE() {
+#ifdef UC1IE_
+			return UC1IE_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUC1IFG() {
+#ifdef UC1IFG_
+			return UC1IFG_;
 #else
 			return 0;
 #endif

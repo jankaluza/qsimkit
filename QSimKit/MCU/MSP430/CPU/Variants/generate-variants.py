@@ -46,6 +46,19 @@ defines += ["INTVECT"]
 # USI
 defines += ["USISR_", "USICTL_", "USICCTL_", "USI_VECTOR"]
 
+# USCI
+defines += ["UCA0CTL0_", "UCA0CTL1_", "UCA0BR0_", "UCA0BR1_", "UCA0MCTL_", "UCA0STAT_"]
+defines += ["UCA0RXBUF_", "UCA0TXBUF_", "UCA0ABCTL_", "UCA0IRTCTL_", "UCA0IRRCTL_"]
+defines += ["UCB0CTL0_", "UCB0CTL1_", "UCB0BR0_", "UCB0BR1_", "UCB0I2CIE_", "UCB0STAT_"]
+defines += ["UCB0RXBUF_", "UCB0TXBUF_", "UCB0I2COA_", "UCB0I2CSA_"]
+
+defines += ["UCA1CTL0_", "UCA1CTL1_", "UCA1BR0_", "UCA1BR1_", "UCA1MCTL_", "UCA1STAT_"]
+defines += ["UCA1RXBUF_", "UCA1TXBUF_", "UCA1ABCTL_", "UCA1IRTCTL_", "UCA1IRRCTL_"]
+defines += ["UCB1CTL0_", "UCB1CTL1_", "UCB1BR0_", "UCB1BR1_", "UCB1I2CIE_", "UCB1STAT_"]
+defines += ["UCB1RXBUF_", "UCB1TXBUF_", "UCB1I2COA_", "UCB1I2CSA_"]
+
+defines += ["UC1IE_", "UC1IFG_"]
+
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
 
