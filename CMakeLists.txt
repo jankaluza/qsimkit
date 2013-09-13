@@ -101,7 +101,7 @@ set(CPACK_COMPONENT_BUTTON_GROUP "Peripherals")
 set(CPACK_COMPONENT_LCD_GROUP "Peripherals")
 set(CPACK_COMPONENT_LED_GROUP "Peripherals")
 set(CPACK_COMPONENT_OSCILLATOR_GROUP "Peripherals")
-set(CPACK_COMPONENT_SD_ROUP "Peripherals")
+set(CPACK_COMPONENT_SD_GROUP "Peripherals")
 
 SET(CPACK_NSIS_CREATE_ICONS "
 CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\QSimKit.lnk' '$INSTDIR\\\\bin\\\\qsimkit.exe'
