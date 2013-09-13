@@ -1,0 +1,22 @@
+---
+layout: default
+title: Changelog
+---
+
+## Changelog
+
+**Version 0.0.2 (2013-09-12):**
+QSimKit GUI:
+* Save projects with .qsp extension
+* Lot of DWARF debugging symbols loading improvements
+* Auto-reload A43/ELF files when they change
+
+MSP430:
+* Add support for USI-SPI (tested with SD card)
+
+SD card
+* Add basic SD card peripheral
+
+**Version 0.0.1:**
+* Initial version
+

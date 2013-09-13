@@ -27,5 +27,13 @@ QSimKit is released under GPLv2+ license.
 * Loading ELF/A43 code and disassembling the code using msp430-objdump (only msp430-gcc supported so far)
 * All instructions implemented
 * BasicClock module supported (TimerA/TimerB support)
+* USI (only SPI so far) support
+
+**Peripherals:**
+* Button
+* LCD - HD44708 (only initial support)
+* LED
+* Crystal Oscillator
+* SD Card (only initial support)
 
 
