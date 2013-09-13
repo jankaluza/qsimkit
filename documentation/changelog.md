@@ -6,6 +6,7 @@ title: Changelog
 ## Changelog
 
 **Version 0.0.2 (2013-09-12):**
+
 QSimKit GUI:
 * Save projects with .qsp extension
 * Lot of DWARF debugging symbols loading improvements
@@ -18,5 +19,6 @@ SD card
 * Add basic SD card peripheral
 
 **Version 0.0.1:**
+
 * Initial version
 

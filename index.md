@@ -30,6 +30,7 @@ QSimKit is released under GPLv2+ license.
 * USI (only SPI so far) support
 
 **Peripherals:**
+
 * Button
 * LCD - HD44708 (only initial support)
 * LED
