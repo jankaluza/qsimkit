@@ -40,6 +40,8 @@ m_output(false) {
 
 	m_mem->addWatcher(m_ctl0, this);
 	m_mem->addWatcher(m_ctl1, this);
+	m_mem->addWatcher(m_br0, this);
+	m_mem->addWatcher(m_br1, this);
 // 	m_mem->addWatcher(m_usicctl + 1, this);
 // 	m_mem->addWatcher(m_usisr, this);
 // 	m_mem->addWatcher(m_usictl, this);
@@ -145,6 +147,9 @@ void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 // 				generateOutput(m_sclkMpx, m_sclk != m_usickpl);
 // 			}
 		}
+	}
+	else if (address == m_br0 || address == m_br1) {
+		m_divider = m_br0 + m_br1 * 256;
 	}
 }
 

@@ -70,7 +70,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		Memory *m_mem;
 		Variant *m_variant;
 		Clock *m_source;
-		uint8_t m_divider;
+		uint16_t m_divider;
 		ACLK *m_aclk;
 		SMCLK *m_smclk;
 		uint16_t m_ctl0;
@@ -81,7 +81,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		uint16_t m_stat;
 		uint16_t m_rxbuf;
 		uint16_t m_txbuf;
-		int m_counter;
+		uint16_t m_counter;
 		std::vector<PinMultiplexer *> m_somiMpx;
 		std::vector<PinMultiplexer *> m_simoMpx;
 		std::vector<PinMultiplexer *> m_clkMpx;
