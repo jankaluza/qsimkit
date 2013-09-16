@@ -90,6 +90,8 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		bool m_usickpl;
 		bool m_input;
 		bool m_output;
+		bool m_transmitting;
+		bool m_txReady;
 };
 
 }

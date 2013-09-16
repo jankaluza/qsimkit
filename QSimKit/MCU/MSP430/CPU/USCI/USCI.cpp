@@ -36,12 +36,13 @@ m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(varian
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
 m_ctl0(ctl0), m_ctl1(ctl1), m_br0(br0), m_br1(br1), m_mctl(mctl), m_stat(stat), m_rxbuf(rxbuf),
 m_txbuf(txbuf), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
-m_output(false) {
+m_output(false), m_transmitting(false), m_txReady(false) {
 
 	m_mem->addWatcher(m_ctl0, this);
 	m_mem->addWatcher(m_ctl1, this);
 	m_mem->addWatcher(m_br0, this);
 	m_mem->addWatcher(m_br1, this);
+	m_mem->addWatcher(m_txbuf, this);
 // 	m_mem->addWatcher(m_usicctl + 1, this);
 // 	m_mem->addWatcher(m_usisr, this);
 // 	m_mem->addWatcher(m_usictl, this);
@@ -68,12 +69,26 @@ void USCI::tickRising() {
 			return;
 		}
 
+		// we are not transmitting
+		if (!m_transmitting) {
+			return;
+		}
 	}
 }
 
 void USCI::tickFalling() {
 	if (m_counter == (m_divider >> 2)) {
+		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
 
+		// Logic is held in reset state
+		if (ctl0 & 1) {
+			return;
+		}
+
+		// we are not transmitting
+		if (!m_transmitting) {
+			return;
+		}
 	}
 }
 
@@ -150,6 +165,9 @@ void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	}
 	else if (address == m_br0 || address == m_br1) {
 		m_divider = m_br0 + m_br1 * 256;
+	}
+	else if (address == m_txbuf) {
+		m_txReady = true;
 	}
 }
 
