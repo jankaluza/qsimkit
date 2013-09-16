@@ -229,7 +229,7 @@ void USI::reset() {
 		m_source->removeHandler(this);
 	}
 	m_source = m_aclk;
-	m_source->addHandler(this, Clock::Rising);
+	m_source->addHandler(this, Clock::RisingFalling);
 
 	// Set default values
 	m_mem->setByte(m_usictl, 1);
@@ -301,7 +301,7 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		}
 
 		if (m_source) {
-			m_source->addHandler(this, Clock::Rising);
+			m_source->addHandler(this, Clock::RisingFalling);
 		}
 
 		// clock polarity (USICKPL)
