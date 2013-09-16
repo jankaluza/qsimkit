@@ -38,7 +38,8 @@ m_ctl0(ctl0), m_ctl1(ctl1), m_br0(br0), m_br1(br1), m_mctl(mctl), m_stat(stat), 
 m_txbuf(txbuf), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
 m_output(false) {
 
-// 	m_mem->addWatcher(m_usicctl, this);
+	m_mem->addWatcher(m_ctl0, this);
+	m_mem->addWatcher(m_ctl1, this);
 // 	m_mem->addWatcher(m_usicctl + 1, this);
 // 	m_mem->addWatcher(m_usisr, this);
 // 	m_mem->addWatcher(m_usictl, this);
@@ -57,6 +58,13 @@ USCI::~USCI() {
 void USCI::tickRising() {
 	if (++m_counter >= m_divider) {
 		m_counter = 0;
+
+		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
+
+		// Logic is held in reset state
+		if (ctl0 & 1) {
+			return;
+		}
 
 	}
 }
@@ -77,19 +85,67 @@ void USCI::handleSignal(const std::string &name, double value) {
 }
 
 void USCI::reset() {
-// 	if (m_source) {
-// 		m_source->removeHandler(this);
-// 	}
-// 	m_source = m_aclk;
-// 	m_source->addHandler(this, Clock::Rising);
-// 
-// 	// Set default values
-// 	m_mem->setByte(m_usictl, 1);
-// 	m_mem->setByte(m_usictl + 1, 1);
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
+	m_source = m_aclk;
+	m_source->addHandler(this, Clock::Rising);
+
+	// Set default values
+	m_mem->setByte(m_ctl1, 1);
 }
 
 void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
+	if (address == m_ctl1) {
+		uint8_t val = m_mem->getByte(address, false);
 
+		// divider
+// 		m_divider = 1 << ((val >> 5) & 7);
+
+		if (m_source) {
+			m_source->removeHandler(this);
+		}
+
+		// source
+		switch((val >> 6) & 3) {
+			case 0:
+				// N/A
+				m_source = 0;
+				break;
+			case 1:
+				m_source = m_aclk;
+				break;
+			case 2: case 3:
+				m_source = m_smclk;
+				break;
+		}
+
+		if (m_source) {
+			m_source->addHandler(this, Clock::Rising);
+		}
+
+
+	}
+	else if (address == m_ctl0) {
+		uint8_t val = m_mem->getByte(address, false);
+
+		// Check UC7BIT and if set, reset UCMSB
+		if (val & (1 << 4)) {
+			m_mem->setByte(address, val | (1 << 5), false);
+		}
+
+		// clock polarity (UCCKPL)
+		bool usickpl = val & (1 << 6);
+		if (usickpl != m_usickpl) {
+			m_usickpl = usickpl;
+
+			// TODO: When clock polarity changes, switch clock output
+// 			uint8_t usictl0 = m_mem->getByte(m_usictl);
+// 			if ((usictl0 & (1 << 5))) {
+// 				generateOutput(m_sclkMpx, m_sclk != m_usickpl);
+// 			}
+		}
+	}
 }
 
 void USCI::handleInterruptFinished(InterruptManager *intManager, int vector) {
