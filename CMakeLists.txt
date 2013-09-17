@@ -30,7 +30,7 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 # Find PythonQt
 set(PythonQt_DIR "${CMAKE_SOURCE_DIR}/cmake_modules")
-find_package(PythonQt)
+find_package(PythonQt QUIET)
 
 
 if (PYTHONQT_INCLUDE_PATH AND PYTHONQT_LIBRARIES)
