@@ -30,7 +30,7 @@ include_directories(${PYTHON_INCLUDE_PATH})
 
 # Find PythonQt
 set(PythonQt_DIR "${CMAKE_SOURCE_DIR}/cmake_modules")
-find_package(PythonQt)
+find_package(PythonQt QUIET)
 
 
 if (PYTHONQT_INCLUDE_PATH AND PYTHONQT_LIBRARIES)
@@ -53,6 +53,11 @@ if(NOT CPPUNIT_FOUND AND CPPUNIT_INCLUDE_DIR AND CPPUNIT_LIBRARY)
 	set(CCPUNIT_LIBRARIES ${CPPUNIT_LIBRARY})
 	set(CPPUNIT_FOUND 1)
 	message(STATUS "Using cppunit: ${CPPUNIT_INCLUDE_DIR} ${CPPUNIT_LIBRARIES}")
+endif()
+
+if (CPPUNIT_FOUND)
+    message(STATUS "Using cppunit:: ${CPPUNIT_INCLUDE_DIR} ${CPPUNIT_LIBRARIES}")
+    include_directories(${CPPUNIT_INCLUDE_DIR})
 endif()
 
 ADD_DEFINITIONS(-DMODULES_DIR="${LIB_INSTALL_DIR}/qsimkit")
