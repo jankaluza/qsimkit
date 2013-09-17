@@ -74,19 +74,19 @@ static void parseCode(DisassembledFiles &df, QString &code, QString &error) {
 			QString addr = line.left(8).right(4);
 			pendingSection = DisassembledLine(addr.toInt(0, 16), num, DisassembledLine::Section, line.mid(9));
 		}
-#ifdef Q_OS_LINUX
-		else if (line.startsWith("+<")) {
-			file = line.mid(6, line.indexOf(':') - 6);
-			num = line.mid(line.indexOf(':') + 1).toInt();
+#ifdef Q_OS_WIN
+		else if (line[1] == ':' && line[2] == '\\') {
+			file = line.left(line.lastIndexOf(':'));
+			num = line.mid(line.lastIndexOf(':') + 1).toInt();
 			if (pendingSection.getAddr()) {
 				df[file].append(pendingSection);
 				pendingSection = DisassembledLine();
 			}
 		}
 #else
-		else if (line[1] == ':' && line[2] == '\\') {
-			file = line.left(line.lastIndexOf(':'));
-			num = line.mid(line.lastIndexOf(':') + 1).toInt();
+		else if (line.startsWith("+<")) {
+			file = line.mid(6, line.indexOf(':') - 6);
+			num = line.mid(line.indexOf(':') + 1).toInt();
 			if (pendingSection.getAddr()) {
 				df[file].append(pendingSection);
 				pendingSection = DisassembledLine();

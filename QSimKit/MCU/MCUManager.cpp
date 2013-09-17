@@ -73,10 +73,10 @@ bool MCUManager::loadXML(QString file) {
 			library = element.text();
 			info.m_library = library;
 			if (type == "binary") {
-#ifdef Q_OS_LINUX
-				info.m_mcu = loadBinaryMCU(file + "/lib" + element.text());
-#else
+#if defined(Q_OS_WIN)
 				info.m_mcu = loadBinaryMCU(file + "/" + element.text());
+#else
+				info.m_mcu = loadBinaryMCU(file + "/lib" + element.text());
 #endif
 				
 			}
