@@ -65,6 +65,15 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		void reset();
 
 	private:
+		void doSPICapture(uint8_t ctl0);
+		void doSPIOutput(uint8_t ctl0);
+		void handleTickSPI(bool rising, uint8_t ctl0);
+		void handleFirstEdgeSPI(uint8_t ctl0);
+		void handleSecondEdgeSPI(uint8_t ctl0);
+		void generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value);
+		void txReady();
+
+	private:
 		PinManager *m_pinManager;
 		InterruptManager *m_intManager;
 		Memory *m_mem;
@@ -92,6 +101,9 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		bool m_output;
 		bool m_transmitting;
 		bool m_txReady;
+		uint8_t m_tx;
+		uint8_t m_rx;
+		uint8_t m_cnt;
 };
 
 }
