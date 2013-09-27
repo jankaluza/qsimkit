@@ -41,7 +41,7 @@ class PinMultiplexer;
 
 class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler, public SignalHandler {
 	public:
-		USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
+		USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant, const std::string &prefix,
 			  ACLK *aclk, SMCLK *smclk, uint16_t ctl0, uint16_t ctl1, uint16_t br0,
 			  uint16_t br1, uint16_t mctl, uint16_t stat, uint16_t rxbuf, uint16_t txbuf);
 		virtual ~USCI();

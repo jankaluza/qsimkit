@@ -29,7 +29,7 @@
 
 namespace MSP430 {
 
-USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
+USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant, const std::string &prefix,
 			 ACLK *aclk, SMCLK *smclk, uint16_t ctl0, uint16_t ctl1, uint16_t br0,
 			  uint16_t br1, uint16_t mctl, uint16_t stat, uint16_t rxbuf, uint16_t txbuf) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
@@ -46,10 +46,11 @@ m_output(false), m_transmitting(false), m_txReady(false) {
 // 	m_mem->addWatcher(m_usicctl + 1, this);
 // 	m_mem->addWatcher(m_usisr, this);
 // 	m_mem->addWatcher(m_usictl, this);
-// 
-// 	m_sdiMpx = m_pinManager->addPinHandler("SDI", this);
-// 	m_sdoMpx = m_pinManager->addPinHandler("SDO", this);
-// 	m_sclkMpx = m_pinManager->addPinHandler("SCLK", this);
+
+	m_somiMpx = m_pinManager->addPinHandler(prefix + "SOMI", this);
+	m_simoMpx = m_pinManager->addPinHandler(prefix + "SIMO", this);
+	m_clkMpx = m_pinManager->addPinHandler(prefix + "CLK", this);
+	m_steMpx = m_pinManager->addPinHandler(prefix + "STE", this);
 
 	reset();
 }
@@ -59,6 +60,7 @@ USCI::~USCI() {
 }
 
 void USCI::doSPICapture(uint8_t ctl0) {
+	std::cout << "CAPTURE\n";
 // 	std::cout << "capture\n";
 	// Check LSB vs. MSB
 	if (ctl0 & (1 << 5)) {
@@ -106,7 +108,6 @@ void USCI::doSPICapture(uint8_t ctl0) {
 		if (m_txReady) {
 			txReady();
 		}
-
 	}
 }
 
@@ -117,10 +118,11 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 		// MSB
 		// Check if we are working in 8 bit mode
 		if (ctl0 & (1 << 4)) {
-			m_output = m_tx & (1 << 7);
+			m_output = m_tx & (1 << 6);
 		}
 		else {
-			m_output = m_tx & (1 << 8);
+			std::cout << "8BIT\n";
+			m_output = m_tx & (1 << 7);
 		}
 		m_tx = m_tx << 1;
 	}
@@ -130,6 +132,7 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 		m_tx = m_tx >> 1;
 	}
 
+	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
 	generateOutput(m_simoMpx, m_output);
 }
 
@@ -141,6 +144,7 @@ void USCI::generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value) {
 }
 
 void USCI::handleFirstEdgeSPI(uint8_t ctl0) {
+	std::cout << "FIRST EDGE\n";
 	// Check UCCKPH:
 	if (ctl0 & (1 << 7)) {
 		doSPICapture(ctl0);
@@ -151,6 +155,7 @@ void USCI::handleFirstEdgeSPI(uint8_t ctl0) {
 }
 
 void USCI::handleSecondEdgeSPI(uint8_t ctl0) {
+	std::cout << "SECOND EDGE << " << (uint16_t) ctl0 << " " << (ctl0 & (1 << 7)) << "\n";
 	// Check UCCKPH:
 	if (ctl0 & (1 << 7)) {
 		doSPIOutput(ctl0);
@@ -183,9 +188,11 @@ void USCI::tickRising() {
 		m_counter = 0;
 
 		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
+		uint8_t ctl1 = m_mem->getByte(m_ctl1, false);
+		
 
 		// Logic is held in reset state
-		if (ctl0 & 1) {
+		if (ctl1 & 1) {
 			return;
 		}
 
@@ -201,9 +208,10 @@ void USCI::tickRising() {
 void USCI::tickFalling() {
 	if (m_counter == (m_divider >> 2)) {
 		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
+		uint8_t ctl1 = m_mem->getByte(m_ctl1, false);
 
 		// Logic is held in reset state
-		if (ctl0 & 1) {
+		if (ctl1 & 1) {
 			return;
 		}
 
@@ -243,6 +251,8 @@ void USCI::txReady() {
 		m_txReady = true;
 		return;
 	}
+
+	std::cout << "STARTING TRANSMITION\n";
 
 	// There is no transmission in progress, so just move data into m_tx and
 	// start the transmission
@@ -315,6 +325,7 @@ void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		m_divider = m_br0 + m_br1 * 256;
 	}
 	else if (address == m_txbuf) {
+		std::cout << "user wrote to TXBUF\n";
 		txReady();
 	}
 }
