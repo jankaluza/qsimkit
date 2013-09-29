@@ -143,6 +143,8 @@ class Variant {
 		virtual unsigned int getUCB0TXBUF() = 0;
 		virtual unsigned int getUCB0I2COA() = 0;
 		virtual unsigned int getUCB0I2CSA() = 0;
+		virtual unsigned int getUSCIAB0TX_VECTOR() = 0;
+		virtual unsigned int getUSCIAB0RX_VECTOR() = 0;
 		virtual unsigned int getUCA1CTL0() = 0;
 		virtual unsigned int getUCA1CTL1() = 0;
 		virtual unsigned int getUCA1BR0() = 0;
@@ -164,6 +166,8 @@ class Variant {
 		virtual unsigned int getUCB1TXBUF() = 0;
 		virtual unsigned int getUCB1I2COA() = 0;
 		virtual unsigned int getUCB1I2CSA() = 0;
+		virtual unsigned int getUSCIAB1TX_VECTOR() = 0;
+		virtual unsigned int getUSCIAB1RX_VECTOR() = 0;
 		virtual unsigned int getUC1IE() = 0;
 		virtual unsigned int getUC1IFG() = 0;
 		virtual double getSRSEL() = 0;

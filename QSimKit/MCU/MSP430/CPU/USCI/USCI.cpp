@@ -60,24 +60,35 @@ USCI::~USCI() {
 }
 
 void USCI::doSPICapture(uint8_t ctl0) {
-	std::cout << "CAPTURE\n";
+// 	std::cout << "CAPTURE\n";
 // 	std::cout << "capture\n";
 	// Check LSB vs. MSB
 	if (ctl0 & (1 << 5)) {
+		m_rx = m_rx << 1;
 		// MSB mode
+		std::cout << "MSB CAPTURE " << m_input << "\n";
 		if (m_input) {
 			m_rx |= 1;
 		}
 		else {
 			m_rx &= ~(1);
 		}
-		m_rx = m_rx << 1;
-		m_rx &= 0xf7;
 	}
 	else {
 		// LSB mode
+		m_rx = m_rx >> 1;
 		if (ctl0 & (1 << 4)) {
 			// 7 bit mode
+			if (m_input) {
+				m_rx |= (1 << 6);
+			}
+			else {
+				m_rx &= ~(1 << 6);
+			}
+			m_rx &= 127;
+		}
+		else {
+			// 8 bit mode
 			if (m_input) {
 				m_rx |= (1 << 7);
 			}
@@ -85,22 +96,12 @@ void USCI::doSPICapture(uint8_t ctl0) {
 				m_rx &= ~(1 << 7);
 			}
 		}
-		else {
-			// 8 bit mode
-			if (m_input) {
-				m_rx |= (1 << 8);
-			}
-			else {
-				m_rx &= ~(1 << 8);
-			}
-			m_rx &= 0xff;
-		}
-		m_rx = m_rx >> 1;
 	}
 
+	std::cout << "RXBUF = " << (uint16_t) m_rx << "\n";
 	m_cnt--;
 	if (m_cnt == 0) {
-// 		std::cout << "USISR = " << usisr << "\n";
+		std::cout << "FINAL RXBUF = " << (uint16_t) m_rx << "\n";
 		m_mem->setByte(m_rxbuf, m_rx, false);
 // 		m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
 		m_transmitting = false;
@@ -121,7 +122,7 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 			m_output = m_tx & (1 << 6);
 		}
 		else {
-			std::cout << "8BIT\n";
+// 			std::cout << "8BIT\n";
 			m_output = m_tx & (1 << 7);
 		}
 		m_tx = m_tx << 1;
@@ -132,7 +133,7 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 		m_tx = m_tx >> 1;
 	}
 
-	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
+// 	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
 	generateOutput(m_simoMpx, m_output);
 }
 
@@ -144,7 +145,7 @@ void USCI::generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value) {
 }
 
 void USCI::handleFirstEdgeSPI(uint8_t ctl0) {
-	std::cout << "FIRST EDGE\n";
+// 	std::cout << "FIRST EDGE\n";
 	// Check UCCKPH:
 	if (ctl0 & (1 << 7)) {
 		doSPICapture(ctl0);
@@ -155,7 +156,7 @@ void USCI::handleFirstEdgeSPI(uint8_t ctl0) {
 }
 
 void USCI::handleSecondEdgeSPI(uint8_t ctl0) {
-	std::cout << "SECOND EDGE << " << (uint16_t) ctl0 << " " << (ctl0 & (1 << 7)) << "\n";
+// 	std::cout << "SECOND EDGE << " << (uint16_t) ctl0 << " " << (ctl0 & (1 << 7)) << "\n";
 	// Check UCCKPH:
 	if (ctl0 & (1 << 7)) {
 		doSPIOutput(ctl0);
@@ -340,7 +341,11 @@ void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value)
 
 
 void USCI::handlePinInput(const std::string &name, double value) {
-
+	if (name == "SOMI") {
+		m_input = value > 1.5;
+// 		std::cout << "SOMI input " << value << "\n";
+		return;
+	}
 }
 
 void USCI::handlePinActivated(const std::string &name) {

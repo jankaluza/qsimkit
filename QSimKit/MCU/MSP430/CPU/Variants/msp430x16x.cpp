@@ -3911,6 +3911,24 @@ class Variant_msp430x16x : public Variant {
 		}
 
 
+		unsigned int getUSCIAB0TX_VECTOR() {
+#ifdef USCIAB0TX_VECTOR
+			return USCIAB0TX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSCIAB0RX_VECTOR() {
+#ifdef USCIAB0RX_VECTOR
+			return USCIAB0RX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 		unsigned int getUCA1CTL0() {
 #ifdef UCA1CTL0_
 			return UCA1CTL0_;
@@ -4094,6 +4112,24 @@ class Variant_msp430x16x : public Variant {
 		unsigned int getUCB1I2CSA() {
 #ifdef UCB1I2CSA_
 			return UCB1I2CSA_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSCIAB1TX_VECTOR() {
+#ifdef USCIAB1TX_VECTOR
+			return USCIAB1TX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSCIAB1RX_VECTOR() {
+#ifdef USCIAB1RX_VECTOR
+			return USCIAB1RX_VECTOR;
 #else
 			return 0;
 #endif

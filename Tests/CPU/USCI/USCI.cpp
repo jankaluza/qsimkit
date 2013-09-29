@@ -27,13 +27,13 @@ class DummyTimerFactory : public TimerFactory {
 		VLO *createVLO() { return new VLO(); }
 };
 
-class DummyPinWatcher1 : public PinWatcher {
+class DummyPinWatcher2 : public PinWatcher {
 	public:
-		DummyPinWatcher1() : sclk(-1), sdo(0) {
+		DummyPinWatcher2() : sclk(-1), sdo(0) {
 		}
 
 		void handlePinChanged(int i, double v) {
-			std::cout << "PIN CHANGED " << i << " " << v << "\n";
+// 			std::cout << "PIN CHANGED " << i << " " << v << "\n";
 			switch (i) {
 				case 2: sclk = v; break;
 				case 1: sdo = v; break;
@@ -57,7 +57,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 	BasicClock *bc;
 	TimerFactory *factory;
 	PinManager *pinManager;
-	DummyPinWatcher1 *watcher;
+	DummyPinWatcher2 *watcher;
 	USCI *usci;
 
 	public:
@@ -95,7 +95,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			}
 			
 			bc = new BasicClock(m, v, intManager, pinManager, factory);
-			watcher = new DummyPinWatcher1();
+			watcher = new DummyPinWatcher2();
 			pinManager->setWatcher(watcher);
 
 			usci = new USCI(pinManager, intManager, m, v, "", bc->getACLK(), bc->getSMCLK(),
@@ -141,7 +141,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
 
 			// prepare '1' to be captured
-			pinManager->handlePinInput(2, 3.0);
+			pinManager->handlePinInput(0, 3.0);
 
 			//  bit captured from SOMI
 			usci->tickFalling();
@@ -154,7 +154,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
 
 			// prepare '0' to be captured
-			pinManager->handlePinInput(2, 0.0);
+			pinManager->handlePinInput(0, 0.0);
 
 			// cnt--, bit captured from SDI
 			usci->tickFalling();
@@ -167,90 +167,81 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
 
 			// prepare '0' to be captured
-			pinManager->handlePinInput(2, 3.0);
+			pinManager->handlePinInput(0, 3.0);
 
 			// cnt--, bit captured from SDI
 			usci->tickFalling();
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
 
-// 		/// BIT 4
-// 			// First (MSB) bit should be sent and rising clock generated
-// 			usi->tickRising();
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
-// 
-// 			// prepare '0' to be captured
-// 			pinManager->handlePinInput(2, 0.0);
-// 
-// 			// cnt--, bit captured from SDI
-// 			usi->tickFalling();
-// 			CPPUNIT_ASSERT_EQUAL(4, (int) m->getByte(v->getUSCICCTL() + 1));
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(122, (int) m->getByte(v->getUSCISR())); // 10111|101 (after shift) -> 0111|1010
-// 
-// 		/// BIT 5
-// 			// First (MSB) bit should be sent and rising clock generated
-// 			usi->tickRising();
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
-// 
-// 			// prepare '0' to be captured
-// 			pinManager->handlePinInput(2, 3.0);
-// 
-// 			// cnt--, bit captured from SDI
-// 			usi->tickFalling();
-// 			CPPUNIT_ASSERT_EQUAL(3, (int) m->getByte(v->getUSCICCTL() + 1));
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(245, (int) m->getByte(v->getUSCISR())); // 0111|1010 (after shift) -> 111|10101
-// 
-// 		/// BIT 6
-// 			// First (MSB) bit should be sent and rising clock generated
-// 			usi->tickRising();
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
-// 
-// 			// prepare '0' to be captured
-// 			pinManager->handlePinInput(2, 0.0);
-// 
-// 			// cnt--, bit captured from SDI
-// 			usi->tickFalling();
-// 			CPPUNIT_ASSERT_EQUAL(2, (int) m->getByte(v->getUSCICCTL() + 1));
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(234, (int) m->getByte(v->getUSCISR())); // 111|10101 (after shift) -> 11|101010
-// 
-// 		/// BIT 7
-// 			// First (MSB) bit should be sent and rising clock generated
-// 			usi->tickRising();
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
-// 
-// 			// prepare '0' to be captured
-// 			pinManager->handlePinInput(2, 3.0);
-// 
-// 			// cnt--, bit captured from SDI
-// 			usi->tickFalling();
-// 			CPPUNIT_ASSERT_EQUAL(1, (int) m->getByte(v->getUSCICCTL() + 1));
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(213, (int) m->getByte(v->getUSCISR())); // 11|101010 (after shift) -> 1|1010101
-// 
-// 		/// BIT 8
-// 			// First (MSB) bit should be sent and rising clock generated
-// 			usi->tickRising();
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
-// 
-// 			// prepare '0' to be captured
-// 			pinManager->handlePinInput(2, 0.0);
-// 
-// 			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
-// 
-// 			// cnt--, bit captured from SDI
-// 			usi->tickFalling();
-// 			CPPUNIT_ASSERT_EQUAL(0, (int) m->getByte(v->getUSCICCTL() + 1));
-// 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
-// 			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUSCISR())); // 1|1010101 (after shift) -> |10101010
-// 
-// 		/// INTERRUPT
+		/// BIT 4
+			// First (MSB) bit should be sent and rising clock generated
+			usci->tickRising();
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(0, 0.0);
+
+			// cnt--, bit captured from SDI
+			usci->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+
+		/// BIT 5
+			// First (MSB) bit should be sent and rising clock generated
+			usci->tickRising();
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(0, 3.0);
+
+			// cnt--, bit captured from SDI
+			usci->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+
+		/// BIT 6
+			// First (MSB) bit should be sent and rising clock generated
+			usci->tickRising();
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(0, 0.0);
+
+			// cnt--, bit captured from SDI
+			usci->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+
+		/// BIT 7
+			// First (MSB) bit should be sent and rising clock generated
+			usci->tickRising();
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(0, 3.0);
+
+			// cnt--, bit captured from SDI
+			usci->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+
+		/// BIT 8
+			// First (MSB) bit should be sent and rising clock generated
+			usci->tickRising();
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(3.0, watcher->sdo);
+
+			// prepare '0' to be captured
+			pinManager->handlePinInput(0, 0.0);
+
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+
+			// cnt--, bit captured from SDI
+			usci->tickFalling();
+			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUCA0RXBUF()));
+
+		/// INTERRUPT
 // 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSCICTL() + 1, 1));
 // 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 // 
