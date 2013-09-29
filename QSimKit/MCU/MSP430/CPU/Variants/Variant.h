@@ -137,6 +137,7 @@ class Variant {
 		virtual unsigned int getUCB0CTL1() = 0;
 		virtual unsigned int getUCB0BR0() = 0;
 		virtual unsigned int getUCB0BR1() = 0;
+		virtual unsigned int getUCB0MCTL() = 0;
 		virtual unsigned int getUCB0I2CIE() = 0;
 		virtual unsigned int getUCB0STAT() = 0;
 		virtual unsigned int getUCB0RXBUF() = 0;

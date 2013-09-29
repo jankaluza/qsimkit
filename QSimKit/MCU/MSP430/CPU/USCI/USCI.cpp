@@ -29,23 +29,80 @@
 
 namespace MSP430 {
 
-USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant, const std::string &prefix,
-			 ACLK *aclk, SMCLK *smclk, uint16_t ctl0, uint16_t ctl1, uint16_t br0,
-			  uint16_t br1, uint16_t mctl, uint16_t stat, uint16_t rxbuf, uint16_t txbuf) :
+USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
+		   Type type, uint8_t id, ACLK *aclk, SMCLK *smclk) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
-m_ctl0(ctl0), m_ctl1(ctl1), m_br0(br0), m_br1(br1), m_mctl(mctl), m_stat(stat), m_rxbuf(rxbuf),
-m_txbuf(txbuf), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
-m_output(false), m_transmitting(false), m_txReady(false) {
+m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
+m_output(false), m_transmitting(false), m_txReady(false), m_type(type) {
+
+	std::string prefix;
+
+	switch(type) {
+		case USCI_A:
+			if (id == 0) {
+				m_ctl0 = variant->getUCA0CTL0();
+				m_ctl1 = variant->getUCA0CTL1();
+				m_br0 = variant->getUCA0BR0();
+				m_br1 = variant->getUCA0BR1();
+				m_mctl = variant->getUCA0MCTL();
+				m_stat = variant->getUCA0STAT();
+				m_rxbuf = variant->getUCA0RXBUF();
+				m_txbuf = variant->getUCA0TXBUF();
+				prefix = "UCA0";
+			}
+			else {
+				m_ctl0 = variant->getUCA1CTL0();
+				m_ctl1 = variant->getUCA1CTL1();
+				m_br0 = variant->getUCA1BR0();
+				m_br1 = variant->getUCA1BR1();
+				m_mctl = variant->getUCA1MCTL();
+				m_stat = variant->getUCA1STAT();
+				m_rxbuf = variant->getUCA1RXBUF();
+				m_txbuf = variant->getUCA1TXBUF();
+				prefix = "UCA1";
+			}
+			break;
+		case USCI_B:
+			if (id == 0) {
+				m_ctl0 = variant->getUCB0CTL0();
+				m_ctl1 = variant->getUCB0CTL1();
+				m_br0 = variant->getUCB0BR0();
+				m_br1 = variant->getUCB0BR1();
+				m_mctl = variant->getUCB0MCTL();
+				m_stat = variant->getUCB0STAT();
+				m_rxbuf = variant->getUCB0RXBUF();
+				m_txbuf = variant->getUCB0TXBUF();
+				prefix = "UCB0";
+			}
+			else {
+				m_ctl0 = variant->getUCB1CTL0();
+				m_ctl1 = variant->getUCB1CTL1();
+				m_br0 = variant->getUCB1BR0();
+				m_br1 = variant->getUCB1BR1();
+				m_mctl = 0;
+				m_stat = variant->getUCB1STAT();
+				m_rxbuf = variant->getUCB1RXBUF();
+				m_txbuf = variant->getUCB1TXBUF();
+				prefix = "UCB1";
+			}
+			break;
+	};
+
+	if (id == 0) {
+		m_rxvect = variant->getUSCIAB0RX_VECTOR();
+		m_txvect = variant->getUSCIAB0TX_VECTOR();
+	}
+	else {
+		m_rxvect = variant->getUSCIAB1RX_VECTOR();
+		m_txvect = variant->getUSCIAB1TX_VECTOR();
+	}
 
 	m_mem->addWatcher(m_ctl0, this);
 	m_mem->addWatcher(m_ctl1, this);
 	m_mem->addWatcher(m_br0, this);
 	m_mem->addWatcher(m_br1, this);
 	m_mem->addWatcher(m_txbuf, this);
-// 	m_mem->addWatcher(m_usicctl + 1, this);
-// 	m_mem->addWatcher(m_usisr, this);
-// 	m_mem->addWatcher(m_usictl, this);
 
 	m_somiMpx = m_pinManager->addPinHandler(prefix + "SOMI", this);
 	m_simoMpx = m_pinManager->addPinHandler(prefix + "SIMO", this);
@@ -103,9 +160,18 @@ void USCI::doSPICapture(uint8_t ctl0) {
 	if (m_cnt == 0) {
 		std::cout << "FINAL RXBUF = " << (uint16_t) m_rx << "\n";
 		m_mem->setByte(m_rxbuf, m_rx, false);
-// 		m_intManager->queueInterrupt(m_variant->getUSI_VECTOR());
-		m_transmitting = false;
+
+		// generate interrupt
+		if (m_type == USCI_A) {
+			m_mem->setByte(m_ifg, 1, false);
+		}
+		else {
+			m_mem->setByte(m_ifg, 4, false);
+		}
+		m_intManager->queueInterrupt(m_rxvect);
+
 		// if there is another byte ready, start tranmission again
+		m_transmitting = false;
 		if (m_txReady) {
 			txReady();
 		}
@@ -341,7 +407,7 @@ void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value)
 
 
 void USCI::handlePinInput(const std::string &name, double value) {
-	if (name == "SOMI") {
+	if (name[5] == 'O') {
 		m_input = value > 1.5;
 // 		std::cout << "SOMI input " << value << "\n";
 		return;

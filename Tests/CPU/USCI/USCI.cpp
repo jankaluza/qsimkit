@@ -75,7 +75,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			{
 				PinMultiplexer::Condition c;
 				c["sel"] = 1;
-				mpx->addMultiplexing(c, "SOMI");
+				mpx->addMultiplexing(c, "UCA0SOMI");
 			}
 
 			mpx = pinManager->addPin(P1, 4);
@@ -83,7 +83,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			{
 				PinMultiplexer::Condition c;
 				c["sel"] = 1;
-				mpx->addMultiplexing(c, "SIMO");
+				mpx->addMultiplexing(c, "UCA0SIMO");
 			}
 
 			mpx = pinManager->addPin(P1, 5);
@@ -91,16 +91,14 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			{
 				PinMultiplexer::Condition c;
 				c["sel"] = 1;
-				mpx->addMultiplexing(c, "CLK");
+				mpx->addMultiplexing(c, "UCA0CLK");
 			}
 			
 			bc = new BasicClock(m, v, intManager, pinManager, factory);
 			watcher = new DummyPinWatcher2();
 			pinManager->setWatcher(watcher);
 
-			usci = new USCI(pinManager, intManager, m, v, "", bc->getACLK(), bc->getSMCLK(),
-						   v->getUCA0CTL0(), v->getUCA0CTL1(), v->getUCA0BR0(), v->getUCA0BR1(),
-						   v->getUCA0MCTL(), v->getUCA0STAT(), v->getUCA0RXBUF(), v->getUCA0TXBUF());
+			usci = new USCI(pinManager, intManager, m, v, USCI::USCI_A, 0, bc->getACLK(), bc->getSMCLK());
 		}
 
 		void tearDown (void) {
@@ -243,7 +241,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 
 		/// INTERRUPT
 // 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSCICTL() + 1, 1));
-// 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 // 
 // 		/// Writing to USCICNT will clear the USCIIFG bit
 // 			m->setByte(v->getUSCICCTL() + 1, 8);

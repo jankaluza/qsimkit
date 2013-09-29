@@ -2857,6 +2857,15 @@ class Variant_msp430xW42x : public Variant {
 		}
 
 
+		unsigned int getUCB0MCTL() {
+#ifdef UCB0MCTL_
+			return UCB0MCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
 		unsigned int getUCB0I2CIE() {
 #ifdef UCB0I2CIE_
 			return UCB0I2CIE_;

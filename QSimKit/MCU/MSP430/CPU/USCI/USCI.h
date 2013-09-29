@@ -41,9 +41,10 @@ class PinMultiplexer;
 
 class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, public PinHandler, public SignalHandler {
 	public:
-		USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant, const std::string &prefix,
-			  ACLK *aclk, SMCLK *smclk, uint16_t ctl0, uint16_t ctl1, uint16_t br0,
-			  uint16_t br1, uint16_t mctl, uint16_t stat, uint16_t rxbuf, uint16_t txbuf);
+		typedef enum {USCI_A, USCI_B} Type;
+
+		USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem,
+			 Variant *variant, Type type, uint8_t id, ACLK *aclk, SMCLK *smclk);
 		virtual ~USCI();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
@@ -90,6 +91,9 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		uint16_t m_stat;
 		uint16_t m_rxbuf;
 		uint16_t m_txbuf;
+		uint16_t m_rxvect;
+		uint16_t m_txvect;
+		uint16_t m_ifg;
 		uint16_t m_counter;
 		std::vector<PinMultiplexer *> m_somiMpx;
 		std::vector<PinMultiplexer *> m_simoMpx;
@@ -104,6 +108,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		uint8_t m_tx;
 		uint8_t m_rx;
 		uint8_t m_cnt;
+		Type m_type;
 };
 
 }
