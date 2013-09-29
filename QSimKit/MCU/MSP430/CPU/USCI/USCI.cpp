@@ -92,10 +92,14 @@ m_output(false), m_transmitting(false), m_txReady(false), m_type(type) {
 	if (id == 0) {
 		m_rxvect = variant->getUSCIAB0RX_VECTOR();
 		m_txvect = variant->getUSCIAB0TX_VECTOR();
+		m_ifg = variant->getUC0IFG();
+		m_ie = variant->getUC0IE();
 	}
 	else {
 		m_rxvect = variant->getUSCIAB1RX_VECTOR();
 		m_txvect = variant->getUSCIAB1TX_VECTOR();
+		m_ifg = variant->getUC1IFG();
+		m_ie = variant->getUC1IE();
 	}
 
 	m_mem->addWatcher(m_ctl0, this);
@@ -163,10 +167,14 @@ void USCI::doSPICapture(uint8_t ctl0) {
 
 		// generate interrupt
 		if (m_type == USCI_A) {
-			m_mem->setByte(m_ifg, 1, false);
+			if (m_mem->getByte(m_ie, false) & 1) {
+				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 1, false);
+			}
 		}
 		else {
-			m_mem->setByte(m_ifg, 4, false);
+			if (m_mem->getByte(m_ie, false) & 4) {
+				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 4, false);
+			}
 		}
 		m_intManager->queueInterrupt(m_rxvect);
 
@@ -201,6 +209,21 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 
 // 	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
 	generateOutput(m_simoMpx, m_output);
+
+	if (m_cnt == 0 || m_cnt == 1) {
+		// generate interrupt
+		if (m_type == USCI_A) {
+			if (m_mem->getByte(m_ie, false) & 2) {
+				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 2, false);
+			}
+		}
+		else {
+			if (m_mem->getByte(m_ie, false) & 8) {
+				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 8, false);
+			}
+		}
+		m_intManager->queueInterrupt(m_txvect);
+	}
 }
 
 void USCI::generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value) {

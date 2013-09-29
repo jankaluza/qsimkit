@@ -59,7 +59,8 @@ defines += ["UCB1CTL0_", "UCB1CTL1_", "UCB1BR0_", "UCB1BR1_", "UCB1I2CIE_", "UCB
 defines += ["UCB1RXBUF_", "UCB1TXBUF_", "UCB1I2COA_", "UCB1I2CSA_"]
 defines += ["USCIAB1TX_VECTOR", "USCIAB1RX_VECTOR"]
 
-defines += ["UC1IE_", "UC1IFG_"]
+defines += ["UC0IE", "UC0IFG"]
+defines += ["UC1IE", "UC1IFG"]
 
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
@@ -103,6 +104,10 @@ for header in os.listdir("../../../../../3rdparty/msp430gcc"):
 		output += "#ifndef %s\n" % (line.split(' ')[1])
 		output += line + "\n"
 		output += "#endif\n"
+		if (line.split(' ')[1].endswith("_")):
+			output += "#ifndef %s\n" % (line.split(' ')[1][:-1])
+			output += line.replace(line.split(' ')[1], line.split(' ')[1][:-1]) + "\n"
+			output += "#endif\n"
 
 	name = header[:-2]
 

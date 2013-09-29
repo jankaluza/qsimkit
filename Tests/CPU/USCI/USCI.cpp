@@ -118,9 +118,8 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			m->setByte(v->getUCA0CTL0(), 41);
 			// UCA0CTL1 &= ~UCSWRST;
 			m->setByte(v->getUCA0CTL1(), 0);
-			// UCA0IE |= UCRXIE;
-			// TODO?
-			//m->setByte(v->getUCA0IE(), 0);
+			// UCA0IE |= UCRXIE | UCTXIE;
+			m->setByte(v->getUC0IE(), 255);
 
 			// nothing should happen until we send character
 			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
@@ -222,6 +221,7 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			// cnt--, bit captured from SDI
 			usci->tickFalling();
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
 
 		/// BIT 8
 			// First (MSB) bit should be sent and rising clock generated
@@ -232,7 +232,9 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			// prepare '0' to be captured
 			pinManager->handlePinInput(0, 0.0);
 
-			CPPUNIT_ASSERT_EQUAL(false, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUC0IFG(), 1));
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 2));
 
 			// cnt--, bit captured from SDI
 			usci->tickFalling();
@@ -240,7 +242,8 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUCA0RXBUF()));
 
 		/// INTERRUPT
-// 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSCICTL() + 1, 1));
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 1));
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 2));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 // 
 // 		/// Writing to USCICNT will clear the USCIIFG bit

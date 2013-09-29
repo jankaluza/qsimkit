@@ -169,6 +169,8 @@ class Variant {
 		virtual unsigned int getUCB1I2CSA() = 0;
 		virtual unsigned int getUSCIAB1TX_VECTOR() = 0;
 		virtual unsigned int getUSCIAB1RX_VECTOR() = 0;
+		virtual unsigned int getUC0IE() = 0;
+		virtual unsigned int getUC0IFG() = 0;
 		virtual unsigned int getUC1IE() = 0;
 		virtual unsigned int getUC1IFG() = 0;
 		virtual double getSRSEL() = 0;
