@@ -270,6 +270,13 @@ void USCI::handleSecondEdgeSPI(uint8_t ctl0) {
 }
 
 void USCI::handleTickSPI(bool rising, uint8_t ctl0) {
+	uint8_t ctl1 = m_mem->getByte(m_ctl1, false);
+
+	// Logic is held in reset state
+	if (ctl1 & 1) {
+		return;
+	}
+
 	// Rising is first edge when m_usickpl == !rising, otherwise
 	// it's second edge
 	bool first_edge = m_usickpl == !rising;
@@ -292,11 +299,9 @@ void USCI::tickRising() {
 		m_counter = 0;
 
 		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
-		uint8_t ctl1 = m_mem->getByte(m_ctl1, false);
-		
 
-		// Logic is held in reset state
-		if (ctl1 & 1) {
+		// We are slave, do not handle ticks from our own CLK
+		if ((ctl0 & (1 << 3)) == 0) {
 			return;
 		}
 
@@ -312,10 +317,9 @@ void USCI::tickRising() {
 void USCI::tickFalling() {
 	if (m_counter == (m_divider >> 2)) {
 		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
-		uint8_t ctl1 = m_mem->getByte(m_ctl1, false);
 
-		// Logic is held in reset state
-		if (ctl1 & 1) {
+		// We are slave, do not handle ticks from our own CLK
+		if ((ctl0 & (1 << 3)) == 0) {
 			return;
 		}
 
@@ -471,6 +475,8 @@ void USCI::handlePinInput(const std::string &name, double value) {
 	switch(name[5]) {
 		// UCA0S'O'MI
 		case 'O':
+		// UCA0S'I'MO
+		case 'I':
 			m_input = value > 1.5;
 			return;
 		// UCA0C'L'K
