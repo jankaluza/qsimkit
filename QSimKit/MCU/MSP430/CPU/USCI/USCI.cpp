@@ -34,7 +34,7 @@ USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Va
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
 m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
-m_output(false), m_transmitting(false), m_txReady(false), m_type(type) {
+m_output(false), m_transmitting(false), m_txReady(false), m_type(type), m_rxRead(false) {
 
 	std::string prefix;
 
@@ -107,6 +107,7 @@ m_output(false), m_transmitting(false), m_txReady(false), m_type(type) {
 	m_mem->addWatcher(m_br0, this);
 	m_mem->addWatcher(m_br1, this);
 	m_mem->addWatcher(m_txbuf, this);
+	m_mem->addWatcher(m_rxbuf, this, MemoryWatcher::Read);
 
 	m_somiMpx = m_pinManager->addPinHandler(prefix + "SOMI", this);
 	m_simoMpx = m_pinManager->addPinHandler(prefix + "SIMO", this);
@@ -165,23 +166,35 @@ void USCI::doSPICapture(uint8_t ctl0) {
 		std::cout << "FINAL RXBUF = " << (uint16_t) m_rx << "\n";
 		m_mem->setByte(m_rxbuf, m_rx, false);
 
+		// Set UCOE (overflow) bit if RXBUF was not read
+		if (!m_rxRead) {
+			m_mem->setBit(m_stat, (1 << 5), true);
+		}
+		m_rxRead = false;
+
 		// generate interrupt
 		if (m_type == USCI_A) {
 			if (m_mem->getByte(m_ie, false) & 1) {
 				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 1, false);
+				m_intManager->queueInterrupt(m_rxvect);
 			}
 		}
 		else {
 			if (m_mem->getByte(m_ie, false) & 4) {
 				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 4, false);
+				m_intManager->queueInterrupt(m_rxvect);
 			}
 		}
-		m_intManager->queueInterrupt(m_rxvect);
 
 		// if there is another byte ready, start tranmission again
 		m_transmitting = false;
 		if (m_txReady) {
 			txReady();
+		}
+
+		// Clear UCBUSY in case we won't transmit anything now
+		if (!m_transmitting) {
+			m_mem->setBit(m_stat, 1, false);
 		}
 	}
 }
@@ -215,14 +228,15 @@ void USCI::doSPIOutput(uint8_t ctl0) {
 		if (m_type == USCI_A) {
 			if (m_mem->getByte(m_ie, false) & 2) {
 				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 2, false);
+				m_intManager->queueInterrupt(m_txvect);
 			}
 		}
 		else {
 			if (m_mem->getByte(m_ie, false) & 8) {
 				m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | 8, false);
+				m_intManager->queueInterrupt(m_txvect);
 			}
 		}
-		m_intManager->queueInterrupt(m_txvect);
 	}
 }
 
@@ -350,6 +364,9 @@ void USCI::txReady() {
 	m_txReady = false;
 	m_transmitting = true;
 
+	// Set UCBUSY flag
+	m_mem->setBit(m_stat, 1, true);
+
 	// 7-bit vs. 8-bit transmit
 	uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
 	if (ctl0 & (1 << 4)) {
@@ -416,6 +433,15 @@ void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	}
 	else if (address == m_txbuf) {
 		std::cout << "user wrote to TXBUF\n";
+
+		// clear interrup flag
+		if (m_type == USCI_A) {
+			m_mem->setBit(m_ifg, 2, false);
+		}
+		else {
+			m_mem->setBit(m_ifg, 8, false);
+		}
+
 		txReady();
 	}
 }
@@ -424,8 +450,20 @@ void USCI::handleInterruptFinished(InterruptManager *intManager, int vector) {
 
 }
 
-void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) {
+void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value) {
+	std::cout << "READ RXBUF\n";
+	// Clear UCOE
+	m_mem->setBit(m_stat, (1 << 5), false);
 
+	// Clear interrup flag
+	if (m_type == USCI_A) {
+		m_mem->setBit(m_ifg, 1, false);
+	}
+	else {
+		m_mem->setBit(m_ifg, 4, false);
+	}
+
+	m_rxRead = true;
 }
 
 

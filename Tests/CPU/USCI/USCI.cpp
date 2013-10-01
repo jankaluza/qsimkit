@@ -126,10 +126,21 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			usci->tickRising();
 			usci->tickFalling();
 			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
+			// UCBUSY is 0 too
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUCA0STAT(), 1));
+
+			// Set TX IFG just to test it gets cleared by write to TXBUF later
+			m->setBit(v->getUC0IFG(), 2, true);
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 2));
 
 			// start transmitting - we will transfer 8 bits
 			m->setByte(v->getUCA0TXBUF(), 55); // 00110111
 			CPPUNIT_ASSERT_EQUAL(-1.0, watcher->sclk);
+
+			// Write to TXBUF should clear TX IFG
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUC0IFG(), 2));
+			// We are transmitting now, so UCBUSY should be 1
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUCA0STAT(), 1));
 
 		/// BIT 1
 			// First (MSB) bit should be sent and rising clock generated
@@ -239,10 +250,17 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			// cnt--, bit captured from SDI
 			usci->tickFalling();
 			CPPUNIT_ASSERT_EQUAL(0.0, watcher->sclk);
+
+			// Transmission stopped, UCBUSY is 0 again
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUCA0STAT(), 1));
+
+			// Check RX IFG flag now, because after reading the value, it should be cleared
+			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 1));
 			CPPUNIT_ASSERT_EQUAL(170, (int) m->getByte(v->getUCA0RXBUF()));
 
 		/// INTERRUPT
-			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 1));
+			// RX IFG is cleared by reading RX BUF
+			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUC0IFG(), 1));
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 2));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
 // 

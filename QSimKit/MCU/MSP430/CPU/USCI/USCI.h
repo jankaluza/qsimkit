@@ -48,7 +48,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		virtual ~USCI();
 
 		void handleMemoryChanged(::Memory *memory, uint16_t address);
-		void handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value);
+		void handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value);
 
 		void handleInterruptFinished(InterruptManager *intManager, int vector);
 
@@ -110,6 +110,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		uint8_t m_rx;
 		uint8_t m_cnt;
 		Type m_type;
+		bool m_rxRead;
 };
 
 }
