@@ -468,10 +468,17 @@ void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value) 
 
 
 void USCI::handlePinInput(const std::string &name, double value) {
-	if (name[5] == 'O') {
-		m_input = value > 1.5;
-// 		std::cout << "SOMI input " << value << "\n";
-		return;
+	switch(name[5]) {
+		// UCA0S'O'MI
+		case 'O':
+			m_input = value > 1.5;
+			return;
+		// UCA0C'L'K
+		case 'L' :
+			handleTickSPI(value > 1.5, m_mem->getByte(m_ctl0, false));
+			return;
+		default:
+			break;
 	}
 }
 

@@ -263,14 +263,6 @@ class USCITest : public CPPUNIT_NS :: TestFixture{
 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUC0IFG(), 1));
 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUC0IFG(), 2));
 			CPPUNIT_ASSERT_EQUAL(true, intManager->hasQueuedInterrupts());
-// 
-// 		/// Writing to USCICNT will clear the USCIIFG bit
-// 			m->setByte(v->getUSCICCTL() + 1, 8);
-// 			CPPUNIT_ASSERT_EQUAL(false, m->isBitSet(v->getUSCICTL() + 1, 1));
-// 
-// 			// writing 0 will raise USCIIFG bit again
-// 			m->setByte(v->getUSCICCTL() + 1, 0);
-// 			CPPUNIT_ASSERT_EQUAL(true, m->isBitSet(v->getUSCICTL() + 1, 1));
 		}
 
 };
