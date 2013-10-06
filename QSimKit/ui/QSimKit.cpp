@@ -66,6 +66,7 @@ m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	connect(actionLoad_project, SIGNAL(triggered()), this, SLOT(loadProject()) );
 	connect(actionProject_options, SIGNAL(triggered()), this, SLOT(projectOptions()) );
 	connect(actionTracked_pins, SIGNAL(triggered(bool)), this, SLOT(showTrackedPins(bool)) );
+	connect(actionExit, SIGNAL(triggered()), this, SLOT(close()));
 
 	populateToolBar();
 
