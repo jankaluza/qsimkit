@@ -114,12 +114,12 @@ void Screen::paintEvent(QPaintEvent *e) {
 	p.begin(this);
 	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
 	p.setPen(QPen(QColor(245, 245, 245), 1, Qt::SolidLine));
-	for (int i = 0; i < 1500; i += 12) {
-		p.drawLine(i, 0, i, 1500);
+	for (int i = e->rect().x(); i < e->rect().width(); i += 12) {
+		p.drawLine(i, 0, i, height());
 	}
 
-	for (int i = 0; i < 1500; i += 12) {
-		p.drawLine(0, i, 1500, i);
+	for (int i = e->rect().y(); i < e->rect().height(); i += 12) {
+		p.drawLine(0, i, width(), i);
 	}
 
 	if (m_objects.empty()) {

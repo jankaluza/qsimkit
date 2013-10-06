@@ -47,6 +47,8 @@
 #include <QSettings>
 #include <QMessageBox>
 
+// #include "valgrind/callgrind.h"
+
 QSimKit::QSimKit(QWidget *parent) : QMainWindow(parent),
 m_dig(0), m_sim(0), m_logicalSteps(0), m_instPerCycle(2500), m_stopped(true) {
 	setupUi(this);
@@ -306,6 +308,8 @@ void QSimKit::resetSimulation() {
 }
 
 void QSimKit::startSimulation() {
+// 	CALLGRIND_ZERO_STATS;
+
 	if (m_pauseAction->isChecked()) {
 		m_pauseAction->setChecked(false);
 		onSimulationStarted(true);
