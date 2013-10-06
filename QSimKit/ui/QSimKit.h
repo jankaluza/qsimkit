@@ -23,6 +23,7 @@
 #include <QString>
 #include <QList>
 #include <QTimer>
+#include <QTime>
 #include <QLineEdit>
 #include <QComboBox>
 
@@ -123,5 +124,6 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		bool m_stopped;
 		QLineEdit *m_runUntil;
 		QComboBox *m_stepModeCombo;
+		QTime m_simStart;
 };
 

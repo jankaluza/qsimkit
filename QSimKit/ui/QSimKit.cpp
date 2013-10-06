@@ -279,6 +279,7 @@ void QSimKit::simulationStep() {
 		m_logicalSteps = 0;
 		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(m_instPerCycle * 20) + " simulation events per second");
 		onSimulationStep(m_sim->nextEventTime());
+		qDebug() << m_simStart.elapsed();
 	}
 
 	
@@ -316,6 +317,7 @@ void QSimKit::startSimulation() {
 	m_stopped = false;
 	m_pauseAction->setEnabled(true);
 	m_timer->start(50);
+	m_simStart.start();
 }
 
 void QSimKit::stopSimulation() {

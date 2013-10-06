@@ -30,7 +30,7 @@ namespace MSP430 {
 
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco, XT2 *xt2) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_xt2(xt2),
-m_divider(1), m_counter(0) {
+m_divider(1), m_counter(0), m_running(false) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -59,6 +59,7 @@ std::string SMCLK::getSourceName() {
 }
 
 void SMCLK::tickRising() {
+// 	std::cout << "SMCLK tick\n";
 	if (++m_counter >= m_divider) {
 		m_counter = 0;
 		callRisingHandlers();
@@ -71,13 +72,35 @@ void SMCLK::tickFalling() {
 	}
 }
 
+void SMCLK::start() {
+	if (m_running) {
+		return;
+	}
+
+// 	std::cout << "Starting SMCLK\n";
+
+	if (m_source) {
+		m_source->addHandler(this);
+		m_running = true;
+	}
+}
+
+void SMCLK::pause() {
+	m_running = false;
+// 	std::cout << "Pausing SMCLK\n";
+
+	if (m_source) {
+		m_source->removeHandler(this);
+	}
+}
+
 void SMCLK::reset() {
 	handleMemoryChanged(m_mem, m_variant->getBCSCTL2());
 	if (m_source) {
 		m_source->removeHandler(this);
 	}
 	m_source = m_dco;
-	m_source->addHandler(this);
+// 	m_source->addHandler(this);
 }
 
 

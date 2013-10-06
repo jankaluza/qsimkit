@@ -47,6 +47,9 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		void tickRising();
 		void tickFalling();
 
+		void start();
+		void pause();
+
 		unsigned long getFrequency();
 
 		std::string getSourceName();
@@ -59,6 +62,7 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		XT2 *m_xt2;
 		uint8_t m_divider;
 		uint8_t m_counter;
+		bool m_running;
 };
 
 }

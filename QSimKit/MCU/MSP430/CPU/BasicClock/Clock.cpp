@@ -31,6 +31,11 @@ Clock::~Clock() {
 }
 
 void Clock::addHandler(ClockHandler *handler, Mode mode) {
+	// Start the clock with first handler added
+	if (m_handlers.empty() && m_fallingHandlers.empty()) {
+		start();
+	}
+
 	switch (mode) {
 		case Rising:
 			m_handlers.push_back(handler);
@@ -54,6 +59,11 @@ void Clock::removeHandler(ClockHandler *handler) {
 	it = std::find(m_fallingHandlers.begin(), m_fallingHandlers.end(), handler);
 	if (it != m_fallingHandlers.end()) {
 		m_fallingHandlers.erase(it);
+	}
+
+	// pause clock when it's not used
+	if (m_handlers.empty() || m_fallingHandlers.empty()) {
+		pause();
 	}
 }
 

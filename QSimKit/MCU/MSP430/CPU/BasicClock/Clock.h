@@ -43,7 +43,14 @@ class Clock {
 		void callRisingHandlers();
 		void callFallingHandlers();
 
+		bool hasHandlers() {
+			return (!m_handlers.empty() || !m_fallingHandlers.empty());
+		}
+
 		virtual void reset() = 0;
+
+		virtual void pause() {}
+		virtual void start() {}
 
 	private:
 		std::vector<ClockHandler *> m_handlers;
