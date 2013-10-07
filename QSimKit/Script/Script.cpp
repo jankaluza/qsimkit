@@ -39,6 +39,7 @@
  ***************************************************************************/
 
 #include "Script.h"
+#include <QDebug>
 
 Script::Script(PythonQtObjectPtr pyobject)
    : m_context(pyobject)
@@ -47,30 +48,44 @@ Script::Script(PythonQtObjectPtr pyobject)
 
 void Script::registerObject(const QString& name, QObject *obj)
 {
-   return m_context.addObject(name,obj);
+	return m_context.addObject(name,obj);
 }
 
 void Script::setVariable(const QString& name, const QVariant& value)
 { 
-   return m_context.addVariable(name,value);
+	return m_context.addVariable(name,value);
 }
       
 QVariant Script::getVariable(const QString& name)
 {
-   return m_context.getVariable(name);
+	return m_context.getVariable(name);
 }
 
 QVariant Script::eval(const QString& code)
 {
-   return m_context.evalScript(code, Py_eval_input);
+	return m_context.evalScript(code, Py_eval_input);
 }
 
 void Script::evalFile(const QString& file)
 {
-   return m_context.evalFile(file);
+	return m_context.evalFile(file);
 }
 
 QVariant Script::call(const QString& callable, const QVariantList& argv)
 {
-   return m_context.call(callable, argv);
+	PythonQtObjectPtr obj = 0;
+
+	QMap<QString, PythonQtObjectPtr>::iterator it = m_objCache.find(callable);
+	if (it == m_objCache.end()) {
+		obj = PythonQt::self()->lookupCallable(m_context, callable);
+		if (!obj) {
+			return QVariant();
+		}
+		m_objCache[callable] = obj;
+	}
+	else {
+		obj = it.value();
+	}
+
+	return PythonQt::self()->call(obj, argv);
 }

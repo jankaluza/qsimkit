@@ -41,6 +41,7 @@
 #pragma once
 
 #include <QVariant>
+#include <QMap>
 #include <PythonQt/PythonQt.h>
 
 class Script{
@@ -63,6 +64,9 @@ class Script{
 		PyObject* object() {
 			return m_context.object();
 		}
+
+	private:
+		QMap<QString, PythonQtObjectPtr> m_objCache;
 
 	friend class ScriptEngine;
 };
