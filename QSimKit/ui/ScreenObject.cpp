@@ -19,11 +19,20 @@
 
 #include "ScreenObject.h"
 
-ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0) {
+ScreenObject::ScreenObject() : QObject(0), m_x(0), m_y(0), m_width(0), m_height(0), m_updated(false) {
 }
 
 void ScreenObject::save(QTextStream &stream) {
 	stream << "    <position x='" << m_x << "' y='" << m_y << "'/>\n";
+}
+
+void ScreenObject::update() {
+	if (m_updated) {
+		return;
+	}
+
+	m_updated = true;
+	onUpdated();
 }
 
 void ScreenObject::setX(int x) {

@@ -78,6 +78,8 @@ class ScreenObject : public QObject
 
 		virtual bool clicked(const QPoint &p) { return false; }
 
+		void update();
+
 	signals:
 		void onUpdated();
 
@@ -93,6 +95,7 @@ class ScreenObject : public QObject
 		QString m_name;
 		QString m_type;
 		QString m_interface;
+		bool m_updated;
 	
 		friend class Screen;
 		friend class MCUInfo;

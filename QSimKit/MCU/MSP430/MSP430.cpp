@@ -170,7 +170,8 @@ void MCU_MSP430::handlePinChanged(int id, double value) {
 		m_wrapper->setContext(m_instruction->original_pc);
 		m_wrapper->reschedule();
 	}
-	onUpdated();
+
+	update();
 }
 
 
@@ -185,7 +186,7 @@ void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {
 			qDebug() << "WARN: input on output PIN";
 		}
 		m_pins[(*it).port].value = (*it).value;
-		onUpdated();
+		update();
 	}
 }
 
