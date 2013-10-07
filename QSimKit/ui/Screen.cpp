@@ -20,6 +20,8 @@
 #include "Screen.h"
 
 #include "Peripherals/Peripheral.h"
+#include "Peripherals/SimulationObject.h"
+#include "Peripherals/SimulationModel.h"
 #include "Peripherals/PeripheralManager.h"
 #include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
@@ -55,7 +57,7 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 	setMouseTracking(true);
 }
 
-void Screen::prepareSimulation(adevs::Digraph<double> *dig) {
+void Screen::prepareSimulation(Digraph *dig) {
 	wrappers.clear();
 	for (int i = 0; i < m_objects.size(); ++i) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);

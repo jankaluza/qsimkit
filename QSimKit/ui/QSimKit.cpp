@@ -26,6 +26,7 @@
 #include "MCU/RegisterSet.h"
 #include "MCU/Register.h"
 #include "Peripherals/PeripheralManager.h"
+#include "Peripherals/SimulationModel.h"
 
 #include "DockWidgets/Disassembler/Disassembler.h"
 #include "DockWidgets/Peripherals/Peripherals.h"
@@ -300,7 +301,7 @@ void QSimKit::resetSimulation() {
 	delete m_dig;
 	delete m_sim;
 
-	m_dig = new adevs::Digraph<double>();
+	m_dig = new Digraph();
 	screen->prepareSimulation(m_dig);
 	m_sim = new adevs::Simulator<SimulationEvent>(m_dig);
 	screen->setSimulator(m_sim);
@@ -308,8 +309,6 @@ void QSimKit::resetSimulation() {
 }
 
 void QSimKit::startSimulation() {
-// 	CALLGRIND_ZERO_STATS;
-
 	if (m_pauseAction->isChecked()) {
 		m_pauseAction->setChecked(false);
 		onSimulationStarted(true);
@@ -322,6 +321,7 @@ void QSimKit::startSimulation() {
 	m_pauseAction->setEnabled(true);
 	m_timer->start(50);
 	m_simStart.start();
+	// 	CALLGRIND_ZERO_STATS;
 }
 
 void QSimKit::stopSimulation() {

@@ -37,6 +37,7 @@ class ScreenObject;
 class SimulationObjectWrapper;
 class Screen;
 class ConnectionNode;
+class Digraph;
 
 
 typedef struct {
@@ -63,7 +64,7 @@ class ConnectionManager
 		bool mousePressEvent(QMouseEvent *event);
 		bool mouseReleaseEvent(QMouseEvent *event);
 
-		void prepareSimulation(adevs::Digraph<double> *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
+		void prepareSimulation(Digraph *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers);
 
 		void movePins(ScreenObject *object);
 		void objectMoved(ScreenObject *object);

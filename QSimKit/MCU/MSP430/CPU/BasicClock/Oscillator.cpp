@@ -24,7 +24,7 @@
 namespace MSP430 {
 	
 Oscillator::Oscillator(const std::string &name) : m_name(name),
-m_rising(true), m_inTick(false) {
+m_rising(true), m_inTick(false), m_willAddRemove(false) {
 }
 
 Oscillator::~Oscillator() {
@@ -36,6 +36,7 @@ void Oscillator::addHandler(OscillatorHandler *handler) {
 	// if we add the handler right now. Postpone adding in the end of tick().
 	if (m_inTick) {
 		m_toAdd.push_back(handler);
+		m_willAddRemove = true;
 		return;
 	}
 
@@ -51,6 +52,7 @@ void Oscillator::removeHandler(OscillatorHandler *handler) {
 	// if we remove it right now. Postpone removal in the end of tick().
 	if (m_inTick) {
 		m_toRemove.push_back(handler);
+		m_willAddRemove = true;
 		return;
 	}
 
@@ -76,6 +78,10 @@ void Oscillator::tick() {
 	}
 	m_rising = !m_rising;
 	m_inTick = false;
+
+	if (!m_willAddRemove) {
+		return;
+	}
 
 	// Remove handlers which called removeHandler() during their callbacks.
 	if (!m_toRemove.empty()) {

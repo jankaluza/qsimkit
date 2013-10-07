@@ -24,6 +24,7 @@
 #include <QChar>
 #include <QRect>
 #include <QList>
+#include <QHash>
 #include <map>
 
 #include "adevs.h"
@@ -104,6 +105,10 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 			m_context = context;
 		}
 
+		adevs::Devs<SimulationEvent, double> *getTarget(int in, int &out);
+
+		void couple(int out, adevs::Devs<SimulationEvent, double> *c, int in);
+
 	private:
 		void addChangeToHistory(int pin, double value);
 
@@ -113,5 +118,13 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 		QList<int> m_monitoredPins;
 		QList<PinHistory *> m_history;
 		uint16_t m_context;
+
+		class node {
+			public:
+			node() : c(0), port(0) {}
+			adevs::Devs<SimulationEvent, double> *c;
+			int port;
+		};
+		QVector<node> m_conns;
 };
 

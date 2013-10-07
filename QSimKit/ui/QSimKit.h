@@ -107,7 +107,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		void doSingleCStep();
 
 	private:
-		adevs::Digraph<double> *m_dig;
+		Digraph *m_dig;
 		adevs::Simulator<SimulationEvent> *m_sim;
 		QTimer *m_timer;
 		PeripheralManager *m_peripherals;

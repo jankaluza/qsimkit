@@ -35,6 +35,7 @@ class MCU;
 class ConnectionManager;
 class PeripheralManager;
 class SimulationObjectWrapper;
+class Digraph;
 
 class Screen : public QWidget
 {
@@ -65,7 +66,7 @@ class Screen : public QWidget
 		void save(QTextStream &stream);
 		bool load(QDomDocument &doc);
 
-		void prepareSimulation(adevs::Digraph<double> *dig);
+		void prepareSimulation(Digraph *dig);
 		void setSimulator(adevs::Simulator<SimulationEvent> *sim);
 
 		ScreenObject *getObject(int x, int y);

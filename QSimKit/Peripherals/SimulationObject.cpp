@@ -36,6 +36,8 @@ m_obj(obj), m_monitoredPins(monitoredPins), m_context(0) {
 			m_history[m_monitoredPins[i]] = new PinHistory();
 		}
 	}
+
+	m_conns.resize(100);
 }
 
 SimulationObjectWrapper::~SimulationObjectWrapper() {
@@ -92,4 +94,18 @@ double SimulationObjectWrapper::ta() {
 
 void SimulationObjectWrapper::gc_output(SimulationEventList& g) {
 
+}
+
+void SimulationObjectWrapper::couple(int out, adevs::Devs<SimulationEvent, double> *c, int in) {
+	node n;
+	n.c = c;
+	n.port = in;
+	m_conns[out] = n;
+}
+
+adevs::Devs<SimulationEvent, double> *SimulationObjectWrapper::getTarget(int in, int &out) {
+	node &n = m_conns[in];
+
+	out = n.port;
+	return n.c;
 }
