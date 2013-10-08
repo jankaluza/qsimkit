@@ -23,11 +23,14 @@
 #include <QObject>
 #include <QList>
 #include <QDomDocument>
+#include "adevs.h"
+#include "Peripherals/SimulationObject.h"
 
 class MCU;
 class ScreenObject;
 class MCUManager;
 class PeripheralManager;
+class SimulationModel;
 
 class ProjectLoader : public QObject {
 	Q_OBJECT
@@ -36,6 +39,8 @@ class ProjectLoader : public QObject {
 		~ProjectLoader();
 
 		bool load(QDomDocument &doc, QString &error);
+
+		adevs::Simulator<SimulationEvent> *prepareSimulation(QDomDocument &doc, SimulationModel *model);
 
 		MCU *getMCU() {
 			return m_mcu;

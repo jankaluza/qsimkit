@@ -47,62 +47,10 @@ int main(int argc, char *argv[])
 	}
 
 	// Create simulation model and object wrappers
-	// TODO: Move that into ProjectLoader...?
 	SimulationModel *model = new SimulationModel();
 
-	// Stores object -> wrapper mapping
-	std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
-
-	// Iterate over all peripherals to create wrappers
-	for (int i = 0; i < p.getObjects().size(); ++i) {
-		Peripheral *per = dynamic_cast<Peripheral *>(p.getObjects()[i]);
-		if (per) {
-			// reset peripheral
-			per->reset();
-
-			// Create wrapper object for the adevs simulation
-			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(per);
-			model->add(wrapper);
-			per->setWrapper(wrapper);
-
-			// Store the wrapper
-			wrappers[p.getObjects()[i]] = wrapper;
-
-			// Some peripherals have extra internal objects which have to be
-			// simulated, so add them into the simulation too.
-			std::vector<SimulationObject *> internalObjects;
-			per->getInternalSimulationObjects(internalObjects);
-			for (int x = 0; x < internalObjects.size(); ++x) {
-				SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(internalObjects[x]);
-				model->add(wrapper);
-			}
-		}
-	}
-
-	// Load connections from XML file and couple the objects
-	// TODO: Move that into ProjectLoader...?
-	QDomElement root = document.firstChild().toElement();
-	QDomElement connections = root.firstChildElement("connections");
-	for(QDomNode node = connections.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		QDomElement c = node.toElement();
-
-		ScreenObject *from = p.getObjects()[c.attribute("from").toInt()];
-		ScreenObject *to = p.getObjects()[c.attribute("to").toInt()];
-		int fpin = c.attribute("fpin").toInt();
-		int tpin = c.attribute("tpin").toInt();
-
-		// Connect pins between these two objects
-		wrappers[from]->couple(fpin, wrappers[to], tpin);
-		wrappers[to]->couple(tpin, wrappers[from], fpin);
-	}
-
-	// Create Simulation object
-	adevs::Simulator<SimulationEvent> *simulator = new adevs::Simulator<SimulationEvent>(model);
-
-	// Pair simulator with wrapper objects
-	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
-		it->second->setSimulator(simulator);
-	}
+	// Create Simulation object and prepare the simulation
+	adevs::Simulator<SimulationEvent> *simulator = p.prepareSimulation(document, model);
 
 	// Run simulation events until 'until'
 	double until = QString(argv[2]).toDouble();

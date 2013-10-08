@@ -20,6 +20,7 @@
 #include "ProjectLoader.h"
 #include <QDebug>
 #include "Peripherals/PeripheralManager.h"
+#include "Peripherals/SimulationModel.h"
 #include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
 #include "ui/ConnectionNode.h"
@@ -86,4 +87,62 @@ bool ProjectLoader::load(QDomDocument &doc, QString &error) {
 	}
 
 	return true;
+}
+
+adevs::Simulator<SimulationEvent> *ProjectLoader::prepareSimulation(QDomDocument &doc, SimulationModel *model) {
+	// Stores object -> wrapper mapping
+	std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
+
+	// Iterate over all peripherals to create wrappers
+	for (int i = 0; i < m_objects.size(); ++i) {
+		Peripheral *per = dynamic_cast<Peripheral *>(m_objects[i]);
+		if (per) {
+			// reset peripheral
+			per->reset();
+
+			// Create wrapper object for the adevs simulation
+			SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(per);
+			model->add(wrapper);
+			per->setWrapper(wrapper);
+
+			// Store the wrapper
+			wrappers[m_objects[i]] = wrapper;
+
+			// Some peripherals have extra internal objects which have to be
+			// simulated, so add them into the simulation too.
+			std::vector<SimulationObject *> internalObjects;
+			per->getInternalSimulationObjects(internalObjects);
+			for (int x = 0; x < internalObjects.size(); ++x) {
+				SimulationObjectWrapper *wrapper = new SimulationObjectWrapper(internalObjects[x]);
+				model->add(wrapper);
+			}
+		}
+	}
+
+	// Load connections from XML file and couple the objects
+	// TODO: Move that into ProjectLoader...?
+	QDomElement root = doc.firstChild().toElement();
+	QDomElement connections = root.firstChildElement("connections");
+	for(QDomNode node = connections.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement c = node.toElement();
+
+		ScreenObject *from = m_objects[c.attribute("from").toInt()];
+		ScreenObject *to = m_objects[c.attribute("to").toInt()];
+		int fpin = c.attribute("fpin").toInt();
+		int tpin = c.attribute("tpin").toInt();
+
+		// Connect pins between these two objects
+		wrappers[from]->couple(fpin, wrappers[to], tpin);
+		wrappers[to]->couple(tpin, wrappers[from], fpin);
+	}
+
+	// Create Simulation object
+	adevs::Simulator<SimulationEvent> *simulator = new adevs::Simulator<SimulationEvent>(model);
+
+	// Pair simulator with wrapper objects
+	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
+		it->second->setSimulator(simulator);
+	}
+	
+	return simulator;
 }
