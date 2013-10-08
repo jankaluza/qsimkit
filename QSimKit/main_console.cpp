@@ -51,8 +51,8 @@ int main(int argc, char *argv[])
 	perManager->loadPeripherals();
 
 	// Load XML file with saved project
-    int errorLine, errorColumn;
-    QString errorMsg;
+	int errorLine, errorColumn;
+	QString errorMsg;
 	QString f(argv[1]);
 	QFile modelFile(f);
 	QDomDocument document;
