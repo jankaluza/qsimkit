@@ -1,3 +1,22 @@
+/**
+ * QSimKit - MSP430 simulator
+ * Copyright (C) 2013 Jan "HanzZ" Kaluza (hanzz.k@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ **/
+
 #include <QtCore/QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -18,7 +37,8 @@ int main(int argc, char *argv[])
 	QCoreApplication a(argc, argv);
 
 	if (argc != 3) {
-		qDebug() << "Usage:" << argv[0] << "<input.qsp>" << "<simulation_time>";
+		qDebug() << "Usage:" << argv[0] << "<input.qsp>" << "<max_simulation_time_in_seconds>";
+		qDebug() << "Example:" << argv[0] << "mmc.qsp" << "0.05";
 		return -2;
 	}
 
@@ -58,9 +78,9 @@ int main(int argc, char *argv[])
 
 	DebugData *dd = p.getMCU()->getDebugData();
 
-	// Run simulation events until 'until'
+	// Run simulation events until 'until' seconds
 	double until = QString(argv[2]).toDouble();
-	qDebug() << "Starting simulation until" << until << simulator->nextEventTime();
+	qDebug() << "Starting simulation until" << until;
 	long eventCount = 0;
 	while (simulator->nextEventTime() <= until) {
 		simulator->execNextEvent();
