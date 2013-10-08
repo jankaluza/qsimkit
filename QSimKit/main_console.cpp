@@ -70,12 +70,13 @@ int main(int argc, char *argv[])
 		return -3;
 	}
 
-	// Create simulation model and object wrappers
+	// Create simulation model
 	SimulationModel *model = new SimulationModel();
 
 	// Create Simulation object and prepare the simulation
 	adevs::Simulator<SimulationEvent> *simulator = p.prepareSimulation(document, model);
 
+	// get debugging data from ELF binary
 	DebugData *dd = p.getMCU()->getDebugData();
 
 	// Run simulation events until 'until' seconds
