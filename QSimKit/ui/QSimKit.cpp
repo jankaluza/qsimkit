@@ -301,7 +301,7 @@ void QSimKit::resetSimulation() {
 	delete m_dig;
 	delete m_sim;
 
-	m_dig = new Digraph();
+	m_dig = new SimulationModel();
 	screen->prepareSimulation(m_dig);
 	m_sim = new adevs::Simulator<SimulationEvent>(m_dig);
 	screen->setSimulator(m_sim);

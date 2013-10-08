@@ -25,14 +25,14 @@
 #include <cstdlib>
 #include "SimulationObject.h"
 
-class Digraph: 
+class SimulationModel: 
 public adevs::Network<SimulationEvent, double>
 {
 	public:
 		typedef adevs::Devs<SimulationEvent, double> Component;
 
 		/// Construct a network with no components.
-		Digraph():
+		SimulationModel():
 		adevs::Network<SimulationEvent, double>()
 		{
 		}
@@ -44,7 +44,7 @@ public adevs::Network<SimulationEvent, double>
 		void route(const SimulationEvent& x, Component* model, 
 		adevs::Bag<adevs::Event<SimulationEvent, double> >& r);
 		/// Destructor.  Destroys all of the component models.
-		~Digraph();
+		~SimulationModel();
 
 	private:	
 

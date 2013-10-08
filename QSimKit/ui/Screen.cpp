@@ -23,6 +23,7 @@
 #include "Peripherals/SimulationObject.h"
 #include "Peripherals/SimulationModel.h"
 #include "Peripherals/PeripheralManager.h"
+#include "Project/ProjectLoader.h"
 #include "MCU/MCUManager.h"
 #include "MCU/MCU.h"
 #include "ConnectionNode.h"
@@ -57,7 +58,7 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 	setMouseTracking(true);
 }
 
-void Screen::prepareSimulation(Digraph *dig) {
+void Screen::prepareSimulation(SimulationModel *dig) {
 	wrappers.clear();
 	for (int i = 0; i < m_objects.size(); ++i) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
@@ -214,59 +215,16 @@ void Screen::save(QTextStream &stream) {
 }
 
 bool Screen::load(QDomDocument &doc) {
-	QDomElement root = doc.firstChild().toElement();
-	QDomElement objects = root.firstChildElement("objects");
+	QString error;
 
-	for(QDomNode node = objects.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		QDomElement object = node.toElement();
-		QString type = object.attribute("type");
-
-		ScreenObject *obj = 0;
-		if (object.attribute("interface") == "mcu") {
-			if (!m_mcuManager->hasMCU(type)) {
-				QMessageBox::critical(this, tr("Loading error"),
-									  tr("File you want to load uses MCU module '%1'. This module is not installed or cannot be loaded.").arg(type));
-				return false;
-			}
-
-			QString variant = object.firstChildElement("variant").text();
-			obj = m_mcuManager->getMCU(type).create(variant);
-		}
-		else if (type == "ConnectionNode") {
-			obj = new ConnectionNode();
-		}
-		else {
-			if (!m_peripherals->hasPeripheral(type)) {
-				QMessageBox::critical(this, tr("Loading error"),
-									  tr("File you want to load uses Peripheral module '%1'. This module is not installed or cannot be loaded.").arg(type));
-				return false;
-			}
-			obj = m_peripherals->getPeripheral(type).create();
-		}
-
-		if (!obj) {
-			continue;
-		}
-
-		QString error;
-		obj->load(object, error);
-		if (!error.isEmpty()) {
-			QMessageBox::critical(this, tr("Peripheral loading error"), error);
-			delete obj;
-			return false;
-		}
-
-		QDomElement position = object.firstChildElement("position");
-		obj->setX(position.attribute("x").toInt());
-		obj->setY(position.attribute("y").toInt());
-
-		if (m_objects.empty()) {
-			setMCU(dynamic_cast<MCU *>(obj));
-		}
-		else {
-			m_objects.append(obj);
-		}
+	ProjectLoader p(m_mcuManager, m_peripherals);
+	if (!p.load(doc, error)) {
+		QMessageBox::critical(this, tr("Loading error"), error);
+		return false;
 	}
+
+	setMCU(p.getMCU());
+	m_objects = p.getObjects();
 
 	m_conns->load(doc);
 

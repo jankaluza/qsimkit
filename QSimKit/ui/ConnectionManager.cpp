@@ -111,7 +111,7 @@ Connection *ConnectionManager::addConnection(ScreenObject *from, int fpin, Scree
 	return c;
 }
 
-void ConnectionManager::prepareSimulation(Digraph *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers) {
+void ConnectionManager::prepareSimulation(SimulationModel *dig, std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers) {
 	for (ConnectionList::iterator it = m_conns.begin(); it != m_conns.end(); ++it) {
 		Connection *c = *it;
 		qDebug() << "connecting" << c->from << c->fpin << c->to << c->tpin;

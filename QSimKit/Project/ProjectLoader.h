@@ -1,4 +1,4 @@
-/**
+/**	
  * QSimKit - MSP430 simulator
  * Copyright (C) 2013 Jan "HanzZ" Kaluza (hanzz.k@gmail.com)
  *
@@ -17,46 +17,39 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "SimulationModel.h"
+#pragma once
 
-#include <QDebug>
+#include <stdint.h>
+#include <QObject>
+#include <QList>
+#include <QDomDocument>
 
+class MCU;
+class ScreenObject;
+class MCUManager;
+class PeripheralManager;
 
-void SimulationModel::add(Component* model)
-{
-	assert(model != this);
-	models.insert(model);
-	model->setParent(this);
-}
+class ProjectLoader : public QObject {
+	Q_OBJECT
+	public:
+		ProjectLoader(MCUManager *mcuManager, PeripheralManager *perManager);
+		~ProjectLoader();
 
-void SimulationModel::getComponents(adevs::Set<Component*>& c)
-{
-	c = models;
-}
+		bool load(QDomDocument &doc, QString &error);
 
-void SimulationModel::
-route(const SimulationEvent& x, Component* model, 
-adevs::Bag<adevs::Event<SimulationEvent, double> >& r)
-{
-	SimulationObjectWrapper *obj = static_cast<SimulationObjectWrapper *>(model);
+		MCU *getMCU() {
+			return m_mcu;
+		}
 
-	adevs::Event<SimulationEvent> event;
-	event.model = obj->getTarget(x.port, event.value.port);
-	if (!event.model) {
-		return;
-	}
+		QList<ScreenObject *> &getObjects() {
+			return m_objects;
+		}
 
-	event.value.value = x.value;
-	r.insert(event);
+	private:
+		MCU *m_mcu;
+		QList<ScreenObject *> m_objects;
+		MCUManager *m_mcuManager;
+		PeripheralManager *m_perManager;
+};
 
-}
-
-SimulationModel::~SimulationModel()
-{ 
-	typename adevs::Set<Component*>::iterator i;
-	for (i = models.begin(); i != models.end(); i++)
-	{
-		delete *i;
-	}
-}
 

@@ -6,9 +6,9 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 
 
 FILE(GLOB SRC ui/*.cpp Peripherals/*.cpp Script/*.cpp MCU/*.cpp)
-FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp Tracking/*.cpp Dwarf/*.cpp)
+FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp Tracking/*.cpp Dwarf/*.cpp Project/*.cpp)
 FILE(GLOB HEADERS ui/*.h Peripherals/*.h Script/*.h MCU/*.h)
-FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h Tracking/*.h Dwarf/*.h)
+FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h Tracking/*.h Dwarf/*.h Project/*.h)
 FILE(GLOB FORMS ui/*.ui)
 FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui)
 
@@ -99,3 +99,65 @@ INSTALL(TARGETS simkitperipheral
 	COMPONENT qsimkit
 )
 
+# console simkit
+
+FILE(GLOB CONSOLE_HEADERS Peripherals/Peripheral.h
+	Peripherals/PeripheralInterface.h
+	Peripherals/SimulationObject.h
+	ui/ScreenObject.h
+	MCU/MCU.h
+	MCU/Register.h
+	MCU/RegisterSet.h
+	MCU/Memory.h
+	Tracking/PinHistory.h
+	DockWidgets/Peripherals/MemoryItem.h
+	Dwarf/DwarfDebugData.h
+	Dwarf/DwarfLoader.h
+	Dwarf/DwarfSubprogram.h
+	Dwarf/DwarfLocation.h
+	Dwarf/DwarfLocationList.h
+	Dwarf/DwarfExpression.h
+	Dwarf/DwarfVariable.h
+	MCU/MCUManager.h
+	Peripherals/PeripheralManager.h
+	Peripherals/PythonPeripheralInterface.h
+	Peripherals/PythonPeripheral.h
+	Peripherals/SimulationModel.h
+	Script/Script.h
+	Script/ScriptEngine.h
+	Project/ProjectLoader.h
+	ui/ConnectionNode.h
+	)
+
+FILE(GLOB CONSOLE_SRC Peripherals/SimulationObject.cpp
+	ui/ScreenObject.cpp
+	Tracking/PinHistory.cpp
+	DockWidgets/Peripherals/MemoryItem.cpp
+	Dwarf/DwarfDebugData.cpp
+	Dwarf/DwarfLoader.cpp
+	Dwarf/DwarfSubprogram.cpp
+	Dwarf/DwarfLocation.cpp
+	Dwarf/DwarfLocationList.cpp
+	Dwarf/DwarfExpression.cpp
+	Dwarf/DwarfVariable.cpp
+	MCU/VariableValueFormatter.cpp
+	MCU/MCUManager.cpp
+	Peripherals/PeripheralManager.cpp
+	Peripherals/PythonPeripheralInterface.cpp
+	Peripherals/PythonPeripheral.cpp
+	Peripherals/SimulationModel.cpp
+	Script/Script.cpp
+	Script/ScriptEngine.cpp
+	Project/ProjectLoader.cpp
+	ui/ConnectionNode.cpp
+	)
+
+QT4_WRAP_CPP(CONSOLE_HEADERS_MOC ${CONSOLE_HEADERS})
+ADD_EXECUTABLE(simkit ${CONSOLE_SRC} ${CONSOLE_HEADERS_MOC} main_console.cpp)
+
+IF(WIN32)
+#c:/Python27/lib/python27.lib
+	TARGET_LINK_LIBRARIES(simkit ${QT_LIBRARIES} ${PYTHONQT_LIBRARIES})
+else()
+	TARGET_LINK_LIBRARIES(simkit ${QT_LIBRARIES} ${PYTHONQT_LIBRARIES})
+endif()

@@ -63,8 +63,7 @@ class SimulationObject {
 
 class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 	public:
-		SimulationObjectWrapper(SimulationObject *obj) : m_obj(obj) {}
-		SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins);
+		SimulationObjectWrapper(SimulationObject *obj, const QList<int> &monitoredPins = QList<int>());
 		~SimulationObjectWrapper();
 
 		/// Internal transition function.
