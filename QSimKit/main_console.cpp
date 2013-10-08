@@ -3,6 +3,10 @@
 #include <QFile>
 #include <QDomDocument>
 
+#include "MCU/MCU.h"
+#include "MCU/Memory.h"
+#include "MCU/RegisterSet.h"
+#include "MCU/Register.h"
 #include "MCU/MCUManager.h"
 #include "Peripherals/PeripheralManager.h"
 #include "Peripherals/SimulationModel.h"
@@ -52,6 +56,8 @@ int main(int argc, char *argv[])
 	// Create Simulation object and prepare the simulation
 	adevs::Simulator<SimulationEvent> *simulator = p.prepareSimulation(document, model);
 
+	DebugData *dd = p.getMCU()->getDebugData();
+
 	// Run simulation events until 'until'
 	double until = QString(argv[2]).toDouble();
 	qDebug() << "Starting simulation until" << until << simulator->nextEventTime();
@@ -59,10 +65,28 @@ int main(int argc, char *argv[])
 	while (simulator->nextEventTime() <= until) {
 		simulator->execNextEvent();
 		if (++eventCount > 65000) {
+			// Print some useful info... just to show how to access MCU internals
 			qDebug() << "Time:" << simulator->nextEventTime();
+
+			uint16_t pc = p.getMCU()->getRegisterSet()->get(0)->getBigEndian();
+			qDebug() << "Small register dump:"
+				<< "PC:" << pc
+				<< "SP:" << p.getMCU()->getRegisterSet()->get(1)->getBigEndian();
+
+			if (dd->getSubprogram(pc)) {
+				qDebug() << "Current subprogram:" << dd->getSubprogram(pc)->getName();
+			}
+
+			qDebug() << "P1OUT:" << p.getMCU()->getMemory()->getByte(0x0021);
 			eventCount = 0;
 		}
 	}
 
 // 	return a.exec();
+
+	delete simulator;
+	delete model;
+	delete dd;
+	delete mcuManager;
+	delete perManager;
 }

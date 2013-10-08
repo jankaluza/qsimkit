@@ -210,6 +210,8 @@ class DebugData {
 		virtual const Subprograms &getSubprograms(const QString &file) = 0;
 
 		virtual Subprogram *getSubprogram(const QString &file, uint16_t pc) = 0;
+
+		virtual Subprogram *getSubprogram(uint16_t pc) = 0;
 };
 
 class MCU : public Peripheral {

@@ -39,6 +39,8 @@ class DwarfDebugData : public DebugData {
 
 		Subprogram *getSubprogram(const QString &file, uint16_t pc);
 
+		Subprogram *getSubprogram(uint16_t pc);
+
 		void addVariableType(VariableType *type) {
 			m_types.append(type);
 		}

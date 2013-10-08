@@ -56,3 +56,18 @@ Subprogram *DwarfDebugData::getSubprogram(const QString &file, uint16_t pc) {
 
 	return 0;
 }
+
+Subprogram *DwarfDebugData::getSubprogram(uint16_t pc) {
+	QMap<QString, Subprograms>::iterator i = m_subprograms.begin();
+	while (i != m_subprograms.end()) {
+		Subprograms &subprograms = i.value();
+		foreach(Subprogram *s, subprograms) {
+			if (pc >= s->getPCLow() && pc < s->getPCHigh()) {
+				return s;
+			}
+		}
+		++i;
+	}
+
+	return 0;
+}
