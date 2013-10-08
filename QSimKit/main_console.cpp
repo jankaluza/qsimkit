@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 				<< "PC:" << pc
 				<< "SP:" << p.getMCU()->getRegisterSet()->get(1)->getBigEndian();
 
-			if (dd->getSubprogram(pc)) {
+			if (dd && dd->getSubprogram(pc)) {
 				qDebug() << "Current subprogram:" << dd->getSubprogram(pc)->getName();
 			}
 
