@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	// Run simulation events until 'until'
 	double until = QString(argv[2]).toDouble();
 	qDebug() << "Starting simulation until" << until << simulator->nextEventTime();
-	int eventCount = 0;
+	long eventCount = 0;
 	while (simulator->nextEventTime() <= until) {
 		simulator->execNextEvent();
 		if (++eventCount > 65000) {
