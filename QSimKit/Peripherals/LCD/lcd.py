@@ -123,7 +123,10 @@ class Peripheral():
 				data |= self.current[D0 + i] << i
 			self.disp[self.cursor] = str(unichr(data));
 			self.cursor += self.cursorInc;
-			self.screen.update()
+			try:
+				self.screen.update()
+			except:
+				pass
 
 	def receiveCommand(self):
 		if self.dl == BIT4 and not self.secondCycle:

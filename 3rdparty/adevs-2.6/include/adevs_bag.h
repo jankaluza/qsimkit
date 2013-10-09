@@ -129,6 +129,12 @@ template <class T> class Bag
 			size_--;
 			b[p.i] = b[size_];
 		}
+		void erase(int i)
+		{
+			size_--;
+			b[i] = b[size_];
+		}
+		T& at(int i) { return b[i]; }
 		/// Remove all of the elements from the bag
 		void clear() { size_ = 0; }
 		/// Find the first instance of k, or end() if no instance is found. Uses == for comparing T.

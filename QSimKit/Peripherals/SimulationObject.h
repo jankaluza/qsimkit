@@ -96,7 +96,7 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 			return m_sim->nextEventTime();
 		}
 
-		QList<PinHistory *> &getPinHistory() {
+		QVector<PinHistory *> &getPinHistory() {
 			return m_history;
 		}
 
@@ -114,8 +114,8 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 	private:
 		adevs::Simulator<SimulationEvent> *m_sim;
 		SimulationObject *m_obj;
-		QList<int> m_monitoredPins;
-		QList<PinHistory *> m_history;
+		QVector<int> m_monitoredPins;
+		QVector<PinHistory *> m_history;
 		uint16_t m_context;
 
 		class node {
@@ -124,6 +124,6 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 			adevs::Devs<SimulationEvent, double> *c;
 			int port;
 		};
-		QVector<node> m_conns;
+		std::vector<node> m_conns;
 };
 

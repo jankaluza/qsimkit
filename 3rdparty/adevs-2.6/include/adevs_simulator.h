@@ -270,8 +270,9 @@ void Simulator<X,T>::computeNextOutput()
 	sched.getImminent(imm);
 	// Compute output functions and route the events. The bags of output
 	// are held for garbage collection at a later time.
+	int i = 0;
 	for (typename Bag<Atomic<X,T>*>::iterator imm_iter = imm.begin(); 
-		imm_iter != imm.end(); imm_iter++)
+		i != imm.size(); imm_iter++, i++)
 	{
 		Atomic<X,T>* model = *imm_iter;
 		// If the output for this model has already been computed, then skip it
@@ -280,8 +281,9 @@ void Simulator<X,T>::computeNextOutput()
 			model->y = io_pool.make_obj();
 			model->output_func(*(model->y));
 			// Route each event in y
+			int x = 0;
 			for (typename Bag<X>::iterator y_iter = model->y->begin(); 
-			y_iter != model->y->end(); y_iter++)
+			x != model->y->size(); y_iter++, x++)
 			{
 				route(model->getParent(),model,*y_iter);
 			}
@@ -295,13 +297,15 @@ void Simulator<X,T>::computeNextState(Bag<Event<X,T> >& input, T t)
 	// Clean up if there was a previous IO calculation
 	if (t < sched.minPriority())
 	{
+		int i = 0;
 		typename Bag<Atomic<X,T>*>::iterator iter;
-		for (iter = activated.begin(); iter != activated.end(); iter++)
+		for (iter = activated.begin(); i != activated.size(); iter++, i++)
 		{
 			clean_up(*iter);
 		}
 		activated.clear();
-		for (iter = imm.begin(); iter != imm.end(); iter++)
+		i = 0;
+		for (iter = imm.begin(); i != imm.size(); iter++, i++)
 		{
 			clean_up(*iter);
 		}
@@ -313,8 +317,9 @@ void Simulator<X,T>::computeNextState(Bag<Event<X,T> >& input, T t)
 		computeNextOutput();
 	}
 	// Apply the injected inputs
+	int i = 0;
 	for (typename Bag<Event<X,T> >::iterator iter = input.begin(); 
-	iter != input.end(); iter++)
+	i != input.size(); iter++, i++)
 	{
 		Atomic<X,T>* amodel = (*iter).model->typeIsAtomic();
 		if (amodel != NULL)
@@ -332,13 +337,15 @@ void Simulator<X,T>::computeNextState(Bag<Event<X,T> >& input, T t)
 	special container that will be used when the structure changes are
 	computed (see exec_event(.)).
 	*/
+	i = 0;
 	for (typename Bag<Atomic<X,T>*>::iterator iter = imm.begin(); 
-	iter != imm.end(); iter++)
+	i != imm.size(); iter++, i++)
 	{
 		exec_event(*iter,true,t); // Internal and confluent transitions
 	}
+	i = 0;
 	for (typename Bag<Atomic<X,T>*>::iterator iter = activated.begin(); 
-	iter != activated.end(); iter++)
+	i != activated.size(); iter++, i++)
 	{
 		exec_event(*iter,false,t); // External transitions
 	}
@@ -376,16 +383,18 @@ void Simulator<X,T>::computeNextState(Bag<Event<X,T> >& input, T t)
 		 * a higher level, then the models will not have been deleted when
 		 * trying to schedule them.
 		 */
+		i = 0;
 		for (typename Bag<Devs<X,T>*>::iterator iter = added.begin(); 
-			iter != added.end(); iter++)
+			i != added.size(); iter++, i++)
 		{
 			schedule(*iter,t);
 		}
 		// Done with the additions
 		added.clear();
+		i = 0;
 		// Remove the models that are in the removed set.
 		for (typename Bag<Devs<X,T>*>::iterator iter = removed.begin(); 
-			iter != removed.end(); iter++)
+			i != removed.size(); iter++, i++)
 		{
 			clean_up(*iter);
 			unschedule_model(*iter);
@@ -424,15 +433,17 @@ void Simulator<X,T>::computeNextState(Bag<Event<X,T> >& input, T t)
 	} // End of the structure change
 	// Cleanup and reschedule models that changed state in this iteration
 	// and survived the structure change phase.
+	i = 0;
 	for (typename Bag<Atomic<X,T>*>::iterator iter = imm.begin(); 
-		iter != imm.end(); iter++) // Schedule the imminents
+		i != imm.size(); iter++, i++) // Schedule the imminents
 	{
 		clean_up(*iter);
 		schedule(*iter,t);
 	}
 	// Schedule the activated
+	i = 0;
 	for (typename Bag<Atomic<X,T>*>::iterator iter = activated.begin(); 
-		iter != activated.end(); iter++)
+		i != activated.size(); iter++, i++)
 	{
 		clean_up(*iter);
 		schedule(*iter,t);
@@ -561,7 +572,7 @@ void Simulator<X,T>::route(Network<X,T>* parent, Devs<X,T>* src, X& x)
 	// Deliver the event to each of its targets
 	Atomic<X,T>* amodel = NULL;
 	typename Bag<Event<X,T> >::iterator recv_iter = recvs->begin();
-	for (; recv_iter != recvs->end(); recv_iter++)
+	for (int i = 0; i != recvs->size(); recv_iter++, i++)
 	{
 		// Check for self-influencing error condition
 		if (src == (*recv_iter).model)

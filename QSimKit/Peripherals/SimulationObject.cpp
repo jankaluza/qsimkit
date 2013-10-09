@@ -23,7 +23,7 @@
 #include <QDebug>
 
 SimulationObjectWrapper::SimulationObjectWrapper( SimulationObject *obj, const QList<int> &monitoredPins) :
-m_obj(obj), m_monitoredPins(monitoredPins), m_context(0) {
+m_obj(obj), m_monitoredPins(monitoredPins.toVector()), m_context(0) {
 
 	if (!m_monitoredPins.empty()) {
 		qSort(m_monitoredPins);

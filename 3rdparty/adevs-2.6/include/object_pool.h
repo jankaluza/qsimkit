@@ -45,9 +45,9 @@ template <class T> class object_pool
 			if (pool.empty()) obj = new T;
 			else
 			{
-				typename Bag<T*>::iterator it = pool.end();
-				obj = *((it)--);
-				pool.erase(it);
+				int size = pool.size();
+				obj = pool.at(--size);
+				pool.erase(size);
 			}
 			return obj;
 		}

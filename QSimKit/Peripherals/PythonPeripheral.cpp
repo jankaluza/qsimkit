@@ -48,7 +48,8 @@ void PythonPeripheral::internalTransition() {
 }
 
 void PythonPeripheral::externalEvent(double t, const SimulationEventList &events) {
-	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
+	int i = 0;
+	for (SimulationEventList::const_iterator it = events.begin(); i != events.size(); ++it, ++i) {
 		m_script->call("externalEvent", QVariantList() << (*it).port << (*it).value);
 	}
 }

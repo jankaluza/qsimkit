@@ -31,6 +31,7 @@
 #include "Peripherals/SimulationModel.h"
 #include "Peripherals/Peripheral.h"
 #include "Project/ProjectLoader.h"
+// #include "valgrind/callgrind.h"
 
 int main(int argc, char *argv[])
 {
@@ -83,6 +84,7 @@ int main(int argc, char *argv[])
 	double until = QString(argv[2]).toDouble();
 	qDebug() << "Starting simulation until" << until;
 	long eventCount = 0;
+// 	CALLGRIND_ZERO_STATS;
 	while (simulator->nextEventTime() <= until) {
 		simulator->execNextEvent();
 		if (++eventCount > 65000) {

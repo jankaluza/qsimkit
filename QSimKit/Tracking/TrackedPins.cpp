@@ -97,7 +97,7 @@ void TrackedPins::handleSimulationStarted(bool wasPaused) {
 
 	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
 	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
-		QList<PinHistory *> &history = (*it).second->getPinHistory();
+		QVector<PinHistory *> &history = (*it).second->getPinHistory();
 		for (int i = 0; i < history.size(); ++i) {
 			if (history[i]) {
 				m_history.append(history[i]);

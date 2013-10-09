@@ -181,7 +181,8 @@ void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &o
 }
 
 void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {
-	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
+	int i = 0;
+	for (SimulationEventList::const_iterator it = events.begin(); i != events.size(); ++it, ++i) {
 		SimulationEvent &ev = *it;
 		if (!m_pinManager->handlePinInput(ev.port, ev.value)) {
 			qDebug() << "WARN: input on output PIN";
