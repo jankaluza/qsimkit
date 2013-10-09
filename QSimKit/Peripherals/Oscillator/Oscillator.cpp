@@ -86,8 +86,7 @@ void Oscillator::externalEvent(double e, const SimulationEventList &events) {
 
 void Oscillator::output(SimulationEventList &output) {
 	if (!m_output.empty()) {
-		output = m_output;
-		m_output.clear();
+		output.swap(m_output);
 	}
 }
 

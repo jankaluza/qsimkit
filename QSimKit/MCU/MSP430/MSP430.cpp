@@ -182,18 +182,18 @@ void MCU_MSP430::getInternalSimulationObjects(std::vector<SimulationObject *> &o
 
 void MCU_MSP430::externalEvent(double t, const SimulationEventList &events) {
 	for (SimulationEventList::const_iterator it = events.begin(); it != events.end(); ++it) {
-		if (!m_pinManager->handlePinInput((*it).port, (*it).value)) {
+		SimulationEvent &ev = *it;
+		if (!m_pinManager->handlePinInput(ev.port, ev.value)) {
 			qDebug() << "WARN: input on output PIN";
 		}
-		m_pins[(*it).port].value = (*it).value;
-		update();
+		m_pins[ev.port].value = ev.value;
 	}
+	update();
 }
 
 void MCU_MSP430::output(SimulationEventList &output) {
 	if (!m_output.empty()) {
-		output = m_output;
-		m_output.clear();
+		output.swap(m_output);
 	}
 }
 

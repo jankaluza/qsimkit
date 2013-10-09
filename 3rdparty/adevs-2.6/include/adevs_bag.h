@@ -85,6 +85,22 @@ template <class T> class Bag
 				b[i] = src.b[i];
 			return *this;
 		}
+		/// swap operator uses the = operator of T
+		const Bag<T>& swap(Bag<T>& src)
+		{
+			unsigned _cap_, _size_;
+			T* _b;
+			_cap_ = src.cap_;
+			_size_ = src.size_;
+			_b = src.b;
+			src.cap_ = cap_;
+			src.size_ = size_;
+			src.b = b;
+			cap_ = _cap_;
+			size_ = _size_;
+			b = _b;
+			return *this;
+		}
 		/// Count the instances of a stored in the bag
 		unsigned count(const T& a) const
 		{

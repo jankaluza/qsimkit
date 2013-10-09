@@ -551,8 +551,8 @@ template <class X, class T>
 void Simulator<X,T>::route(Network<X,T>* parent, Devs<X,T>* src, X& x)
 {
 	// Notify event listeners if this is an output event
-	if (parent != src && (lps == NULL || lps->out_flag != RESTORING_OUTPUT))
-		this->notify_output_listeners(src,x,sched.minPriority());
+// 	if (parent != src && (lps == NULL || lps->out_flag != RESTORING_OUTPUT))
+// 		this->notify_output_listeners(src,x,sched.minPriority());
 	// No one to do the routing, so return
 	if (parent == NULL) return;
 	// Compute the set of receivers for this value
@@ -617,7 +617,7 @@ void Simulator<X,T>::exec_event(Atomic<X,T>* model, bool internal, T t)
 		model->delta_ext(t-model->tL,*(model->x));
 	}
 	// Notify any listeners
-	this->notify_state_listeners(model,t);
+// 	this->notify_state_listeners(model,t);
 	// Check for a model transition
 	if (model->model_transition() && model->getParent() != NULL)
 	{
