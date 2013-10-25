@@ -53,7 +53,7 @@ adevs::Bag<adevs::Event<SimulationEvent, double> >& r)
 
 SimulationModel::~SimulationModel()
 { 
-	typename adevs::Set<Component*>::iterator i;
+	adevs::Set<Component*>::iterator i;
 	for (i = models.begin(); i != models.end(); i++)
 	{
 		delete *i;

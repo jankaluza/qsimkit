@@ -200,8 +200,8 @@ void MCU_MSP430::output(SimulationEventList &output) {
 
 void MCU_MSP430::tickRising() {
 	if (++m_counter == m_instructionCycles) {
-		int cycles = executeInstruction(m_reg, m_mem, m_instruction);
-		if (cycles == -1) {
+		int error = executeInstruction(m_reg, m_mem, m_instruction);
+		if (error == -1) {
 			qDebug() << "ERROR: Unknown instruction" << "type" << m_instruction->type << "opcode" << m_instruction->opcode;
 			m_instructionCycles = DBL_MAX;
 			return;
