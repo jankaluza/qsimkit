@@ -23,7 +23,8 @@
 #include "MCU/MCU.h"
 
 BreakpointManager::BreakpointManager() : m_mcu(0), m_break(0) {
-
+	// We need at least PC register at the beginning.
+	m_breaks.append(QList<uint16_t>());
 }
 
 BreakpointManager::~BreakpointManager() {
@@ -60,6 +61,8 @@ void BreakpointManager::handleMemoryChanged(Memory *memory, uint16_t address) {
 
 void BreakpointManager::setMCU(MCU *mcu) {
 	m_mcu = mcu;
+	m_breaks.clear();
+	m_membreaks.clear();
 
 	for (int i = 0; i < m_mcu->getRegisterSet()->size(); ++i) {
 		m_breaks.append(QList<uint16_t>());

@@ -36,9 +36,15 @@ class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 
 		void addRegisterBreak(int reg, uint16_t value);
 		void removeRegisterBreak(int reg, uint16_t value);
+		const QList<uint16_t> &getRegisterBreaks(int reg) {
+			return m_breaks[reg];
+		}
 
 		void addMemoryBreak(uint16_t addr, uint16_t value);
 		void removeMemoryBreak(uint16_t addr);
+		const QHash<uint16_t, uint16_t> &getMemoryBreaks() {
+			return m_membreaks;
+		}
 
 		bool shouldBreak();
 

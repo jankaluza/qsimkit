@@ -70,8 +70,8 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void handleShowModeClicked();
 
 	private:
-		void addBreakpoint();
-		void removeBreakpoint();
+		void addBreakpoint(const QString &addr);
+		void removeBreakpoint(const QString &addr);
 		void addSourceLine(uint16_t addr, const QString &line);
 		void addInstructionLine(uint16_t addr, const QString &line, const QString &tooltip);
 		void addSectionLine(uint16_t addr, const QString &line);
@@ -85,7 +85,6 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		MCU *m_mcu;
 		QSimKit *m_simkit;
 		QList<QTreeWidgetItem *> m_currentItems;
-		QList<QTreeWidgetItem *> m_breakpoints;
 		bool m_showSource;
 		bool m_showAssembler;
 		DisassembledFiles m_files;

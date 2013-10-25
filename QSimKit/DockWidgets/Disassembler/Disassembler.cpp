@@ -66,7 +66,7 @@ void Disassembler::handleFileChanged(int id) {
 }
 
 void Disassembler::handleFuncChanged(int id) {
-	uint16_t pcLow = func->itemData(id).toUInt();
+	uint16_t pcLow = func->itemData(id).toUInt(0);
 	QString addr = QString("%1").arg(pcLow, 0, 16);
 	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
 	if (items.isEmpty()) {
@@ -114,7 +114,7 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 
 	QAction *add = 0;
 	QAction *remove = 0;
-	if (!m_breakpoints.contains(item)) {
+	if (!m_simkit->getBreakpointManager()->getRegisterBreaks(0).contains(item->text(0).toUInt(0))) {
 		add = new QAction("Add breakpoint", 0);
 		actions.append(add);
 	}
@@ -134,41 +134,36 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 	}
 
 	if (action == add) {
-		addBreakpoint();
+		addBreakpoint(item->text(0));
 	}
 	else if (action == remove) {
-		removeBreakpoint();
+		removeBreakpoint(item->text(0));
 	}
 	else if (action == showSource) {
 		showSourceCode(action->isChecked());
 	}
 }
 
-void Disassembler::addBreakpoint() {
+void Disassembler::addBreakpoint(const QString &addr) {
 	QTreeWidgetItem *item = view->currentItem();
 
-	QList<QTreeWidgetItem *> items = view->findItems(item->text(0), Qt::MatchExactly);
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
 	foreach(QTreeWidgetItem *it, items) {
 		it->setBackground(0, QBrush(Qt::red));
-		m_breakpoints.append(it);
 	}
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
-	m->addRegisterBreak(0, item->text(0).toInt(0, 16));
-	qDebug() << "break when PC is" << item->text(0).toInt(0, 16);
+	m->addRegisterBreak(0, addr.toInt(0, 16));
 }
 
-void Disassembler::removeBreakpoint() {
-	QTreeWidgetItem *item = view->currentItem();
-	QList<QTreeWidgetItem *> items = view->findItems(item->text(0), Qt::MatchExactly);
+void Disassembler::removeBreakpoint(const QString &addr) {
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
 	foreach(QTreeWidgetItem *it, items) {
 		it->setBackground(0, view->palette().window());
-		m_breakpoints.removeAll(it);
 	}
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
-	m->removeRegisterBreak(0, item->text(0).toInt(0, 16));
-	qDebug() << "removing break when PC is" << item->text(0).toInt(0, 16);
+	m->removeRegisterBreak(0, addr.toInt(0, 16));
 }
 
 void Disassembler::addSourceLine(uint16_t addr, const QString &line) {
@@ -322,12 +317,21 @@ void Disassembler::reloadFile() {
 		reloadFileSource(lines);
 	}
 
+	// Reload list of functions in file
 	if (m_dd) {
 		func->clear();
-
 		Subprograms subprograms = m_dd->getSubprograms(file->currentText());
 		foreach(const Subprogram *s, subprograms) {
 			func->addItem(s->getName(), s->getPCLow());
+		}
+	}
+
+	// Reload breakpoints
+	const QList<uint16_t> &breaks = m_simkit->getBreakpointManager()->getRegisterBreaks(0);
+	foreach(uint16_t addr, breaks) {
+		QList<QTreeWidgetItem *> items = view->findItems(QString::number(addr, 16), Qt::MatchExactly);
+		foreach(QTreeWidgetItem *it, items) {
+			it->setBackground(0, QBrush(Qt::red));
 		}
 	}
 }
