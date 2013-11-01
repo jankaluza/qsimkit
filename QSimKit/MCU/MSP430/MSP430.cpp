@@ -33,6 +33,7 @@
 #include "CPU/BasicClock/MCLK.h"
 #include "CPU/USI/USI.h"
 #include "CPU/USCI/USCIModules.h"
+#include "CPU/USART/USARTModules.h"
 
 #include "Package.h"
 #include "CodeUtil.h"
@@ -91,6 +92,8 @@ m_syncing(0) {
 	}
 
 	m_usci = new MSP430::USCIModules(m_pinManager, m_intManager, m_mem, m_variant,
+									 m_basicClock->getACLK(), m_basicClock->getSMCLK());
+	m_usart = new MSP430::USARTModules(m_pinManager, m_intManager, m_mem, m_variant,
 									 m_basicClock->getACLK(), m_basicClock->getSMCLK());
 
 	reset();

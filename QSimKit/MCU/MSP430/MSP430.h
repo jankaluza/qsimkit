@@ -41,6 +41,7 @@ class InterruptManager;
 class BasicClock;
 class USI;
 class USCIModules;
+class USARTModules;
 
 }
 
@@ -149,6 +150,7 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 		MSP430::BasicClock *m_basicClock;
 		MSP430::USI *m_usi;
 		MSP430::USCIModules *m_usci;
+		MSP430::USARTModules *m_usart;
 		AdevsTimerFactory *m_timerFactory;
 		QString m_code;
 		SimulationEventList m_output;
