@@ -33,6 +33,8 @@
 #define LCD_BASE 0x30
 #define __msp430_have_lcdlowr
 
+#define ME1 0x0004
+
 #include <msp430/gpio.h>
 #include <msp430/lcd.h>
 #include <msp430/basic_timer.h>

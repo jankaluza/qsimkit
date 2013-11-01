@@ -62,6 +62,15 @@ defines += ["USCIAB1TX_VECTOR", "USCIAB1RX_VECTOR"]
 defines += ["UC0IE", "UC0IFG"]
 defines += ["UC1IE", "UC1IFG"]
 
+# USART
+defines += ["U0CTL", "U0TCTL_", "U0RCTL_", "U0MCTL_", "U0BR0_", "U0BR1_", "U0RXBUF_", "U0TXBUF_"]
+defines += ["U0ME", "U0IE", "U0IFG"]
+defines += ["USART0TX_VECTOR", "USART0RX_VECTOR"]
+
+defines += ["U1CTL", "U1TCTL_", "U1RCTL_", "U1MCTL_", "U1BR0_", "U1BR1_", "U1RXBUF_", "U1TXBUF_"]
+defines += ["U1ME", "U1IE", "U1IFG"]
+defines += ["USART1TX_VECTOR", "USART1RX_VECTOR"]
+
 # Config files
 double_defines += ["SRSEL", "SDCO", "DCOZERO"]
 

@@ -1,4 +1,4 @@
-#include <msp430x241x.h>
+#include "msp430g2553.h"
 
 #define REDLED		BIT0
 #define GREENLED	BIT6

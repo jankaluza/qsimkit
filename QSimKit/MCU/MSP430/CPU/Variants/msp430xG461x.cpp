@@ -5848,6 +5848,240 @@ class Variant_msp430xG461x : public Variant {
 		}
 
 
+		unsigned int getU0CTL() {
+#ifdef U0CTL
+			return U0CTL;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0TCTL() {
+#ifdef U0TCTL_
+			return U0TCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0RCTL() {
+#ifdef U0RCTL_
+			return U0RCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0MCTL() {
+#ifdef U0MCTL_
+			return U0MCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0BR0() {
+#ifdef U0BR0_
+			return U0BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0BR1() {
+#ifdef U0BR1_
+			return U0BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0RXBUF() {
+#ifdef U0RXBUF_
+			return U0RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0TXBUF() {
+#ifdef U0TXBUF_
+			return U0TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0ME() {
+#ifdef U0ME
+			return U0ME;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0IE() {
+#ifdef U0IE
+			return U0IE;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU0IFG() {
+#ifdef U0IFG
+			return U0IFG;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSART0TX_VECTOR() {
+#ifdef USART0TX_VECTOR
+			return USART0TX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSART0RX_VECTOR() {
+#ifdef USART0RX_VECTOR
+			return USART0RX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1CTL() {
+#ifdef U1CTL
+			return U1CTL;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1TCTL() {
+#ifdef U1TCTL_
+			return U1TCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1RCTL() {
+#ifdef U1RCTL_
+			return U1RCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1MCTL() {
+#ifdef U1MCTL_
+			return U1MCTL_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1BR0() {
+#ifdef U1BR0_
+			return U1BR0_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1BR1() {
+#ifdef U1BR1_
+			return U1BR1_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1RXBUF() {
+#ifdef U1RXBUF_
+			return U1RXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1TXBUF() {
+#ifdef U1TXBUF_
+			return U1TXBUF_;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1ME() {
+#ifdef U1ME
+			return U1ME;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1IE() {
+#ifdef U1IE
+			return U1IE;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getU1IFG() {
+#ifdef U1IFG
+			return U1IFG;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSART1TX_VECTOR() {
+#ifdef USART1TX_VECTOR
+			return USART1TX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSART1RX_VECTOR() {
+#ifdef USART1RX_VECTOR
+			return USART1RX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
 		double getSRSEL() {
 #ifdef SRSEL
 			return SRSEL;
