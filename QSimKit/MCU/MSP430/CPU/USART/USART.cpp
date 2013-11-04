@@ -50,6 +50,11 @@ m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 		m_me = variant->getU0ME();
 		m_rxvect = variant->getUSART0RX_VECTOR();
 		m_txvect = variant->getUSART0TX_VECTOR();
+		m_utxie = variant->getUTXIE0();
+		m_urxie = variant->getURXIE0();
+		m_uspie = variant->getUSPIE0();
+		m_utxifg = variant->getUTXIFG0();
+		m_urxifg = variant->getURXIFG0();
 		m_somiMpx = m_pinManager->addPinHandler("SOMI0", this);
 		m_simoMpx = m_pinManager->addPinHandler("SIMO0", this);
 		m_clkMpx = m_pinManager->addPinHandler("UCLK0", this);
@@ -69,6 +74,11 @@ m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 		m_me = variant->getU1ME();
 		m_rxvect = variant->getUSART1RX_VECTOR();
 		m_txvect = variant->getUSART1TX_VECTOR();
+		m_utxie = variant->getUTXIE1();
+		m_urxie = variant->getURXIE1();
+		m_uspie = variant->getUSPIE1();
+		m_utxifg = variant->getUTXIFG1();
+		m_urxifg = variant->getURXIFG1();
 		m_somiMpx = m_pinManager->addPinHandler("SOMI1", this);
 		m_simoMpx = m_pinManager->addPinHandler("SIMO1", this);
 		m_clkMpx = m_pinManager->addPinHandler("UCLK1", this);
@@ -140,8 +150,8 @@ void USART::doSPICapture(uint8_t ctl) {
 		}
 		m_rxRead = false;
 
-		if (m_mem->getByte(m_ie, false) & (1 << 4)) {
-			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | (1 << 6), false);
+		if (m_mem->getByte(m_ie, false) & m_urxie) {
+			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | m_urxifg, false);
 			m_intManager->queueInterrupt(m_rxvect);
 		}
 
@@ -184,8 +194,8 @@ void USART::doSPIOutput(uint8_t ctl) {
 
 	if (m_cnt == 0 || m_cnt == 1) {
 		// generate interrupt
-		if (m_mem->getByte(m_ie, false) & (1 << 7)) {
-			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | (1 << 5), false);
+		if (m_mem->getByte(m_ie, m_utxie) & (1 << 7)) {
+			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | m_utxifg, false);
 			m_intManager->queueInterrupt(m_txvect);
 		}
 	}
@@ -382,7 +392,7 @@ void USART::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		std::cout << "user wrote to TXBUF\n";
 
 		// clear interrup flag
-		m_mem->setBit(m_ifg, 2, false);
+		m_mem->setBit(m_ifg, m_utxifg, false);
 		txReady();
 	}
 }
@@ -397,7 +407,7 @@ void USART::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value)
 	m_mem->setBit(m_rctl, (1 << 5), false);
 
 	// Clear interrup flag
-	m_mem->setBit(m_ifg, 1, false);
+	m_mem->setBit(m_ifg, m_urxifg, false);
 
 	m_rxRead = true;
 }

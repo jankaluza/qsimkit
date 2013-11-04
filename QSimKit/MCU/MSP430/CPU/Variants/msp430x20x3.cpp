@@ -3622,6 +3622,51 @@ class Variant_msp430x20x3 : public Variant {
 		}
 
 
+		unsigned int getUTXIE0() {
+#ifdef UTXIE0
+			return UTXIE0;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getURXIE0() {
+#ifdef URXIE0
+			return URXIE0;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUTXIFG0() {
+#ifdef UTXIFG0
+			return UTXIFG0;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getURXIFG0() {
+#ifdef URXIFG0
+			return URXIFG0;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSPIE0() {
+#ifdef USPIE0
+			return USPIE0;
+#else
+			return 0;
+#endif
+		}
+
+
 		unsigned int getU1CTL() {
 #ifdef U1CTL
 			return U1CTL;
@@ -3733,6 +3778,51 @@ class Variant_msp430x20x3 : public Variant {
 		unsigned int getUSART1RX_VECTOR() {
 #ifdef USART1RX_VECTOR
 			return USART1RX_VECTOR;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUTXIE1() {
+#ifdef UTXIE1
+			return UTXIE1;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getURXIE1() {
+#ifdef URXIE1
+			return URXIE1;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUTXIFG1() {
+#ifdef UTXIFG1
+			return UTXIFG1;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getURXIFG1() {
+#ifdef URXIFG1
+			return URXIFG1;
+#else
+			return 0;
+#endif
+		}
+
+
+		unsigned int getUSPIE1() {
+#ifdef USPIE1
+			return USPIE1;
 #else
 			return 0;
 #endif

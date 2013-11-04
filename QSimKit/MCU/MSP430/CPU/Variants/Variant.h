@@ -186,6 +186,11 @@ class Variant {
 		virtual unsigned int getU0IFG() = 0;
 		virtual unsigned int getUSART0TX_VECTOR() = 0;
 		virtual unsigned int getUSART0RX_VECTOR() = 0;
+		virtual unsigned int getUTXIE0() = 0;
+		virtual unsigned int getURXIE0() = 0;
+		virtual unsigned int getUTXIFG0() = 0;
+		virtual unsigned int getURXIFG0() = 0;
+		virtual unsigned int getUSPIE0() = 0;
 		virtual unsigned int getU1CTL() = 0;
 		virtual unsigned int getU1TCTL() = 0;
 		virtual unsigned int getU1RCTL() = 0;
@@ -199,6 +204,11 @@ class Variant {
 		virtual unsigned int getU1IFG() = 0;
 		virtual unsigned int getUSART1TX_VECTOR() = 0;
 		virtual unsigned int getUSART1RX_VECTOR() = 0;
+		virtual unsigned int getUTXIE1() = 0;
+		virtual unsigned int getURXIE1() = 0;
+		virtual unsigned int getUTXIFG1() = 0;
+		virtual unsigned int getURXIFG1() = 0;
+		virtual unsigned int getUSPIE1() = 0;
 		virtual double getSRSEL() = 0;
 		virtual double getSDCO() = 0;
 		virtual double getDCOZERO() = 0;

@@ -92,6 +92,11 @@ class USART : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 		uint16_t m_ifg;
 		uint16_t m_ie;
 		uint16_t m_me;
+		uint8_t m_utxie;
+		uint8_t m_urxie;
+		uint8_t m_uspie;
+		uint8_t m_utxifg;
+		uint8_t m_urxifg;
 
 		uint16_t m_rxvect;
 		uint16_t m_txvect;
