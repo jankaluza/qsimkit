@@ -31,6 +31,12 @@
 #ifndef __ASSEMBLER_
 #define __ASSEMBLER_ 1
 #endif
+#ifndef VLD0
+#define VLD0 (1<<4)
+#endif
+#ifndef VLD2
+#define VLD2 (4<<4)
+#endif
 #ifndef __MSP430_HAS_PORT3__
 #define __MSP430_HAS_PORT3__ 
 #endif
@@ -145,6 +151,9 @@
 #ifndef LCDM14
 #define LCDM14 LCD_BASE+0xE
 #endif
+#ifndef OUTMOD_2
+#define OUTMOD_2 (2<<5)
+#endif
 #ifndef LCDM15_
 #define LCDM15_ LCD_BASE+0xF
 #endif
@@ -177,6 +186,9 @@
 #endif
 #ifndef XCAP14PF
 #define XCAP14PF 0x20
+#endif
+#ifndef BTIE
+#define BTIE (1<<7)
 #endif
 #ifndef FSSEL0
 #define FSSEL0 0x0040
@@ -312,6 +324,15 @@
 #endif
 #ifndef __LDBL_MAX_EXP_
 #define __LDBL_MAX_EXP_ 128
+#endif
+#ifndef TASSEL_1
+#define TASSEL_1 (1<<8)
+#endif
+#ifndef TASSEL_2
+#define TASSEL_2 (2<<8)
+#endif
+#ifndef TASSEL_3
+#define TASSEL_3 (3<<8)
 #endif
 #ifndef CCTL2_
 #define CCTL2_ TA0CCTL2_
@@ -586,6 +607,9 @@
 #ifndef __LDBL_HAS_QUIET_NAN_
 #define __LDBL_HAS_QUIET_NAN_ 1
 #endif
+#ifndef WDTIFG
+#define WDTIFG (1<<0)
+#endif
 #ifndef LOCK
 #define LOCK 0x0010
 #endif
@@ -655,6 +679,18 @@
 #ifndef __BIGGEST_ALIGNMENT_
 #define __BIGGEST_ALIGNMENT_ 2
 #endif
+#ifndef ID_0
+#define ID_0 (0<<6)
+#endif
+#ifndef ID_1
+#define ID_1 (1<<6)
+#endif
+#ifndef ID_2
+#define ID_2 (2<<6)
+#endif
+#ifndef ID_3
+#define ID_3 (3<<6)
+#endif
 #ifndef LCDSG0
 #define LCDSG0 0x00
 #endif
@@ -690,6 +726,15 @@
 #endif
 #ifndef TACCR1
 #define TACCR1 TA0CCR1_
+#endif
+#ifndef CCIS_1
+#define CCIS_1 (1<<12)
+#endif
+#ifndef CCIS_2
+#define CCIS_2 (2<<12)
+#endif
+#ifndef CCIS_3
+#define CCIS_3 (3<<12)
 #endif
 #ifndef P1DIR_
 #define P1DIR_ 0x0022
@@ -1015,6 +1060,18 @@
 #ifndef BTHOLD
 #define BTHOLD 0x40
 #endif
+#ifndef MC_0
+#define MC_0 (0<<4)
+#endif
+#ifndef MC_1
+#define MC_1 (1<<4)
+#endif
+#ifndef MC_2
+#define MC_2 (2<<4)
+#endif
+#ifndef MC_3
+#define MC_3 (3<<4)
+#endif
 #ifndef CPUOFF
 #define CPUOFF 0x0010
 #endif
@@ -1201,6 +1258,9 @@
 #ifndef CM_POS
 #define CM_POS CM_1
 #endif
+#ifndef NMIIE
+#define NMIIE (1<<4)
+#endif
 #ifndef FSSEL_SMCLK
 #define FSSEL_SMCLK FSSEL_2
 #endif
@@ -1225,8 +1285,14 @@
 #ifndef LCDM1
 #define LCDM1 LCDMEM_
 #endif
+#ifndef VLD1
+#define VLD1 (2<<4)
+#endif
 #ifndef BTDIV
 #define BTDIV 0x20
+#endif
+#ifndef VLD3
+#define VLD3 (8<<4)
 #endif
 #ifndef LCDM2_
 #define LCDM2_ LCD_BASE+0x2
@@ -1338,6 +1404,18 @@
 #endif
 #ifndef FXKEY
 #define FXKEY 0x3300
+#endif
+#ifndef CM_0
+#define CM_0 (0<<14)
+#endif
+#ifndef CM_1
+#define CM_1 (1<<14)
+#endif
+#ifndef CM_2
+#define CM_2 (2<<14)
+#endif
+#ifndef CM_3
+#define CM_3 (3<<14)
 #endif
 #ifndef PORON
 #define PORON 0x08
@@ -1516,6 +1594,9 @@
 #ifndef OUTMOD_SET
 #define OUTMOD_SET OUTMOD_1
 #endif
+#ifndef WDTIE
+#define WDTIE (1<<0)
+#endif
 #ifndef CAREF_VT
 #define CAREF_VT CAREF_3
 #endif
@@ -1524,6 +1605,9 @@
 #endif
 #ifndef __LDBL_MANT_DIG_
 #define __LDBL_MANT_DIG_ 24
+#endif
+#ifndef ACCVIE
+#define ACCVIE (1<<5)
 #endif
 #ifndef __MSP430_HAS_FLASH__
 #define __MSP430_HAS_FLASH__ 
@@ -1627,6 +1711,27 @@
 #ifndef __FLT_MAX_EXP_
 #define __FLT_MAX_EXP_ 128
 #endif
+#ifndef OUTMOD_0
+#define OUTMOD_0 (0<<5)
+#endif
+#ifndef OUTMOD_1
+#define OUTMOD_1 (1<<5)
+#endif
+#ifndef OUTMOD_3
+#define OUTMOD_3 (3<<5)
+#endif
+#ifndef OUTMOD_4
+#define OUTMOD_4 (4<<5)
+#endif
+#ifndef OUTMOD_5
+#define OUTMOD_5 (5<<5)
+#endif
+#ifndef OUTMOD_6
+#define OUTMOD_6 (6<<5)
+#endif
+#ifndef OUTMOD_7
+#define OUTMOD_7 (7<<5)
+#endif
 #ifndef BASICTIMER_VECTOR
 #define BASICTIMER_VECTOR 0
 #endif
@@ -1678,6 +1783,9 @@
 #ifndef CACTL2
 #define CACTL2 0x005A
 #endif
+#ifndef TASSEL_0
+#define TASSEL_0 (0<<8)
+#endif
 #ifndef IFG2_
 #define IFG2_ 0x0003
 #endif
@@ -1710,6 +1818,9 @@
 #endif
 #ifndef P2IN
 #define P2IN 0x0028
+#endif
+#ifndef NMIIFG
+#define NMIIFG (1<<4)
 #endif
 #ifndef __MSP430_HAS_SVS__
 #define __MSP430_HAS_SVS__ 
@@ -1858,6 +1969,9 @@
 #ifndef TAIV
 #define TAIV TA0IV_
 #endif
+#ifndef OFIE
+#define OFIE (1<<1)
+#endif
 #ifndef __SIZEOF_DOUBLE__
 #define __SIZEOF_DOUBLE__ 4
 #endif
@@ -1881,6 +1995,9 @@
 #endif
 #ifndef FLLD_1
 #define FLLD_1 0
+#endif
+#ifndef CCIS_0
+#define CCIS_0 (0<<12)
 #endif
 #ifndef __GNUC_MINOR__
 #define __GNUC_MINOR__ 5
@@ -1929,6 +2046,9 @@
 #endif
 #ifndef MC1
 #define MC1 0x0020
+#endif
+#ifndef BTIFG
+#define BTIFG (1<<7)
 #endif
 #ifndef __PTRDIFF_TYPE__
 #define __PTRDIFF_TYPE__ long int
@@ -2049,6 +2169,9 @@
 #endif
 #ifndef __msp430_has_non_variable_svs_threshold
 #define __msp430_has_non_variable_svs_threshold 
+#endif
+#ifndef OFIFG
+#define OFIFG (1<<1)
 #endif
 #ifndef CAPD0
 #define CAPD0 0x01

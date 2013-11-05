@@ -110,7 +110,7 @@ for header in os.listdir("../../../../../3rdparty/msp430gcc"):
 
 	child = subprocess.Popen("msp430-gcc -D__ASSEMBLER__=1 -E -dM -I../../../../../3rdparty/msp430gcc/ ../../../../../3rdparty/msp430gcc/" + header, shell=True, stdout=subprocess.PIPE)
 	for line in child.communicate()[0].split('\n'):
-		if len(line) == 0 or line.find("(") != -1:
+		if len(line) == 0 or (line.find("(") != -1 and line.find("<<") == -1):
 			continue
 		output += "#ifndef %s\n" % (line.split(' ')[1])
 		output += line + "\n"

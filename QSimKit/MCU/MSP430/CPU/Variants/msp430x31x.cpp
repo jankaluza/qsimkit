@@ -175,6 +175,9 @@
 #ifndef __GNUC_PATCHLEVEL_
 #define __GNUC_PATCHLEVEL_ 3
 #endif
+#ifndef BTIE
+#define BTIE (1<<7)
+#endif
 #ifndef __DEC64_MAX_EXP__
 #define __DEC64_MAX_EXP__ 385
 #endif
@@ -252,6 +255,12 @@
 #endif
 #ifndef __UINTMAX_TYPE_
 #define __UINTMAX_TYPE_ long long unsigned int
+#endif
+#ifndef P0IE_0
+#define P0IE_0 (1<<2)
+#endif
+#ifndef P0IE_1
+#define P0IE_1 (1<<3)
 #endif
 #ifndef P0IE_2
 #define P0IE_2 0x04
@@ -450,6 +459,9 @@
 #endif
 #ifndef __LDBL_HAS_QUIET_NAN_
 #define __LDBL_HAS_QUIET_NAN_ 1
+#endif
+#ifndef WDTIFG
+#define WDTIFG (1<<0)
 #endif
 #ifndef TCSSEL_P01
 #define TCSSEL_P01 0
@@ -688,6 +700,9 @@
 #ifndef __MSP430
 #define __MSP430 1
 #endif
+#ifndef TPIE
+#define TPIE (1<<2)
+#endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
 #endif
@@ -816,6 +831,12 @@
 #endif
 #ifndef __msp430_headers_common_h
 #define __msp430_headers_common_h 
+#endif
+#ifndef P0IFG_0
+#define P0IFG_0 (1<<2)
+#endif
+#ifndef P0IFG_1
+#define P0IFG_1 (1<<3)
 #endif
 #ifndef P0IFG_2
 #define P0IFG_2 0x04
@@ -1135,6 +1156,9 @@
 #ifndef LPM3
 #define LPM3 SCG1+SCG0+CPUOFF
 #endif
+#ifndef WDTIE
+#define WDTIE (1<<0)
+#endif
 #ifndef __LDBL_MANT_DIG__
 #define __LDBL_MANT_DIG__ 24
 #endif
@@ -1270,6 +1294,9 @@
 #ifndef TIMERPORT_VECTOR
 #define TIMERPORT_VECTOR 10
 #endif
+#ifndef NMIIFG
+#define NMIIFG (1<<4)
+#endif
 #ifndef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2
 #endif
@@ -1363,6 +1390,9 @@
 #ifndef __FLT_MAX_
 #define __FLT_MAX_ 3.40282347e+38F
 #endif
+#ifndef OFIE
+#define OFIE (1<<1)
+#endif
 #ifndef __SIZEOF_DOUBLE__
 #define __SIZEOF_DOUBLE__ 4
 #endif
@@ -1434,6 +1464,9 @@
 #endif
 #ifndef __STDC_
 #define __STDC_ 1
+#endif
+#ifndef BTIFG
+#define BTIFG (1<<7)
 #endif
 #ifndef __PTRDIFF_TYPE__
 #define __PTRDIFF_TYPE__ long int
@@ -1533,6 +1566,9 @@
 #endif
 #ifndef TPCNT1_EN_ON
 #define TPCNT1_EN_ON ENA
+#endif
+#ifndef OFIFG
+#define OFIFG (1<<1)
 #endif
 #ifndef C
 #define C 0x0001

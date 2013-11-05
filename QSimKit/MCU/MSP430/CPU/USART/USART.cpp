@@ -44,7 +44,7 @@ m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 		m_br0 = variant->getU0BR0();
 		m_br1 = variant->getU0BR1();;
 		m_rxbuf = variant->getU0RXBUF();
-		m_txbuf = variant->getU0RXBUF();
+		m_txbuf = variant->getU0TXBUF();
 		m_ifg = variant->getU0IFG();
 		m_ie = variant->getU0IE();
 		m_me = variant->getU0ME();
@@ -68,7 +68,7 @@ m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 		m_br0 = variant->getU1BR0();
 		m_br1 = variant->getU1BR1();;
 		m_rxbuf = variant->getU1RXBUF();
-		m_txbuf = variant->getU1RXBUF();
+		m_txbuf = variant->getU1TXBUF();
 		m_ifg = variant->getU1IFG();
 		m_ie = variant->getU1IE();
 		m_me = variant->getU1ME();
@@ -161,9 +161,9 @@ void USART::doSPICapture(uint8_t ctl) {
 			txReady();
 		}
 
-		// Clear UCBUSY in case we won't transmit anything now
+		// We won't be transmitting anything, so tx is empty
 		if (!m_transmitting) {
-			m_mem->setBit(m_tctl, 1, false);
+			m_mem->setBit(m_tctl, 1, true);
 		}
 	}
 }
@@ -313,6 +313,7 @@ void USART::reset() {
 
 	// Set default values
 	m_mem->setByte(m_ctl, 1);
+	m_mem->setByte(m_tctl, 1);
 }
 
 void USART::txReady() {
@@ -320,6 +321,12 @@ void USART::txReady() {
 	// finishes
 	if (m_transmitting) {
 		m_txReady = true;
+		return;
+	}
+
+	// USPIE is not enabled, so don't start transmition
+	if (m_mem->getByte(m_me, false) & m_uspie == 0) {
+		// TODO: Should we do anything with txReady here?
 		return;
 	}
 
@@ -331,10 +338,8 @@ void USART::txReady() {
 	m_txReady = false;
 	m_transmitting = true;
 
-	// Clear UCBUSY in case we won't transmit anything now
-	if (!m_transmitting) {
-		m_mem->setBit(m_tctl, 1, false);
-	}
+	// Set TXEPT to 0, because we are transmitting and tx is not empty
+	m_mem->setBit(m_tctl, 1, false);
 
 	// 7-bit vs. 8-bit transmit
 	uint8_t ctl = m_mem->getByte(m_ctl, false);
@@ -347,6 +352,7 @@ void USART::txReady() {
 }
 
 void USART::handleMemoryChanged(::Memory *memory, uint16_t address) {
+// 	std::cout << "\n mem changed = " << address << " " << m_txbuf << "\n";
 	if (address == m_tctl) {
 		uint8_t val = m_mem->getByte(address, false);
 

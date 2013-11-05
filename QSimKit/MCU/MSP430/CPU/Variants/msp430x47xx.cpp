@@ -1,3 +1,6 @@
+#ifndef MPYC
+#define MPYC (1<<0)
+#endif
 #ifndef MC0
 #define MC0 0x0010
 #endif
@@ -31,6 +34,9 @@
 #ifndef __FLT_MIN_
 #define __FLT_MIN_ 1.17549435e-38F
 #endif
+#ifndef LCDFREQ_256
+#define LCDFREQ_256 (5<<5)
+#endif
 #ifndef LCDAPCTL0_
 #define LCDAPCTL0_ 0x00AC
 #endif
@@ -57,6 +63,15 @@
 #endif
 #ifndef __ASSEMBLER_
 #define __ASSEMBLER_ 1
+#endif
+#ifndef VLD0
+#define VLD0 (1<<4)
+#endif
+#ifndef VLD2
+#define VLD2 (4<<4)
+#endif
+#ifndef VLD3
+#define VLD3 (8<<4)
 #endif
 #ifndef SD16_VECTOR
 #define SD16_VECTOR 14
@@ -214,6 +229,9 @@
 #ifndef RES0
 #define RES0 __MSP430_MPY32_BASE__ + 0x24
 #endif
+#ifndef UCA1RXIFG
+#define UCA1RXIFG (1<<0)
+#endif
 #ifndef XT2OF
 #define XT2OF 0x08
 #endif
@@ -259,6 +277,9 @@
 #ifndef RES1
 #define RES1 __MSP430_MPY32_BASE__ + 0x26
 #endif
+#ifndef OUTMOD_2
+#define OUTMOD_2 (2<<5)
+#endif
 #ifndef LCDM15_
 #define LCDM15_ LCD_BASE+0xF
 #endif
@@ -291,6 +312,9 @@
 #endif
 #ifndef LCDM16
 #define LCDM16 LCD_BASE+0x10
+#endif
+#ifndef UCB0RXIFG
+#define UCB0RXIFG (1<<2)
 #endif
 #ifndef CAIES
 #define CAIES 0x04
@@ -346,6 +370,9 @@
 #ifndef LCDM19
 #define LCDM19 LCD_BASE+0x13
 #endif
+#ifndef MPYPO2_32
+#define MPYPO2_32 (1<<7)
+#endif
 #ifndef SD16SSEL_MCLK
 #define SD16SSEL_MCLK SD16SSEL_0
 #endif
@@ -357,6 +384,9 @@
 #endif
 #ifndef XCAP14PF
 #define XCAP14PF 0x20
+#endif
+#ifndef BTIE
+#define BTIE (1<<7)
 #endif
 #ifndef TBCTL_
 #define TBCTL_ 0x0180
@@ -406,6 +436,9 @@
 #ifndef P7OUT
 #define P7OUT 0x003A
 #endif
+#ifndef SD16OSR_32
+#define SD16OSR_32 (3<<8)
+#endif
 #ifndef __SHRT_MAX__
 #define __SHRT_MAX__ 32767
 #endif
@@ -418,6 +451,9 @@
 #ifndef __LDBL_MAX_
 #define __LDBL_MAX_ 3.40282347e+38L
 #endif
+#ifndef MPYM1
+#define MPYM1 (1<<5)
+#endif
 #ifndef P10REN_
 #define P10REN_ 0x0017
 #endif
@@ -429,6 +465,12 @@
 #endif
 #ifndef P7SEL
 #define P7SEL 0x003E
+#endif
+#ifndef SD16OSR_64
+#define SD16OSR_64 (2<<8)
+#endif
+#ifndef TBCLGRP_2
+#define TBCLGRP_2 (2<<13)
 #endif
 #ifndef __MSP430_HAS_SD16_CH2__
 #define __MSP430_HAS_SD16_CH2__ 
@@ -520,6 +562,9 @@
 #ifndef __DEC32_EPSILON_
 #define __DEC32_EPSILON_ 1E-6DF
 #endif
+#ifndef UCSSEL_0
+#define UCSSEL_0 (0<<6)
+#endif
 #ifndef TAIV_CCR2
 #define TAIV_CCR2 0x04
 #endif
@@ -576,6 +621,15 @@
 #endif
 #ifndef __LDBL_MAX_EXP_
 #define __LDBL_MAX_EXP_ 128
+#endif
+#ifndef TASSEL_1
+#define TASSEL_1 (1<<8)
+#endif
+#ifndef TASSEL_2
+#define TASSEL_2 (2<<8)
+#endif
+#ifndef TASSEL_3
+#define TASSEL_3 (3<<8)
 #endif
 #ifndef UCA0BR1_
 #define UCA0BR1_ 0x0063
@@ -766,6 +820,9 @@
 #ifndef OUTMOD_RESET_SET
 #define OUTMOD_RESET_SET OUTMOD_7
 #endif
+#ifndef MPYM0
+#define MPYM0 (1<<4)
+#endif
 #ifndef __MSP430_HAS_USCI0__
 #define __MSP430_HAS_USCI0__ 
 #endif
@@ -844,6 +901,9 @@
 #ifndef MERAS
 #define MERAS 0x0004
 #endif
+#ifndef VLCD_14
+#define VLCD_14 (13<<1)
+#endif
 #ifndef __MSP430__
 #define __MSP430__ 1
 #endif
@@ -858,6 +918,9 @@
 #endif
 #ifndef LCDS28
 #define LCDS28 0x80
+#endif
+#ifndef MPYDLYWRTEN
+#define MPYDLYWRTEN (1<<8)
 #endif
 #ifndef LCDS32
 #define LCDS32 0x01
@@ -916,6 +979,9 @@
 #ifndef UCB0BR0
 #define UCB0BR0 0x006A
 #endif
+#ifndef UCA1TXIE
+#define UCA1TXIE (1<<1)
+#endif
 #ifndef UCB0BR1_
 #define UCB0BR1_ 0x006B
 #endif
@@ -939,6 +1005,36 @@
 #endif
 #ifndef __SIZEOF_LONG_
 #define __SIZEOF_LONG_ 4
+#endif
+#ifndef VLCD_0
+#define VLCD_0 (0<<1)
+#endif
+#ifndef VLCD_1
+#define VLCD_1 (1<<1)
+#endif
+#ifndef VLCD_2
+#define VLCD_2 (2<<1)
+#endif
+#ifndef VLCD_3
+#define VLCD_3 (3<<1)
+#endif
+#ifndef VLCD_4
+#define VLCD_4 (4<<1)
+#endif
+#ifndef VLCD_5
+#define VLCD_5 (5<<1)
+#endif
+#ifndef VLCD_6
+#define VLCD_6 (6<<1)
+#endif
+#ifndef VLCD_7
+#define VLCD_7 (7<<1)
+#endif
+#ifndef VLCD_8
+#define VLCD_8 (8<<1)
+#endif
+#ifndef VLCD_9
+#define VLCD_9 (9<<1)
 #endif
 #ifndef MACS32L_
 #define MACS32L_ __MSP430_MPY32_BASE__ + 0x1C
@@ -1024,6 +1120,9 @@
 #ifndef __LDBL_HAS_QUIET_NAN_
 #define __LDBL_HAS_QUIET_NAN_ 1
 #endif
+#ifndef WDTIFG
+#define WDTIFG (1<<0)
+#endif
 #ifndef LOCK
 #define LOCK 0x0010
 #endif
@@ -1044,6 +1143,21 @@
 #endif
 #ifndef RTCSEC
 #define RTCSEC RTCNT1
+#endif
+#ifndef VLCD_10
+#define VLCD_10 (10<<1)
+#endif
+#ifndef VLCD_11
+#define VLCD_11 (11<<1)
+#endif
+#ifndef VLCD_12
+#define VLCD_12 (12<<1)
+#endif
+#ifndef VLCD_13
+#define VLCD_13 (12<<1)
+#endif
+#ifndef VLCD_15
+#define VLCD_15 (15<<1)
 #endif
 #ifndef LCDR03EXT
 #define LCDR03EXT 0x40
@@ -1099,6 +1213,9 @@
 #ifndef TBSSEL_SMCLK
 #define TBSSEL_SMCLK TBSSEL_2
 #endif
+#ifndef LCDFREQ_384
+#define LCDFREQ_384 (6<<5)
+#endif
 #ifndef __msp430_have_lcd_16_20
 #define __msp430_have_lcd_16_20 
 #endif
@@ -1114,6 +1231,18 @@
 #ifndef __MSP430_HAS_PORT10_R_
 #define __MSP430_HAS_PORT10_R_ 
 #endif
+#ifndef ID_0
+#define ID_0 (0<<6)
+#endif
+#ifndef ID_1
+#define ID_1 (1<<6)
+#endif
+#ifndef ID_2
+#define ID_2 (2<<6)
+#endif
+#ifndef ID_3
+#define ID_3 (3<<6)
+#endif
 #ifndef UCA1IRRCTL_
 #define UCA1IRRCTL_ 0x00CF
 #endif
@@ -1125,6 +1254,9 @@
 #endif
 #ifndef P9IN
 #define P9IN 0x0008
+#endif
+#ifndef UCB0TXIFG
+#define UCB0TXIFG (1<<3)
 #endif
 #ifndef BT_ADLY_0_064
 #define BT_ADLY_0_064 0
@@ -1144,6 +1276,9 @@
 #ifndef TACCR0
 #define TACCR0 TA0CCR0_
 #endif
+#ifndef SD16INTDLY_2
+#define SD16INTDLY_2 (2<<6)
+#endif
 #ifndef CAREF_OFF
 #define CAREF_OFF CAREF_0
 #endif
@@ -1161,6 +1296,15 @@
 #endif
 #ifndef TACCR1
 #define TACCR1 TA0CCR1_
+#endif
+#ifndef CCIS_1
+#define CCIS_1 (1<<12)
+#endif
+#ifndef CCIS_2
+#define CCIS_2 (2<<12)
+#endif
+#ifndef CCIS_3
+#define CCIS_3 (3<<12)
 #endif
 #ifndef P1DIR_
 #define P1DIR_ 0x0022
@@ -1210,6 +1354,36 @@
 #ifndef UCA0STAT
 #define UCA0STAT 0x0065
 #endif
+#ifndef UCBRF_0
+#define UCBRF_0 (0x0<<4)
+#endif
+#ifndef UCBRF_1
+#define UCBRF_1 (0x1<<4)
+#endif
+#ifndef UCBRF_2
+#define UCBRF_2 (0x2<<4)
+#endif
+#ifndef UCBRF_3
+#define UCBRF_3 (0x3<<4)
+#endif
+#ifndef UCBRF_4
+#define UCBRF_4 (0x4<<4)
+#endif
+#ifndef UCBRF_5
+#define UCBRF_5 (0x5<<4)
+#endif
+#ifndef UCBRF_6
+#define UCBRF_6 (0x6<<4)
+#endif
+#ifndef UCBRF_7
+#define UCBRF_7 (0x7<<4)
+#endif
+#ifndef UCBRF_8
+#define UCBRF_8 (0x8<<4)
+#endif
+#ifndef UCBRF_9
+#define UCBRF_9 (0x9<<4)
+#endif
 #ifndef MC_CONT
 #define MC_CONT MC_2
 #endif
@@ -1224,6 +1398,9 @@
 #endif
 #ifndef UCA1ABCTL
 #define UCA1ABCTL 0x00CD
+#endif
+#ifndef MPYDLY32
+#define MPYDLY32 (1<<9)
 #endif
 #ifndef UCA0IRTCTL_
 #define UCA0IRTCTL_ 0x005E
@@ -1258,6 +1435,9 @@
 #ifndef P2DIR
 #define P2DIR 0x002A
 #endif
+#ifndef UCB1TXIE
+#define UCB1TXIE (1<<3)
+#endif
 #ifndef LCDSON
 #define LCDSON 0x04
 #endif
@@ -1266,6 +1446,33 @@
 #endif
 #ifndef __LDBL_HAS_DENORM_
 #define __LDBL_HAS_DENORM_ 1
+#endif
+#ifndef VLD_1
+#define VLD_1 (1<<4)
+#endif
+#ifndef VLD_2
+#define VLD_2 (2<<4)
+#endif
+#ifndef VLD_3
+#define VLD_3 (3<<4)
+#endif
+#ifndef VLD_4
+#define VLD_4 (4<<4)
+#endif
+#ifndef VLD_5
+#define VLD_5 (5<<4)
+#endif
+#ifndef VLD_6
+#define VLD_6 (6<<4)
+#endif
+#ifndef VLD_7
+#define VLD_7 (7<<4)
+#endif
+#ifndef VLD_8
+#define VLD_8 (8<<4)
+#endif
+#ifndef VLD_9
+#define VLD_9 (9<<4)
 #endif
 #ifndef __DEC128_MAX__
 #define __DEC128_MAX__ 9.999999999999999999999999999999999E6144DL
@@ -1360,6 +1567,9 @@
 #ifndef BT_fCLK2_ACLK
 #define BT_fCLK2_ACLK 0x00
 #endif
+#ifndef SD16OSR_128
+#define SD16OSR_128 (1<<8)
+#endif
 #ifndef SD16INCTL1_
 #define SD16INCTL1_ 0x00B1
 #endif
@@ -1368,6 +1578,18 @@
 #endif
 #ifndef SCFQ_4M
 #define SCFQ_4M 0x7F
+#endif
+#ifndef UCMODE_0
+#define UCMODE_0 (0<<1)
+#endif
+#ifndef UCMODE_1
+#define UCMODE_1 (1<<1)
+#endif
+#ifndef UCMODE_2
+#define UCMODE_2 (2<<1)
+#endif
+#ifndef UCMODE_3
+#define UCMODE_3 (3<<1)
 #endif
 #ifndef SD16INCTL2_
 #define SD16INCTL2_ 0x00B2
@@ -1456,6 +1678,18 @@
 #ifndef __msp430_headers_timera_h_
 #define __msp430_headers_timera_h_ 
 #endif
+#ifndef MPYM_0
+#define MPYM_0 (0<<4)
+#endif
+#ifndef MPYM_1
+#define MPYM_1 (1<<4)
+#endif
+#ifndef MPYM_2
+#define MPYM_2 (2<<4)
+#endif
+#ifndef MPYM_3
+#define MPYM_3 (3<<4)
+#endif
 #ifndef TASSEL0
 #define TASSEL0 0x0100
 #endif
@@ -1464,6 +1698,9 @@
 #endif
 #ifndef TASSEL2
 #define TASSEL2 0x0400
+#endif
+#ifndef UCA0TXIE
+#define UCA0TXIE (1<<1)
 #endif
 #ifndef P1IE_
 #define P1IE_ 0x0025
@@ -1501,6 +1738,42 @@
 #ifndef IFG1
 #define IFG1 0x0002
 #endif
+#ifndef SD16INCH_0
+#define SD16INCH_0 (0<<0)
+#endif
+#ifndef SD16INCH_1
+#define SD16INCH_1 (1<<0)
+#endif
+#ifndef SD16INCH_2
+#define SD16INCH_2 (2<<0)
+#endif
+#ifndef SD16INCH_3
+#define SD16INCH_3 (3<<0)
+#endif
+#ifndef SD16INCH_4
+#define SD16INCH_4 (4<<0)
+#endif
+#ifndef SD16INCH_5
+#define SD16INCH_5 (5<<0)
+#endif
+#ifndef SD16INCH_6
+#define SD16INCH_6 (6<<0)
+#endif
+#ifndef SD16INCH_7
+#define SD16INCH_7 (7<<0)
+#endif
+#ifndef SD16BUF_0
+#define SD16BUF_0 (0<<13)
+#endif
+#ifndef SD16BUF_1
+#define SD16BUF_1 (1<<13)
+#endif
+#ifndef SD16BUF_2
+#define SD16BUF_2 (2<<13)
+#endif
+#ifndef SD16BUF_3
+#define SD16BUF_3 (3<<13)
+#endif
 #ifndef CCIFG
 #define CCIFG 0x0001
 #endif
@@ -1509,6 +1782,12 @@
 #endif
 #ifndef TBCCR1
 #define TBCCR1 0x0194
+#endif
+#ifndef VLCD_2_60
+#define VLCD_2_60 (1<<1)
+#endif
+#ifndef VLCD_2_66
+#define VLCD_2_66 (2<<1)
 #endif
 #ifndef MC_STOP
 #define MC_STOP MC_0
@@ -1540,6 +1819,12 @@
 #ifndef CACTL27
 #define CACTL27 0x80
 #endif
+#ifndef VLCD_2_72
+#define VLCD_2_72 (3<<1)
+#endif
+#ifndef VLCD_2_78
+#define VLCD_2_78 (4<<1)
+#endif
 #ifndef CACTL2_
 #define CACTL2_ 0x005A
 #endif
@@ -1564,6 +1849,9 @@
 #ifndef FLL_DIV_8
 #define FLL_DIV_8 0x03
 #endif
+#ifndef VLCD_2_84
+#define VLCD_2_84 (5<<1)
+#endif
 #ifndef __MSP430_IVCNT__
 #define __MSP430_IVCNT__ 16
 #endif
@@ -1582,6 +1870,12 @@
 #ifndef __MSP430_HAS_COMPA_
 #define __MSP430_HAS_COMPA_ 
 #endif
+#ifndef VLCD_2_90
+#define VLCD_2_90 (6<<1)
+#endif
+#ifndef VLCD_2_96
+#define VLCD_2_96 (7<<1)
+#endif
 #ifndef TBCCTL2_
 #define TBCCTL2_ 0x0186
 #endif
@@ -1596,6 +1890,9 @@
 #endif
 #ifndef FCTL1
 #define FCTL1 0x0128
+#endif
+#ifndef UCB1TXIFG
+#define UCB1TXIFG (1<<3)
 #endif
 #ifndef __MSP430_MPY32_BASE__
 #define __MSP430_MPY32_BASE__ 0x140
@@ -1644,6 +1941,18 @@
 #endif
 #ifndef P10OUT
 #define P10OUT 0x000B
+#endif
+#ifndef MC_0
+#define MC_0 (0<<4)
+#endif
+#ifndef MC_1
+#define MC_1 (1<<4)
+#endif
+#ifndef MC_2
+#define MC_2 (2<<4)
+#endif
+#ifndef MC_3
+#define MC_3 (3<<4)
 #endif
 #ifndef UCA1TXBUF_
 #define UCA1TXBUF_ 0x00D7
@@ -1704,6 +2013,18 @@
 #endif
 #ifndef PORT1_VECTOR
 #define PORT1_VECTOR 8
+#endif
+#ifndef VLCDREF_0
+#define VLCDREF_0 (0<<1)
+#endif
+#ifndef VLCDREF_1
+#define VLCDREF_1 (1<<1)
+#endif
+#ifndef VLCDREF_2
+#define VLCDREF_2 (2<<1)
+#endif
+#ifndef VLCDREF_3
+#define VLCDREF_3 (3<<1)
 #endif
 #ifndef FRKEY
 #define FRKEY 0x9600
@@ -1785,6 +2106,18 @@
 #endif
 #ifndef __VERSION_
 #define __VERSION_ "4.5.3"
+#endif
+#ifndef RTCMODE_0
+#define RTCMODE_0 (0<<4)
+#endif
+#ifndef RTCMODE_1
+#define RTCMODE_1 (1<<4)
+#endif
+#ifndef RTCMODE_2
+#define RTCMODE_2 (2<<4)
+#endif
+#ifndef RTCMODE_3
+#define RTCMODE_3 (3<<4)
 #endif
 #ifndef WDTCTL_
 #define WDTCTL_ 0x0120
@@ -1894,6 +2227,24 @@
 #ifndef MAC32L
 #define MAC32L __MSP430_MPY32_BASE__ + 0x18
 #endif
+#ifndef SD16OSR_256
+#define SD16OSR_256 (0<<8)
+#endif
+#ifndef CNTL_0
+#define CNTL_0 (0<<11)
+#endif
+#ifndef CNTL_1
+#define CNTL_1 (1<<11)
+#endif
+#ifndef CNTL_2
+#define CNTL_2 (2<<11)
+#endif
+#ifndef CNTL_3
+#define CNTL_3 (3<<11)
+#endif
+#ifndef UCA1RXIE
+#define UCA1RXIE (1<<0)
+#endif
 #ifndef TACCR0
 #define TACCR0 TA0CCR0
 #endif
@@ -1933,6 +2284,12 @@
 #ifndef __DEC64_EPSILON_
 #define __DEC64_EPSILON_ 1E-15DD
 #endif
+#ifndef UCB1RXIFG
+#define UCB1RXIFG (1<<2)
+#endif
+#ifndef VLD_OFF
+#define VLD_OFF (0<<4)
+#endif
 #ifndef P1SEL_
 #define P1SEL_ 0x0026
 #endif
@@ -1951,11 +2308,23 @@
 #ifndef UCB0I2CIE
 #define UCB0I2CIE 0x006C
 #endif
+#ifndef SD16INTDLY_0
+#define SD16INTDLY_0 (0<<6)
+#endif
+#ifndef SD16INTDLY_1
+#define SD16INTDLY_1 (1<<6)
+#endif
+#ifndef SD16INTDLY_3
+#define SD16INTDLY_3 (3<<6)
+#endif
 #ifndef __MSP430_HAS_PORT9_R__
 #define __MSP430_HAS_PORT9_R__ 
 #endif
 #ifndef __MSP430_HAS_PORT9_R_
 #define __MSP430_HAS_PORT9_R_ 
+#endif
+#ifndef NMIIE
+#define NMIIE (1<<4)
 #endif
 #ifndef FSSEL_SMCLK
 #define FSSEL_SMCLK FSSEL_2
@@ -1983,6 +2352,9 @@
 #endif
 #ifndef SELM_XT2
 #define SELM_XT2 0x10
+#endif
+#ifndef VLD1
+#define VLD1 (2<<4)
 #endif
 #ifndef SD16INTDLY0
 #define SD16INTDLY0 0x0040
@@ -2104,11 +2476,17 @@
 #ifndef LCDM7
 #define LCDM7 LCD_BASE+0x7
 #endif
+#ifndef UCA0RXIE
+#define UCA0RXIE (1<<0)
+#endif
 #ifndef LCDM8_
 #define LCDM8_ LCD_BASE+0x8
 #endif
 #ifndef LCDM8
 #define LCDM8 LCD_BASE+0x8
+#endif
+#ifndef UCB0TXIE
+#define UCB0TXIE (1<<3)
 #endif
 #ifndef SD16IFG
 #define SD16IFG 0x0004
@@ -2149,11 +2527,38 @@
 #ifndef SD16CCTL1
 #define SD16CCTL1 0x0104
 #endif
+#ifndef CM_0
+#define CM_0 (0<<14)
+#endif
+#ifndef CM_1
+#define CM_1 (1<<14)
+#endif
+#ifndef CM_2
+#define CM_2 (2<<14)
+#endif
+#ifndef CM_3
+#define CM_3 (3<<14)
+#endif
+#ifndef CLLD_0
+#define CLLD_0 (0<<9)
+#endif
+#ifndef CLLD_1
+#define CLLD_1 (1<<9)
+#endif
+#ifndef CLLD_2
+#define CLLD_2 (2<<9)
+#endif
+#ifndef CLLD_3
+#define CLLD_3 (3<<9)
+#endif
 #ifndef SD16MEM0_
 #define SD16MEM0_ __MSP430_SD16MEM_BASE__ + 0x00
 #endif
 #ifndef SD16MEM0
 #define SD16MEM0 __MSP430_SD16MEM_BASE__ + 0x00
+#endif
+#ifndef UCB1RXIE
+#define UCB1RXIE (1<<2)
 #endif
 #ifndef SD16MEM1_
 #define SD16MEM1_ __MSP430_SD16MEM_BASE__ + 0x02
@@ -2187,6 +2592,18 @@
 #endif
 #ifndef __DEC32_SUBNORMAL_MIN_
 #define __DEC32_SUBNORMAL_MIN_ 0.000001E-95DF
+#endif
+#ifndef TBSSEL_0
+#define TBSSEL_0 (0<<8)
+#endif
+#ifndef TBSSEL_1
+#define TBSSEL_1 (1<<8)
+#endif
+#ifndef TBSSEL_2
+#define TBSSEL_2 (2<<8)
+#endif
+#ifndef TBSSEL_3
+#define TBSSEL_3 (3<<8)
 #endif
 #ifndef NMI_VECTOR
 #define NMI_VECTOR 28
@@ -2250,6 +2667,9 @@
 #endif
 #ifndef __FLT_MAX_10_EXP_
 #define __FLT_MAX_10_EXP_ 38
+#endif
+#ifndef LCDFREQ_32
+#define LCDFREQ_32 (0<<5)
 #endif
 #ifndef RTCMIN
 #define RTCMIN RTCNT2
@@ -2332,6 +2752,9 @@
 #ifndef __DEC64_MAX_
 #define __DEC64_MAX_ 9.999999999999999E384DD
 #endif
+#ifndef LCDFREQ_64
+#define LCDFREQ_64 (1<<5)
+#endif
 #ifndef RTCNT3_
 #define RTCNT3_ 0x0044
 #endif
@@ -2389,6 +2812,9 @@
 #ifndef FSSEL_MCLK
 #define FSSEL_MCLK FSSEL_1
 #endif
+#ifndef LCDFREQ_96
+#define LCDFREQ_96 (2<<5)
+#endif
 #ifndef P8REN_
 #define P8REN_ 0x0015
 #endif
@@ -2431,11 +2857,29 @@
 #ifndef __MSP430_HAS_LCD_A_
 #define __MSP430_HAS_LCD_A_ 
 #endif
+#ifndef SLSHR_0
+#define SLSHR_0 (0<<9)
+#endif
+#ifndef SLSHR_1
+#define SLSHR_1 (1<<9)
+#endif
+#ifndef SLSHR_2
+#define SLSHR_2 (2<<9)
+#endif
+#ifndef SLSHR_3
+#define SLSHR_3 (3<<9)
+#endif
 #ifndef XT2OFF
 #define XT2OFF 0x20
 #endif
+#ifndef UCB0RXIE
+#define UCB0RXIE (1<<2)
+#endif
 #ifndef OUTMOD_SET
 #define OUTMOD_SET OUTMOD_1
+#endif
+#ifndef WDTIE
+#define WDTIE (1<<0)
 #endif
 #ifndef CAREF_VT
 #define CAREF_VT CAREF_3
@@ -2464,6 +2908,9 @@
 #ifndef SLSHR1
 #define SLSHR1 0x0400
 #endif
+#ifndef ACCVIE
+#define ACCVIE (1<<5)
+#endif
 #ifndef __DBL_HAS_QUIET_NAN__
 #define __DBL_HAS_QUIET_NAN__ 1
 #endif
@@ -2472,6 +2919,12 @@
 #endif
 #ifndef SD16BUF1
 #define SD16BUF1 0x4000
+#endif
+#ifndef LCDFREQ_128
+#define LCDFREQ_128 (3<<5)
+#endif
+#ifndef MPYPO1_32
+#define MPYPO1_32 (1<<6)
 #endif
 #ifndef MPYS32L_
 #define MPYS32L_ __MSP430_MPY32_BASE__ + 0x14
@@ -2524,17 +2977,44 @@
 #ifndef VLD_1_8V
 #define VLD_1_8V 0x10
 #endif
+#ifndef UCBRF_10
+#define UCBRF_10 (0xA<<4)
+#endif
+#ifndef UCBRF_11
+#define UCBRF_11 (0xB<<4)
+#endif
+#ifndef UCBRF_12
+#define UCBRF_12 (0xC<<4)
+#endif
+#ifndef UCBRF_13
+#define UCBRF_13 (0xD<<4)
+#endif
+#ifndef UCBRF_14
+#define UCBRF_14 (0xE<<4)
+#endif
+#ifndef UCBRF_15
+#define UCBRF_15 (0xF<<4)
+#endif
 #ifndef __FLT_DIG__
 #define __FLT_DIG__ 6
 #endif
 #ifndef __FLT_DIG_
 #define __FLT_DIG_ 6
 #endif
+#ifndef VLCD_3_02
+#define VLCD_3_02 (8<<1)
+#endif
+#ifndef VLCD_3_08
+#define VLCD_3_08 (9<<1)
+#endif
 #ifndef __MSPGCC__
 #define __MSPGCC__ 20110706
 #endif
 #ifndef __MSPGCC_
 #define __MSPGCC_ 20110706
+#endif
+#ifndef LCDFREQ_192
+#define LCDFREQ_192 (4<<5)
 #endif
 #ifndef CAREF_050
 #define CAREF_050 CAREF_2
@@ -2544,6 +3024,9 @@
 #endif
 #ifndef __MSP430_HAS_USCI_AB1_
 #define __MSP430_HAS_USCI_AB1_ 
+#endif
+#ifndef VLCD_3_14
+#define VLCD_3_14 (10<<1)
 #endif
 #ifndef LCDFREQ0
 #define LCDFREQ0 0x20
@@ -2572,14 +3055,35 @@
 #ifndef CNTL1
 #define CNTL1 0x1000
 #endif
+#ifndef VLCD_3_20
+#define VLCD_3_20 (11<<1)
+#endif
+#ifndef VLCD_3_26
+#define VLCD_3_26 (12<<1)
+#endif
+#ifndef SD16GAIN_16
+#define SD16GAIN_16 (4<<3)
+#endif
 #ifndef WDTTMSEL
 #define WDTTMSEL 0x0010
 #endif
 #ifndef __msp430_headers_basic_timer_h
 #define __msp430_headers_basic_timer_h 
 #endif
+#ifndef VLCD_3_32
+#define VLCD_3_32 (12<<1)
+#endif
+#ifndef VLCD_3_38
+#define VLCD_3_38 (13<<1)
+#endif
 #ifndef USCIAB1RX_VECTOR
 #define USCIAB1RX_VECTOR 6
+#endif
+#ifndef SD16GAIN_32
+#define SD16GAIN_32 (5<<3)
+#endif
+#ifndef VLCD_3_44
+#define VLCD_3_44 (15<<1)
 #endif
 #ifndef P2IE_
 #define P2IE_ 0x002D
@@ -2607,6 +3111,36 @@
 #endif
 #ifndef UCA0RXBUF
 #define UCA0RXBUF 0x0066
+#endif
+#ifndef OUTMOD_0
+#define OUTMOD_0 (0<<5)
+#endif
+#ifndef OUTMOD_1
+#define OUTMOD_1 (1<<5)
+#endif
+#ifndef OUTMOD_3
+#define OUTMOD_3 (3<<5)
+#endif
+#ifndef OUTMOD_4
+#define OUTMOD_4 (4<<5)
+#endif
+#ifndef OUTMOD_5
+#define OUTMOD_5 (5<<5)
+#endif
+#ifndef OUTMOD_6
+#define OUTMOD_6 (6<<5)
+#endif
+#ifndef OUTMOD_7
+#define OUTMOD_7 (7<<5)
+#endif
+#ifndef TBCLGRP_0
+#define TBCLGRP_0 (0<<13)
+#endif
+#ifndef TBCLGRP_1
+#define TBCLGRP_1 (1<<13)
+#endif
+#ifndef TBCLGRP_3
+#define TBCLGRP_3 (3<<13)
 #endif
 #ifndef __DBL_MANT_DIG__
 #define __DBL_MANT_DIG__ 24
@@ -2677,6 +3211,9 @@
 #ifndef TA0CTL
 #define TA0CTL 0x0160
 #endif
+#ifndef TASSEL_0
+#define TASSEL_0 (0<<8)
+#endif
 #ifndef IFG2_
 #define IFG2_ 0x0003
 #endif
@@ -2716,11 +3253,17 @@
 #ifndef P8DIR
 #define P8DIR 0x003D
 #endif
+#ifndef NMIIFG
+#define NMIIFG (1<<4)
+#endif
 #ifndef __MSP430_HAS_SVS__
 #define __MSP430_HAS_SVS__ 
 #endif
 #ifndef __MSP430_HAS_SVS_
 #define __MSP430_HAS_SVS_ 
+#endif
+#ifndef LCDFREQ_512
+#define LCDFREQ_512 (7<<5)
 #endif
 #ifndef LCDS0
 #define LCDS0 0x01
@@ -2728,11 +3271,29 @@
 #ifndef LCDS4
 #define LCDS4 0x02
 #endif
+#ifndef VLD_10
+#define VLD_10 (10<<4)
+#endif
+#ifndef VLD_11
+#define VLD_11 (11<<4)
+#endif
+#ifndef VLD_12
+#define VLD_12 (12<<4)
+#endif
+#ifndef VLD_13
+#define VLD_13 (13<<4)
+#endif
+#ifndef VLD_14
+#define VLD_14 (14<<4)
+#endif
 #ifndef __SIZEOF_WCHAR_T__
 #define __SIZEOF_WCHAR_T__ 2
 #endif
 #ifndef __SIZEOF_WCHAR_T_
 #define __SIZEOF_WCHAR_T_ 2
+#endif
+#ifndef UCA0TXIFG
+#define UCA0TXIFG (1<<1)
 #endif
 #ifndef CLLD0
 #define CLLD0 0x0200
@@ -2821,6 +3382,9 @@
 #ifndef TAR
 #define TAR TA0R
 #endif
+#ifndef VLCD_DISABLED
+#define VLCD_DISABLED (0<<1)
+#endif
 #ifndef __MSP430_HAS_SD16_CH1__
 #define __MSP430_HAS_SD16_CH1__ 
 #endif
@@ -2905,6 +3469,9 @@
 #ifndef SCFI0
 #define SCFI0 0x0050
 #endif
+#ifndef MPYFRAC
+#define MPYFRAC (1<<2)
+#endif
 #ifndef UCA0MCTL_
 #define UCA0MCTL_ 0x0064
 #endif
@@ -2950,11 +3517,38 @@
 #ifndef __CHAR32_TYPE_
 #define __CHAR32_TYPE_ unsigned int
 #endif
+#ifndef VLD_EXT
+#define VLD_EXT (15<<4)
+#endif
 #ifndef __FLT_MAX__
 #define __FLT_MAX__ 3.40282347e+38F
 #endif
 #ifndef __FLT_MAX_
 #define __FLT_MAX_ 3.40282347e+38F
+#endif
+#ifndef UCBRS_0
+#define UCBRS_0 (0<<1)
+#endif
+#ifndef UCBRS_1
+#define UCBRS_1 (1<<1)
+#endif
+#ifndef UCBRS_2
+#define UCBRS_2 (2<<1)
+#endif
+#ifndef UCBRS_3
+#define UCBRS_3 (3<<1)
+#endif
+#ifndef UCBRS_4
+#define UCBRS_4 (4<<1)
+#endif
+#ifndef UCBRS_5
+#define UCBRS_5 (5<<1)
+#endif
+#ifndef UCBRS_6
+#define UCBRS_6 (6<<1)
+#endif
+#ifndef UCBRS_7
+#define UCBRS_7 (7<<1)
 #endif
 #ifndef TBCLGRP0
 #define TBCLGRP0 0x2000
@@ -2982,6 +3576,9 @@
 #endif
 #ifndef SD16SSEL_TACLK
 #define SD16SSEL_TACLK SD16SSEL_3
+#endif
+#ifndef OFIE
+#define OFIE (1<<1)
 #endif
 #ifndef USCIAB0RX_VECTOR
 #define USCIAB0RX_VECTOR 18
@@ -3019,6 +3616,9 @@
 #ifndef FLLD_1
 #define FLLD_1 0
 #endif
+#ifndef UCA1TXIFG
+#define UCA1TXIFG (1<<1)
+#endif
 #ifndef P5REN_
 #define P5REN_ 0x0012
 #endif
@@ -3027,6 +3627,9 @@
 #endif
 #ifndef SD16GRP
 #define SD16GRP 0x0001
+#endif
+#ifndef CCIS_0
+#define CCIS_0 (0<<12)
 #endif
 #ifndef UCB1STAT_
 #define UCB1STAT_ 0x00DD
@@ -3082,6 +3685,9 @@
 #ifndef SD16INCH1
 #define SD16INCH1 0x0002
 #endif
+#ifndef MPYSAT
+#define MPYSAT (1<<3)
+#endif
 #ifndef __MSP430_HAS_PORT4_R__
 #define __MSP430_HAS_PORT4_R__ 
 #endif
@@ -3102,6 +3708,21 @@
 #endif
 #ifndef MC1
 #define MC1 0x0020
+#endif
+#ifndef RTCTEV_0
+#define RTCTEV_0 (0<<2)
+#endif
+#ifndef RTCTEV_1
+#define RTCTEV_1 (1<<2)
+#endif
+#ifndef RTCTEV_2
+#define RTCTEV_2 (2<<2)
+#endif
+#ifndef RTCTEV_3
+#define RTCTEV_3 (3<<2)
+#endif
+#ifndef BTIFG
+#define BTIFG (1<<7)
 #endif
 #ifndef __PTRDIFF_TYPE__
 #define __PTRDIFF_TYPE__ long int
@@ -3129,6 +3750,15 @@
 #endif
 #ifndef TACCTL2
 #define TACCTL2 TA0CCTL2_
+#endif
+#ifndef UCSSEL_1
+#define UCSSEL_1 (1<<6)
+#endif
+#ifndef UCSSEL_2
+#define UCSSEL_2 (2<<6)
+#endif
+#ifndef UCSSEL_3
+#define UCSSEL_3 (3<<6)
 #endif
 #ifndef DCOPLUS
 #define DCOPLUS 0x80
@@ -3199,6 +3829,18 @@
 #ifndef __MSP430_CPU_
 #define __MSP430_CPU_ 0
 #endif
+#ifndef SD16GAIN_1
+#define SD16GAIN_1 (0<<3)
+#endif
+#ifndef SD16GAIN_2
+#define SD16GAIN_2 (1<<3)
+#endif
+#ifndef SD16GAIN_4
+#define SD16GAIN_4 (2<<3)
+#endif
+#ifndef SD16GAIN_8
+#define SD16GAIN_8 (3<<3)
+#endif
 #ifndef P9OUT_
 #define P9OUT_ 0x000A
 #endif
@@ -3222,6 +3864,9 @@
 #endif
 #ifndef __SIZEOF_LONG_LONG_
 #define __SIZEOF_LONG_LONG_ 8
+#endif
+#ifndef UCA0RXIFG
+#define UCA0RXIFG (1<<0)
 #endif
 #ifndef UCA0TXBUF_
 #define UCA0TXBUF_ 0x0067
@@ -3274,6 +3919,18 @@
 #ifndef OSCOFF
 #define OSCOFF 0x0020
 #endif
+#ifndef SHR_0
+#define SHR_0 (0<<13)
+#endif
+#ifndef SHR_1
+#define SHR_1 (1<<13)
+#endif
+#ifndef SHR_2
+#define SHR_2 (2<<13)
+#endif
+#ifndef SHR_3
+#define SHR_3 (3<<13)
+#endif
 #ifndef __GNUC_GNU_INLINE__
 #define __GNUC_GNU_INLINE__ 1
 #endif
@@ -3300,6 +3957,9 @@
 #endif
 #ifndef WDTIS0
 #define WDTIS0 0x0001
+#endif
+#ifndef OFIFG
+#define OFIFG (1<<1)
 #endif
 #ifndef CAPD0
 #define CAPD0 0x01
