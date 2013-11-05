@@ -392,7 +392,7 @@ void USART::handleMemoryChanged(::Memory *memory, uint16_t address) {
 
 	}
 	else if (address == m_br0 || address == m_br1) {
-		m_divider = m_br0 + m_br1 * 256;
+		m_divider = m_mem->getByte(m_br0, false) + m_mem->getByte(m_br1, false) * 256;
 	}
 	else if (address == m_txbuf) {
 		std::cout << "user wrote to TXBUF\n";
