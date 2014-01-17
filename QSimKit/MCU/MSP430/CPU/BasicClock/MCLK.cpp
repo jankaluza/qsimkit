@@ -32,7 +32,7 @@ namespace MSP430 {
 
 MCLK::MCLK(Memory *mem, Variant *variant, DCO *dco, VLO *vlo, LFXT1 *lfxt1, XT2 *xt2) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_vlo(vlo),
-m_lfxt1(lfxt1), m_xt2(xt2), m_divider(1), m_counter(0) {
+m_lfxt1(lfxt1), m_xt2(xt2), m_divider(1), m_counter(0), m_rising(false) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
@@ -65,16 +65,27 @@ std::string MCLK::getSourceName() {
 }
 
 void MCLK::tickRising() {
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
-		callRisingHandlers();
+
+		m_rising = !m_rising;
+		if (m_rising) {
+			callRisingHandlers();
+		}
+		else {
+			callFallingHandlers();
+		}
 	}
 }
 
 void MCLK::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		callFallingHandlers();
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void MCLK::reset() {
@@ -117,6 +128,8 @@ void MCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		case 3: m_divider = 8; break;
 		default: break;
 	}
+
+	m_counter = m_divider;
 }
 
 }

@@ -410,6 +410,8 @@ void Timer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 			default: break;
 		}
 
+		m_counter = m_divider;
+
 		// Choose source
 		switch((val >> 8) & 3) {
 			case 0: break;

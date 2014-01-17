@@ -33,7 +33,7 @@ USCI::USCI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Va
 		   Type type, uint8_t id, ACLK *aclk, SMCLK *smclk) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
-m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
+m_counter(0), m_rising(false), m_sclk(false), m_usickpl(false), m_input(false),
 m_output(false), m_transmitting(false), m_txReady(false), m_type(type), m_rxRead(false) {
 
 	std::string prefix;
@@ -295,7 +295,7 @@ void USCI::handleTickSPI(bool rising, uint8_t ctl0) {
 }
 
 void USCI::tickRising() {
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
 
 		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
@@ -310,26 +310,19 @@ void USCI::tickRising() {
 			return;
 		}
 
-		handleTickSPI(true, ctl0);
+		m_rising = !m_rising;
+		handleTickSPI(m_rising, ctl0);
 	}
 }
 
 void USCI::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		uint8_t ctl0 = m_mem->getByte(m_ctl0, false);
-
-		// We are slave, do not handle ticks from our own CLK
-		if ((ctl0 & (1 << 3)) == 0) {
-			return;
-		}
-
-		// we are not transmitting
-		if (!m_transmitting) {
-			return;
-		}
-
-		handleTickSPI(false, ctl0);
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void USCI::handleSignal(const std::string &name, double value) {
@@ -434,6 +427,7 @@ void USCI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	}
 	else if (address == m_br0 || address == m_br1) {
 		m_divider = m_mem->getByte(m_br0, false) + m_mem->getByte(m_br1, false) * 256;
+		m_counter = m_divider;
 	}
 	else if (address == m_txbuf) {
 		std::cout << "user wrote to TXBUF\n";

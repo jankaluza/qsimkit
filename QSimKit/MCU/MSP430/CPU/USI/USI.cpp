@@ -33,7 +33,7 @@ USI::USI(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Vari
 			 ACLK *aclk, SMCLK *smclk) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk), m_usictl(variant->getUSICTL()), m_usicctl(variant->getUSICCTL()),
-m_usisr(variant->getUSISR()), m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
+m_usisr(variant->getUSISR()), m_counter(0), m_rising(false), m_sclk(false), m_usickpl(false), m_input(false),
 m_output(false) {
 
 	m_mem->addWatcher(m_usicctl, this);
@@ -174,7 +174,7 @@ void USI::handleTickSPI(bool rising, uint8_t usictl0, uint8_t usictl1) {
 }
 
 void USI::tickRising() {
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
 
 		uint8_t usictl0 = m_mem->getByte(m_usictl);
@@ -190,29 +190,20 @@ void USI::tickRising() {
 			
 		}
 		else {
-			handleTickSPI(true, usictl0, usictl1);
+			m_rising = !m_rising;
+			handleTickSPI(m_rising, usictl0, usictl1);
 		}
 	}
 }
 
 void USI::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		uint8_t usictl0 = m_mem->getByte(m_usictl);
-		uint8_t usictl1 = m_mem->getByte(m_usictl + 1);
-
-		// Logic is held in reset state
-		if (usictl0 & 1) {
-			return;
-		}
-
-		// I2C
-		if (usictl1 & (1 << 6)) {
-			
-		}
-		else {
-			handleTickSPI(false, usictl0, usictl1);
-		}
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void USI::handleSignal(const std::string &name, double value) {
@@ -261,6 +252,7 @@ void USI::handleMemoryChanged(::Memory *memory, uint16_t address) {
 
 		// divider
 		m_divider = 1 << ((val >> 5) & 7);
+		m_counter = m_divider;
 
 		if (m_source) {
 			m_source->removeHandler(this);

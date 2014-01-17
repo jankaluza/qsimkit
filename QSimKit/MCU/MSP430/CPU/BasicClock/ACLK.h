@@ -59,6 +59,7 @@ class ACLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		LFXT1 *m_lfxt1;
 		uint8_t m_divider;
 		uint8_t m_counter;
+		bool m_rising;
 };
 
 }

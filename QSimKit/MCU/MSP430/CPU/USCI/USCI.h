@@ -96,6 +96,7 @@ class USCI : public ClockHandler, public MemoryWatcher, public InterruptWatcher,
 		uint16_t m_ifg;
 		uint16_t m_ie;
 		uint16_t m_counter;
+		bool m_rising;
 		std::vector<PinMultiplexer *> m_somiMpx;
 		std::vector<PinMultiplexer *> m_simoMpx;
 		std::vector<PinMultiplexer *> m_clkMpx;

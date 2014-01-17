@@ -62,6 +62,7 @@ class SMCLK : public Clock, public OscillatorHandler, public MemoryWatcher {
 		XT2 *m_xt2;
 		uint8_t m_divider;
 		uint8_t m_counter;
+		bool m_rising;
 		bool m_running;
 };
 

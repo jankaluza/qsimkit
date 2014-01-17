@@ -29,11 +29,13 @@
 
 namespace MSP430 {
 
+#define IS_MASTER(CTL) ((CTL & (1 << 1)) != 0)
+
 USART::USART(PinManager *pinManager, InterruptManager *intManager, Memory *mem, Variant *variant,
 		   uint8_t id, ACLK *aclk, SMCLK *smclk) :
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
-m_counter(0), m_sclk(false), m_usickpl(false), m_input(false),
+m_counter(0), m_rising(0), m_sclk(false), m_usickpl(false), m_input(false),
 m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 
 	if (id == 0) {
@@ -85,7 +87,6 @@ m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
 		m_steMpx = m_pinManager->addPinHandler("STE1", this);
 	}
 
-// 	m_mem->addWatcher(m_ctl, this);
 	m_mem->addWatcher(m_tctl, this);
 	m_mem->addWatcher(m_br0, this);
 	m_mem->addWatcher(m_br1, this);
@@ -189,7 +190,7 @@ void USART::doSPIOutput(uint8_t ctl) {
 		m_tx = m_tx >> 1;
 	}
 
-// 	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
+	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
 	generateOutput(m_simoMpx, m_output);
 
 	if (m_cnt == 0 || m_cnt == 1) {
@@ -203,7 +204,6 @@ void USART::doSPIOutput(uint8_t ctl) {
 
 void USART::generateOutput(std::vector<PinMultiplexer *> &mpxs, bool value) {
 	for (std::vector<PinMultiplexer *>::iterator it = mpxs.begin(); it != mpxs.end(); ++it) {
-// 		std::cout << "outputing\n";
 		(*it)->generateOutput(this, value ? 3.0 : 0.0);
 	}
 }
@@ -240,9 +240,17 @@ void USART::handleTickSPI(bool rising, uint8_t ctl) {
 		return;
 	}
 
-	// Rising is first edge when m_usickpl == !rising, otherwise
-	// it's second edge
-	bool first_edge = m_usickpl == !rising;
+	bool first_edge;
+	if (IS_MASTER(ctl)) {
+		// Master does not take care of ckpl
+		first_edge = rising;
+	}
+	else {
+		// Rising is first edge when m_usickpl == !rising, otherwise
+		// it's second edge
+		first_edge = m_usickpl == !rising;
+	}
+
 	if (first_edge) {
 		handleFirstEdgeSPI(ctl);
 	}
@@ -251,20 +259,20 @@ void USART::handleTickSPI(bool rising, uint8_t ctl) {
 	}
 
 	// Master generates output clock
-	if (ctl & (1 << 1)) {
+	if (IS_MASTER(ctl)) {
 		m_sclk = rising;
 		generateOutput(m_clkMpx, m_sclk != m_usickpl);
 	}
 }
 
 void USART::tickRising() {
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
 
 		uint8_t ctl = m_mem->getByte(m_ctl, false);
 
 		// We are slave, do not handle ticks from our own CLK
-		if ((ctl & (1 << 1)) == 0) {
+		if (!IS_MASTER(ctl)) {
 			return;
 		}
 
@@ -273,26 +281,19 @@ void USART::tickRising() {
 			return;
 		}
 
-		handleTickSPI(true, ctl);
+		m_rising = !m_rising;
+		handleTickSPI(m_rising, ctl);
 	}
 }
 
 void USART::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		uint8_t ctl = m_mem->getByte(m_ctl, false);
-
-		// We are slave, do not handle ticks from our own CLK
-		if ((ctl & (1 << 1)) == 0) {
-			return;
-		}
-
-		// we are not transmitting
-		if (!m_transmitting) {
-			return;
-		}
-
-		handleTickSPI(false, ctl);
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void USART::handleSignal(const std::string &name, double value) {
@@ -393,6 +394,7 @@ void USART::handleMemoryChanged(::Memory *memory, uint16_t address) {
 	}
 	else if (address == m_br0 || address == m_br1) {
 		m_divider = m_mem->getByte(m_br0, false) + m_mem->getByte(m_br1, false) * 256;
+		m_counter = m_divider;
 	}
 	else if (address == m_txbuf) {
 		std::cout << "user wrote to TXBUF\n";

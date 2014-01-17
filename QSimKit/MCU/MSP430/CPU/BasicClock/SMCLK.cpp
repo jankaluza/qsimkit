@@ -30,7 +30,7 @@ namespace MSP430 {
 
 SMCLK::SMCLK(Memory *mem, Variant *variant, DCO *dco, XT2 *xt2) :
 m_mem(mem), m_variant(variant), m_source(dco), m_dco(dco), m_xt2(xt2),
-m_divider(1), m_counter(0), m_running(false) {
+m_divider(1), m_counter(0), m_rising(false), m_running(false) {
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
 	ADD_WATCHER(m_variant->getBCSCTL2());
@@ -59,17 +59,27 @@ std::string SMCLK::getSourceName() {
 }
 
 void SMCLK::tickRising() {
-// 	std::cout << "SMCLK tick\n";
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
-		callRisingHandlers();
+
+		m_rising = !m_rising;
+		if (m_rising) {
+			callRisingHandlers();
+		}
+		else {
+			callFallingHandlers();
+		}
 	}
 }
 
 void SMCLK::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		callFallingHandlers();
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void SMCLK::start() {
@@ -115,6 +125,8 @@ void SMCLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		case 3: m_divider = 8; break;
 		default: break;
 	}
+
+	m_counter = m_divider;
 
 	if (m_source) {
 		m_source->removeHandler(this);

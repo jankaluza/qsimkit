@@ -30,7 +30,7 @@ namespace MSP430 {
 
 ACLK::ACLK(Memory *mem, Variant *variant, VLO *vlo, LFXT1 *lfxt1) :
 m_mem(mem), m_variant(variant), m_source(0), m_vlo(vlo),
-m_lfxt1(lfxt1), m_divider(1), m_counter(0) {
+m_lfxt1(lfxt1), m_divider(1), m_counter(0), m_rising(false) {
 
 #define ADD_WATCHER(METHOD) \
 	if (METHOD != 0) { m_mem->addWatcher(METHOD, this); }
@@ -62,16 +62,27 @@ std::string ACLK::getSourceName() {
 }
 
 void ACLK::tickRising() {
-	if (++m_counter >= m_divider) {
+	if (++m_counter >= (m_divider >> 1)) {
 		m_counter = 0;
-		callRisingHandlers();
+
+		m_rising = !m_rising;
+		if (m_rising) {
+			callRisingHandlers();
+		}
+		else {
+			callFallingHandlers();
+		}
 	}
 }
 
 void ACLK::tickFalling() {
-	if (m_counter == (m_divider >> 2)) {
-		callFallingHandlers();
+	// Ignore falling tick if divider is one, because falling tick is generated
+	// on second rising tick in this case.
+	if (m_divider != 1) {
+		return;
 	}
+
+	tickRising();
 }
 
 void ACLK::reset() {
@@ -96,6 +107,8 @@ void ACLK::handleMemoryChanged(::Memory *memory, uint16_t address) {
 			case 3: m_divider = 8; break;
 			default: break;
 		}
+
+		m_counter = m_divider;
 	}
 	else if (address == m_variant->getBCSCTL3()) {
 		if (m_source) {

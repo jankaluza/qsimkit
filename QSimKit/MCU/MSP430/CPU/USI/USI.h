@@ -85,6 +85,7 @@ class USI : public ClockHandler, public MemoryWatcher, public InterruptWatcher, 
 		uint16_t m_usicctl;
 		uint16_t m_usisr;
 		uint16_t m_counter;
+		bool m_rising;
 		std::vector<PinMultiplexer *> m_sdiMpx;
 		std::vector<PinMultiplexer *> m_sdoMpx;
 		std::vector<PinMultiplexer *> m_sclkMpx;
