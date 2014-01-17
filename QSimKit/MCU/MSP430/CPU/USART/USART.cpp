@@ -195,7 +195,9 @@ void USART::doSPIOutput(uint8_t ctl) {
 
 	if (m_cnt == 0 || m_cnt == 1) {
 		// generate interrupt
-		if (m_mem->getByte(m_ie, m_utxie) & (1 << 7)) {
+		std::cout << "CAN GENERATE INTERRUPT\n";
+		if (m_mem->getByte(m_ie, false) & m_utxie) {
+			std::cout << "GENERATE INTERRUPT\n";
 			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | m_utxifg, false);
 			m_intManager->queueInterrupt(m_txvect);
 		}
@@ -410,7 +412,7 @@ void USART::handleInterruptFinished(InterruptManager *intManager, int vector) {
 }
 
 void USART::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value) {
-	std::cout << "READ RXBUF\n";
+	std::cout << "READ RXBUF " << (int) m_ifg << " " << (int) m_urxifg << "\n";
 	// Clear UCOE
 	m_mem->setBit(m_rctl, (1 << 5), false);
 
