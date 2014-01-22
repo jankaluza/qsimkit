@@ -139,10 +139,10 @@ void Peripherals::addPeripheral(QObject *peripheral) {
 	addPeripheralItem(item);
 }
 
-void Peripherals::removePeripheralItem(PeripheralItem *item) {
+void Peripherals::removePeripheralItem(PeripheralItem *it) {
 	for (int i = 0; i < view->topLevelItemCount(); ++i) {
 		PeripheralItem *item = dynamic_cast<PeripheralItem *>(view->topLevelItem(i));
-		if (item == item) {
+		if (item == it) {
 			view->takeTopLevelItem(i);
 			break;
 		}
