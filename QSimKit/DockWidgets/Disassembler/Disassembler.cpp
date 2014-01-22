@@ -114,7 +114,7 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 
 	QAction *add = 0;
 	QAction *remove = 0;
-	if (!m_simkit->getBreakpointManager()->getRegisterBreaks(0).contains(item->text(0).toUInt(0))) {
+	if (!m_simkit->getBreakpointManager()->getRegisterBreaks(0).contains(item->text(0).toInt(0, 16))) {
 		add = new QAction("Add breakpoint", 0);
 		actions.append(add);
 	}
