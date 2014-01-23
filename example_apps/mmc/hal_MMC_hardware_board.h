@@ -38,22 +38,22 @@
 
 
 
-#include "msp430x20x2.h"              // Adjust this according to the
+#include "msp430x16x.h"              // Adjust this according to the
                                      // MSP430 device being used.
 // SPI port definitions              // Adjust the values for the chosen
-#define SPI_PxSEL         P1SEL      // interfaces, according to the pin
-#define SPI_PxDIR         P1DIR      // assignments indicated in the
-#define SPI_PxIN          P1IN       // chosen MSP430 device datasheet.
-#define SPI_PxOUT         P1OUT
-#define SPI_SIMO          (1 << 7)
-#define SPI_SOMI          (1 << 6)
-#define SPI_UCLK          (1 << 5)
+#define SPI_PxSEL         P3SEL      // interfaces, according to the pin
+#define SPI_PxDIR         P3DIR      // assignments indicated in the
+#define SPI_PxIN          P3IN       // chosen MSP430 device datasheet.
+#define SPI_PxOUT         P3OUT
+#define SPI_SIMO          (1 << 1)
+#define SPI_SOMI          (1 << 2)
+#define SPI_UCLK          (1 << 3)
 
 //----------------------------------------------------------------------------
 // SPI/UART port selections.  Select which port will be used for the interface 
 //----------------------------------------------------------------------------
 //#define SPI_SER_INTF      SER_INTF_USART1  // Interface to MMC
-#define SPI_SER_INTF      SER_INTF_USI  // Interface to MMC
+#define SPI_SER_INTF      SER_INTF_USART0  // Interface to MMC
 
 
 /*

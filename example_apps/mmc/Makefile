@@ -1,5 +1,5 @@
 CC=msp430-gcc
-CFLAGS=-Os -Wall -g -I. -mmcu=msp430f2012
+CFLAGS=-Os -Wall -g -I. -mmcu=msp430x168
 
 OBJS=main.c mmc.c hal_SPI.c
 
