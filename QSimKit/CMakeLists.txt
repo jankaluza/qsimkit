@@ -10,7 +10,7 @@ FILE(GLOB_RECURSE SRCR DockWidgets/*.cpp Breakpoints/*.cpp Tracking/*.cpp Dwarf/
 FILE(GLOB HEADERS ui/*.h Peripherals/*.h Script/*.h MCU/*.h)
 FILE(GLOB_RECURSE HEADERSR DockWidgets/*.h Breakpoints/*.h Tracking/*.h Dwarf/*.h Project/*.h)
 FILE(GLOB FORMS ui/*.ui)
-FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui)
+FILE(GLOB_RECURSE FORMSR DockWidgets/*.ui Tracking/*.ui Breakpoints/*.ui)
 
 QT4_WRAP_CPP(HEADERS_MOC ${HEADERS} ${HEADERSR})
 QT4_WRAP_UI(FORMS_HEADERS ${FORMS} ${FORMSR})

@@ -25,6 +25,7 @@
 #include "MCU/MCU.h"
 #include "Peripherals/Peripheral.h"
 #include "Breakpoints/BreakpointManager.h"
+#include "Breakpoints/AddMemoryBreakpoint.h"
 #include "MCU/RegisterSet.h"
 #include "MCU/Register.h"
 
@@ -48,19 +49,13 @@ DockWidget(simkit), m_mcu(0), m_simkit(simkit) {
 }
 
 void Peripherals::addBreakpoint() {
-	bool ok = false;
-	int val = QInputDialog::getInt(this, "Add memory breakpoint", "Memory value:", 0, 0, 65535, 1, &ok);
-	if (!ok) {
-		return;
-	}
-
 	QTreeWidgetItem *item = view->currentItem();
 
-	item->setBackground(0, QBrush(Qt::red));
-	m_breakpoints.append(item);
-
-	BreakpointManager *m = m_simkit->getBreakpointManager();
-	m->addMemoryBreak(item->data(0, Qt::UserRole).toInt(), val);
+	AddMemoryBreakpoint dialog(m_simkit->getBreakpointManager(), item->data(0, Qt::UserRole).toString(), this);
+	if (dialog.exec() == QDialog::Accepted) {
+		item->setBackground(0, QBrush(Qt::red));
+		m_breakpoints.append(item);
+	}
 }
 
 void Peripherals::removeBreakpoint() {

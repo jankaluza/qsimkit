@@ -54,7 +54,7 @@ void BreakpointManager::handleMemoryChanged(Memory *memory, uint16_t address) {
 		return;
 	}
 
-	if (m_membreaks[address] == memory->getBigEndian(address)) {
+	if (m_membreaks[address].any || m_membreaks[address].val == memory->getBigEndian(address)) {
 		m_break = true;
 	}
 }
@@ -71,7 +71,14 @@ void BreakpointManager::setMCU(MCU *mcu) {
 
 void BreakpointManager::addMemoryBreak(uint16_t addr, uint16_t value) {
 	m_mcu->getMemory()->addWatcher(addr, this);
-	m_membreaks[addr] = value;
+	MemoryBreak v = {value, false};
+	m_membreaks[addr] = v;
+}
+
+void BreakpointManager::addMemoryBreak(uint16_t addr) {
+	m_mcu->getMemory()->addWatcher(addr, this);
+	MemoryBreak v = {0, true};
+	m_membreaks[addr] = v;
 }
 
 void BreakpointManager::removeMemoryBreak(uint16_t addr) {

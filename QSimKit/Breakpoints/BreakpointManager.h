@@ -29,6 +29,11 @@ class MCU;
 
 class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 	public:
+		typedef struct {
+			uint16_t val;
+			bool any;
+		} MemoryBreak;
+
 		BreakpointManager();
 		~BreakpointManager();
 
@@ -41,8 +46,9 @@ class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 		}
 
 		void addMemoryBreak(uint16_t addr, uint16_t value);
+		void addMemoryBreak(uint16_t addr);
 		void removeMemoryBreak(uint16_t addr);
-		const QHash<uint16_t, uint16_t> &getMemoryBreaks() {
+		const QHash<uint16_t, MemoryBreak> &getMemoryBreaks() {
 			return m_membreaks;
 		}
 
@@ -54,7 +60,7 @@ class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 	private:
 		MCU *m_mcu;
 		QList<QList<uint16_t> > m_breaks;
-		QHash<uint16_t, uint16_t> m_membreaks;
+		QHash<uint16_t, MemoryBreak> m_membreaks;
 		bool m_break;
 
 };

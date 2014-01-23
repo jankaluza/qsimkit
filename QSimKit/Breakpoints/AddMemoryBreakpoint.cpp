@@ -1,0 +1,53 @@
+/**
+ * QSimKit - MSP430 simulator
+ * Copyright (C) 2013 Jan "HanzZ" Kaluza (hanzz.k@gmail.com)
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ **/
+
+#include "AddMemoryBreakpoint.h"
+
+#include "Breakpoints/BreakpointManager.h"
+
+#include <QWidget>
+#include <QTime>
+#include <QMainWindow>
+#include <QString>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QFile>
+#include <QIcon>
+#include <QTreeWidgetItem>
+#include <QDebug>
+
+AddMemoryBreakpoint::AddMemoryBreakpoint(BreakpointManager *p, const QString &addr, QWidget *parent) :
+QDialog(parent), m_breakpoints(p) {
+	setupUi(this);
+
+	address->setText(addr);
+	value->setFocus(Qt::MouseFocusReason);
+}
+
+void AddMemoryBreakpoint::accept() {
+	if (breakOnAny->isChecked()) {
+		m_breakpoints->addMemoryBreak(address->text().toInt());
+	}
+	else {
+		m_breakpoints->addMemoryBreak(address->text().toInt(), value->text().toInt());
+	}
+
+	QDialog::accept();
+}
+
