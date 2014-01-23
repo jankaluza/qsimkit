@@ -48,4 +48,10 @@ USARTModules::~USARTModules() {
 	}
 }
 
+void USARTModules::reset() {
+	for (std::vector<USART *>::iterator it = m_usart.begin(); it != m_usart.end(); ++it) {
+		(*it)->reset();
+	}
+}
+
 }

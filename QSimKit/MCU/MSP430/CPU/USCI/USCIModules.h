@@ -46,6 +46,8 @@ class USCIModules  {
 			 Variant *variant, ACLK *aclk, SMCLK *smclk);
 		virtual ~USCIModules();
 
+		void reset();
+
 	private:
 		std::vector<USCI *> m_usci;
 };

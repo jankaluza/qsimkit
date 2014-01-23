@@ -56,4 +56,10 @@ USCIModules::~USCIModules() {
 	}
 }
 
+void USCIModules::reset() {
+	for (std::vector<USCI *>::iterator it = m_usci.begin(); it != m_usci.end(); ++it) {
+		(*it)->reset();
+	}
+}
+
 }

@@ -86,6 +86,7 @@ m_syncing(0) {
 	m_basicClock = new MSP430::BasicClock(m_mem, m_variant, m_intManager, m_pinManager, m_timerFactory);
 	m_basicClock->getMCLK()->addHandler(this, MSP430::Clock::Rising);
 
+	m_usi = 0;
 	if (m_variant->getUSICTL() != 0) {
 		m_usi = new MSP430::USI(m_pinManager, m_intManager, m_mem, m_variant,
 								m_basicClock->getACLK(), m_basicClock->getSMCLK());
@@ -129,6 +130,9 @@ void MCU_MSP430::reset() {
 	m_intManager->reset();
 	m_pinManager->reset();
 	m_basicClock->reset();
+	m_usart->reset();
+	m_usci->reset();
+	if (m_usi) m_usi->reset();
 
 	m_decoder = new MSP430::InstructionDecoder(m_reg, m_mem);
 

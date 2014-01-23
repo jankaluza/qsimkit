@@ -30,10 +30,10 @@
 		<pin id="25"><name sel="0">P2.5</name></pin>
 		<pin id="26"><name sel="0">P2.6</name></pin>
 		<pin id="27"><name sel="0">P2.7</name></pin>
-		<pin id="28"><name sel="0">P3.0</name></pin>
-		<pin id="29"><name sel="0">P3.1</name></pin>
-		<pin id="30"><name sel="0">P3.2</name></pin>
-		<pin id="31"><name sel="0">P3.3</name></pin>
+		<pin id="28"><name sel="0">P3.0</name><name sel="1">STE0</name></pin>
+		<pin id="29"><name sel="0">P3.1</name><name sel="1">SIMO0</name></pin>
+		<pin id="30"><name sel="0">P3.2</name><name sel="1">SOMI0</name></pin>
+		<pin id="31"><name sel="0">P3.3</name><name sel="1">UCLK0</name></pin>
 		<pin id="32"><name sel="0">P3.4</name></pin>
 	</down>
 	<right>
@@ -48,10 +48,10 @@
 		<pin id="41"><name sel="0">P4.5</name></pin>
 		<pin id="42"><name sel="0">P4.6</name></pin>
 		<pin id="43"><name sel="0">P4.7</name></pin>
-		<pin id="44"><name sel="0">P5.0</name></pin>
-		<pin id="45"><name sel="0">P5.1</name></pin>
-		<pin id="46"><name sel="0">P5.2</name></pin>
-		<pin id="47"><name sel="0">P5.3</name></pin>
+		<pin id="44"><name sel="0">P5.0</name><name sel="1">STE1</name></pin>
+		<pin id="45"><name sel="0">P5.1</name><name sel="1">SIMO1</name></pin>
+		<pin id="46"><name sel="0">P5.2</name><name sel="1">SOMI1</name></pin>
+		<pin id="47"><name sel="0">P5.3</name><name sel="1">UCLK1</name></pin>
 		<pin id="48"><name sel="0">P5.4</name></pin>
 	</right>
 	<up>

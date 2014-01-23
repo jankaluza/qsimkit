@@ -33,6 +33,7 @@ class TimerAItem;
 class TimerBItem;
 class BasicClockItem;
 class USIItem;
+class USARTItem;
 
 class MSP430PeripheralItem : public PeripheralItem
 {
@@ -49,5 +50,6 @@ class MSP430PeripheralItem : public PeripheralItem
 		TimerBItem *m_timerBItem;
 		BasicClockItem *m_bcItem;
 		USIItem *m_usiItem;
+		USARTItem *m_usartItem;
 };
 

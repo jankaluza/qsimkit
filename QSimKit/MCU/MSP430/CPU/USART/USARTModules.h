@@ -46,6 +46,8 @@ class USARTModules  {
 			 Variant *variant, ACLK *aclk, SMCLK *smclk);
 		virtual ~USARTModules();
 
+		void reset();
+
 	private:
 		std::vector<USART *> m_usart;
 };

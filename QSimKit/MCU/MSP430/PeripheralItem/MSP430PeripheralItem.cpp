@@ -31,6 +31,7 @@
 #include "TimerBItem.h"
 #include "BasicClockItem.h"
 #include "USIItem.h"
+#include "USARTItem.h"
 
 #include <QWidget>
 #include <QTime>
@@ -70,6 +71,14 @@ MSP430PeripheralItem::MSP430PeripheralItem(MCU_MSP430 *cpu) {
 	else {
 		m_usiItem = 0;
 	}
+
+	if (v->getU0CTL() != 0) {
+		m_usartItem = new USARTItem(m_cpu);
+		addChild(m_usartItem);
+	}
+	else {
+		m_usartItem = 0;
+	}
 }
 
 MSP430PeripheralItem::~MSP430PeripheralItem() {
@@ -82,4 +91,5 @@ void MSP430PeripheralItem::refresh() {
 	m_timerAItem->refresh();
 	m_timerBItem->refresh();
 	if (m_usiItem) m_usiItem->refresh();
+	if (m_usartItem) m_usartItem->refresh();
 }
