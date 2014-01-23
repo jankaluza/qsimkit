@@ -117,6 +117,7 @@ class USART : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 		uint8_t m_rx;
 		uint8_t m_cnt;
 		bool m_rxRead;
+		uint8_t m_id;
 };
 
 }

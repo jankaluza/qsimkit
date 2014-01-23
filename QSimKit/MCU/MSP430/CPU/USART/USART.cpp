@@ -36,7 +36,7 @@ USART::USART(PinManager *pinManager, InterruptManager *intManager, Memory *mem, 
 m_pinManager(pinManager), m_intManager(intManager), m_mem(mem), m_variant(variant), m_source(0),
 m_divider(1), m_aclk(aclk), m_smclk(smclk),
 m_counter(0), m_rising(0), m_sclk(false), m_usickpl(false), m_input(false),
-m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false) {
+m_output(false), m_transmitting(false), m_txReady(false), m_rxRead(false), m_id(id) {
 
 	if (id == 0) {
 		m_ctl = variant->getU0CTL();
@@ -107,7 +107,7 @@ void USART::doSPICapture(uint8_t ctl) {
 	if (true) {
 		m_rx = m_rx << 1;
 		// MSB mode
-		std::cout << "MSB CAPTURE " << m_input << "\n";
+// 		std::cout << "MSB CAPTURE " << m_input << "\n";
 		if (m_input) {
 			m_rx |= 1;
 		}
@@ -139,10 +139,10 @@ void USART::doSPICapture(uint8_t ctl) {
 		}
 	}
 
-	std::cout << "RXBUF = " << (uint16_t) m_rx << "\n";
+// 	std::cout << "RXBUF = " << (uint16_t) m_rx << "\n";
 	m_cnt--;
 	if (m_cnt == 0) {
-		std::cout << "FINAL RXBUF = " << (uint16_t) m_rx << "\n";
+// 		std::cout << "FINAL RXBUF = " << (uint16_t) m_rx << "\n";
 		m_mem->setByte(m_rxbuf, m_rx, false);
 
 		// Set UCOE (overflow) bit if RXBUF was not read
@@ -190,14 +190,12 @@ void USART::doSPIOutput(uint8_t ctl) {
 		m_tx = m_tx >> 1;
 	}
 
-	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
+// 	std::cout << "OUTPUT " << m_output << " buf=" << (uint16_t) m_tx << "\n";
 	generateOutput(m_simoMpx, m_output);
 
 	if (m_cnt == 0 || m_cnt == 1) {
 		// generate interrupt
-		std::cout << "CAN GENERATE INTERRUPT\n";
 		if (m_mem->getByte(m_ie, false) & m_utxie) {
-			std::cout << "GENERATE INTERRUPT\n";
 			m_mem->setByte(m_ifg, m_mem->getByte(m_ifg, false) | m_utxifg, false);
 			m_intManager->queueInterrupt(m_txvect);
 		}
@@ -317,6 +315,12 @@ void USART::reset() {
 	// Set default values
 	m_mem->setByte(m_ctl, 1);
 	m_mem->setByte(m_tctl, 1);
+	if (m_id == 0) {
+		m_mem->setByte(m_ifg, 0x82);
+	}
+	else {
+		m_mem->setByte(m_ifg, 0x20);
+	}
 }
 
 void USART::txReady() {
@@ -333,7 +337,7 @@ void USART::txReady() {
 		return;
 	}
 
-	std::cout << "STARTING TRANSMITION\n";
+// 	std::cout << "STARTING TRANSMITION\n";
 
 	// There is no transmission in progress, so just move data into m_tx and
 	// start the transmission
@@ -393,13 +397,16 @@ void USART::handleMemoryChanged(::Memory *memory, uint16_t address) {
 // 			}
 		}
 
+		// Set TXEPT bit
+		m_mem->setBit(m_tctl, 1, m_transmitting == false);
+
 	}
 	else if (address == m_br0 || address == m_br1) {
 		m_divider = m_mem->getByte(m_br0, false) + m_mem->getByte(m_br1, false) * 256;
 		m_counter = m_divider;
 	}
 	else if (address == m_txbuf) {
-		std::cout << "user wrote to TXBUF\n";
+// 		std::cout << "user wrote to TXBUF\n";
 
 		// clear interrup flag
 		m_mem->setBit(m_ifg, m_utxifg, false);
@@ -412,7 +419,7 @@ void USART::handleInterruptFinished(InterruptManager *intManager, int vector) {
 }
 
 void USART::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value) {
-	std::cout << "READ RXBUF " << (int) m_ifg << " " << (int) m_urxifg << "\n";
+// 	std::cout << "READ RXBUF " << (int) m_ifg << " " << (int) m_urxifg << "\n";
 	// Clear UCOE
 	m_mem->setBit(m_rctl, (1 << 5), false);
 

@@ -131,6 +131,7 @@ void halSPISetup(void)
   UMCTL0 = 0x00;                            // No modulation
   ME1 |= USPIE0;                            // Enable USART0 SPI mode
   UCTL0 &= ~SWRST;                          // Initialize USART state machine
+  IE1 |= UTXE0 | URXE0;
 }
 
 #elif SPI_SER_INTF == SER_INTF_USART1
