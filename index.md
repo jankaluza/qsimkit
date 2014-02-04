@@ -28,6 +28,8 @@ QSimKit is released under GPLv2+ license.
 * All instructions implemented
 * BasicClock module supported (TimerA/TimerB support)
 * USI (only SPI so far) support
+* USCI-SPI support.
+* USART-SPI support.
 
 **Peripherals:**
 
