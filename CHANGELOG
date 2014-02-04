@@ -1,8 +1,12 @@
-Version 0.0.3 (2014-01-XX):
+Version 0.0.3 (2014-02-04):
 	QSimKit GUI:
 	* Drawing optimizations
 	* Fixed bug when breakpoints got lost when switching between C and ASM
 	* Fixed crash when DebugData cannot be loaded
+	* Add dialog for adding breakpoints on any change on particular memory
+	  address
+	* Fixed bug when peripherals have not been removed from left panel when
+	  creating new project
 
 	MSP430:
 	* Add support for USCI-SPI
