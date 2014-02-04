@@ -24,7 +24,7 @@ MSP430:
 * Timer optimizations
 * Fix of divider handling in all modules
 
-**Version 0.0.2 (2013-09-12):**
+### Version 0.0.2 (2013-09-12):
 
 QSimKit GUI:
 
@@ -40,7 +40,7 @@ SD card:
 
 * Add basic SD card peripheral
 
-**Version 0.0.1:**
+### Version 0.0.1:
 
 * Initial version
 
