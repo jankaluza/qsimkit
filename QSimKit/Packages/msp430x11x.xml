@@ -1,5 +1,5 @@
 <variant>
-<package name="MSP430x16x">
+<package name="MSP430x11x">
 	<left>
 		<pin id="1"><name>TEST/VPP</name></pin>
 		<pin id="2"><name>VCC</name></pin>
@@ -13,16 +13,16 @@
 		<pin id="10"><name sel="0">P2.2</name><name>TA0</name></pin>
 	</left>
 	<right>
-		<pin id="11"><name sel="0">P1.7</name><name>TA2</name></pin>
-		<pin id="12"><name sel="0">P1.6</name><name>TA1</name></pin>
-		<pin id="13"><name sel="0">P1.5</name><name>TA0</name></pin>
-		<pin id="14"><name sel="0">P1.4</name><name>SMCLK</name></pin>
-		<pin id="15"><name sel="0">P1.3</name><name>TA2</name></pin>
-		<pin id="16"><name sel="0">P1.2</name><name>TA1</name></pin>
-		<pin id="17"><name sel="0">P1.1</name><name>TA0</name></pin>
-		<pin id="18"><name sel="0">P1.0</name><name>TACLK</name></pin>
-		<pin id="19"><name sel="0">P2.4</name><name>TA2</name></pin>
-		<pin id="20"><name sel="0">P2.3</name><name>TA1</name></pin>
+		<pin id="11"><name sel="0">P2.3</name><name>TA1</name></pin>
+		<pin id="12"><name sel="0">P2.4</name><name>TA2</name></pin>
+		<pin id="13"><name sel="0">P1.0</name><name dir="1" sel="1">TACLK</name><name dir="0" sel="1">TACLK</name></pin>
+		<pin id="14"><name sel="0">P1.1</name><name dir="1" sel="1">TA0</name><name dir="0" sel="1">TA0.CCI0A</name></pin>
+		<pin id="15"><name sel="0">P1.2</name><name dir="1" sel="1">TA1</name><name dir="0" sel="1">TA1.CCI1A</name></pin>
+		<pin id="16"><name sel="0">P1.3</name><name dir="1" sel="1">TA2</name><name dir="0" sel="1">TA2.CCI2A</name></pin>
+		<pin id="17"><name sel="0">P1.4</name><name>SMCLK</name><name>TCK</name></pin>
+		<pin id="18"><name sel="0">P1.5</name><name>TA0</name><name>TMS</name></pin>
+		<pin id="19"><name sel="0">P1.6</name><name>TA1</name><name>TDI</name></pin>
+		<pin id="20"><name sel="0">P1.7</name><name>TA2</name><name>TDO</name><name>TDI</name></pin>
 	</right>
 </package>
 </variant>
