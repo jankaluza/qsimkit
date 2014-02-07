@@ -82,7 +82,7 @@ class BasicClock {
 		}
 
 		Timer *getTimerB() {
-			m_timerB;
+			return m_timerB;
 		}
 
 		ACLK *getACLK() {

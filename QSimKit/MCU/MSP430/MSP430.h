@@ -83,6 +83,8 @@ class MCU_MSP430 : public MCU, public MSP430::PinWatcher, public MSP430::ClockHa
 
 		double timeAdvance();
 
+		QString getFeatures();
+
 		void tickRising();
 		void tickFalling() {}
 

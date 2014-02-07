@@ -232,6 +232,8 @@ class MCU : public Peripheral {
 
 		virtual DebugData *getDebugData() = 0;
 
+		virtual QString getFeatures() = 0;
+
 
 	signals:
 		void onCodeLoaded();

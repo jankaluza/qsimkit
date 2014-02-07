@@ -31,6 +31,7 @@
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/BasicClock/BasicClock.h"
 #include "CPU/BasicClock/MCLK.h"
+#include "CPU/BasicClock/Timer.h"
 #include "CPU/USI/USI.h"
 #include "CPU/USCI/USCIModules.h"
 #include "CPU/USART/USARTModules.h"
@@ -103,6 +104,29 @@ m_syncing(0) {
 
 	m_options << "Load ELF";
 	m_options << "Load A43 (IHEX)";
+}
+
+QString MCU_MSP430::getFeatures() {
+	QString ret;
+
+	ret += "<h3>" + m_variantStr + "</h3>";
+	ret += "<ul>";
+	if (m_basicClock->getTimerA()) {
+		ret += "<li>Timer_A" + QString::number(m_basicClock->getTimerA()->getCCRCount()) + " (TA0.0, TA0.CCI0A, TA0.CCI0B, ...)</li>";
+	}
+	if (m_basicClock->getTimerA1()) {
+		ret += "<li>Timer1_A" + QString::number(m_basicClock->getTimerA1()->getCCRCount()) + " (TA1.0, TA1.CCI0A, TA1.CCI0B, ...)</li>";
+	}
+	if (m_basicClock->getTimerB()) {
+		ret += "<li>Timer_B" + QString::number(m_basicClock->getTimerB()->getCCRCount()) + " (TB0.0, TB0.CCI0A, TB0.CCI0B, ...)</li>";
+	}
+	if (m_usi) {
+		ret += "<li>USI (SDI, SDO, SCLK)</li>";
+	}
+
+	ret += "</ul>";
+
+	return ret;
 }
 
 void MCU_MSP430::handleFileChanged(const QString &path) {

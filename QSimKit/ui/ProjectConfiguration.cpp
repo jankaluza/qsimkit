@@ -19,6 +19,8 @@
 
 #include "ProjectConfiguration.h"
 
+#include "Features.h"
+
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralManager.h"
 #include "MCU/MCUManager.h"
@@ -66,6 +68,17 @@ QDialog(parent), m_manager(manager) {
 	if (mcu) {
 		MSP430Variants->setEnabled(false);
 		handleCurrentItemChanged(0, 0);
+	}
+
+	buttonBox->addButton("Show features", QDialogButtonBox::HelpRole);
+	connect(buttonBox, SIGNAL(helpRequested()), this, SLOT(showFeatures()));
+}
+
+void ProjectConfiguration::showFeatures() {
+	MCU *mcu = static_cast<MCU *>(preview->getObject());
+	if (mcu) {
+		Features features(mcu->getFeatures(), this);
+		features.exec();
 	}
 }
 

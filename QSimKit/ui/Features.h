@@ -23,27 +23,13 @@
 #include <QString>
 #include <QTimer>
 
-#include "ui_ProjectConfiguration.h"
+#include "ui_Features.h"
 
-class MCU;
-class MCUManager;
-
-class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
+class Features : public QDialog, public Ui::Features
 {
 	Q_OBJECT
 
 	public:
-		ProjectConfiguration(QWidget *parent = 0, MCUManager *manager = 0, MCU *mcu = 0);
-
-		MCU *getMCU();
-
-
-	private slots:
-		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);
-		void showFeatures();
-
-	private:
-		MCUManager *m_manager;
-
+		Features(const QString &features, QWidget *parent = 0);
 };
 

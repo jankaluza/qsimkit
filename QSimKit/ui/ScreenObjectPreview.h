@@ -35,6 +35,9 @@ class ScreenObjectPreview : public QWidget
 		virtual ~ScreenObjectPreview();
 
 		void setObject(ScreenObject *object);
+		ScreenObject *getObject() {
+			return m_object;
+		}
 
 	protected:
 		void paintEvent(QPaintEvent *e);

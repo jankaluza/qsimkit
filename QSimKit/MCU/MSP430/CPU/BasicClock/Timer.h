@@ -67,6 +67,10 @@ class Timer : public ClockHandler, public MemoryWatcher, public InterruptWatcher
 
 		void reset();
 
+		int getCCRCount() {
+			return m_ccr.size();
+		}
+
 	private:
 		typedef struct {
 			uint16_t tacctl;

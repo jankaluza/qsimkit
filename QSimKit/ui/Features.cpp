@@ -17,33 +17,22 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#pragma once
+#include "Features.h"
 
-#include <QDialog>
+#include <QWidget>
+#include <QTime>
+#include <QMainWindow>
 #include <QString>
-#include <QTimer>
+#include <QFileDialog>
+#include <QInputDialog>
+#include <QFile>
+#include <QIcon>
+#include <QTreeWidgetItem>
+#include <QDebug>
 
-#include "ui_ProjectConfiguration.h"
+Features::Features(const QString &f, QWidget *parent) :
+QDialog(parent) {
+	setupUi(this);
 
-class MCU;
-class MCUManager;
-
-class ProjectConfiguration : public QDialog, public Ui::ProjectConfiguration
-{
-	Q_OBJECT
-
-	public:
-		ProjectConfiguration(QWidget *parent = 0, MCUManager *manager = 0, MCU *mcu = 0);
-
-		MCU *getMCU();
-
-
-	private slots:
-		void handleCurrentItemChanged(QListWidgetItem *, QListWidgetItem *);
-		void showFeatures();
-
-	private:
-		MCUManager *m_manager;
-
-};
-
+	features->setText(f);
+}
