@@ -457,12 +457,14 @@ void Disassembler::pointToInstruction(uint16_t pc) {
 
 	view->scrollToItem(m_currentItems[0]);
 
-	// Change func QComboBox to show the name of current function
-	Subprogram *s = m_dd->getSubprogram(file->currentText(), pc);
-	if (s) {
-		int id = func->findText(s->getName());
-		if (id != -1) {
-			func->setCurrentIndex(id);
+	if (m_dd) {
+		// Change func QComboBox to show the name of current function
+		Subprogram *s = m_dd->getSubprogram(file->currentText(), pc);
+		if (s) {
+			int id = func->findText(s->getName());
+			if (id != -1) {
+				func->setCurrentIndex(id);
+			}
 		}
 	}
 }

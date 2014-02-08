@@ -61,10 +61,15 @@ void GPPinHandler::handleMemoryChanged(::Memory *memory, uint16_t address) {
 
 void GPPinHandler::handlePinInput(const std::string &name, double value) {
 	bool old_value = m_mem->isBitSet(m_in, m_id);
-	// Checks if the pin is input and stores the value in the
+	// Checks if the pin is input and store the value in the
 	// proper address in memory
 	if (!(m_mem->getByte(m_dir) & m_id)) {
-		m_mem->setBit(m_in, m_id, value >= 1.5); \
+		if (m_id == 16) 
+			std::cout << "INPUT " << (int) m_in << " " << (int) m_id << " " << (value >= 1.5) << "\n";
+		m_mem->setBitWatcher(m_in, m_id, value >= 1.5);
+	}
+	else {
+		return;
 	}
 
 	// No interrupt handling for this PIN.
@@ -96,6 +101,8 @@ void GPPinHandler::handlePinInput(const std::string &name, double value) {
 }
 
 void GPPinHandler::handlePinActivated(const std::string &name) {
+	if (m_id == 16) 
+		std::cout << "activated \n";
 	m_active = true;
 }
 

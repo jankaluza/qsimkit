@@ -134,6 +134,11 @@ void PinMultiplexer::handleMemoryChanged(::Memory *memory, uint16_t address) {
 		}
 
 		if (satisfied) {
+			// If we are still using the same handler as before, do nothing
+			if (!m_handlerName.empty() && m_handler && m_handlerName == m_outputs[i]) {
+				break;
+			}
+
 			if (!m_handlerName.empty() && m_handler) {
 				m_handler->handlePinDeactivated(m_handlerName);
 			}
