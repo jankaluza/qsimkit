@@ -96,6 +96,7 @@ class VariableType {
 			Const,
 			Array,
 			Pointer,
+			Subroutine,
 		} Type;
 
 		VariableType(const QString &name, uint8_t byteSize, Encoding encoding, Type type, uint16_t upperBound = 0, VariableType *subtype = 0) :

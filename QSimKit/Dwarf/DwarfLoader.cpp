@@ -44,9 +44,11 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 	QStringList lines = out.split("\n", QString::SkipEmptyParts);
 	bool notFound = true;
 	int maxTries = 10;
+	QStringList notFoundList;
 
 	while (notFound && maxTries-- > 0) {
 		notFound = false;
+		notFoundList.clear();
 		for (int i = 0; i < lines.size(); ++i) {
 			QString &line = lines[i];
 
@@ -86,6 +88,16 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 					dd->addVariableType(type);
 				}
 			}
+			else if (line.contains("DW_TAG_subroutine_type")) {
+				uint16_t addr = line.mid(line.lastIndexOf("<") + 1, line.lastIndexOf(">") - line.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
+				if (types.contains(addr)) {
+					continue;
+				}
+
+				VariableType *type = new VariableType("", 0, VariableType::Address, VariableType::Subroutine);
+				types[addr] = type;
+				dd->addVariableType(type);
+			}
 			else {
 				VariableType::Type type;
 				if (line.contains("DW_TAG_volatile_type")) {
@@ -112,16 +124,18 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 				VariableType *t = 0;
 				int16_t subrange = 0;
 				uint8_t byteSize = 0;
+				bool typeNotFound = false;
 				for (i++; i < lines.size(); ++i) { 
 					QString &l = lines[i];
 					if (l.contains("DW_AT_type") && subrange == 0) {
 						uint16_t address = l.mid(l.lastIndexOf("<") + 1, l.lastIndexOf(">") - l.lastIndexOf("<") - 1).trimmed().toUInt(0, 16);
-						if (types.contains(address)) {
+						if (types.contains(address) && types[address] != NULL) {
 							t = types[address];
 						}
-// 						else {
-// 							qDebug() << "Unknown type while loading types" << l;
-// 						}
+						else {
+							typeNotFound = true;
+							notFoundList << l;
+						}
 					}
 					else if (l.contains("DW_AT_byte_size")) {
 						byteSize = l.mid(l.lastIndexOf(":") + 2).trimmed().toUInt(0, 16);
@@ -138,7 +152,7 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 					}
 				}
 
-				if (!t) {
+				if (typeNotFound) {
 					notFound = true;
 					continue;
 				}
@@ -150,7 +164,9 @@ bool DwarfLoader::loadVariableTypes(const QString &out, DwarfDebugData *dd, QMap
 		}
 	}
 
-// 	qDebug() << maxTries;
+	if (!notFoundList.isEmpty()) {
+		qDebug() << "Didn't find following DWARF types:" << notFoundList;
+	}
 	return !notFound;
 }
 
