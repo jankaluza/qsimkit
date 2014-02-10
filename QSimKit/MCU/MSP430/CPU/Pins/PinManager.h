@@ -70,6 +70,10 @@ class PinManager : public SignalManager {
 			m_watcher = watcher;
 		}
 
+		const std::vector<PinMultiplexer *> &getMultiplexers() {
+			return m_multiplexers;
+		}
+
 	private:
 		Memory *m_mem;
 		Variant *m_variant;

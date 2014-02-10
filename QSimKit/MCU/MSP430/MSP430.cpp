@@ -28,6 +28,7 @@
 #include "CPU/Variants/Variant.h"
 #include "CPU/Variants/VariantManager.h"
 #include "CPU/Pins/PinManager.h"
+#include "CPU/Pins/PinMultiplexer.h"
 #include "CPU/Interrupts/InterruptManager.h"
 #include "CPU/BasicClock/BasicClock.h"
 #include "CPU/BasicClock/MCLK.h"
@@ -350,8 +351,11 @@ void MCU_MSP430::paint(QWidget *screen) {
 
 	int even = -1;
 	int id = 0;
-	for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); ++it, ++id) {
-		if (it->value >= 0.5) {
+	std::vector<MSP430::PinMultiplexer *>::const_iterator it2 = m_pinManager->getMultiplexers().begin();
+	for (PinList::iterator it = m_pins.begin(); it != m_pins.end() && it2 != m_pinManager->getMultiplexers().end(); ++it, ++id, ++it2) {
+		bool isInput;
+		double value = *it2 ? (*it2)->getValue(isInput) : 0;
+		if (value >= 1.5 && value != HIGH_IMPEDANCE) {
 			qp.fillRect(it->rect, QBrush(QColor(0,255,0)));
 		}
 		qp.drawRect(it->rect);

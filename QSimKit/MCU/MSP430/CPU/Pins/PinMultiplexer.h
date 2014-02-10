@@ -58,6 +58,10 @@ class PinMultiplexer : public MemoryWatcher {
 
 		double getValue(bool &isInput);
 
+		int getId() {
+			return m_id;
+		}
+
 	private:
 		PinManager *m_manager;
 		int m_id;
