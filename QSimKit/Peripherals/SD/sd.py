@@ -173,6 +173,9 @@ class Peripheral():
 				self.frame = []
 
 	def externalEvent(self, pin, value):
+		if value > 512: # HIGH_IMPEDANCE
+			return
+
 		if pin != SCK:
 			self.states[pin] = value >= 1.5
 		else:

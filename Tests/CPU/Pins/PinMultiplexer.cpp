@@ -100,8 +100,9 @@ class PinMultiplexerTest : public CPPUNIT_NS :: TestFixture{
 
 		void switchHandlers() {
 			m->setBitWatcher(v->getP1OUT(), 1, true);
-			// No output, because pin is in input mode
-			CPPUNIT_ASSERT_EQUAL(-1, watcher->id);
+			// Pin is in input mode, so HIGH_IMPEDANCE
+			CPPUNIT_ASSERT_EQUAL(0, watcher->id);
+			CPPUNIT_ASSERT_EQUAL(DBL_MAX, watcher->value);
 			m->setBitWatcher(v->getP1DIR(), 1, true);
 			CPPUNIT_ASSERT_EQUAL(0, watcher->id);
 			watcher->id = -1;

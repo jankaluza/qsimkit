@@ -466,6 +466,10 @@ void USCI::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value) 
 
 
 void USCI::handlePinInput(const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	switch(name[5]) {
 		// UCA0S'O'MI
 		case 'O':

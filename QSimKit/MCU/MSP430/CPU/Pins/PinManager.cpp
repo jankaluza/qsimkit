@@ -28,7 +28,7 @@
 namespace MSP430 {
 
 PinManager::PinManager(Memory *mem, InterruptManager *intManager, Variant *variant) :
-m_mem(mem), m_intManager(intManager), m_variant(variant) {
+m_mem(mem), m_intManager(intManager), m_variant(variant), m_watcher(0) {
 
 }
 
@@ -111,7 +111,9 @@ bool PinManager::handlePinInput(int id, double value) {
 }
 
 void PinManager::generateOutput(int id, double value) {
-	m_watcher->handlePinChanged(id, value);
+	if (m_watcher) {
+		m_watcher->handlePinChanged(id, value);
+	}
 }
 
 void PinManager::reset() {

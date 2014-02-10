@@ -338,6 +338,10 @@ void USI::handleMemoryRead(::Memory *memory, uint16_t address, uint16_t &value) 
 
 
 void USI::handlePinInput(const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	if (name == "SDI") {
 		m_input = value > 1.5;
 // 		std::cout << "SDI input " << value << "\n";

@@ -22,8 +22,11 @@
 #include <stdint.h>
 #include <string>
 #include <vector>
+#include <float.h>
 
 namespace MSP430 {
+
+#define HIGH_IMPEDANCE DBL_MAX
 
 class PinHandler {
 	public:

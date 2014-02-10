@@ -72,6 +72,10 @@ void LFXT1::handlePinInput(const std::string &name, double value) {
 		return;
 	}
 
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	bool newState = value > 1.5;
 	if (m_state != newState) {
 		m_state = newState;

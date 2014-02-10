@@ -37,6 +37,8 @@ class Peripheral():
 		self.state = False;
 
 	def externalEvent(self, pin, value):
+		if value > 512: # HIGH_IMPEDANCE
+			return
 		self.state = value >  1.5;
 		self.screen.update();
 

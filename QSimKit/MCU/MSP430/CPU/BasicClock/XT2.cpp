@@ -51,6 +51,10 @@ void XT2::handleMemoryChanged(::Memory *memory, uint16_t address) {
 }
 
 void XT2::handlePinInput(const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	bool newState = value > 1.5;
 	if (m_state != newState) {
 		m_state = newState;

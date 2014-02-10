@@ -599,6 +599,10 @@ void Timer::doCapture(CCR &ccr, int ccrIndex, uint16_t tacctl) {
 }
 
 void Timer::handlePinInput(CCR &ccr, int ccrIndex, const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	uint16_t tacctl = m_mem->getBigEndian(ccr.tacctl, false);
 	bool old_value = tacctl & 8;
 

@@ -431,6 +431,10 @@ void USART::handleMemoryRead(::Memory *memory, uint16_t address, uint8_t &value)
 
 
 void USART::handlePinInput(const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	switch(name[1]) {
 		// S'O'MI
 		case 'O':

@@ -49,6 +49,7 @@ void GPPinHandler::handleMemoryChanged(::Memory *memory, uint16_t address) {
 
 	// We are input PIN, so no output
 	if (m_mem->isBitSet(m_dir, m_id) == false) {
+		m_mpx->generateOutput(this, HIGH_IMPEDANCE);
 		return;
 	}
 
@@ -60,6 +61,10 @@ void GPPinHandler::handleMemoryChanged(::Memory *memory, uint16_t address) {
 }
 
 void GPPinHandler::handlePinInput(const std::string &name, double value) {
+	if (value == HIGH_IMPEDANCE) {
+		return;
+	}
+
 	bool old_value = m_mem->isBitSet(m_in, m_id);
 	// Checks if the pin is input and store the value in the
 	// proper address in memory

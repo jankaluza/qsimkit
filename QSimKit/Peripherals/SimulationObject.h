@@ -29,6 +29,7 @@
 
 #include "adevs.h"
 #include <stdint.h>
+#include <float.h>
 
 class PinHistory;
 
@@ -37,6 +38,8 @@ typedef adevs::PortValue<double> SimulationEvent;
 typedef adevs::Bag<SimulationEvent> SimulationEventList;
 
 class SimulationObjectWrapper;
+
+#define HIGH_IMPEDANCE DBL_MAX
 
 class SimulationObject {
 	public:
