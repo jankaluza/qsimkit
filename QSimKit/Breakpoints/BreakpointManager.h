@@ -27,7 +27,9 @@
 
 class MCU;
 
-class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
+class BreakpointManager : public QObject, public RegisterWatcher, public MemoryWatcher {
+	Q_OBJECT
+
 	public:
 		typedef struct {
 			uint16_t val;
@@ -56,6 +58,12 @@ class BreakpointManager : public RegisterWatcher, public MemoryWatcher {
 
 		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+
+	signals:
+		void onRegisterBreakAdded(int reg, uint16_t value);
+		void onRegisterBreakRemoved(int reg, uint16_t value);
+		void onMemoryBreakAdded(uint16_t addr);
+		void onMemoryBreakRemoved(uint16_t addr);
 
 	private:
 		MCU *m_mcu;

@@ -73,23 +73,31 @@ void BreakpointManager::addMemoryBreak(uint16_t addr, uint16_t value) {
 	m_mcu->getMemory()->addWatcher(addr, this);
 	MemoryBreak v = {value, false};
 	m_membreaks[addr] = v;
+
+	onMemoryBreakAdded(addr);
 }
 
 void BreakpointManager::addMemoryBreak(uint16_t addr) {
 	m_mcu->getMemory()->addWatcher(addr, this);
 	MemoryBreak v = {0, true};
 	m_membreaks[addr] = v;
+
+	onMemoryBreakAdded(addr);
 }
 
 void BreakpointManager::removeMemoryBreak(uint16_t addr) {
 	m_mcu->getMemory()->removeWatcher(addr, this);
 	m_membreaks.remove(addr);
+
+	onMemoryBreakRemoved(addr);
 }
 
 void BreakpointManager::addRegisterBreak(int reg, uint16_t value) {
 	m_mcu->getRegisterSet()->get(reg)->addWatcher(this);
 	m_breaks[reg].append(value);
 	qSort(m_breaks[reg]);
+
+	onRegisterBreakAdded(reg, value);
 }
 
 void BreakpointManager::removeRegisterBreak(int reg, uint16_t value) {
@@ -97,6 +105,8 @@ void BreakpointManager::removeRegisterBreak(int reg, uint16_t value) {
 	if (m_breaks[reg].empty()) {
 		m_mcu->getRegisterSet()->get(reg)->removeWatcher(this);
 	}
+
+	onRegisterBreakRemoved(reg, value);
 }
 
 bool BreakpointManager::shouldBreak() {
