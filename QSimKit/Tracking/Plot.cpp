@@ -36,8 +36,8 @@
 #define PLOT_SPACE_BETWEEN 5
 #define PLOT_WIDTH (width() - PLOT_SPACE_LEFT - PLOT_SPACE_RIGHT)
 
-Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_minX(0), m_maxY(3.3), m_pinHistory0(0),
-	m_pinHistory1(0), m_fromX(-1), m_toX(-1)  {
+Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_minX(0), m_maxY(3.3),
+	m_fromX(-1), m_toX(-1)  {
 	setMouseTracking(true);
 
 	// Test:
@@ -86,13 +86,6 @@ void Plot::addPinHistory(const QString &name, PinHistory *pinHistory) {
 	p.pin = pinHistory;
 	m_pins.append(p);
 
-	refreshSize();
-	repaint();
-}
-
-void Plot::removePinHistory(const QString &name) {
-	
-// 	m_pins.erase(name);
 	refreshSize();
 	repaint();
 }
@@ -262,6 +255,12 @@ void Plot::paintEvent(QPaintEvent *e) {
 	p.begin(this);
 	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
 
+	if (m_pins.empty()) {
+		p.drawText(0, 0, width(), height(), Qt::AlignCenter, "No pins tracked. To track pin, right-click the pin and select 'Track pin'.");
+		p.end();
+		return;
+	}
+
 	// Get the X value of mouse pointer, so we can show the exact Y value
 	// for this X in paintPin later.
 	double x = (double(m_pos.x() - PLOT_SPACE_LEFT) / PLOT_WIDTH) * (m_maxX - m_minX) + m_minX;
@@ -277,22 +276,37 @@ void Plot::paintEvent(QPaintEvent *e) {
 void Plot::mouseReleaseEvent(QMouseEvent *event) {
 }
 
-int Plot::correctX(int x, double &t) {
+PinHistory *Plot::pinHistoryUnderMouse(int x, int y) {
+	int slot = 0;
+	foreach(const PlotPin &plotpin, m_pins) {
+		bool mouseInPlot = y < PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) &&
+		y > PLOT_SPACE_BETWEEN + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN);
+
+		if (mouseInPlot) {
+			return plotpin.pin;
+		}
+	}
+
+	return 0;
+}
+
+int Plot::correctX(int x, int y, double &t) {
+	PinHistory *pin = pinHistoryUnderMouse(x, y);
 	m_context = 0;
 	t = (double(x - 25) / (width() - 35)) * (m_maxX - m_minX) + m_minX;
-	if (!m_pinHistory0) {
+	if (!pin) {
 		return x;
 	}
 
-	QLinkedList<PinEvent>::iterator it = m_pinHistory0->getEvents().begin();
-	for (; it != m_pinHistory0->getEvents().end(); ++it) {
+	QLinkedList<PinEvent>::iterator it = pin->getEvents().begin();
+	for (; it != pin->getEvents().end(); ++it) {
 		if ((*it).t < m_minX) {
 			continue;
 		}
 		if ((*it).t > m_maxX) {
 			break;
 		}
-		double toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
+		double toX = ((*it).t / (m_maxX - m_minX)) * (PLOT_WIDTH) + PLOT_SPACE_LEFT - (m_minX / (m_maxX - m_minX)) * (PLOT_WIDTH);
 		if (x > toX - 5 && x < toX + 5) {
 			t = (*it).t;
 			m_context = (*it).context;
@@ -308,7 +322,7 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 		QList<QAction *> actions;
 
 		double dummy;
-		correctX(event->pos().x(), dummy);
+		correctX(event->pos().x(), event->pos().y(), dummy);
 		if (m_context != 0) {
 			QAction *action = new QAction("Point to instruction", 0);
 			action->setData(2);
@@ -350,11 +364,11 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 	}
 
 	if (m_fromX == -1 && m_toX == -1) {
-		m_fromX = correctX(event->pos().x(), m_fromT);
+		m_fromX = correctX(event->pos().x(), event->pos().y(), m_fromT);
 		m_toX = -1;
 	}
 	else if (m_toX == -1) {
-		m_toX = correctX(event->pos().x(), m_toT);
+		m_toX = correctX(event->pos().x(), event->pos().y(), m_toT);
 		if (m_toX < m_fromX) {
 			double tmp = m_toX;
 			m_toX = m_fromX;
@@ -366,7 +380,7 @@ void Plot::mousePressEvent(QMouseEvent *event) {
 		}
 	}
 	else {
-		m_fromX = correctX(event->pos().x(), m_fromT);
+		m_fromX = correctX(event->pos().x(), event->pos().y(), m_fromT);
 		m_toX = -1;
 	}
 	repaint();

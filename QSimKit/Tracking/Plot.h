@@ -37,7 +37,6 @@ class Plot : public QWidget
 		void setMaximumY(double y);
 
 		void addPinHistory(const QString &name, PinHistory *pinHistory);
-		void removePinHistory(const QString &name);
 		void clear();
 
 		void resetView();
@@ -52,9 +51,10 @@ class Plot : public QWidget
 		void mouseReleaseEvent(QMouseEvent *event);
 
 	private:
-		int correctX(int x, double &t);
+		int correctX(int x, int y, double &t);
 		void paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot, double x);
 		void refreshSize();
+		PinHistory *pinHistoryUnderMouse(int x, int y);
 
 	private:
 		typedef struct {
@@ -66,8 +66,6 @@ class Plot : public QWidget
 		double m_minX;
 		double m_maxY;
 		QPoint m_pos;
-		PinHistory *m_pinHistory0;
-		PinHistory *m_pinHistory1;
 		int m_fromX;
 		int m_toX;
 		double m_fromT;
