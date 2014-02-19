@@ -205,13 +205,37 @@ void Screen::clear() {
 void Screen::save(QTextStream &stream) {
 	stream << "<objects>\n";
 	for (int i = 0; i < m_objects.size(); ++i) {
-		stream << "<object id='" << i << "' type='" << m_objects[i]->type() << "' interface='" + m_objects[i]->interface() + "' name='" + m_objects[i]->name() + "'>\n";
+		stream << "<object id='" << i << "' type='" << m_objects[i]->type();
+		stream << "' interface='" + m_objects[i]->interface() + "' name='" + m_objects[i]->name() + "'>\n";
 		m_objects[i]->save(stream);
 		stream << "</object>\n";
 	}
 	stream << "</objects>\n";
 
+	stream << "<trackedpins>\n";
+	for (std::map<ScreenObject *, QList<int> >::iterator it = m_trackedPins.begin(); it != m_trackedPins.end(); ++it) {
+		foreach(int pin, it->second) {
+			stream << "<object id='" << objectId(it->first) << "' pin='" << pin << "'/>\n";
+		}
+	}
+	stream << "</trackedpins>\n";
+
 	m_conns->save(stream);
+}
+
+void Screen::loadTrackedPins(QDomDocument &doc) {
+	QDomElement root = doc.firstChild().toElement();
+	QDomElement connections = root.firstChildElement("trackedpins");
+
+	for(QDomNode node = connections.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement c = node.toElement();
+
+		ScreenObject *object = objectFromId(c.attribute("id").toInt());
+		int pin = c.attribute("pin").toInt();
+
+		m_trackedPins[object].append(pin);
+		onPinTracked(object, pin);
+	}
 }
 
 bool Screen::load(QDomDocument &doc) {
@@ -227,6 +251,8 @@ bool Screen::load(QDomDocument &doc) {
 	m_objects = p.getObjects();
 
 	m_conns->load(doc);
+
+	loadTrackedPins(doc);
 
 	repaint();
 	return true;

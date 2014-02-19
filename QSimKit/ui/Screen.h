@@ -105,6 +105,7 @@ class Screen : public QWidget
 		void showObjectMenu(ScreenObject *object, const QPoint &pos);
 		void showPinMenu(ScreenObject *object, int pin, const QPoint &pos);
 		void showScreenMenu(const QPoint &pos);
+		void loadTrackedPins(QDomDocument &doc);
 
 	private:
 		QList<ScreenObject *> m_objects;
