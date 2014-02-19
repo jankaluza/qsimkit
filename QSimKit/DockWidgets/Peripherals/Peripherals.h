@@ -60,6 +60,5 @@ class Peripherals : public DockWidget, public Ui::Peripherals
 	private:
 		MCU *m_mcu;
 		QSimKit *m_simkit;
-		QList<QTreeWidgetItem *> m_breakpoints;
 };
 

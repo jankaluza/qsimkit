@@ -54,7 +54,6 @@ void Peripherals::addBreakpoint() {
 	AddMemoryBreakpoint dialog(m_simkit->getBreakpointManager(), item->data(0, Qt::UserRole).toString(), this);
 	if (dialog.exec() == QDialog::Accepted) {
 		item->setBackground(0, QBrush(Qt::red));
-		m_breakpoints.append(item);
 	}
 }
 
@@ -62,7 +61,6 @@ void Peripherals::removeBreakpoint() {
 	QTreeWidgetItem *item = view->currentItem();
 
 	item->setBackground(0, view->palette().window());
-	m_breakpoints.removeAll(item);
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->removeMemoryBreak(item->data(0, Qt::UserRole).toInt());
@@ -78,7 +76,7 @@ void Peripherals::handleContextMenu(const QPoint &pos) {
 
 	QAction *add = 0;
 	QAction *remove = 0;
-	if (!m_breakpoints.contains(item)) {
+	if (!m_simkit->getBreakpointManager()->getMemoryBreaks().contains(item->data(0, Qt::UserRole).toInt())) {
 		add = new QAction("Add breakpoint", 0);
 		actions.append(add);
 	}
