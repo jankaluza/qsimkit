@@ -19,9 +19,6 @@
      <number>0</number>
     </property>
     <item>
-     <widget class="PlotHeader" name="plotHeader" native="true"/>
-    </item>
-    <item>
      <widget class="Plot" name="plot" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
@@ -39,12 +36,6 @@
    <class>Plot</class>
    <extends>QWidget</extends>
    <header>Tracking/Plot.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>PlotHeader</class>
-   <extends>QWidget</extends>
-   <header>Tracking/PlotHeader.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

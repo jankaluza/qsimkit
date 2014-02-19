@@ -56,7 +56,13 @@ uint16_t DwarfSubprogram::getFrameBase(RegisterSet *r, Memory *m, uint16_t pc) {
 	uint16_t base;
 	bool isAddress;
 	if (m_ll) {
-		base = m_ll->getValue(r, m, this, pc, isAddress)[0].getData();
+		VariableValue vv = m_ll->getValue(r, m, this, pc, isAddress);
+		if (!vv.empty()) {
+			base = vv[0].getData();
+		}
+		else {
+			qDebug() << "DwarfSubprogram::getFrameBase(): no VariableValue!" << getName() << getPCLow() << getPCHigh() <<  pc;
+		}
 	}
 	else {
 		base = m_expr->getValue(r, m, this, pc, isAddress)[0].getData();

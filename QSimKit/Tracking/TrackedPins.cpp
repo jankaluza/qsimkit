@@ -39,74 +39,60 @@
 TrackedPins::TrackedPins(QSimKit *simkit, QWidget *parent) :
 QDockWidget(parent), m_simkit(simkit) {
 	setupUi(this);
-	setMinimumHeight(100);
 
 	connect(m_simkit, SIGNAL(onSimulationStep(double)), this, SLOT(handleSimulationStep(double)));
 	connect(m_simkit, SIGNAL(onSimulationStarted(bool)), this, SLOT(handleSimulationStarted(bool)));
-	connect(plotHeader, SIGNAL(onPinChanged(int, int)), this, SLOT(handlePinChanged(int, int)));
-	connect(plotHeader, SIGNAL(onShowTable()), this, SLOT(showTable()));
 	connect(plot, SIGNAL(onPointToInstruction(int)), m_simkit, SLOT(pointToInstruction(int)));
 	connect(m_simkit->getScreen(), SIGNAL(onPinTracked(QObject *, int)), this, SLOT(handlePinTracked(QObject *, int)));
-
-	setTitleBarWidget(plotHeader);
+	connect(m_simkit->getScreen(), SIGNAL(onPinUntracked(QObject *, int)), this, SLOT(handlePinUntracked(QObject *, int)));
 }
 
 void TrackedPins::showTable() {
-	Table dialog(this);
+// 	Table dialog(this);
 
-	for (int i = 0; i < m_history.size(); ++i) {
-		dialog.addPinHistory(m_history[i]);
+// 	for (int i = 0; i < m_history.size(); ++i) {
+// 		dialog.addPinHistory(m_history[i]);
+// 	}
+
+// 	dialog.populate();
+// 	dialog.exec();
+}
+
+void TrackedPins::refreshPins() {
+	plot->clear();
+	plot->resetView();
+
+	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
+	std::map<ScreenObject *, QList<int> > &pins = m_simkit->getScreen()->getTrackedPins();
+
+	for (std::map<ScreenObject *, QList<int> >::iterator it = pins.begin(); it != pins.end(); ++it) {
+		foreach(int pin, it->second) {
+			PinHistory *history = 0;
+			std::map<ScreenObject *, SimulationObjectWrapper *>::iterator itw = wrappers.find(it->first);
+			if (itw != wrappers.end()) {
+				QVector<PinHistory *> &h = (*itw).second->getPinHistory();
+				if (pin < h.size()) {
+					history = h[pin];
+				}
+			}
+
+			plot->addPinHistory((*it).first->getPins()[pin].name, history);
+		}
 	}
 
-	dialog.populate();
-	dialog.exec();
+	plot->repaint();
 }
 
 void TrackedPins::handlePinTracked(QObject *obj, int pin) {
-	ScreenObject *object = static_cast<ScreenObject *>(obj);
-	plotHeader->addPin(object->getPins()[pin].name);
+	refreshPins();
 }
 
-void TrackedPins::handlePinChanged(int color, int id) {
-	if (m_history.size() <= id || id < 0) {
-		if (id == -1) {
-			if (color == 0) {
-				plot->showPinHistory0(0);
-			}
-			else {
-				plot->showPinHistory1(0);
-			}
-		}
-		return;
-	}
-
-	if (color == 0) {
-		plot->showPinHistory0(m_history[id]);
-	}
-	else {
-		plot->showPinHistory1(m_history[id]);
-	}
-	plot->repaint();
+void TrackedPins::handlePinUntracked(QObject *obj, int pin) {
+	refreshPins();
 }
 
 void TrackedPins::handleSimulationStarted(bool wasPaused) {
-	m_history.clear();
-	plot->clear();
-	plot->resetView();
-	plotHeader->clear();
-
-	std::map<ScreenObject *, SimulationObjectWrapper *> &wrappers = m_simkit->getScreen()->getWrappers();
-	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
-		QVector<PinHistory *> &history = (*it).second->getPinHistory();
-		for (int i = 0; i < history.size(); ++i) {
-			if (history[i]) {
-				m_history.append(history[i]);
-				plotHeader->addPin((*it).first->getPins()[i].name);
-			}
-		}
-	}
-
-	plot->repaint();
+	refreshPins();
 }
 
 void TrackedPins::handleSimulationStep(double t) {

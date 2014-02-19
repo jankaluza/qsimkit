@@ -30,7 +30,7 @@ typedef struct {
 
 class PinHistory {
 	public:
-		PinHistory();
+		PinHistory(int pin);
 		~PinHistory();
 
 		void addEvent(double t, double value, uint16_t context);
@@ -39,8 +39,13 @@ class PinHistory {
 			return m_events;
 		}
 
+		int getPin() {
+			return m_pin;
+		}
+
 	private:
 		QLinkedList<PinEvent> m_events;
+		int m_pin;
 
 };
 

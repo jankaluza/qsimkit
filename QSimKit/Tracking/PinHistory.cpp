@@ -20,8 +20,7 @@
 #include "PinHistory.h"
 #include <QDebug>
 
-PinHistory::PinHistory() {
-
+PinHistory::PinHistory(int pin) : m_pin(pin) {
 }
 
 PinHistory::~PinHistory() {

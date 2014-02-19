@@ -30,15 +30,26 @@
 #include <QMouseEvent>
 #include <QDebug>
 
+#define PLOT_HEIGHT 30
+#define PLOT_SPACE_LEFT 75
+#define PLOT_SPACE_RIGHT 10
+#define PLOT_SPACE_BETWEEN 5
+#define PLOT_WIDTH (width() - PLOT_SPACE_LEFT - PLOT_SPACE_RIGHT)
+
 Plot::Plot(QWidget *parent) : QWidget(parent), m_maxX(1.0), m_minX(0), m_maxY(3.3), m_pinHistory0(0),
 	m_pinHistory1(0), m_fromX(-1), m_toX(-1)  {
 	setMouseTracking(true);
 
 	// Test:
-// 	m_pinHistory = new PinHistory();
-// 	m_pinHistory->addEvent(0.5, 1.0);
-// 	m_pinHistory->addEvent(0.6, 1.5);
-// 	m_pinHistory->addEvent(0.65, 0.3);
+// 	PinHistory *m_pinHistory = new PinHistory();
+// 	m_pinHistory->addEvent(0.5, 1.0, 0);
+// 	m_pinHistory->addEvent(0.6, 3.3, 0);
+// 	m_pinHistory->addEvent(0.65, 0.3, 0);
+// 	m_pinHistory->addEvent(0.8, 0.0, 0);
+// 	m_pins << m_pinHistory;
+// 	m_pins << m_pinHistory;
+
+	refreshSize();
 }
 
 void Plot::setMaximumX(double x) {
@@ -58,50 +69,112 @@ void Plot::resetView() {
 	repaint();
 }
 
+void Plot::refreshSize() {
+	parentWidget()->setMinimumHeight(PLOT_SPACE_BETWEEN + m_pins.size() * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) + 15);
+	parentWidget()->setMaximumHeight(PLOT_SPACE_BETWEEN + m_pins.size() * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) + 15);
+}
+
 void Plot::clear() {
-	m_pinHistory0 = 0;
-	m_pinHistory1 = 0;
-}
-
-void Plot::showPinHistory0(PinHistory *pinHistory) {
-	m_pinHistory0 = pinHistory;
+	m_pins.clear();
+	refreshSize();
 	repaint();
 }
 
-void Plot::showPinHistory1(PinHistory *pinHistory) {
-	m_pinHistory1 = pinHistory;
+void Plot::addPinHistory(const QString &name, PinHistory *pinHistory) {
+	PlotPin p;
+	p.name = name;
+	p.pin = pinHistory;
+	m_pins.append(p);
+
+	refreshSize();
 	repaint();
 }
 
-void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x) {
+void Plot::removePinHistory(const QString &name) {
+	
+// 	m_pins.erase(name);
+	refreshSize();
+	repaint();
+}
+
+void Plot::paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot, double x) {
+	p.setPen(QPen(QColor(0, 0, 0), 1, Qt::SolidLine));
+
+	// Draw name of the pin
+	p.drawText(10, PLOT_SPACE_BETWEEN + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
+			   PLOT_SPACE_LEFT - 10, PLOT_HEIGHT, Qt::AlignCenter | Qt::TextWrapAnywhere, name);
+
+	// Draw axis
+	p.drawLine(PLOT_SPACE_LEFT, PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
+			   PLOT_SPACE_LEFT, PLOT_SPACE_BETWEEN + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN));
+	p.drawLine(PLOT_SPACE_LEFT, PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
+			   width() - PLOT_SPACE_RIGHT, PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN));
+
+	// No PinHistory yet, so just return
+	if (!pin) {
+		return;
+	}
+
+	// Draw axis descriptions
+// 	p.drawText(21, height() - 20, 10, 20, Qt::AlignCenter, "0");
+// 	p.drawText(0, 0, 20, 20, Qt::AlignCenter, QString::number(m_maxY));
+
+	// Draw selection when user wants to zoom particuular part of plot
+	if (m_fromX != -1 && m_toX != -1) {
+		// User already finished selection (mouse button  is released)
+		p.fillRect(m_fromX, slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
+				   m_toX - m_fromX, PLOT_HEIGHT,
+				   palette().highlight());
+	}
+	else if (m_fromX != -1 && m_toX == -1) {
+		// User is still selecting (mouse button is down, so use m_pos.x())
+		p.fillRect(m_fromX, slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
+				   m_pos.x() - m_fromX, PLOT_HEIGHT,
+				   palette().highlight());
+	}
+
+	// Set color of the plot line
+	p.setPen(QPen(QColor(255, 0, 0, 128), 2, Qt::SolidLine));
+
 	double toX = 0;
 	double toY = 0;
-	double fromX = 25;
-	double fromY = height() - 20;
+	double fromX = PLOT_SPACE_LEFT;
+	double fromY = PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN);
 	bool draw = false;
 	double previousV = 0;
 	bool skipped = false;
 
+	bool mouseInPlot = m_pos.y() < PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) &&
+		m_pos.y() > PLOT_SPACE_BETWEEN + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN);
+
+	// Skip all events which happend before current 'x'
 	QLinkedList<PinEvent>::iterator it = pin->getEvents().begin();
 	for (; it != pin->getEvents().end(); ++it) {
 		if ((*it).t < m_minX) {
 			continue;
 		}
+
+		// go backward one pin to be able to decide later from which value
+		// we want to draw initial line in plot
 		if (it != pin->getEvents().begin()) {
 			it--;
 		}
 		break;
 	}
-	
+
+
 	for (; it != pin->getEvents().end(); ++it) {
 		// Do not paint pins which are out of boundaries
 		if ((*it).t > m_maxX) {
 			break;
 		}
 
-		// Draw the horizontal line to toX and vertial line to toY
-		toX = ((*it).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
-		toY = height() - 20 - ((*it).v / m_maxY) * (height() - 30);
+		// Get the coordinates of the next point to which we will draw to line to
+		toX = ((*it).t / (m_maxX - m_minX)) * (PLOT_WIDTH) + PLOT_SPACE_LEFT - (m_minX / (m_maxX - m_minX)) * (PLOT_WIDTH);
+		toY = PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) - ((*it).v / m_maxY) * (PLOT_HEIGHT);
+
+		// If these two points are too close together, show them
+		// as vertical dashed line.
 		if (toX - fromX < 3 && toX != fromX) {
 			previousV = (*it).v;
 			QPen pen = p.pen();
@@ -115,52 +188,53 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 			fromY = toY;
 			continue;
 		}
+
+		// Draw the horizontal line representing value change
 		p.drawLine(fromX, fromY, toX, fromY);
-		int toX2 = ((*(it + 1)).t / (m_maxX - m_minX)) * (width() - 35) + 25 - (m_minX / (m_maxX - m_minX)) * (width() - 35);
-		if (toX2 - toX < 3 && toX2 != toX) {
-			QPen pen = p.pen();
-			QPen n = pen;
-			n.setWidth(1);
-			n.setStyle(Qt::DashLine);
-			p.setPen(n);
-			p.drawLine(toX, fromY, toX, toY);
-			p.setPen(pen);
+
+		if (it + 1 != pin->getEvents().end()) {
+			// Get the 'x' coordinate of the next point we will draw vertical line to
+			int toX2 = ((*(it + 1)).t / (m_maxX - m_minX)) * (PLOT_WIDTH) + PLOT_SPACE_LEFT - (m_minX / (m_maxX - m_minX)) * (PLOT_WIDTH);
+
+			// If the next 'x' coordinate is close to this 'x' coordinate,
+			// show only vertical dashed line on this place. Otherwise
+			// draw proper vertical line.
+			if (toX2 - toX < 3 && toX2 != toX) {
+				QPen pen = p.pen();
+				QPen n = pen;
+				n.setWidth(1);
+				n.setStyle(Qt::DashLine);
+				p.setPen(n);
+				p.drawLine(toX, fromY, toX, toY);
+				p.setPen(pen);
+			}
+			else {
+				p.drawLine(toX, fromY, toX, toY);
+			}
 		}
 		else {
 			p.drawLine(toX, fromY, toX, toY);
 		}
 
-// 		if (skipped) {
-// 			skipped = false;
-// 			QPen pen = p.pen();
-// 			QPen n = pen;
-// 			n.setWidth(1);
-// 			n.setStyle(Qt::DashLine);
-// 			p.setPen(n);
-// 			
-// 			for (int s = fromX; s < toX; s += 3) {
-// 				p.drawLine(s, fromY, s, toY);
-// 			}
-// 			p.setPen(pen);
-// 		}
-
 		// If the mouse pointer is close to some point, snap to this point
-		if (!draw && m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
-			p.drawRect(toX - 4, toY - 4, 8, 8);
-			QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-			if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-				label += ", delta t=" + QString::number(m_toT - m_fromT);
+		if (mouseInPlot) {
+			if (!draw && m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
+				p.drawRect(toX - 4, toY - 4, 8, 8);
+				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
+				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT);
+				}
+				p.drawText(10, height() - 20, 300, 20, Qt::AlignLeft, label);
+				draw = true;
 			}
-			p.drawText(text_x, height() - 20, 300, 20, Qt::AlignLeft, label);
-			draw = true;
-		}
-		else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
-			p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-			QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
-			if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-				label += ", delta t=" + QString::number(m_toT - m_fromT);
+			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
+				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
+				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
+				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT);
+				}
+				p.drawText(10, height() - 20, 300, 20, Qt::AlignLeft, label);
 			}
-			p.drawText(text_x, height() - 20, 300, 20, Qt::AlignLeft, label);
 		}
 
 		previousV = (*it).v;
@@ -169,14 +243,14 @@ void Plot::paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x
 	}
 
 	// Display label for last line
-	if (!draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
+	if (mouseInPlot && !draw && m_pos.x() > fromX && m_pos.x() < width() - 20) {
 		it--;
 		p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
 		QString label = QString("t=") + QString::number(x) + ", v=" + QString::number((*it).v);
 		if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
 			label += ", delta t=" + QString::number(m_toT - m_fromT);
 		}
-		p.drawText(text_x, height() - 20, 300, 20, Qt::AlignLeft, label);
+		p.drawText(10, height() - 20, 300, 20, Qt::AlignLeft, label);
 	}
 
 	// Last line is only horizontal and ends up in the infinity
@@ -187,34 +261,14 @@ void Plot::paintEvent(QPaintEvent *e) {
 	QPainter p;
 	p.begin(this);
 	p.fillRect(QRect(0, 0, width(), height()), QBrush(QColor(255, 255, 255)));
-	p.setPen(QPen(QColor(0, 0, 0), 1, Qt::SolidLine));
 
-	// Draw axis
-	p.drawLine(25, height() - 20, 25, 10);
-	p.drawLine(25, height() - 20, width() - 10, height() - 20);
+	// Get the X value of mouse pointer, so we can show the exact Y value
+	// for this X in paintPin later.
+	double x = (double(m_pos.x() - PLOT_SPACE_LEFT) / PLOT_WIDTH) * (m_maxX - m_minX) + m_minX;
 
-	// Draw axis descriptions
-	p.drawText(21, height() - 20, 10, 20, Qt::AlignCenter, "0");
-	p.drawText(0, 0, 20, 20, Qt::AlignCenter, QString::number(m_maxY));
-
-	double x = (double(m_pos.x() - 25) / (width() - 35)) * (m_maxX - m_minX) + m_minX;
-	double y = m_maxY - (double(m_pos.y() - 10) / (height() - 30)) * m_maxY;
-
-	if (m_fromX != -1 && m_toX != -1) {
-		p.fillRect(m_fromX, 10, m_toX - m_fromX, height() - 30, palette().highlight());
-	}
-	else if (m_fromX != -1 && m_toX == -1) {
-		p.fillRect(m_fromX, 10, m_pos.x() - m_fromX, height() - 30, palette().highlight());
-	}
-
-	if (m_pinHistory0) {
-		p.setPen(QPen(QColor(255, 0, 0, 128), 2, Qt::SolidLine));
-		paintPin(p, m_pinHistory0, x, y, 30);
-	}
-
-	p.setPen(QPen(QColor(0, 160, 0, 255), 2, Qt::SolidLine));
-	if (m_pinHistory1) {
-		paintPin(p, m_pinHistory1, x, y, 128);
+	int slot = 0;
+	foreach(const PlotPin &plotpin, m_pins) {
+		paintPin(p, plotpin.name, plotpin.pin, slot++, x);
 	}
 
 	p.end();

@@ -33,7 +33,7 @@ m_obj(obj), m_monitoredPins(monitoredPins.toVector()), m_context(0) {
 		}
 
 		for (int i = 0; i < m_monitoredPins.size(); ++i) {
-			m_history[m_monitoredPins[i]] = new PinHistory();
+			m_history[m_monitoredPins[i]] = new PinHistory(m_monitoredPins[i]);
 		}
 	}
 

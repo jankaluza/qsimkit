@@ -111,6 +111,10 @@ class SimulationObjectWrapper : public adevs::Atomic<SimulationEvent> {
 
 		void couple(int out, adevs::Devs<SimulationEvent, double> *c, int in);
 
+		SimulationObject *getObject() {
+			return m_obj;
+		}
+
 	private:
 		void addChangeToHistory(int pin, double value);
 

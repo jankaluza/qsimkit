@@ -22,6 +22,7 @@
 #include <QWidget>
 #include <QString>
 #include <QList>
+#include <QVector>
 
 class PinHistory;
 
@@ -35,8 +36,8 @@ class Plot : public QWidget
 		void setMaximumX(double x);
 		void setMaximumY(double y);
 
-		void showPinHistory0(PinHistory *pinHistory);
-		void showPinHistory1(PinHistory *pinHistory);
+		void addPinHistory(const QString &name, PinHistory *pinHistory);
+		void removePinHistory(const QString &name);
 		void clear();
 
 		void resetView();
@@ -52,9 +53,15 @@ class Plot : public QWidget
 
 	private:
 		int correctX(int x, double &t);
-		void paintPin(QPainter &p, PinHistory *pin, double x, double y, int text_x);
+		void paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot, double x);
+		void refreshSize();
 
 	private:
+		typedef struct {
+			PinHistory *pin;
+			QString name;
+		} PlotPin;
+
 		double m_maxX;
 		double m_minX;
 		double m_maxY;
@@ -67,6 +74,7 @@ class Plot : public QWidget
 		double m_toT;
 		double m_realMaxX;
 		int m_context;
+		QVector<PlotPin> m_pins;
 
 };
 

@@ -81,7 +81,11 @@ class Screen : public QWidget
 		}
 
 		std::map<ScreenObject *, SimulationObjectWrapper *> &getWrappers() {
-			return wrappers;
+			return m_wrappers;
+		}
+
+		std::map<ScreenObject *, QList<int> > &getTrackedPins() {
+			return  m_trackedPins;
 		}
 
 	signals:
@@ -110,7 +114,7 @@ class Screen : public QWidget
 		ConnectionManager *m_conns;
 		PeripheralManager *m_peripherals;
 		MCUManager *m_mcuManager;
-		std::map<ScreenObject *, SimulationObjectWrapper *> wrappers;
+		std::map<ScreenObject *, SimulationObjectWrapper *> m_wrappers;
 		std::map<ScreenObject *, QList<int> > m_trackedPins;
 };
 

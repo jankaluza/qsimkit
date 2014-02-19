@@ -59,7 +59,7 @@ Screen::Screen(QWidget *parent) : QWidget(parent) {
 }
 
 void Screen::prepareSimulation(SimulationModel *dig) {
-	wrappers.clear();
+	m_wrappers.clear();
 	for (int i = 0; i < m_objects.size(); ++i) {
 		Peripheral *p = dynamic_cast<Peripheral *>(m_objects[i]);
 		if (p) {
@@ -69,7 +69,7 @@ void Screen::prepareSimulation(SimulationModel *dig) {
 			dig->add(wrapper);
 			p->setWrapper(wrapper);
 
-			wrappers[m_objects[i]] = wrapper;
+			m_wrappers[m_objects[i]] = wrapper;
 
 			std::vector<SimulationObject *> internalObjects;
 			p->getInternalSimulationObjects(internalObjects);
@@ -80,11 +80,11 @@ void Screen::prepareSimulation(SimulationModel *dig) {
 		}
 	}
 
-	m_conns->prepareSimulation(dig, wrappers);
+	m_conns->prepareSimulation(dig, m_wrappers);
 }
 
 void Screen::setSimulator(adevs::Simulator<SimulationEvent> *sim) {
-	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = wrappers.begin(); it != wrappers.end(); ++it) {
+	for (std::map<ScreenObject *, SimulationObjectWrapper *>::iterator it = m_wrappers.begin(); it != m_wrappers.end(); ++it) {
 		it->second->setSimulator(sim);
 	}
 }
@@ -350,8 +350,8 @@ void Screen::mousePressEvent(QMouseEvent *event) {
 			return;
 		}
 
-		if (object->clicked(event->pos()) && wrappers[object]) {
-			wrappers[object]->reschedule();
+		if (object->clicked(event->pos()) && m_wrappers[object]) {
+			m_wrappers[object]->reschedule();
 		}
 	}
 }
