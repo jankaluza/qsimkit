@@ -116,3 +116,39 @@ bool BreakpointManager::shouldBreak() {
 	}
 	return false;
 }
+
+void BreakpointManager::save(QTextStream &stream) {
+	stream << "<registerbreakpoints>\n";
+	for (int i = 0; i < m_breaks.size(); ++i) {
+		stream << "<register id='" << i << "'>\n";
+		foreach(uint16_t value, m_breaks[i]) {
+			stream << "<value>" << value << "</value>\n";
+		}
+		stream << "</register>\n";
+	}
+	stream << "</registerbreakpoints>\n";
+
+	stream << "<memorybreakpoints>\n";
+	QHashIterator<uint16_t, MemoryBreak> i(m_membreaks);
+	while (i.hasNext()) {
+		i.next();
+		stream << "<break address='" << i.key() << "' any='" << i.value().any << "' value='" << i.value().val << "'/>\n";
+	}
+	stream << "</memorybreakpoints>\n";
+}
+
+bool BreakpointManager::load(QDomDocument &doc) {
+	QDomElement root = doc.firstChild().toElement();
+
+	QDomElement registers = root.firstChildElement("registerbreakpoints");
+	for(QDomNode node = registers.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement reg = node.toElement();
+		int id = reg.attribute("id").toInt();
+
+		for(QDomNode node2 = reg.firstChild(); !node2.isNull(); node2 = node2.nextSibling()) {
+			addRegisterBreak(id, node2.toElement().text().toAscii().toUInt());
+		}
+	}
+
+	return true;
+}

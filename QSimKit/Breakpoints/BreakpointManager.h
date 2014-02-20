@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <QList>
 #include <QHash>
+#include <QTextStream>
+#include <QDomDocument>
 #include "MCU/Register.h"
 #include "MCU/Memory.h"
 
@@ -58,6 +60,9 @@ class BreakpointManager : public QObject, public RegisterWatcher, public MemoryW
 
 		bool handleRegisterChanged(Register *reg, int id, uint16_t value);
 		void handleMemoryChanged(Memory *memory, uint16_t address);
+
+		void save(QTextStream &stream);
+		bool load(QDomDocument &doc);
 
 	signals:
 		void onRegisterBreakAdded(int reg, uint16_t value);

@@ -371,6 +371,7 @@ void QSimKit::saveProject() {
 	QTextStream stream(&file);
 	stream << "<qsimkit_project>\n";
 	screen->save(stream);
+	m_breakpointManager->save(stream);
 	stream << "</qsimkit_project>\n";
 }
 
@@ -399,6 +400,8 @@ bool QSimKit::loadProject(const QString &file) {
 	m_filename = file;
 	setDockWidgetsMCU(screen->getMCU());
 	m_breakpointManager->setMCU(screen->getMCU());
+
+	m_breakpointManager->load(document);
 
 	return true;
 }

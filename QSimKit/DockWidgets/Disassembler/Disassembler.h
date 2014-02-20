@@ -68,6 +68,8 @@ class Disassembler : public DockWidget, public Ui::Disassembler
 		void handleFileChanged(int id);
 		void handleFuncChanged(int id);
 		void handleShowModeClicked();
+		void handleRegisterBreakAdded(int reg, uint16_t value);
+		void handleRegisterBreakRemoved(int reg, uint16_t value);
 
 	private:
 		void addBreakpoint(const QString &addr);

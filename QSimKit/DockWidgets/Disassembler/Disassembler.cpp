@@ -53,6 +53,9 @@ m_dd(0), m_showingAssembler(0) {
 	connect(showMode, SIGNAL(clicked()), this, SLOT(handleShowModeClicked()));
 	connect(func, SIGNAL(activated ( int )), this, SLOT(handleFuncChanged( int )));
 
+	connect(m_simkit->getBreakpointManager(), SIGNAL(onRegisterBreakAdded(int, uint16_t)), this, SLOT(handleRegisterBreakAdded(int, uint16_t)));
+	connect(m_simkit->getBreakpointManager(), SIGNAL(onRegisterBreakRemoved(int, uint16_t)), this, SLOT(handleRegisterBreakRemoved(int, uint16_t)));
+
 	m_simkit->getPeripheralsWidget()->addPeripheralItem(new DisassemblerItem(this));
 }
 
@@ -63,6 +66,31 @@ void Disassembler::handleShowModeClicked() {
 void Disassembler::handleFileChanged(int id) {
 	m_currentFile = file->itemData(id).toString();
 	reloadFile();
+}
+
+void Disassembler::handleRegisterBreakAdded(int reg, uint16_t value) {
+	if (reg != 0) {
+		return;
+	}
+
+	QString addr = QString::number(value, 16);
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, QBrush(Qt::red));
+	}
+}
+
+void Disassembler::handleRegisterBreakRemoved(int reg, uint16_t value) {
+	if (reg != 0) {
+		return;
+	}
+
+	QString addr = QString::number(value, 16);
+	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, view->palette().window());
+	}
+
 }
 
 void Disassembler::handleFuncChanged(int id) {
@@ -145,23 +173,11 @@ void Disassembler::handleContextMenu(const QPoint &pos) {
 }
 
 void Disassembler::addBreakpoint(const QString &addr) {
-	QTreeWidgetItem *item = view->currentItem();
-
-	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
-	foreach(QTreeWidgetItem *it, items) {
-		it->setBackground(0, QBrush(Qt::red));
-	}
-
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->addRegisterBreak(0, addr.toInt(0, 16));
 }
 
 void Disassembler::removeBreakpoint(const QString &addr) {
-	QList<QTreeWidgetItem *> items = view->findItems(addr, Qt::MatchExactly);
-	foreach(QTreeWidgetItem *it, items) {
-		it->setBackground(0, view->palette().window());
-	}
-
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->removeRegisterBreak(0, addr.toInt(0, 16));
 }
