@@ -150,5 +150,20 @@ bool BreakpointManager::load(QDomDocument &doc) {
 		}
 	}
 
+	QDomElement memory = root.firstChildElement("memorybreakpoints");
+	for(QDomNode node = memory.firstChild(); !node.isNull(); node = node.nextSibling()) {
+		QDomElement br = node.toElement();
+		uint16_t address = br.attribute("address").toUInt();
+		bool any = br.attribute("any").toInt();
+		uint16_t value = br.attribute("value").toUInt();
+
+		if (any) {
+			addMemoryBreak(address);
+		}
+		else {
+			addMemoryBreak(address, value);
+		}
+	}
+
 	return true;
 }

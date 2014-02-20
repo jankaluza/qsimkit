@@ -46,6 +46,38 @@ DockWidget(simkit), m_mcu(0), m_simkit(simkit) {
 	setupUi(this);
 
 	connect(view, SIGNAL(customContextMenuRequested(const QPoint &)), this, SLOT(handleContextMenu(const QPoint &)) );
+	connect(m_simkit->getBreakpointManager(), SIGNAL(onMemoryBreakAdded(uint16_t)), this, SLOT(handleMemoryBreakAdded(uint16_t)));
+	connect(m_simkit->getBreakpointManager(), SIGNAL(onMemoryBreakRemoved(uint16_t)), this, SLOT(handleMemoryBreakRemoved(uint16_t)));
+}
+
+QList<QTreeWidgetItem *> Peripherals::findItemsWithAddress(uint16_t addr) {
+	QList<QTreeWidgetItem *> ret;
+
+	QTreeWidgetItemIterator it(view);
+	while (*it) {
+		if ((*it)->data(0, Qt::UserRole).toInt() == addr) {
+			ret.append(*it);
+		}
+		++it;
+	}
+
+	return ret;
+}
+
+void Peripherals::handleMemoryBreakAdded(uint16_t address) {
+	QString addr = QString::number(address, 16);
+	QList<QTreeWidgetItem *> items = findItemsWithAddress(address);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, QBrush(Qt::red));
+	}
+}
+
+void Peripherals::handleMemoryBreakRemoved(uint16_t address) {
+	QString addr = QString::number(address, 16);
+	QList<QTreeWidgetItem *> items = findItemsWithAddress(address);
+	foreach(QTreeWidgetItem *it, items) {
+		it->setBackground(0, view->palette().window());
+	}
 }
 
 void Peripherals::addBreakpoint() {
@@ -59,8 +91,6 @@ void Peripherals::addBreakpoint() {
 
 void Peripherals::removeBreakpoint() {
 	QTreeWidgetItem *item = view->currentItem();
-
-	item->setBackground(0, view->palette().window());
 
 	BreakpointManager *m = m_simkit->getBreakpointManager();
 	m->removeMemoryBreak(item->data(0, Qt::UserRole).toInt());

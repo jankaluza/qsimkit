@@ -26,6 +26,7 @@
 #include <QTreeWidgetItem>
 
 #include "ui_Peripherals.h"
+#include <stdint.h>
 
 class MCU;
 class QSimKit;
@@ -52,10 +53,14 @@ class Peripherals : public DockWidget, public Ui::Peripherals
 		void removePeripheral(QObject *peripheral);
 
 		void handleContextMenu(const QPoint &point);
+		void handleMemoryBreakAdded(uint16_t addr);
+		void handleMemoryBreakRemoved(uint16_t addr);
 
 	private:
 		void addBreakpoint();
 		void removeBreakpoint();
+
+		QList<QTreeWidgetItem *> findItemsWithAddress(uint16_t addr);
 
 	private:
 		MCU *m_mcu;
