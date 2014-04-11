@@ -17,3 +17,8 @@ notifications:
       - "chat.freenode.net#qsimkit"
     template:
       - "%{repository}/%{branch} (%{commit} - %{author}): %{message}"
+  email:
+    recipients:
+      - hanzz.k@gmail.com
+    on_success: never
+    on_failure: always
