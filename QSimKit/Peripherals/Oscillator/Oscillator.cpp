@@ -19,13 +19,7 @@
 
 #include "Oscillator.h"
 
-#include <QWidget>
-#include <QApplication>
-#include <QString>
-#include <QFile>
-#include <QPen>
 #include <QPainter>
-#include <QDebug>
 #include <QDomDocument>
 #include <QInputDialog>
 #include <QtCore/qplugin.h>

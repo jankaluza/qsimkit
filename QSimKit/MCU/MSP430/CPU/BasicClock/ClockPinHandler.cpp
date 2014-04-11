@@ -40,11 +40,11 @@ ClockPinHandler::~ClockPinHandler() {
 }
 
 void ClockPinHandler::tickRising() {
-	m_mpx->generateOutput(this, 3.0);
+	m_mpx->generateOutput(this, 0.0);
 }
 
 void ClockPinHandler::tickFalling() {
-	m_mpx->generateOutput(this, 0.0);
+	m_mpx->generateOutput(this, 3.0);
 }
 
 void ClockPinHandler::handlePinInput(const std::string &name, double value) {

@@ -198,7 +198,7 @@ void MCU_MSP430::handlePinChanged(int id, double value) {
 	m_pins[id].value = value;
 	bool reschedule = m_output.empty();
 	m_output.insert(SimulationEvent(id, value));
-	if (reschedule) {
+	if (reschedule && m_wrapper) {
 		m_wrapper->setContext(m_instruction->original_pc);
 		m_wrapper->reschedule();
 	}

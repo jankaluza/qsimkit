@@ -21,9 +21,6 @@
 
 #include <QWidget>
 #include <QString>
-#include <QChar>
-#include <QRect>
-#include <map>
 #include "Peripherals/Peripheral.h"
 #include "Peripherals/PeripheralInterface.h"
 

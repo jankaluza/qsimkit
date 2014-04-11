@@ -97,12 +97,6 @@ class Peripheral():
 		p.setBrush(QBrush())
 		p.drawEllipse(self.x + 3, self.y + 16, 4, 4);
 		p.drawEllipse(self.x + 17, self.y + 16, 4, 4);
-		#pol = QPolygon()
-		#pol.append(QPoint(self.x + 8, self.y + 9))
-		#pol.append(QPoint(self.x + 17, self.y + 18))
-		#pol.append(QPoint(self.x + 8, self.y + 27))
-		#p.drawPolygon(pol)
-		
 
 		for rect in self.pins:
 			if self.state == self.highWhenPushed:

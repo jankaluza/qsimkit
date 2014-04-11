@@ -1,4 +1,4 @@
-#include "msp430g2553.h"
+#include "msp430x16x.h"
 
 #define REDLED		BIT0
 #define GREENLED	BIT6
@@ -18,11 +18,11 @@ int main(void) {
 	for(;;) {
 		i = DELAY;
 
-		P1OUT ^= REDLED;	// Switch state of REDLED
+// 		P1OUT ^= REDLED;	// Switch state of REDLED
 		P1OUT ^= GREENLED;	// Switch state of GREENLED
 
-		do			// Busy wait loop for delay
-			i--;
-		while (i > 0);
+// 		do			// Busy wait loop for delay
+// 			i--;
+// 		while (i > 0);
 	}
 }

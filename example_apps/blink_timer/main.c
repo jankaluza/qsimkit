@@ -17,7 +17,7 @@
 
 #include <msp430x241x.h>
 #include <signal.h>
-#define GRN_LED BIT6
+#define GRN_LED BIT7
 #define RED_LED BIT0
 
 #define ONE_SECOND	150	/*  125 = SMCLK/8/1000 */
@@ -63,9 +63,9 @@ main(void)
 
 	__enable_interrupt();
 
-	int lol = 1;
+	int dummy = 1;
 	while(1) {
-		lol++;
+		dummy++;
 		/*  all work is done in the ISR */
 	}
 
