@@ -1,0 +1,19 @@
+language: cpp
+compiler:
+  - gcc
+install:
+  - sudo apt-get -qq update
+  - sudo apt-get -qq install libqt4-dev python-dev libcppunit-dev
+script:
+  - cmake .
+  - make
+  - ./Tests/simkit_test
+branches:
+  only:
+    - master
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#qsimkit"
+    template:
+      - "%{repository}/%{branch} (%{commit} - %{author}): %{message}"
