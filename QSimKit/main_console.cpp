@@ -20,6 +20,7 @@
 #include <QtCore/QCoreApplication>
 #include <QDebug>
 #include <QFile>
+#include <QTime>
 #include <QDomDocument>
 
 #include "MCU/MCU.h"
@@ -84,10 +85,14 @@ int main(int argc, char *argv[])
 	double until = QString(argv[2]).toDouble();
 	qDebug() << "Starting simulation until" << until;
 	long eventCount = 0;
+	unsigned long totalEventCount = 0;
+	QTime simStart;
+	simStart.start();
 // 	CALLGRIND_ZERO_STATS;
 	while (simulator->nextEventTime() <= until) {
 		simulator->execNextEvent();
 		if (++eventCount > 65000) {
+			totalEventCount += eventCount;
 			// Print some useful info... just to show how to access MCU internals
 			qDebug() << "Time:" << simulator->nextEventTime();
 
@@ -104,6 +109,10 @@ int main(int argc, char *argv[])
 			eventCount = 0;
 		}
 	}
+
+	totalEventCount += eventCount;
+	qDebug() << "Simulation paused. Simulation lasted" << simStart.elapsed() << "ms.";
+	qDebug() << "Executed" << totalEventCount << "simulation events.";
 
 // 	return a.exec();
 

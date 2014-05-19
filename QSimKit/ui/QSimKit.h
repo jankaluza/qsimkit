@@ -121,6 +121,7 @@ class QSimKit : public QMainWindow, public Ui::QSimKit
 		TrackedPins *m_trackedPins;
 		int m_logicalSteps;
 		int m_instPerCycle;
+		unsigned long m_instCounter;
 		bool m_stopped;
 		QLineEdit *m_runUntil;
 		QComboBox *m_stepModeCombo;

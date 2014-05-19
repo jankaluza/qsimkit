@@ -31,7 +31,7 @@
 #include <QDebug>
 
 #define PLOT_HEIGHT 30
-#define PLOT_SPACE_LEFT 75
+#define PLOT_SPACE_LEFT 100
 #define PLOT_SPACE_RIGHT 10
 #define PLOT_SPACE_BETWEEN 5
 #define PLOT_WIDTH (width() - PLOT_SPACE_LEFT - PLOT_SPACE_RIGHT)
@@ -117,7 +117,8 @@ void Plot::paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot,
 		// User already finished selection (mouse button  is released)
 		p.fillRect(m_fromX, slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN),
 				   m_toX - m_fromX, PLOT_HEIGHT,
-				   palette().highlight());
+// 				   palette().highlight());
+				   QBrush(QColor(228, 242, 255)));
 	}
 	else if (m_fromX != -1 && m_toX == -1) {
 		// User is still selecting (mouse button is down, so use m_pos.x())
@@ -166,6 +167,11 @@ void Plot::paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot,
 		toX = ((*it).t / (m_maxX - m_minX)) * (PLOT_WIDTH) + PLOT_SPACE_LEFT - (m_minX / (m_maxX - m_minX)) * (PLOT_WIDTH);
 		toY = PLOT_HEIGHT + slot * (PLOT_HEIGHT + PLOT_SPACE_BETWEEN) - ((*it).v / m_maxY) * (PLOT_HEIGHT);
 
+		if (toX <= PLOT_SPACE_LEFT) {
+			skipped = true;
+			fromY = toY;
+		}
+
 		// If these two points are too close together, show them
 		// as vertical dashed line.
 		if (toX - fromX < 3 && toX != fromX) {
@@ -211,23 +217,25 @@ void Plot::paintPin(QPainter &p, const QString &name, PinHistory *pin, int slot,
 
 		// If the mouse pointer is close to some point, snap to this point
 		if (mouseInPlot) {
+			p.setPen(QPen(QColor(0, 0, 0), 1, Qt::SolidLine));
 			if (!draw && m_pos.x() > toX - 5 && m_pos.x() < toX + 5) {
 				p.drawRect(toX - 4, toY - 4, 8, 8);
-				QString label = QString("t=") + QString::number((*it).t) + ", v=" + QString::number((*it).v);
-				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-					label += ", delta t=" + QString::number(m_toT - m_fromT);
-				}
+				QString label = QString("t=") + QString::number((*it).t) + " s, v=" + QString::number((*it).v) + " V";
+// 				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT) + " s";
+// 				}
 				p.drawText(10, height() - 20, 300, 20, Qt::AlignLeft, label);
 				draw = true;
 			}
 			else if (!draw && m_pos.x() > fromX && m_pos.x() < toX) {
 				p.drawRect(m_pos.x() - 4, fromY - 4, 8, 8);
-				QString label = QString("t=") + QString::number(x) + ", v=" + QString::number(previousV);
-				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
-					label += ", delta t=" + QString::number(m_toT - m_fromT);
-				}
+				QString label = QString("t=") + QString::number(x) + " s, v=" + QString::number(previousV) + " V";
+// 				if (m_pos.x() > m_fromX && m_pos.x() < m_toX) {
+					label += ", delta t=" + QString::number(m_toT - m_fromT) + " s";
+// 				}
 				p.drawText(10, height() - 20, 300, 20, Qt::AlignLeft, label);
 			}
+			p.setPen(QPen(QColor(255, 0, 0, 128), 2, Qt::SolidLine));
 		}
 
 		previousV = (*it).v;

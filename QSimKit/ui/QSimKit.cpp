@@ -264,6 +264,7 @@ void QSimKit::simulationStep() {
 	for (int i = 0; i < m_instPerCycle; ++i) {
 		m_sim->execNextEvent();
 		if (m_breakpointManager->shouldBreak()) {
+			m_instCounter += m_instPerCycle;
 			onSimulationStep(m_sim->nextEventTime());
 			m_pauseAction->setChecked(true);
 			pauseSimulation(true);
@@ -271,18 +272,19 @@ void QSimKit::simulationStep() {
 		}
 
 		if (m_sim->nextEventTime() >= until) {
+			m_instCounter += m_instPerCycle;
 			refreshDockWidgets();
 			onSimulationStep(m_sim->nextEventTime());
 			pauseSimulation(true);
 			return;
 		}
 	}
+	m_instCounter += m_instPerCycle;
 	m_logicalSteps++;
 	if (m_logicalSteps == 2) {
 		m_logicalSteps = 0;
 		statusbar->showMessage(QString("Simulation Time: ") + QString::number(m_sim->nextEventTime()) + ", " + QString::number(m_instPerCycle * 20) + " simulation events per second");
 		onSimulationStep(m_sim->nextEventTime());
-		qDebug() << m_simStart.elapsed();
 	}
 
 	
@@ -318,6 +320,7 @@ void QSimKit::startSimulation() {
 		onSimulationStarted(false);
 	}
 	m_stopped = false;
+	m_instCounter = 0;
 	m_pauseAction->setEnabled(true);
 	m_timer->start(50);
 	m_simStart.start();
@@ -334,6 +337,8 @@ void QSimKit::stopSimulation() {
 
 void QSimKit::pauseSimulation(bool checked) {
 	if (checked) {
+		qDebug() << "Simulation paused. Simulation lasted" << m_simStart.elapsed() << "ms.";
+		qDebug() << "Executed" << m_instCounter << "simulation events.";
 		m_timer->stop();
 		refreshDockWidgets();
 		onSimulationPaused();

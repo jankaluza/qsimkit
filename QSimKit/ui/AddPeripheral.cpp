@@ -43,7 +43,7 @@ QDialog(parent), m_peripherals(p) {
 		item->setData(0, Qt::UserRole, peripheral.getLibrary());
 	}
 
-	connect(peripherals, SIGNAL(itemActivated(QTreeWidgetItem *, int)), this, SLOT(handleItemActivated(QTreeWidgetItem *, int)));
+	connect(peripherals, SIGNAL(itemClicked(QTreeWidgetItem *, int)), this, SLOT(handleItemActivated(QTreeWidgetItem *, int)));
 }
 
 QString AddPeripheral::getPeripheral() {
