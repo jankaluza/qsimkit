@@ -599,6 +599,13 @@ bool ConnectionManager::mousePressEvent(QMouseEvent *event) {
 			int point;
 			Connection *c = getPoint(NORM(event->x()), NORM(event->y()), point);
 			if (point != -1) {
+                ScreenObject *object = m_screen->getObject(NORM(event->x()), NORM(event->y()));
+                if (object) {
+                    m_points.erase(m_points.end() - 1);
+                    m_points.erase(m_points.end() - 1);
+                    return false;
+                }
+
 				addConnectionNode(c, point, event->x(), event->y(), m_points);
 
 				m_fromPin = -1;
