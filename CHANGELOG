@@ -1,3 +1,11 @@
+Version 0.0.4 (2014-05-20):
+	QSimKit GUI:
+	* Rewrite of tracked pins dock widget
+	* Store tracked pins and breakpoints in .qsp files
+	* Show supported features by each MCU
+	* Fix crash when DWARF data can't be loaded
+	* Add example projects
+
 Version 0.0.3 (2014-02-04):
 	QSimKit GUI:
 	* Drawing optimizations

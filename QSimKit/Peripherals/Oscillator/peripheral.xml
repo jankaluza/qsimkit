@@ -1,4 +1,4 @@
-<peripheral type='python'>
+<peripheral type='binary'>
    <name>Crystal oscillator</name>
    <comment>Crystal oscillator</comment>
    <author>Jan Kaluza</author>

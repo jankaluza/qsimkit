@@ -50,6 +50,7 @@ endif()
     
 ADD_SUBDIRECTORY(Peripherals)
 ADD_SUBDIRECTORY(MCU)
+ADD_SUBDIRECTORY(examples)
 
 # simkitperipheral library
 
