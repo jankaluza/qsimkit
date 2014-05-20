@@ -78,6 +78,8 @@ class Peripheral():
 		self.shift = False
 		self.disp = ['']*16
 		self.cursor = 0
+		for i in range(0, 16):
+			self.states[i] = False
 
 	def output(self):
 		if len(self.out) == 0:

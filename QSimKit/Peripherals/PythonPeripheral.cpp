@@ -88,6 +88,9 @@ void PythonPeripheral::paint(QWidget *screen) {
 
 void PythonPeripheral::reset() {
 	m_script->call("reset");
+    for (PinList::iterator it = m_pins.begin(); it != m_pins.end(); it++) {
+        it->value = 0;
+    }
 }
 
 const QStringList &PythonPeripheral::getOptions() {

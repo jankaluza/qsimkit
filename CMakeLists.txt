@@ -111,7 +111,7 @@ set(CPACK_COMPONENT_SD_GROUP "Peripherals")
 
 SET(CPACK_NSIS_CREATE_ICONS "
 CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\QSimKit.lnk' '$INSTDIR\\\\bin\\\\qsimkit.exe'
-CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\QSimKit - LCD Example.lnk' '$INSTDIR\\\\bin\\\\qsimkit.exe $INSTDIR\\\\bin\\\\qsimkit\\\\examples\\\\lcd.qsp'
+CreateShortCut '\$SMPROGRAMS\\\\$STARTMENU_FOLDER\\\\QSimKit - LCD Example.lnk' '$INSTDIR\\\\bin\\\\qsimkit.exe' 'bin\\\\qsimkit\\\\examples\\\\lcd.qsp'
 "
 )
 SET(CPACK_NSIS_CREATE_ICONS_EXTRA "CreateShortCut '\$DESKTOP\\\\QSimKit.lnk' '$INSTDIR\\\\bin\\\\qsimkit.exe'")

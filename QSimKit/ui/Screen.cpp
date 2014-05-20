@@ -194,6 +194,7 @@ void Screen::removeObject(ScreenObject *object) {
 	m_conns->objectRemoved(object);
 	m_objects.removeAll(object);
 	delete object;
+    repaint();
 }
 
 void Screen::clear() {

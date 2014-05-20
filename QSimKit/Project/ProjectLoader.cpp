@@ -38,7 +38,7 @@ bool ProjectLoader::load(QDomDocument &doc, QString &error) {
 	QDomElement objects = root.firstChildElement("objects");
 
 	for(QDomNode node = objects.firstChild(); !node.isNull(); node = node.nextSibling()) {
-		
+
 		QDomElement object = node.toElement();
 		QString type = object.attribute("type");
 
