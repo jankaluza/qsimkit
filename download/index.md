@@ -7,11 +7,12 @@ title: Download
 
 Latest version:
 
-* [Version 0.0.3 - Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.3-win32.exe/download)
+* [Version 0.0.4 - Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.4-win32.exe/download)
 * [Changelog](http://qsimkit.org/documentation/changelog.html)
 
 Older versions:
 
+* [Version 0.0.3 - Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.3-win32.exe/download)
 * [Version 0.0.2 - Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.2-win32.exe/download)
 * [Version 0.0.1 - Experimental Windows installer](http://sourceforge.net/projects/qsimkit/files/Experimental%20builds/QSimKit-0.0.1-win32.exe/download)
 
